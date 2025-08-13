@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block meta_description %}DiversIA - Plataforma de inclusión laboral para personas neurodivergentes. Tests gamificados, empleo inclusivo y comunidad.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" role="banner">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Talento que piensa distinto.<br>
+                    <span class="text-primary">Trabajo que encaja.</span>
+                </h1>
+                <p class="lead mb-5">
+                    Conectamos a personas neurodivergentes con empresas que valoran la diversidad cognitiva. 
+                    Encuentra tu lugar en el mundo laboral.
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3">
+                    <a href="{{ url_for('registro') }}" class="btn btn-primary btn-lg" role="button">
+                        <i data-lucide="play-circle" aria-hidden="true"></i>
+                        Haz mi test
+                    </a>
+                    <a href="{{ url_for('empresas') }}" class="btn btn-outline-primary btn-lg" role="button">
+                        <i data-lucide="building" aria-hidden="true"></i>
+                        Soy empresa
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image">
+                    <svg viewBox="0 0 400 300" class="w-100" style="max-width: 400px;" aria-hidden="true">
+                        <rect x="50" y="50" width="300" height="200" rx="20" fill="#44D6C4" opacity="0.1"/>
+                        <circle cx="200" cy="100" r="30" fill="#44D6C4"/>
+                        <rect x="150" y="150" width="100" height="60" rx="10" fill="#A084E8" opacity="0.8"/>
+                        <circle cx="120" cy="180" r="15" fill="#F59E0B"/>
+                        <circle cx="280" cy="180" r="15" fill="#EF4444"/>
+                        <path d="M170 170 L200 150 L230 170" stroke="#1F2937" stroke-width="2" fill="none"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cards Section -->
+<section class="cards-section py-5" aria-labelledby="cards-heading">
+    <div class="container">
+        <h2 id="cards-heading" class="text-center mb-5">Cómo funciona DiversIA</h2>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card feature-card h-100" tabindex="0">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i data-lucide="gamepad-2" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="card-title h5">Tests gamificados</h3>
+                        <p class="card-text">
+                            Evaluaciones neurocognitivas diseñadas como juegos para identificar tus fortalezas únicas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card feature-card h-100" tabindex="0">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i data-lucide="briefcase" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="card-title h5">Empleo inclusivo</h3>
+                        <p class="card-text">
+                            Conectamos tu perfil con empresas que buscan específicamente talento neurodivergente.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card feature-card h-100" tabindex="0">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i data-lucide="users" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="card-title h5">Comunidad</h3>
+                        <p class="card-text">
+                            Únete a una comunidad de apoyo donde compartir experiencias y crecer profesionalmente.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Privacy Section -->
+<section class="privacy-section py-5 bg-light" aria-labelledby="privacy-heading">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="privacy-icon mb-3">
+                    <i data-lucide="shield-check" aria-hidden="true"></i>
+                </div>
+                <h2 id="privacy-heading" class="mb-3">Tus datos, bajo tu control</h2>
+                <p class="lead mb-4">
+                    Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.
+                </p>
+                <a href="#" class="btn btn-outline-primary">
+                    <i data-lucide="file-text" aria-hidden="true"></i>
+                    Leer política de privacidad
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Carousel -->
+<section class="testimonials-section py-5" aria-labelledby="testimonials-heading">
+    <div class="container">
+        <h2 id="testimonials-heading" class="text-center mb-5">Historias de éxito</h2>
+        <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="false" data-bs-interval="false">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="testimonial-card">
+                                <blockquote class="blockquote text-center">
+                                    <p class="mb-4">"Gracias a DiversIA encontré un trabajo que se adapta perfectamente a mi forma de procesar información. Por primera vez siento que mis diferencias son valoradas."</p>
+                                    <footer class="blockquote-footer">
+                                        <cite title="Ana M.">Ana M., Desarrolladora con TDAH</cite>
+                                    </footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="testimonial-card">
+                                <blockquote class="blockquote text-center">
+                                    <p class="mb-4">"Como empresa, DiversIA nos ayudó a encontrar talentos excepcionales que aportan perspectivas únicas a nuestro equipo."</p>
+                                    <footer class="blockquote-footer">
+                                        <cite title="Carlos R.">Carlos R., Director de RRHH</cite>
+                                    </footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="testimonial-card">
+                                <blockquote class="blockquote text-center">
+                                    <p class="mb-4">"La plataforma me permitió entender mejor mis fortalezas y encontrar un entorno laboral donde puedo brillar sin estrés."</p>
+                                    <footer class="blockquote-footer">
+                                        <cite title="María L.">María L., Diseñadora con TEA</cite>
+                                    </footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Carousel Controls -->
+            <div class="carousel-controls text-center mt-4">
+                <button class="btn btn-outline-primary me-2" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev" aria-label="Testimonio anterior">
+                    <i data-lucide="chevron-left" aria-hidden="true"></i>
+                </button>
+                <button class="btn btn-outline-primary" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next" aria-label="Siguiente testimonio">
+                    <i data-lucide="chevron-right" aria-hidden="true"></i>
+                </button>
+            </div>
+            
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators position-static mt-3">
+                <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Ir a testimonio 1"></button>
+                <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="1" aria-label="Ir a testimonio 2"></button>
+                <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="2" aria-label="Ir a testimonio 3"></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h2 class="mb-3">¿Listo para encontrar tu lugar?</h2>
+                <p class="lead mb-4">
+                    Únete a miles de personas neurodivergentes que ya han encontrado trabajo a través de DiversIA.
+                </p>
+                <a href="{{ url_for('registro') }}" class="btn btn-light btn-lg">
+                    Comenzar ahora
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

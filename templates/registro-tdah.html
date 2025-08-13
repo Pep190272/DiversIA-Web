@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Registro TDAH - DiversIA{% endblock %}
+{% block meta_description %}Registro específico para personas con TDAH. Encuentra trabajo adaptado a tus necesidades.{% endblock %}
+
+{% block content %}
+<section class="registration-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <div class="neurodiversity-badge tdah mb-3">
+                        <i data-lucide="zap" aria-hidden="true"></i>
+                        TDAH
+                    </div>
+                    <h1 class="mb-3">Registro TDAH</h1>
+                    <p class="lead">
+                        Este formulario está diseñado específicamente para personas con TDAH, 
+                        con preguntas que nos ayudan a entender mejor tu perfil único.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-body p-4">
+                        <form method="POST" novalidate>
+                            {{ form.hidden_tag() }}
+                            
+                            <!-- Información Personal -->
+                            <div class="form-section mb-5">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="user" aria-hidden="true"></i>
+                                    Información Personal
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.nombre.label(class="form-label required") }}
+                                        {{ form.nombre(class="form-control" + (" is-invalid" if form.nombre.errors else "")) }}
+                                        {% if form.nombre.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.nombre.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.apellidos.label(class="form-label required") }}
+                                        {{ form.apellidos(class="form-control" + (" is-invalid" if form.apellidos.errors else "")) }}
+                                        {% if form.apellidos.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.apellidos.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.email.label(class="form-label required") }}
+                                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.fecha_nacimiento.label(class="form-label required") }}
+                                        {{ form.fecha_nacimiento(class="form-control" + (" is-invalid" if form.fecha_nacimiento.errors else "")) }}
+                                        {% if form.fecha_nacimiento.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.fecha_nacimiento.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.telefono.label(class="form-label") }}
+                                        {{ form.telefono(class="form-control") }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.ciudad.label(class="form-label") }}
+                                        {{ form.ciudad(class="form-control") }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información específica de TDAH -->
+                            <div class="form-section mb-5 tdah-section">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="activity" aria-hidden="true"></i>
+                                    Perfil TDAH
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        {{ form.nivel_atencion.label(class="form-label") }}
+                                        {{ form.nivel_atencion(class="form-select") }}
+                                        <div class="form-text">¿Cómo describirías tu capacidad de mantener la atención en tareas?</div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        {{ form.impulsividad.label(class="form-label") }}
+                                        {{ form.impulsividad(class="form-select") }}
+                                        <div class="form-text">¿Con qué frecuencia actúas sin pensar primero?</div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        {{ form.hiperactividad.label(class="form-label") }}
+                                        {{ form.hiperactividad(class="form-select") }}
+                                        <div class="form-text">¿Necesitas moverte o cambiar de actividad frecuentemente?</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.medicacion_actual(class="form-check-input") }}
+                                        {{ form.medicacion_actual.label(class="form-check-label") }}
+                                    </div>
+                                    <div class="form-text">Esta información es confidencial y opcional.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.estrategias_organizacion.label(class="form-label") }}
+                                    {{ form.estrategias_organizacion(class="form-control", rows="3", placeholder="Ej: listas de tareas, recordatorios, aplicaciones específicas, técnicas de planificación...") }}
+                                    <div class="form-text">Comparte las estrategias que te ayudan a mantenerte organizado.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.diagnostico_formal(class="form-check-input") }}
+                                        {{ form.diagnostico_formal.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información Profesional -->
+                            <div class="form-section mb-5">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="briefcase" aria-hidden="true"></i>
+                                    Experiencia Profesional
+                                </h3>
+                                
+                                <div class="mb-3">
+                                    {{ form.experiencia_laboral.label(class="form-label") }}
+                                    {{ form.experiencia_laboral(class="form-control", rows="4") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.formacion_academica.label(class="form-label") }}
+                                    {{ form.formacion_academica(class="form-control", rows="3") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.habilidades.label(class="form-label") }}
+                                    {{ form.habilidades(class="form-control", rows="3", placeholder="Ej: creatividad, pensamiento fuera de la caja, capacidad multitarea, energía alta...") }}
+                                    <div class="form-text">Las personas con TDAH often tienen fortalezas únicas como creatividad y energía.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.intereses_laborales.label(class="form-label") }}
+                                    {{ form.intereses_laborales(class="form-control", rows="3") }}
+                                </div>
+                            </div>
+
+                            <!-- Adaptaciones específicas para TDAH -->
+                            <div class="form-section mb-5">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="settings" aria-hidden="true"></i>
+                                    Adaptaciones para TDAH
+                                </h3>
+                                
+                                <div class="mb-3">
+                                    {{ form.adaptaciones_necesarias.label(class="form-label") }}
+                                    {{ form.adaptaciones_necesarias(class="form-control", rows="4", placeholder="Ej: descansos frecuentes, ambiente sin distracciones, horarios flexibles, tareas variadas...") }}
+                                    <div class="form-text">
+                                        Especifica las adaptaciones que te ayudan a rendir mejor en el trabajo.
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info" role="alert">
+                                    <div class="d-flex">
+                                        <i data-lucide="lightbulb" class="me-2" aria-hidden="true"></i>
+                                        <div>
+                                            <strong>¿Sabías que?</strong><br>
+                                            Muchas empresas valoran las fortalezas del TDAH como la creatividad, 
+                                            la capacidad de pensar fuera de la caja y la energía para abordar nuevos desafíos.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-between">
+                                <a href="{{ url_for('personas_nd') }}" class="btn btn-outline-secondary">
+                                    <i data-lucide="arrow-left" aria-hidden="true"></i>
+                                    Volver
+                                </a>
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    <i data-lucide="check" aria-hidden="true"></i>
+                                    Completar Registro TDAH
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

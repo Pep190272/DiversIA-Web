@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Registro General - DiversIA{% endblock %}
+{% block meta_description %}Regístrate en DiversIA y encuentra trabajo adaptado a tu forma única de pensar.{% endblock %}
+
+{% block content %}
+<section class="registration-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <h1 class="mb-3">Registro General</h1>
+                    <p class="lead">
+                        Completa tu perfil para conectar con oportunidades laborales que se adapten a tu forma única de pensar.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-body p-4">
+                        <form method="POST" novalidate autocomplete="on">
+                            {{ form.hidden_tag() }}
+                            
+                            <!-- Información Personal -->
+                            <div class="form-section mb-5">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="user" aria-hidden="true"></i>
+                                    Información Personal
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.nombre.label(class="form-label required") }}
+                                        {{ form.nombre(class="form-control" + (" is-invalid" if form.nombre.errors else ""), autocomplete="given-name") }}
+                                        {% if form.nombre.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.nombre.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.apellidos.label(class="form-label required") }}
+                                        {{ form.apellidos(class="form-control" + (" is-invalid" if form.apellidos.errors else ""), autocomplete="family-name") }}
+                                        {% if form.apellidos.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.apellidos.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.email.label(class="form-label required") }}
+                                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), autocomplete="email") }}
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.fecha_nacimiento.label(class="form-label required") }}
+                                        {{ form.fecha_nacimiento(class="form-control" + (" is-invalid" if form.fecha_nacimiento.errors else ""), autocomplete="bday") }}
+                                        {% if form.fecha_nacimiento.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.fecha_nacimiento.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.telefono.label(class="form-label") }}
+                                        {{ form.telefono(class="form-control", autocomplete="tel") }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.ciudad.label(class="form-label") }}
+                                        {{ form.ciudad(class="form-control", autocomplete="address-level2") }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información sobre Neurodivergencia -->
+                            <div class="form-section mb-5">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="brain" aria-hidden="true"></i>
+                                    Información sobre Neurodivergencia
+                                </h3>
+                                
+                                <div class="mb-3">
+                                    {{ form.tipo_neurodivergencia.label(class="form-label required") }}
+                                    {{ form.tipo_neurodivergencia(class="form-select" + (" is-invalid" if form.tipo_neurodivergencia.errors else "")) }}
+                                    {% if form.tipo_neurodivergencia.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.tipo_neurodivergencia.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Si no estás seguro, puedes seleccionar "Otro" y proporcionar más detalles.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.diagnostico_formal(class="form-check-input") }}
+                                        {{ form.diagnostico_formal.label(class="form-check-label") }}
+                                    </div>
+                                    <div class="form-text">
+                                        No es obligatorio tener un diagnóstico formal para usar DiversIA.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información Profesional -->
+                            <div class="form-section mb-5">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="briefcase" aria-hidden="true"></i>
+                                    Información Profesional
+                                </h3>
+                                
+                                <div class="mb-3">
+                                    {{ form.experiencia_laboral.label(class="form-label") }}
+                                    {{ form.experiencia_laboral(class="form-control", rows="4", placeholder="Describe tu experiencia laboral anterior, incluyendo puestos, responsabilidades y logros...") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.formacion_academica.label(class="form-label") }}
+                                    {{ form.formacion_academica(class="form-control", rows="3", placeholder="Incluye títulos, certificaciones, cursos relevantes...") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.habilidades.label(class="form-label") }}
+                                    {{ form.habilidades(class="form-control", rows="3", placeholder="Menciona tanto habilidades técnicas como fortalezas personales...") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.intereses_laborales.label(class="form-label") }}
+                                    {{ form.intereses_laborales(class="form-control", rows="3", placeholder="¿Qué tipo de trabajo te interesa? ¿En qué sectores te gustaría desarrollarte?") }}
+                                </div>
+                            </div>
+
+                            <!-- Adaptaciones -->
+                            <div class="form-section mb-5">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="settings" aria-hidden="true"></i>
+                                    Adaptaciones y Necesidades
+                                </h3>
+                                
+                                <div class="mb-3">
+                                    {{ form.adaptaciones_necesarias.label(class="form-label") }}
+                                    {{ form.adaptaciones_necesarias(class="form-control", rows="4", placeholder="Describe las adaptaciones que necesitas en el trabajo (horarios flexibles, ambiente tranquilo, herramientas específicas, etc.)") }}
+                                    <div class="form-text">
+                                        Esta información nos ayuda a encontrar empresas que puedan proporcionar el entorno adecuado para ti.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Auto-save notice -->
+                            <div class="alert alert-info mb-4" role="alert">
+                                <div class="d-flex">
+                                    <i data-lucide="save" class="me-2" aria-hidden="true"></i>
+                                    <div>
+                                        <strong>Auto-guardado activado</strong><br>
+                                        Tu progreso se guarda automáticamente cada 30 segundos.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-between">
+                                <a href="{{ url_for('personas_nd') }}" class="btn btn-outline-secondary">
+                                    <i data-lucide="arrow-left" aria-hidden="true"></i>
+                                    Volver
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i data-lucide="check" aria-hidden="true"></i>
+                                    Completar Registro
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-save functionality
+let formData = {};
+let autoSaveInterval;
+
+function autoSave() {
+    const form = document.querySelector('form');
+    const currentData = new FormData(form);
+    
+    // Check if data has changed
+    let hasChanged = false;
+    for (let [key, value] of currentData.entries()) {
+        if (formData[key] !== value) {
+            hasChanged = true;
+            formData[key] = value;
+        }
+    }
+    
+    if (hasChanged) {
+        console.log('Auto-saving form data...');
+        // In a real application, this would send data to the server
+        localStorage.setItem('diversia_form_backup', JSON.stringify(formData));
+    }
+}
+
+// Start auto-save when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Load saved data if available
+    const savedData = localStorage.getItem('diversia_form_backup');
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            for (let [key, value] of Object.entries(data)) {
+                const field = document.querySelector(`[name="${key}"]`);
+                if (field && field.type !== 'hidden') {
+                    field.value = value;
+                }
+            }
+        } catch (e) {
+            console.error('Error loading saved data:', e);
+        }
+    }
+    
+    // Set up auto-save
+    autoSaveInterval = setInterval(autoSave, 30000); // Every 30 seconds
+});
+
+// Clear saved data on successful submit
+document.querySelector('form').addEventListener('submit', function() {
+    localStorage.removeItem('diversia_form_backup');
+    clearInterval(autoSaveInterval);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Registro Dislexia - DiversIA{% endblock %}
+{% block meta_description %}Registro específico para personas con dislexia. Encuentra trabajo adaptado a tus fortalezas.{% endblock %}
+
+{% block content %}
+<section class="registration-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <div class="neurodiversity-badge dislexia mb-3">
+                        <i data-lucide="book-open" aria-hidden="true"></i>
+                        Dislexia
+                    </div>
+                    <h1 class="mb-3">Registro Dislexia</h1>
+                    <p class="lead">
+                        Formulario adaptado para personas con dislexia, diseñado para ser 
+                        fácil de leer y completar.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-body p-4">
+                        <form method="POST" novalidate>
+                            {{ form.hidden_tag() }}
+                            
+                            <!-- Información Personal -->
+                            <div class="form-section mb-5">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="user" aria-hidden="true"></i>
+                                    Información Personal
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.nombre.label(class="form-label required") }}
+                                        {{ form.nombre(class="form-control" + (" is-invalid" if form.nombre.errors else "")) }}
+                                        {% if form.nombre.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.nombre.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.apellidos.label(class="form-label required") }}
+                                        {{ form.apellidos(class="form-control" + (" is-invalid" if form.apellidos.errors else "")) }}
+                                        {% if form.apellidos.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.apellidos.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.email.label(class="form-label required") }}
+                                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.fecha_nacimiento.label(class="form-label required") }}
+                                        {{ form.fecha_nacimiento(class="form-control" + (" is-invalid" if form.fecha_nacimiento.errors else "")) }}
+                                        {% if form.fecha_nacimiento.errors %}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.fecha_nacimiento.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.telefono.label(class="form-label") }}
+                                        {{ form.telefono(class="form-control") }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.ciudad.label(class="form-label") }}
+                                        {{ form.ciudad(class="form-control") }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información específica de Dislexia -->
+                            <div class="form-section mb-5 dislexia-section">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="type" aria-hidden="true"></i>
+                                    Perfil Dislexia
+                                </h3>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Dificultades de lectura que experimentas</label>
+                                    <div class="form-text mb-3">Selecciona todas las que apliquen a tu caso:</div>
+                                    {% for subfield in form.dificultades_lectura %}
+                                        <div class="form-check">
+                                            {{ subfield(class="form-check-input") }}
+                                            {{ subfield.label(class="form-check-label") }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Herramientas de apoyo que utilizas</label>
+                                    <div class="form-text mb-3">Marca las herramientas que te ayudan:</div>
+                                    {% for subfield in form.herramientas_apoyo %}
+                                        <div class="form-check">
+                                            {{ subfield(class="form-check-input") }}
+                                            {{ subfield.label(class="form-check-label") }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.diagnostico_formal(class="form-check-input") }}
+                                        {{ form.diagnostico_formal.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información Profesional -->
+                            <div class="form-section mb-5">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="briefcase" aria-hidden="true"></i>
+                                    Experiencia Profesional
+                                </h3>
+                                
+                                <div class="mb-3">
+                                    {{ form.experiencia_laboral.label(class="form-label") }}
+                                    {{ form.experiencia_laboral(class="form-control", rows="4") }}
+                                    <div class="form-text">Puedes usar el botón de audio para escuchar lo que escribes.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.formacion_academica.label(class="form-label") }}
+                                    {{ form.formacion_academica(class="form-control", rows="3") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.habilidades.label(class="form-label") }}
+                                    {{ form.habilidades(class="form-control", rows="3", placeholder="Ej: pensamiento visual, creatividad, resolución de problemas, habilidades espaciales...") }}
+                                    <div class="form-text">Las personas con dislexia often tienen fortalezas en pensamiento visual y creatividad.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.intereses_laborales.label(class="form-label") }}
+                                    {{ form.intereses_laborales(class="form-control", rows="3") }}
+                                </div>
+                            </div>
+
+                            <!-- Adaptaciones específicas -->
+                            <div class="form-section mb-5">
+                                <h3 class="form-section-title">
+                                    <i data-lucide="settings" aria-hidden="true"></i>
+                                    Adaptaciones para Dislexia
+                                </h3>
+                                
+                                <div class="mb-3">
+                                    {{ form.adaptaciones_necesarias.label(class="form-label") }}
+                                    {{ form.adaptaciones_necesarias(class="form-control", rows="4", placeholder="Ej: software de texto a voz, tiempo extra para lectura, instrucciones verbales, formatos alternativos...") }}
+                                    <div class="form-text">
+                                        Describe las adaptaciones que necesitas para trabajar de forma eficiente.
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info" role="alert">
+                                    <div class="d-flex">
+                                        <i data-lucide="eye" class="me-2" aria-hidden="true"></i>
+                                        <div>
+                                            <strong>Fortalezas de la dislexia:</strong><br>
+                                            Muchas personas con dislexia destacan en pensamiento visual, 
+                                            creatividad, resolución de problemas y habilidades espaciales.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-between">
+                                <a href="{{ url_for('personas_nd') }}" class="btn btn-outline-secondary">
+                                    <i data-lucide="arrow-left" aria-hidden="true"></i>
+                                    Volver
+                                </a>
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i data-lucide="check" aria-hidden="true"></i>
+                                    Completar Registro Dislexia
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Text-to-speech functionality for dislexia users
+function addTextToSpeechButtons() {
+    const textareas = document.querySelectorAll('textarea');
+    
+    textareas.forEach(textarea => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'position-relative';
+        textarea.parentNode.insertBefore(wrapper, textarea);
+        wrapper.appendChild(textarea);
+        
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-sm btn-outline-primary position-absolute';
+        button.style.cssText = 'top: 5px; right: 5px; z-index: 10;';
+        button.innerHTML = '<i data-lucide="volume-2" aria-hidden="true"></i>';
+        button.setAttribute('aria-label', 'Leer texto en voz alta');
+        
+        button.addEventListener('click', function() {
+            const text = textarea.value;
+            if (text && 'speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                speechSynthesis.speak(utterance);
+            }
+        });
+        
+        wrapper.appendChild(button);
+    });
+    
+    // Re-initialize icons after adding buttons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', addTextToSpeechButtons);
+</script>
+{% endblock %}
