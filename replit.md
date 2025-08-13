@@ -55,13 +55,46 @@ Preferred communication style: Simple, everyday language.
 - **Flask-WTF**: Form handling and CSRF protection
 - **WTForms**: Form validation and rendering library
 - **Werkzeug**: WSGI utilities including ProxyFix for deployment
+- **SendGrid**: Email service for automated notifications and form submissions
 
 ### Database
-- **SQLite**: Default development database (configurable via DATABASE_URL environment variable)
-- **PostgreSQL Ready**: Architecture supports PostgreSQL for production deployment
+- **PostgreSQL**: Production database with environment variables configuration
+- **SQLAlchemy ORM**: Full relational database support with migration capabilities
+
+### Communication & CRM Integration
+- **SendGrid API**: Automated email notifications to diversiaeternals@gmail.com
+- **CRM Export Module**: CSV and JSON export capabilities for HubSpot, Salesforce integration
+- **Social Media Integration**: Direct links to Discord, Instagram, LinkedIn, and email contact
 
 ### Security & Deployment
 - **Environment Configuration**: Secure configuration via environment variables
 - **Security Headers**: Comprehensive security header implementation
 - **Session Management**: Secure session handling with configurable secret keys
 - **WSGI Deployment**: Production-ready with ProxyFix middleware
+
+## Recent Updates (2025-01-13)
+
+### Social Media & Communication
+- ✓ Added direct links to DiversIA social media accounts (Discord, Instagram, LinkedIn)
+- ✓ Integrated email contact (diversiaeternals@gmail.com) in footer
+- ✓ All social links open in new tabs with proper security attributes
+
+### Email Integration
+- ✓ Automated email notifications for all form submissions
+- ✓ SendGrid integration with HTML-formatted emails
+- ✓ Separate email templates for user registrations and company registrations
+- ✓ All form data automatically sent to diversiaeternals@gmail.com
+
+### Associations Section
+- ✓ Created new "Asociaciones" page with directory of neurodivergent-related organizations
+- ✓ Filterable directory by neurodivergence type, location, and services
+- ✓ Sample associations for TDAH, TEA, Dislexia, and general support
+- ✓ Contact information and direct links to association websites
+- ✓ Call-to-action for new associations to join the directory
+
+### CRM Integration Capabilities
+- ✓ Enhanced database models with CRM export tracking
+- ✓ CSV and JSON export functionality for external CRM systems
+- ✓ Export audit logging with timestamps and status tracking
+- ✓ Ready-to-use formatters for HubSpot and Salesforce integration
+- ✓ Automated marking of exported records to prevent duplicates

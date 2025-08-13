@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Asociaciones Neurodivergentes - DiversIA{% endblock %}
+
+{% block meta_description %}Red de asociaciones y organizaciones que apoyan a personas neurodivergentes. Conecta con recursos, apoyo y comunidad en tu área.{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 mb-4">
+                    <span class="gradient-text">Red de Asociaciones</span><br>
+                    Neurodivergentes
+                </h1>
+                <p class="lead mb-4">Conecta con organizaciones y asociaciones que ofrecen apoyo, recursos y comunidad para personas neurodivergentes y sus familias.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Filtros de búsqueda -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Buscar Asociaciones</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <select class="form-select" id="tipo-neurodivergencia">
+                                <option value="">Todas las condiciones</option>
+                                <option value="tdah">TDAH</option>
+                                <option value="tea">TEA</option>
+                                <option value="dislexia">Dislexia</option>
+                                <option value="general">General</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="ubicacion">
+                                <option value="">Todas las ubicaciones</option>
+                                <option value="madrid">Madrid</option>
+                                <option value="barcelona">Barcelona</option>
+                                <option value="valencia">Valencia</option>
+                                <option value="sevilla">Sevilla</option>
+                                <option value="bilbao">Bilbao</option>
+                                <option value="nacional">Nacional</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="servicios">
+                                <option value="">Todos los servicios</option>
+                                <option value="apoyo-familiar">Apoyo familiar</option>
+                                <option value="terapia">Terapia</option>
+                                <option value="educacion">Educación</option>
+                                <option value="laboral">Inserción laboral</option>
+                                <option value="legal">Asesoría legal</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Directorio de Asociaciones -->
+    <div class="row" id="asociaciones-grid">
+        <!-- Asociación TDAH -->
+        <div class="col-lg-6 mb-4 asociacion-card" data-tipo="tdah" data-ubicacion="madrid" data-servicios="apoyo-familiar,terapia">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="condition-badge tdah me-3">
+                            <i data-lucide="zap" class="condition-icon"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="card-title mb-1">Fundación CADAH</h5>
+                            <p class="text-muted small mb-2">Madrid · TDAH</p>
+                        </div>
+                    </div>
+                    <p class="card-text mb-3">Cantabria de Ayuda al Déficit de Atención e Hiperactividad. Apoyo integral a familias y personas con TDAH.</p>
+                    <div class="mb-3">
+                        <small class="text-muted">Servicios:</small>
+                        <div class="d-flex flex-wrap gap-1 mt-1">
+                            <span class="badge bg-light text-dark">Apoyo familiar</span>
+                            <span class="badge bg-light text-dark">Terapia</span>
+                            <span class="badge bg-light text-dark">Formación</span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="https://www.fundacioncadah.org" target="_blank" class="btn btn-sm btn-outline-primary" rel="noopener noreferrer">
+                            <i data-lucide="external-link" class="me-1"></i>Web
+                        </a>
+                        <a href="tel:+34942321843" class="btn btn-sm btn-outline-secondary">
+                            <i data-lucide="phone" class="me-1"></i>Llamar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asociación TEA -->
+        <div class="col-lg-6 mb-4 asociacion-card" data-tipo="tea" data-ubicacion="barcelona" data-servicios="apoyo-familiar,educacion">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="condition-badge tea me-3">
+                            <i data-lucide="puzzle" class="condition-icon"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="card-title mb-1">Autisme Catalunya</h5>
+                            <p class="text-muted small mb-2">Barcelona · TEA</p>
+                        </div>
+                    </div>
+                    <p class="card-text mb-3">Federación catalana de asociaciones que trabajan en el ámbito del autismo y otros trastornos generalizados del desarrollo.</p>
+                    <div class="mb-3">
+                        <small class="text-muted">Servicios:</small>
+                        <div class="d-flex flex-wrap gap-1 mt-1">
+                            <span class="badge bg-light text-dark">Apoyo familiar</span>
+                            <span class="badge bg-light text-dark">Educación</span>
+                            <span class="badge bg-light text-dark">Investigación</span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="http://www.autisme.com" target="_blank" class="btn btn-sm btn-outline-primary" rel="noopener noreferrer">
+                            <i data-lucide="external-link" class="me-1"></i>Web
+                        </a>
+                        <a href="mailto:info@autisme.com" class="btn btn-sm btn-outline-secondary">
+                            <i data-lucide="mail" class="me-1"></i>Email
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asociación Dislexia -->
+        <div class="col-lg-6 mb-4 asociacion-card" data-tipo="dislexia" data-ubicacion="valencia" data-servicios="educacion,apoyo-familiar">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="condition-badge dislexia me-3">
+                            <i data-lucide="book-open" class="condition-icon"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="card-title mb-1">AVADIS</h5>
+                            <p class="text-muted small mb-2">Valencia · Dislexia</p>
+                        </div>
+                    </div>
+                    <p class="card-text mb-3">Asociación Valenciana de Dislexia. Apoyo a familias y personas con dislexia y otras dificultades específicas de aprendizaje.</p>
+                    <div class="mb-3">
+                        <small class="text-muted">Servicios:</small>
+                        <div class="d-flex flex-wrap gap-1 mt-1">
+                            <span class="badge bg-light text-dark">Educación</span>
+                            <span class="badge bg-light text-dark">Apoyo familiar</span>
+                            <span class="badge bg-light text-dark">Talleres</span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="http://www.avadis.org" target="_blank" class="btn btn-sm btn-outline-primary" rel="noopener noreferrer">
+                            <i data-lucide="external-link" class="me-1"></i>Web
+                        </a>
+                        <a href="mailto:info@avadis.org" class="btn btn-sm btn-outline-secondary">
+                            <i data-lucide="mail" class="me-1"></i>Email
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asociación General -->
+        <div class="col-lg-6 mb-4 asociacion-card" data-tipo="general" data-ubicacion="nacional" data-servicios="legal,laboral">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="condition-badge general me-3">
+                            <i data-lucide="heart" class="condition-icon"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="card-title mb-1">FEAPS</h5>
+                            <p class="text-muted small mb-2">Nacional · General</p>
+                        </div>
+                    </div>
+                    <p class="card-text mb-3">Confederación española de organizaciones en favor de las personas con discapacidad intelectual o del desarrollo.</p>
+                    <div class="mb-3">
+                        <small class="text-muted">Servicios:</small>
+                        <div class="d-flex flex-wrap gap-1 mt-1">
+                            <span class="badge bg-light text-dark">Asesoría legal</span>
+                            <span class="badge bg-light text-dark">Inserción laboral</span>
+                            <span class="badge bg-light text-dark">Advocacy</span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="https://www.plenainclusion.org" target="_blank" class="btn btn-sm btn-outline-primary" rel="noopener noreferrer">
+                            <i data-lucide="external-link" class="me-1"></i>Web
+                        </a>
+                        <a href="tel:+34917034816" class="btn btn-sm btn-outline-secondary">
+                            <i data-lucide="phone" class="me-1"></i>Llamar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Llamada a la acción -->
+    <div class="row mt-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body py-5">
+                    <h3 class="mb-3">¿Tu asociación no está aquí?</h3>
+                    <p class="text-muted mb-4">Si representas una asociación que apoya a personas neurodivergentes, nos encantaría incluirte en nuestro directorio.</p>
+                    <a href="mailto:diversiaeternals@gmail.com?subject=Solicitud de inclusión - Asociación" class="btn btn-primary btn-lg">
+                        <i data-lucide="plus-circle" class="me-2"></i>
+                        Agregar mi Asociación
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Función de filtrado
+    function filterAsociaciones() {
+        const tipoFilter = document.getElementById('tipo-neurodivergencia').value;
+        const ubicacionFilter = document.getElementById('ubicacion').value;
+        const serviciosFilter = document.getElementById('servicios').value;
+        
+        const cards = document.querySelectorAll('.asociacion-card');
+        
+        cards.forEach(card => {
+            const tipo = card.dataset.tipo;
+            const ubicacion = card.dataset.ubicacion;
+            const servicios = card.dataset.servicios.split(',');
+            
+            let show = true;
+            
+            if (tipoFilter && tipo !== tipoFilter) show = false;
+            if (ubicacionFilter && ubicacion !== ubicacionFilter) show = false;
+            if (serviciosFilter && !servicios.includes(serviciosFilter)) show = false;
+            
+            card.style.display = show ? 'block' : 'none';
+        });
+    }
+    
+    // Event listeners para los filtros
+    document.getElementById('tipo-neurodivergencia').addEventListener('change', filterAsociaciones);
+    document.getElementById('ubicacion').addEventListener('change', filterAsociaciones);
+    document.getElementById('servicios').addEventListener('change', filterAsociaciones);
+    
+    // Inicializar iconos Lucide
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
+{% endblock %}

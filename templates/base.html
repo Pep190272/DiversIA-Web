@@ -84,6 +84,10 @@
                         <a class="nav-link" href="{{ url_for('comunidad') }}"
                            {% if request.endpoint == 'comunidad' %}aria-current="page"{% endif %}>Comunidad</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('asociaciones') }}"
+                           {% if request.endpoint == 'asociaciones' %}aria-current="page"{% endif %}>Asociaciones</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -127,14 +131,17 @@
                 <div class="col-lg-4">
                     <h6>Síguenos</h6>
                     <div class="d-flex gap-3">
-                        <a href="#" class="text-muted" aria-label="LinkedIn">
+                        <a href="https://www.linkedin.com/company/mydiversia" target="_blank" class="text-muted" aria-label="LinkedIn" rel="noopener noreferrer">
                             <i data-lucide="linkedin" aria-hidden="true"></i>
                         </a>
-                        <a href="#" class="text-muted" aria-label="Discord">
+                        <a href="https://discord.gg/qTcNDZ7V" target="_blank" class="text-muted" aria-label="Discord" rel="noopener noreferrer">
                             <i data-lucide="message-circle" aria-hidden="true"></i>
                         </a>
-                        <a href="#" class="text-muted" aria-label="Instagram">
+                        <a href="https://www.instagram.com/diversiaeternals/" target="_blank" class="text-muted" aria-label="Instagram" rel="noopener noreferrer">
                             <i data-lucide="instagram" aria-hidden="true"></i>
+                        </a>
+                        <a href="mailto:diversiaeternals@gmail.com" class="text-muted" aria-label="Email">
+                            <i data-lucide="mail" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>

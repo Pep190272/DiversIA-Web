@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, jsonify
 from app import app, db
 from models import User, Company, JobOffer, TestResult
 from forms import RegistroGeneralForm, RegistroTDAHForm, RegistroDislexiaForm, RegistroTEAForm, EmpresaRegistroForm, OfertaEmpleoForm
+from sendgrid_helper import send_registration_notification, send_company_registration_notification
 
 @app.route('/')
 def index():
@@ -20,6 +21,10 @@ def empresas():
 @app.route('/comunidad')
 def comunidad():
     return render_template('comunidad.html')
+
+@app.route('/asociaciones')
+def asociaciones():
+    return render_template('asociaciones.html')
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
@@ -42,6 +47,25 @@ def registro():
         )
         db.session.add(user)
         db.session.commit()
+        
+        # Enviar email de notificación
+        user_data = {
+            'nombre': form.nombre.data,
+            'apellidos': form.apellidos.data,
+            'email': form.email.data,
+            'telefono': form.telefono.data,
+            'ciudad': form.ciudad.data,
+            'fecha_nacimiento': form.fecha_nacimiento.data,
+            'tipo_neurodivergencia': form.tipo_neurodivergencia.data,
+            'diagnostico_formal': form.diagnostico_formal.data,
+            'experiencia_laboral': form.experiencia_laboral.data,
+            'formacion_academica': form.formacion_academica.data,
+            'habilidades': form.habilidades.data,
+            'intereses_laborales': form.intereses_laborales.data,
+            'adaptaciones_necesarias': form.adaptaciones_necesarias.data
+        }
+        send_registration_notification(user_data, "Registro General")
+        
         flash('¡Registro completado exitosamente!', 'success')
         return redirect(url_for('index'))
     return render_template('registro.html', form=form)
@@ -67,6 +91,25 @@ def registro_tdah():
         )
         db.session.add(user)
         db.session.commit()
+        
+        # Enviar email de notificación
+        user_data = {
+            'nombre': form.nombre.data,
+            'apellidos': form.apellidos.data,
+            'email': form.email.data,
+            'telefono': form.telefono.data,
+            'ciudad': form.ciudad.data,
+            'fecha_nacimiento': form.fecha_nacimiento.data,
+            'tipo_neurodivergencia': 'TDAH',
+            'diagnostico_formal': form.diagnostico_formal.data,
+            'experiencia_laboral': form.experiencia_laboral.data,
+            'formacion_academica': form.formacion_academica.data,
+            'habilidades': form.habilidades.data,
+            'intereses_laborales': form.intereses_laborales.data,
+            'adaptaciones_necesarias': form.adaptaciones_necesarias.data
+        }
+        send_registration_notification(user_data, "Registro TDAH")
+        
         flash('¡Registro de TDAH completado exitosamente!', 'success')
         return redirect(url_for('index'))
     return render_template('registro-tdah.html', form=form)
@@ -92,6 +135,25 @@ def registro_dislexia():
         )
         db.session.add(user)
         db.session.commit()
+        
+        # Enviar email de notificación
+        user_data = {
+            'nombre': form.nombre.data,
+            'apellidos': form.apellidos.data,
+            'email': form.email.data,
+            'telefono': form.telefono.data,
+            'ciudad': form.ciudad.data,
+            'fecha_nacimiento': form.fecha_nacimiento.data,
+            'tipo_neurodivergencia': 'Dislexia',
+            'diagnostico_formal': form.diagnostico_formal.data,
+            'experiencia_laboral': form.experiencia_laboral.data,
+            'formacion_academica': form.formacion_academica.data,
+            'habilidades': form.habilidades.data,
+            'intereses_laborales': form.intereses_laborales.data,
+            'adaptaciones_necesarias': form.adaptaciones_necesarias.data
+        }
+        send_registration_notification(user_data, "Registro Dislexia")
+        
         flash('¡Registro de Dislexia completado exitosamente!', 'success')
         return redirect(url_for('index'))
     return render_template('registro-dislexia.html', form=form)
@@ -117,6 +179,25 @@ def registro_tea():
         )
         db.session.add(user)
         db.session.commit()
+        
+        # Enviar email de notificación
+        user_data = {
+            'nombre': form.nombre.data,
+            'apellidos': form.apellidos.data,
+            'email': form.email.data,
+            'telefono': form.telefono.data,
+            'ciudad': form.ciudad.data,
+            'fecha_nacimiento': form.fecha_nacimiento.data,
+            'tipo_neurodivergencia': 'TEA (Trastorno del Espectro Autista)',
+            'diagnostico_formal': form.diagnostico_formal.data,
+            'experiencia_laboral': form.experiencia_laboral.data,
+            'formacion_academica': form.formacion_academica.data,
+            'habilidades': form.habilidades.data,
+            'intereses_laborales': form.intereses_laborales.data,
+            'adaptaciones_necesarias': form.adaptaciones_necesarias.data
+        }
+        send_registration_notification(user_data, "Registro TEA")
+        
         flash('¡Registro de TEA completado exitosamente!', 'success')
         return redirect(url_for('index'))
     return render_template('registro-tea.html', form=form)
@@ -135,6 +216,23 @@ def empresa_registro():
         )
         db.session.add(company)
         db.session.commit()
+        
+        # Enviar email de notificación
+        company_data = {
+            'nombre': form.nombre_empresa.data,
+            'contacto_email': form.email_contacto.data,
+            'contacto_telefono': form.telefono.data,
+            'sector': form.sector.data,
+            'tamaño': form.tamano_empresa.data,
+            'ubicacion': form.ciudad.data,
+            'sitio_web': 'N/A',
+            'contacto_nombre': 'N/A',
+            'experiencia_neurodivergentes': False,
+            'politicas_inclusion': 'N/A',
+            'adaptaciones_disponibles': 'N/A'
+        }
+        send_company_registration_notification(company_data)
+        
         flash('¡Empresa registrada exitosamente!', 'success')
     return redirect(url_for('empresas'))
 
