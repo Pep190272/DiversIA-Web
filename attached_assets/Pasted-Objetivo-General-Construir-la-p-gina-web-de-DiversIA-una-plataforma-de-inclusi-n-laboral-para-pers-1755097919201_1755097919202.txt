@@ -1,0 +1,88 @@
+Objetivo General:
+Construir la página web de DiversIA, una plataforma de inclusión laboral para personas neurodivergentes, siguiendo la estructura, los principios de UX/UI y el stack tecnológico (Next.js, React, Tailwind CSS, shadcn/ui) especificados en la documentación proporcionada. La web debe ser minimalista, accesible, segura y optimizada para SEO.
+
+Paleta de Colores y Diseño:
+
+Colores Primarios: Utilizar una paleta cálida y calmada.
+
+Principal: Cian suave (#44D6C4) - Para CTAs y elementos interactivos.
+
+Secundario: Púrpura suave (#A084E8) - Para elementos de fondo y acentos.
+
+Fondo: Gris claro / Blanco roto (#F9FAFB) - Fondo principal.
+
+Texto: Gris oscuro (#1F2937) - Para textos principales.
+
+Colores de Neurodivergencias: Implementar el sistema de color-código del documento estructura de la web DiversIA.docx para las secciones de cada neurodivergencia (ej. TDAH = naranja; TEA = azul).
+
+Tipografía: Utilizar Atkinson Hyperlegible o Inter para garantizar la máxima legibilidad.
+
+Tokens de Diseño: Implementar spacing generoso, radios grandes en los bordes y sombras suaves para reducir la carga cognitiva.
+
+Estructura y Contenido (basado en la documentación):
+
+Página de Inicio (/)
+
+Hero Section: Título "Talento que piensa distinto. Trabajo que encaja.", con dos CTAs "Haz mi test" y "Soy empresa".
+
+Sección de Tarjetas: Tres tarjetas con títulos "Tests gamificados", "Empleo inclusivo" y "Comunidad".
+
+Sección de Privacidad: Módulo sobre "Tus datos, bajo tu control", con enlace a la política de privacidad (GDPR).
+
+Carrusel de Testimonios: Un carrusel de testimonios con navegación manual, sin auto-scroll.
+
+Footer: Incluir enlaces a redes sociales (LinkedIn, Discord, Instagram), aviso legal y política de privacidad.
+
+Página de Persona Neurodivergente (/personas-nd)
+
+Formularios de Registro: Implementar un formulario de registro general (Formulario_Registro_Perfil_DiversIA_Calcado.docx) y formularios específicos para TDAH (Formulario_TDAH_DiversIA (1).docx), Dislexia, TEA, etc. Los formularios deben tener auto-guardado y un diseño accesible.
+
+Sección de Tests: Descripción del proceso de evaluación neurocognitiva gamificada.
+
+Sección de Recursos: Un espacio con guías y recursos.
+
+Página de Empresas (/empresas)
+
+Formulario de Alta de Oferta: Crear el formulario para empresas (Formulario_Alta_Oferta_DiversIA.docx) con campos para el puesto, entorno laboral, requisitos y adaptaciones.
+
+Página de Comunidad (/comunidad)
+
+Integrar un widget de Discord y un enlace a un calendario de eventos.
+
+Principios de UX/UI para ND (a implementar en toda la web):
+
+Carga Cognitiva Baja: Utilizar bloques cortos de texto, mucho espacio en blanco.
+
+Controles de Accesibilidad: Implementar en el encabezado (header) controles para:
+
+Cambiar el tamaño del texto.
+
+Activar el modo oscuro y alto contraste.
+
+Desactivar animaciones.
+
+Activar un lector de texto (TTS) para cada bloque.
+
+Navegación: Asegurar una navegación teclado-first completa (navegación con Tab impecable, foco visible). Utilizar etiquetas ARIA para todos los elementos interactivos.
+
+Lenguaje: Utilizar un lenguaje claro, frases cortas y evitar la jerga técnica.
+
+Iconografía: Usar íconos de la librería Lucide o SVGs en línea, siempre con una etiqueta textual para la accesibilidad.
+
+Validación de Formularios: Mensajes de error claros y amables, no solo con color.
+
+Seguridad y SEO:
+
+Seguridad: Implementar headers de seguridad básicos (CSP, X-XSS-Protection, etc.) y protección contra XSS y CSRF. Utilizar un proveedor de autenticación como Magic Link (passwordless) para reducir la fricción y aumentar la seguridad.
+
+SEO: Optimizar la estructura del código con etiquetas semánticas (<header>, <main>, <footer>, <article>, etc.). Implementar metadatos para cada página (título, descripción, etc.). Utilizar URLs amigables. Investigar y aplicar las palabras clave relevantes para la inclusión laboral y la neurodivergencia.
+
+Arquitectura Técnica:
+
+Framework: Next.js (React).
+
+Estilos: Tailwind CSS y shadcn/ui.
+
+Base de Datos: Configurar la conexión a Supabase para gestionar los datos de usuarios, ofertas y resultados de tests. (El prompt de la app lo manejará en detalle).
+
+Despliegue: Preparar la aplicación para ser desplegada en Vercel.
