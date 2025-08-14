@@ -88,6 +88,10 @@
                         <a class="nav-link" href="{{ url_for('asociaciones') }}"
                            {% if request.endpoint == 'asociaciones' %}aria-current="page"{% endif %}>Asociaciones</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('sobre_nosotros') }}"
+                           {% if request.endpoint == 'sobre_nosotros' %}aria-current="page"{% endif %}>Nosotros</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -123,9 +127,10 @@
                 <div class="col-lg-4">
                     <h6>Enlaces</h6>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-muted">Política de Privacidad</a></li>
-                        <li><a href="#" class="text-muted">Aviso Legal</a></li>
-                        <li><a href="#" class="text-muted">Términos y Condiciones</a></li>
+                        <li><a href="{{ url_for('politica_privacidad') }}" class="text-muted">Política de Privacidad</a></li>
+                        <li><a href="{{ url_for('aviso_legal') }}" class="text-muted">Aviso Legal</a></li>
+                        <li><a href="{{ url_for('terminos_condiciones') }}" class="text-muted">Términos y Condiciones</a></li>
+                        <li><a href="{{ url_for('sobre_nosotros') }}" class="text-muted">Sobre Nosotros</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4">

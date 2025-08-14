@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Aviso Legal - DiversIA{% endblock %}
+
+{% block meta_description %}Aviso legal de DiversIA. Información sobre la titularidad, condiciones de uso y aspectos legales de la plataforma.{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-5 mb-4">Aviso Legal</h1>
+            <p class="text-muted mb-5">Última actualización: 14 de enero de 2025</p>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">1. Datos identificativos</h2>
+                    <p><strong>DiversIA</strong> es una plataforma desarrollada por el equipo Eternals de AI Stars League.</p>
+                    <ul>
+                        <li><strong>Denominación:</strong> DiversIA - Equipo Eternals</li>
+                        <li><strong>Actividad:</strong> Plataforma de inclusión laboral para personas neurodivergentes</li>
+                        <li><strong>Email de contacto:</strong> <a href="mailto:diversiaeternals@gmail.com">diversiaeternals@gmail.com</a></li>
+                        <li><strong>Sitio web:</strong> diversia.app</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">2. Objeto y ámbito de aplicación</h2>
+                    <p>El presente aviso legal regula el uso del sitio web DiversIA, accesible a través de la dirección diversia.app, que proporciona servicios de:</p>
+                    <ul>
+                        <li>Conexión entre personas neurodivergentes y empresas inclusivas</li>
+                        <li>Directorio de asociaciones especializadas en neurodivergencia</li>
+                        <li>Recursos y herramientas para la inclusión laboral</li>
+                        <li>Formación y asesoramiento a empresas</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">3. Condiciones de acceso y uso</h2>
+                    <p>El acceso y uso de este sitio web implica la aceptación expresa de las siguientes condiciones:</p>
+                    <ul>
+                        <li>El usuario se compromete a hacer un uso adecuado de los contenidos y servicios</li>
+                        <li>Queda prohibido el uso del sitio para fines ilícitos o lesivos</li>
+                        <li>No se permite la reproducción, distribución o modificación no autorizada del contenido</li>
+                        <li>El usuario es responsable de la veracidad de los datos proporcionados</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">4. Propiedad intelectual</h2>
+                    <p>Todos los contenidos del sitio web (textos, imágenes, sonidos, bases de datos, software, etc.) están protegidos por derechos de propiedad intelectual e industrial.</p>
+                    <p>Queda expresamente prohibida la reproducción, distribución, comunicación pública, transformación o cualquier otra actividad que pueda realizarse con los contenidos sin autorización expresa.</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">5. Responsabilidad</h2>
+                    <p>DiversIA se exime de cualquier responsabilidad derivada de:</p>
+                    <ul>
+                        <li>La falta de disponibilidad, mantenimiento y efectivo funcionamiento del sitio web</li>
+                        <li>La existencia de virus, programas maliciosos o lesivos en los contenidos</li>
+                        <li>El uso ilícito o incorrecto del sitio web</li>
+                        <li>La falta de licitud, fiabilidad, utilidad, veracidad o actualidad de los contenidos transmitidos por terceros</li>
+                    </ul>
+                    <p>El usuario es el único responsable de las infracciones que pueda cometer o de los perjuicios que pueda causar por el uso del sitio web.</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">6. Enlaces externos</h2>
+                    <p>Los enlaces a sitios web de terceros tienen finalidad meramente informativa. DiversIA no asume responsabilidad alguna sobre el contenido de dichos sitios web ni sobre las consecuencias de su utilización.</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">7. Protección de datos</h2>
+                    <p>El tratamiento de los datos personales se rige por lo dispuesto en nuestra <a href="{{ url_for('politica_privacidad') }}">Política de Privacidad</a>, en cumplimiento del Reglamento General de Protección de Datos (RGPD) y la legislación aplicable.</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">8. Modificaciones</h2>
+                    <p>DiversIA se reserva el derecho a modificar el presente aviso legal cuando lo considere oportuno. Los usuarios serán informados de dichos cambios mediante publicación en el sitio web.</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body bg-light">
+                    <h2 class="h4 mb-3">9. Legislación aplicable y jurisdicción</h2>
+                    <p>Las presentes condiciones se rigen por la legislación española. Para la resolución de cualquier controversia las partes se someterán a los Juzgados y Tribunales correspondientes conforme a derecho.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

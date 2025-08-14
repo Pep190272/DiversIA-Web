@@ -26,6 +26,22 @@ def comunidad():
 def asociaciones():
     return render_template('asociaciones.html')
 
+@app.route('/politica-privacidad')
+def politica_privacidad():
+    return render_template('politica-privacidad.html')
+
+@app.route('/aviso-legal')
+def aviso_legal():
+    return render_template('aviso-legal.html')
+
+@app.route('/terminos-condiciones')
+def terminos_condiciones():
+    return render_template('terminos-condiciones.html')
+
+@app.route('/sobre-nosotros')
+def sobre_nosotros():
+    return render_template('sobre-nosotros.html')
+
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     form = RegistroGeneralForm()
