@@ -57,7 +57,14 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg" role="navigation" aria-label="Navegación principal">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}" aria-label="DiversIA - Ir a inicio">
+            <!-- DiversIA Logo Area -->
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}" aria-label="DiversIA - Ir a inicio">
+                <!-- Logo placeholder - Medidas recomendadas: 150x50px (PNG/SVG) -->
+                <img src="{{ url_for('static', filename='images/logo-header.png') }}" 
+                     alt="DiversIA Logo" 
+                     class="navbar-logo me-2"
+                     style="height: 40px; width: auto;"
+                     onerror="this.style.display='none';">
                 <strong>DiversIA</strong>
             </a>
             
@@ -92,6 +99,24 @@
                         <a class="nav-link" href="{{ url_for('sobre_nosotros') }}"
                            {% if request.endpoint == 'sobre_nosotros' %}aria-current="page"{% endif %}>Nosotros</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i data-lucide="globe" aria-hidden="true"></i> Idioma
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('es')">🇪🇸 Español</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('en')">🇺🇸 English</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('fr')">🇫🇷 Français</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('de')">🇩🇪 Deutsch</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('it')">🇮🇹 Italiano</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('pt')">🇵🇹 Português</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('ar')">🇸🇦 العربية</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('zh')">🇨🇳 中文</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('ja')">🇯🇵 日本語</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="resetTranslation()">🔄 Original</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -120,22 +145,46 @@
     <footer class="footer mt-5" role="contentinfo">
         <div class="container">
             <div class="row gy-4">
-                <div class="col-lg-4">
-                    <h5>DiversIA</h5>
-                    <p class="text-muted">Conectando talento neurodivergente con oportunidades laborales inclusivas.</p>
+                <div class="col-lg-3">
+                    <!-- Logo Footer - Medidas recomendadas: 120x40px (PNG/SVG) -->
+                    <div class="mb-3">
+                        <img src="{{ url_for('static', filename='images/logo-footer.png') }}" 
+                             alt="DiversIA Logo" 
+                             class="footer-logo"
+                             style="height: 32px; width: auto;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <h5 style="display: none;">DiversIA</h5>
+                    </div>
+                    <p class="text-muted small">Conectando talento neurodivergente con oportunidades laborales inclusivas.</p>
+                    <p class="text-muted small mb-1"><strong>CEO:</strong> Olga Cruz Hernández</p>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-3">
+                    <h6>Contacto</h6>
+                    <p class="text-muted small mb-2">
+                        <i data-lucide="map-pin" class="me-1" style="width: 14px; height: 14px;"></i>
+                        Avda Espoia, 762<br>08789 Barcelona, España
+                    </p>
+                    <p class="text-muted small mb-2">
+                        <i data-lucide="phone" class="me-1" style="width: 14px; height: 14px;"></i>
+                        <a href="tel:+34695260546" class="text-muted text-decoration-none">695 260 546</a>
+                    </p>
+                    <p class="text-muted small">
+                        <i data-lucide="mail" class="me-1" style="width: 14px; height: 14px;"></i>
+                        <a href="mailto:diversiaeternals@gmail.com" class="text-muted text-decoration-none">diversiaeternals@gmail.com</a>
+                    </p>
+                </div>
+                <div class="col-lg-3">
                     <h6>Enlaces</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{{ url_for('politica_privacidad') }}" class="text-muted">Política de Privacidad</a></li>
-                        <li><a href="{{ url_for('aviso_legal') }}" class="text-muted">Aviso Legal</a></li>
-                        <li><a href="{{ url_for('terminos_condiciones') }}" class="text-muted">Términos y Condiciones</a></li>
-                        <li><a href="{{ url_for('sobre_nosotros') }}" class="text-muted">Sobre Nosotros</a></li>
+                        <li><a href="{{ url_for('politica_privacidad') }}" class="text-muted text-decoration-none">Política de Privacidad</a></li>
+                        <li><a href="{{ url_for('aviso_legal') }}" class="text-muted text-decoration-none">Aviso Legal</a></li>
+                        <li><a href="{{ url_for('terminos_condiciones') }}" class="text-muted text-decoration-none">Términos y Condiciones</a></li>
+                        <li><a href="{{ url_for('sobre_nosotros') }}" class="text-muted text-decoration-none">Sobre Nosotros</a></li>
                     </ul>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-3">
                     <h6>Síguenos</h6>
-                    <div class="d-flex gap-3">
+                    <div class="d-flex gap-3 mb-3">
                         <a href="https://www.linkedin.com/company/mydiversia" target="_blank" class="text-muted" aria-label="LinkedIn" rel="noopener noreferrer">
                             <i data-lucide="linkedin" aria-hidden="true"></i>
                         </a>
@@ -145,19 +194,17 @@
                         <a href="https://www.instagram.com/diversiaeternals/" target="_blank" class="text-muted" aria-label="Instagram" rel="noopener noreferrer">
                             <i data-lucide="instagram" aria-hidden="true"></i>
                         </a>
-                        <a href="mailto:diversiaeternals@gmail.com" class="text-muted" aria-label="Email">
-                            <i data-lucide="mail" aria-hidden="true"></i>
-                        </a>
                     </div>
+                    <p class="text-muted small">Equipo Eternals<br>AI Stars League</p>
                 </div>
             </div>
             <hr class="my-4">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <p class="mb-0 text-muted small">&copy; 2025 DiversIA. Todos los derechos reservados.</p>
+                    <p class="mb-0 text-muted small">&copy; 2025 DiversIA - Equipo Eternals. Todos los derechos reservados.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <p class="mb-0 text-muted small">Construido con accesibilidad en mente</p>
+                    <p class="mb-0 text-muted small">Construido con accesibilidad en mente 🌟</p>
                 </div>
             </div>
         </div>
@@ -166,9 +213,13 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Google Translate -->
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/accessibility.js') }}"></script>
     <script src="{{ url_for('static', filename='js/carousel.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/translator.js') }}"></script>
     
     <!-- Initialize Lucide icons -->
     <script>
