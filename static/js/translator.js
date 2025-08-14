@@ -1,21 +1,39 @@
 // Google Translate Integration for DiversIA
 let googleTranslateInstance = null;
 
+// This function is called automatically by Google Translate
 function googleTranslateElementInit() {
-    if (!document.getElementById('google_translate_element')) {
-        // Create hidden element for Google Translate
-        const translateDiv = document.createElement('div');
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeTranslate);
+    } else {
+        initializeTranslate();
+    }
+}
+
+function initializeTranslate() {
+    // Create hidden element for Google Translate if it doesn't exist
+    let translateDiv = document.getElementById('google_translate_element');
+    if (!translateDiv) {
+        translateDiv = document.createElement('div');
         translateDiv.id = 'google_translate_element';
         translateDiv.style.display = 'none';
         document.body.appendChild(translateDiv);
     }
 
-    googleTranslateInstance = new google.translate.TranslateElement({
-        pageLanguage: 'es',
-        includedLanguages: 'en,fr,de,it,pt,ar,zh,ja,es',
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-        autoDisplay: false
-    }, 'google_translate_element');
+    // Initialize Google Translate
+    try {
+        googleTranslateInstance = new google.translate.TranslateElement({
+            pageLanguage: 'es',
+            includedLanguages: 'en,fr,de,it,pt,ar,zh,ja,es',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+        
+        console.log('Google Translate initialized successfully');
+    } catch (error) {
+        console.error('Error initializing Google Translate:', error);
+    }
 }
 
 function translateTo(languageCode) {
@@ -24,27 +42,44 @@ function translateTo(languageCode) {
         return;
     }
 
-    // Wait for Google Translate to be ready
-    if (typeof google === 'undefined' || !google.translate) {
-        setTimeout(() => translateTo(languageCode), 500);
-        return;
-    }
+    // Wait for Google Translate to be ready with retries
+    let retryCount = 0;
+    const maxRetries = 10;
+    
+    function attemptTranslation() {
+        if (typeof google === 'undefined' || !google.translate) {
+            retryCount++;
+            if (retryCount < maxRetries) {
+                setTimeout(attemptTranslation, 500);
+            } else {
+                console.error('Google Translate failed to load after multiple attempts');
+            }
+            return;
+        }
 
-    // Find and trigger the Google Translate select
-    const selectElement = document.querySelector('.goog-te-combo');
-    if (selectElement) {
-        selectElement.value = languageCode;
-        selectElement.dispatchEvent(new Event('change'));
-        
-        // Store current language preference
-        localStorage.setItem('diversia_language', languageCode);
-        
-        // Update language indicator
-        updateLanguageIndicator(languageCode);
-    } else {
-        // Retry if element not found
-        setTimeout(() => translateTo(languageCode), 500);
+        // Find and trigger the Google Translate select
+        const selectElement = document.querySelector('.goog-te-combo');
+        if (selectElement) {
+            selectElement.value = languageCode;
+            selectElement.dispatchEvent(new Event('change'));
+            
+            // Store current language preference
+            localStorage.setItem('diversia_language', languageCode);
+            
+            // Update language indicator
+            updateLanguageIndicator(languageCode);
+            console.log('Translation to', languageCode, 'initiated');
+        } else {
+            retryCount++;
+            if (retryCount < maxRetries) {
+                setTimeout(attemptTranslation, 500);
+            } else {
+                console.error('Google Translate select element not found after multiple attempts');
+            }
+        }
     }
+    
+    attemptTranslation();
 }
 
 function resetTranslation() {
