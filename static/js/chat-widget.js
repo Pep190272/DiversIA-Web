@@ -198,27 +198,45 @@
             }
             
             .message-content {
-                background: #f1f3f4;
-                padding: 12px;
-                border-radius: 12px;
+                background: #f8f9fa;
+                padding: 12px 16px;
+                border-radius: 18px;
                 font-size: 14px;
-                line-height: 1.4;
+                line-height: 1.5;
+                border: 1px solid #e9ecef;
+                word-wrap: break-word;
+                max-width: 100%;
             }
             
             .user-message .message-content {
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
+                border: none;
+                border-radius: 18px 18px 4px 18px;
+            }
+            
+            .bot-message .message-content {
+                background: #ffffff;
+                border: 1px solid #e2e6ea;
+                border-radius: 18px 18px 18px 4px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             }
             
             .message-time {
-                font-size: 11px;
-                color: #666;
-                margin-top: 4px;
-                text-align: right;
+                font-size: 10px;
+                color: #6c757d;
+                margin-top: 6px;
+                opacity: 0.8;
             }
             
             .user-message .message-time {
+                text-align: right;
+                color: rgba(255,255,255,0.8);
+            }
+            
+            .bot-message .message-time {
                 text-align: left;
+                color: #6c757d;
             }
             
             .chat-input-container {
@@ -368,7 +386,7 @@
         // Show typing indicator
         showTypingIndicator();
         
-        // Send to n8n webhook
+        // Send to n8n webhook (con fallback local)
         sendToWebhook(message);
         
         // Track action
@@ -415,7 +433,7 @@
     async function sendToWebhook(message) {
         try {
             // CAMBIAR ESTA URL POR TU WEBHOOK DE N8N
-            const n8nWebhookUrl = 'https://tu-n8n.webhook.url/chat';
+            const n8nWebhookUrl = 'http://localhost:5678/webhook-test/diversia-chat';
             
             const response = await fetch(n8nWebhookUrl, {
                 method: 'POST',
@@ -444,12 +462,13 @@
         } catch (error) {
             console.error('Error sending message:', error);
             hideTypingIndicator();
-            addMessage('Lo siento, hubo un error. Por favor, intenta de nuevo.', 'bot');
+            // Usar respuesta local como fallback
+            addBotResponseLocal(message);
         }
     }
     
-    function addBotResponse(userMessage) {
-        // Simple response logic (in production, responses come from n8n)
+    function addBotResponseLocal(userMessage) {
+        // Respuestas locales mejoradas mientras se configura n8n
         let response = '';
         
         const message = userMessage.toLowerCase();
@@ -464,10 +483,12 @@
             response = 'Para personas con dislexia, ofrecemos tests especializados y recursos de apoyo. También conectamos con asociaciones como DISFAM que pueden proporcionar evaluaciones profesionales. ¿Necesitas más información?';
         } else if (message.includes('empresa') || message.includes('contratar')) {
             response = 'Ayudamos a empresas a encontrar talento neurodivergente excepcional. Nuestro proceso incluye:<br><br>• Matching inteligente<br>• Orientación sobre inclusión<br>• Seguimiento del proceso<br><br>¿Te gustaría registrar tu empresa?';
-        } else if (message.includes('hola') || message.includes('ayuda')) {
-            response = '¡Hola! Estoy aquí para ayudarte con cualquier duda sobre DiversIA. Puedo contarte sobre nuestros servicios, el proceso de registro, o cualquier información que necesites. ¿En qué puedo asistirte?';
+        } else if (message.includes('hola') || message.includes('buenas') || message.includes('ayuda')) {
+            response = '¡Hola! Soy el asistente de DiversIA. Estoy aquí para ayudarte con cualquier duda sobre nuestra plataforma de inclusión laboral. Puedo contarte sobre nuestros servicios, el proceso de registro, o cualquier información que necesites. ¿En qué puedo asistirte?';
+        } else if (message.includes('trabajo') || message.includes('empleo')) {
+            response = 'Nuestro sistema de matching inteligente conecta candidatos neurodivergentes con ofertas de trabajo compatibles. Actualmente tenemos ofertas en desarrollo, diseño y análisis de datos. ¿Cuál es tu área de experiencia?';
         } else {
-            response = 'Gracias por tu mensaje. Puedo ayudarte con información sobre:<br><br>• Registro de personas neurodivergentes<br>• Registro de empresas<br>• Tipos de neurodivergencia (TDAH, TEA, Dislexia)<br>• Proceso de matching<br><br>¿Sobre qué te gustaría saber más?';
+            response = 'Gracias por tu mensaje. Puedo ayudarte con información sobre:<br><br>• Registro de personas neurodivergentes<br>• Registro de empresas inclusivas<br>• Tipos de neurodivergencia (TDAH, TEA, Dislexia)<br>• Proceso de matching laboral<br>• Recursos y asociaciones<br><br>¿Sobre qué te gustaría saber más?';
         }
         
         addMessage(response, 'bot');

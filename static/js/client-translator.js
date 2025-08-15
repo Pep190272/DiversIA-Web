@@ -35,6 +35,16 @@
             'Todos los derechos reservados': 'All rights reserved',
             'Construido con accesibilidad en mente': 'Built with accessibility in mind',
             
+            // Main content expanded
+            'Más información': 'More information',
+            'Tests especializados': 'Specialized tests',
+            'Evaluaciones gratuitas': 'Free evaluations',
+            'Registro especializado': 'Specialized registration',
+            'Gamificación': 'Gamification',
+            'Perfil personalizado': 'Personalized profile',
+            'Encuentra tu trabajo ideal': 'Find your ideal job',
+            'Conecta con empresas inclusivas': 'Connect with inclusive companies',
+            
             // Accessibility
             'Accesibilidad': 'Accessibility',
             'Cambiar tamaño de texto': 'Change text size',
@@ -229,37 +239,43 @@
         const dictionary = translations[langCode];
         if (!dictionary) return;
         
-        // Translate text nodes
-        const walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_TEXT,
-            {
-                acceptNode: function(node) {
-                    // Skip script and style elements
-                    const parent = node.parentElement;
-                    if (parent && (parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE')) {
-                        return NodeFilter.FILTER_REJECT;
-                    }
-                    
-                    const text = node.textContent.trim();
-                    return text && dictionary[text] ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-                }
+        // Translate all text content recursively
+        function translateElement(element) {
+            // Skip script, style, and chat widget elements
+            if (element.tagName === 'SCRIPT' || 
+                element.tagName === 'STYLE' || 
+                element.id === 'diversia-chat-widget') {
+                return;
             }
-        );
-        
-        const textNodes = [];
-        let node;
-        while (node = walker.nextNode()) {
-            textNodes.push(node);
+            
+            // Translate direct text content
+            if (element.childNodes) {
+                element.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const text = node.textContent.trim();
+                        if (text && dictionary[text]) {
+                            node.textContent = node.textContent.replace(text, dictionary[text]);
+                        } else {
+                            // Try partial matches for longer texts
+                            let translatedText = node.textContent;
+                            Object.keys(dictionary).forEach(key => {
+                                if (translatedText.includes(key)) {
+                                    translatedText = translatedText.replace(key, dictionary[key]);
+                                }
+                            });
+                            if (translatedText !== node.textContent) {
+                                node.textContent = translatedText;
+                            }
+                        }
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        translateElement(node);
+                    }
+                });
+            }
         }
         
-        // Apply translations
-        textNodes.forEach(textNode => {
-            const originalText = textNode.textContent.trim();
-            if (dictionary[originalText]) {
-                textNode.textContent = textNode.textContent.replace(originalText, dictionary[originalText]);
-            }
-        });
+        // Start translation from body
+        translateElement(document.body);
         
         // Translate specific attributes
         document.querySelectorAll('[aria-label]').forEach(element => {
@@ -273,6 +289,13 @@
             const originalTitle = element.getAttribute('title');
             if (dictionary[originalTitle]) {
                 element.setAttribute('title', dictionary[originalTitle]);
+            }
+        });
+        
+        document.querySelectorAll('[placeholder]').forEach(element => {
+            const originalPlaceholder = element.getAttribute('placeholder');
+            if (dictionary[originalPlaceholder]) {
+                element.setAttribute('placeholder', dictionary[originalPlaceholder]);
             }
         });
     }
