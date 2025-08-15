@@ -414,7 +414,10 @@
     
     async function sendToWebhook(message) {
         try {
-            const response = await fetch('/webhook/n8n-chat', {
+            // CAMBIAR ESTA URL POR TU WEBHOOK DE N8N
+            const n8nWebhookUrl = 'https://tu-n8n.webhook.url/chat';
+            
+            const response = await fetch(n8nWebhookUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -429,12 +432,13 @@
             
             const data = await response.json();
             
-            if (data.success) {
-                // Simulate bot response (in production, this would come from n8n)
+            if (response.ok) {
+                const data = await response.json();
+                // Usar respuesta real de n8n
                 setTimeout(() => {
                     hideTypingIndicator();
-                    addBotResponse(message);
-                }, 2000);
+                    addMessage(data.final_response || data.response || 'Respuesta recibida', 'bot');
+                }, 1500);
             }
             
         } catch (error) {
