@@ -17,7 +17,6 @@ class User(db.Model):
     intereses_laborales = db.Column(db.Text, nullable=True)
     adaptaciones_necesarias = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     # CRM export status
     exported_to_crm = db.Column(db.Boolean, default=False)
     crm_export_date = db.Column(db.DateTime, nullable=True)
@@ -27,14 +26,14 @@ class User(db.Model):
 
 class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nombre_empresa = db.Column(db.String(200), nullable=False)
-    email_contacto = db.Column(db.String(120), nullable=False)
+    nombre = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
     telefono = db.Column(db.String(20), nullable=True)
     sector = db.Column(db.String(100), nullable=True)
     tamano_empresa = db.Column(db.String(50), nullable=True)
     ciudad = db.Column(db.String(100), nullable=True)
+    descripcion = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     # CRM export status
     exported_to_crm = db.Column(db.Boolean, default=False)
     crm_export_date = db.Column(db.DateTime, nullable=True)
@@ -43,29 +42,25 @@ class Company(db.Model):
     job_offers = db.relationship('JobOffer', backref='company', lazy=True)
 
     def __repr__(self):
-        return f'<Company {self.nombre_empresa}>'
+        return f'<Company {self.nombre}>'
 
 class JobOffer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
-    titulo_puesto = db.Column(db.String(200), nullable=False)
+    titulo = db.Column(db.String(200), nullable=False)
     descripcion = db.Column(db.Text, nullable=False)
-    tipo_contrato = db.Column(db.String(50), nullable=False)
-    modalidad_trabajo = db.Column(db.String(50), nullable=False)
-    salario_min = db.Column(db.Integer, nullable=True)
-    salario_max = db.Column(db.Integer, nullable=True)
-    requisitos = db.Column(db.Text, nullable=True)
-    adaptaciones_disponibles = db.Column(db.Text, nullable=True)
-    neurodivergencias_target = db.Column(db.String(200), nullable=True)
+    ubicacion = db.Column(db.String(100), nullable=True)
+    salario = db.Column(db.String(50), nullable=True)
+    neurodivergencias_aceptadas = db.Column(db.String(200), nullable=True)
     activa = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
     # CRM export status
     exported_to_crm = db.Column(db.Boolean, default=False)
     crm_export_date = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
-        return f'<JobOffer {self.titulo_puesto}>'
+        return f'<JobOffer {self.titulo}>'
 
 class TestResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -73,6 +68,10 @@ class TestResult(db.Model):
     test_type = db.Column(db.String(50), nullable=False)
     score = db.Column(db.Integer, nullable=True)
     results_data = db.Column(db.JSON, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<TestResult {self.test_type} for User {self.user_id}>'
     completed_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
