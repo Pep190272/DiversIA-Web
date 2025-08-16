@@ -19,10 +19,10 @@ https://tu-dominio.replit.app/api/v1/user-insights
 
 ## 🛠️ SOLUCIÓN PASO A PASO
 
-### **1. Obtener tu URL de Replit**
+### **1. URL de tu aplicación Replit**
 Tu aplicación está en:
 ```
-https://[tu-proyecto-name].[tu-usuario].replit.app
+https://073083d2-dd14-424e-a549-4c03e48131b7-00-1vatfbc2lts0v.janeway.replit.dev/
 ```
 
 ### **2. Actualizar el nodo HTTP Request en n8n**
@@ -33,7 +33,7 @@ https://tu-dominio.replit.app/api/v1/user-insights
 
 A:
 ```
-https://[tu-url-real].replit.app/api/v1/user-insights
+https://073083d2-dd14-424e-a549-4c03e48131b7-00-1vatfbc2lts0v.janeway.replit.dev/api/v1/user-insights
 ```
 
 ### **3. El chat ya está configurado**
@@ -97,4 +97,16 @@ Una vez funcionando:
 3. **Configurar lead scoring** automático
 4. **Integrar con CRM** si tienes uno
 
-¿Cuál es la URL real de tu aplicación Replit para completar la configuración?
+## 🎯 CONFIGURACIÓN FINAL
+
+### **PASO 1: Actualizar n8n**
+1. Ve a tu flujo en n8n
+2. Haz clic en el nodo "HTTP Request" (el tercero)
+3. Cambia la URL a: `https://073083d2-dd14-424e-a549-4c03e48131b7-00-1vatfbc2lts0v.janeway.replit.dev/api/v1/user-insights`
+4. Guarda el flujo
+
+### **PASO 2: Probar el chat**
+1. Ve a tu aplicación DiversIA
+2. Haz clic en el chat widget (esquina inferior derecha)
+3. Escribe: "Hola, quiero información sobre registro"
+4. Deberías recibir respuesta del agente n8n con estadísticas
