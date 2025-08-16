@@ -4,9 +4,9 @@
 
 Tu flujo de n8n está **configurado correctamente**:
 
-### **Webhook ID detectado**: `9ce397c7-bd6c-4a8f-ac2c-231c13b45cfa`
-### **Path configurado**: `/diversia-chat`
-### **URL completa**: `https://hooks.n8n.cloud/webhook/9ce397c7-bd6c-4a8f-ac2c-231c13b45cfa`
+### **Webhook URL detectada**: `http://localhost:5678/webhook-test/diversia-chat`
+### **Configuración**: n8n local en puerto 5678
+### **Path configurado**: `/webhook-test/diversia-chat`
 
 ## 🔍 PROBLEMA IDENTIFICADO
 
@@ -36,10 +36,10 @@ A:
 https://073083d2-dd14-424e-a549-4c03e48131b7-00-1vatfbc2lts0v.janeway.replit.dev/api/v1/user-insights
 ```
 
-### **3. El chat ya está configurado**
-El chat widget ya tiene la URL correcta del webhook:
+### **3. El chat actualizado**
+El chat widget ahora usa tu URL local:
 ```javascript
-const n8nWebhookUrl = 'https://hooks.n8n.cloud/webhook/9ce397c7-bd6c-4a8f-ac2c-231c13b45cfa';
+const n8nWebhookUrl = 'http://localhost:5678/webhook-test/diversia-chat';
 ```
 
 ## 🔄 FLUJO DE FUNCIONAMIENTO

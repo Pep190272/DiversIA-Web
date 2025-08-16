@@ -4,7 +4,7 @@
 
 **URL de tu aplicación**: `https://073083d2-dd14-424e-a549-4c03e48131b7-00-1vatfbc2lts0v.janeway.replit.dev/`
 
-**Webhook ID**: `9ce397c7-bd6c-4a8f-ac2c-231c13b45cfa`
+**Webhook URL**: `http://localhost:5678/webhook-test/diversia-chat`
 
 ## 🎯 LO QUE TIENES QUE HACER
 

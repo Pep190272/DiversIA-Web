@@ -441,8 +441,8 @@
     
     async function sendToWebhook(message) {
         try {
-            // URL del webhook de n8n (extraído del JSON proporcionado)
-            const n8nWebhookUrl = 'https://hooks.n8n.cloud/webhook/9ce397c7-bd6c-4a8f-ac2c-231c13b45cfa';
+            // URL del webhook de n8n local
+            const n8nWebhookUrl = 'http://localhost:5678/webhook-test/diversia-chat';
             
             const response = await fetch(n8nWebhookUrl, {
                 method: 'POST',
@@ -469,9 +469,9 @@
             }
             
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.error('Error sending to n8n (localhost not accessible):', error);
             hideTypingIndicator();
-            // Usar respuesta local como fallback
+            // Usar respuesta local inteligente como fallback
             addBotResponseLocal(message);
         }
     }
