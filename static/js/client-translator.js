@@ -413,9 +413,17 @@
         'ja': { name: '日本語', flag: '🇯🇵' }
     };
     
+    // Store original content on first load
+    let originalContent = null;
+    
     // Main translate function
     window.translateTo = function(langCode) {
         console.log('Translating to:', langCode);
+        
+        // Store original content if not already stored
+        if (!originalContent) {
+            originalContent = document.body.innerHTML;
+        }
         
         if (langCode === 'es') {
             resetTranslation();
@@ -427,6 +435,18 @@
         // Apply translations
         setTimeout(() => {
             try {
+                // Reset to original before applying new translation
+                if (currentLanguage !== 'es') {
+                    document.body.innerHTML = originalContent;
+                    // Reinitialize icons and chat
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                    if (window.initializeChatWidget) {
+                        window.initializeChatWidget();
+                    }
+                }
+                
                 applyTranslations(langCode);
                 currentLanguage = langCode;
                 localStorage.setItem('diversia_language', langCode);
@@ -439,6 +459,27 @@
             }
         }, 500);
     };
+    
+    // Reset function
+    function resetTranslation() {
+        if (originalContent) {
+            document.body.innerHTML = originalContent;
+            
+            // Reinitialize scripts
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            // Reinitialize chat widget
+            if (window.initializeChatWidget) {
+                window.initializeChatWidget();
+            }
+        }
+        
+        currentLanguage = 'es';
+        localStorage.setItem('diversia_language', 'es');
+        updateLanguageButton('es', false);
+    }
     
     // Apply translations to page elements
     function applyTranslations(langCode) {
@@ -506,14 +547,26 @@
         });
     }
     
-    // Reset translation
-    window.resetTranslation = function() {
+    // Reset function
+    function resetTranslation() {
+        if (originalContent) {
+            document.body.innerHTML = originalContent;
+            
+            // Reinitialize scripts
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            // Reinitialize chat widget
+            if (window.initializeChatWidget) {
+                window.initializeChatWidget();
+            }
+        }
+        
         currentLanguage = 'es';
-        localStorage.removeItem('diversia_language');
+        localStorage.setItem('diversia_language', 'es');
         updateLanguageButton('es', false);
-        // Reload page to restore original Spanish text
-        window.location.reload();
-    };
+    }
     
     // Update language button
     function updateLanguageButton(langCode, loading) {

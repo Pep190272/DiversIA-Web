@@ -7,7 +7,7 @@
     let sessionId = null;
     
     // Initialize chat widget
-    function initChatWidget() {
+    window.initializeChatWidget = function() {
         // Generate session ID
         sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         
@@ -441,8 +441,8 @@
     
     async function sendToWebhook(message) {
         try {
-            // CAMBIAR ESTA URL POR TU WEBHOOK DE N8N
-            const n8nWebhookUrl = 'http://localhost:5678/webhook-test/diversia-chat';
+            // URL del webhook de n8n (extraído del JSON proporcionado)
+            const n8nWebhookUrl = 'https://hooks.n8n.cloud/webhook/9ce397c7-bd6c-4a8f-ac2c-231c13b45cfa';
             
             const response = await fetch(n8nWebhookUrl, {
                 method: 'POST',
@@ -529,9 +529,9 @@
     
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initChatWidget);
+        document.addEventListener('DOMContentLoaded', window.initializeChatWidget);
     } else {
-        initChatWidget();
+        window.initializeChatWidget();
     }
     
 })();
