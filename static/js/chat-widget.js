@@ -457,15 +457,21 @@
                 })
             });
             
-            const data = await response.json();
+            console.log('n8n response status:', response.status);
             
             if (response.ok) {
                 const data = await response.json();
+                console.log('n8n response data:', data);
+                
                 // Usar respuesta real de n8n
                 setTimeout(() => {
                     hideTypingIndicator();
-                    addMessage(data.final_response || data.response || 'Respuesta recibida', 'bot');
+                    const botResponse = data.final_response || data.response || data.message || 'Respuesta recibida';
+                    addMessage(botResponse, 'bot');
                 }, 1500);
+            } else {
+                console.error('n8n response error:', response.status, response.statusText);
+                throw new Error(`HTTP ${response.status}`);
             }
             
         } catch (error) {
