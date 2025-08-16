@@ -24,9 +24,9 @@ https://hooks.n8n.cloud/webhook/[webhook-id]
 
 ## 🧪 CONFIGURACIÓN ACTUAL
 
-**El chat actualmente usa**: `http://localhost:5678/webhook-test/diversia-chat`
+**El chat ahora usa**: `https://pepmorenocreador.app.n8n.cloud/webhook-test/diversia-chat`
 
-**Necesita cambiar a**: La URL que te dio n8n.cloud
+**Estado**: ✅ CONFIGURADO CORRECTAMENTE
 
 ## 🔧 PASOS PARA ACTUALIZAR
 

@@ -441,8 +441,8 @@
     
     async function sendToWebhook(message) {
         try {
-            // URL del webhook de n8n local
-            const n8nWebhookUrl = 'http://localhost:5678/webhook-test/diversia-chat';
+            // URL del webhook de n8n.cloud
+            const n8nWebhookUrl = 'https://pepmorenocreador.app.n8n.cloud/webhook-test/diversia-chat';
             
             const response = await fetch(n8nWebhookUrl, {
                 method: 'POST',
@@ -469,7 +469,7 @@
             }
             
         } catch (error) {
-            console.error('Error sending to n8n (localhost not accessible):', error);
+            console.error('Error sending to n8n cloud:', error);
             hideTypingIndicator();
             // Usar respuesta local inteligente como fallback
             addBotResponseLocal(message);
