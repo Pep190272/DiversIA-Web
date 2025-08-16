@@ -45,6 +45,17 @@
             'Encuentra tu trabajo ideal': 'Find your ideal job',
             'Conecta con empresas inclusivas': 'Connect with inclusive companies',
             
+            // Full page content
+            'Cómo funciona DiversIA': 'How DiversIA Works',
+            'Tests gamificados': 'Gamified Tests',
+            'Evaluaciones neurocognitivas diseñadas como juegos para identificar tus fortalezas únicas.': 'Neurocognitive assessments designed as games to identify your unique strengths.',
+            'Empleo inclusivo': 'Inclusive Employment',
+            'Conectamos tu perfil con empresas que buscan específicamente talento neurodivergente.': 'We connect your profile with companies specifically seeking neurodivergent talent.',
+            'Community': 'Community',
+            'Únete a una comunidad de apoyo donde compartir experiencias y crecer profesionalmente.': 'Join a supportive community to share experiences and grow professionally.',
+            'Tus datos, bajo tu control': 'Your data, under your control',
+            'Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.': 'We comply with GDPR and guarantee maximum privacy. Your data is only shared with your explicit consent.',
+            
             // Accessibility
             'Accesibilidad': 'Accessibility',
             'Cambiar tamaño de texto': 'Change text size',
@@ -76,12 +87,28 @@
             'Idioma': 'Langue',
             
             // Main content
+            'Plataforma de inclusión laboral': 'Plateforme d\'inclusion professionnelle',
+            'para personas neurodivergentes': 'pour personnes neurodivergentes',
             'Talento que piensa distinto': 'Des talents qui pensent différemment',
             'Conectando talento neurodivergente con oportunidades laborales inclusivas': 'Connecter les talents neurodivergents avec des opportunités d\'emploi inclusives',
+            'Conectamos talento neurodivergente con empresas inclusivas': 'Nous connectons le talent neurodivergent avec des entreprises inclusives',
             'Regístrate como persona neurodivergente': 'S\'inscrire comme personne neurodivergente',
             'Regístrate como empresa inclusiva': 'S\'inscrire comme entreprise inclusive',
             'Únete a nuestra comunidad': 'Rejoindre notre communauté',
             'Explora asociaciones': 'Explorer les associations',
+            
+            // How it works section
+            'Cómo funciona DiversIA': 'Comment fonctionne DiversIA',
+            'Tests gamificados': 'Tests gamifiés',
+            'Evaluaciones neurocognitivas diseñadas como juegos para identificar tus fortalezas únicas.': 'Évaluations neurocognitives conçues comme des jeux pour identifier vos forces uniques.',
+            'Empleo inclusivo': 'Emploi inclusif',
+            'Conectamos tu perfil con empresas que buscan específicamente talento neurodivergente.': 'Nous connectons votre profil avec des entreprises recherchant spécifiquement du talent neurodivergent.',
+            'Community': 'Communauté',
+            'Únete a una comunidad de apoyo donde compartir experiencias y crecer profesionalmente.': 'Rejoignez une communauté de soutien pour partager des expériences et grandir professionnellement.',
+            
+            // Privacy section
+            'Tus datos, bajo tu control': 'Vos données, sous votre contrôle',
+            'Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.': 'Nous respectons le RGPD et garantissons une confidentialité maximale. Vos données ne sont partagées qu\'avec votre consentement explicite.',
             
             // Footer
             'Contacto': 'Contact',
@@ -111,12 +138,28 @@
             'Idioma': 'Sprache',
             
             // Main content
+            'Plataforma de inclusión laboral': 'Plattform für berufliche Inklusion',
+            'para personas neurodivergentes': 'für neurodivergente Personen',
             'Talento que piensa distinto': 'Talente, die anders denken',
             'Conectando talento neurodivergente con oportunidades laborales inclusivas': 'Neurodivergente Talente mit inklusiven Arbeitsmöglichkeiten verbinden',
+            'Conectamos talento neurodivergente con empresas inclusivas': 'Wir verbinden neurodivergente Talente mit inklusiven Unternehmen',
             'Regístrate como persona neurodivergente': 'Als neurodivergente Person registrieren',
             'Regístrate como empresa inclusiva': 'Als inklusives Unternehmen registrieren',
             'Únete a nuestra comunidad': 'Unserer Gemeinschaft beitreten',
             'Explora asociaciones': 'Verbände erkunden',
+            
+            // How it works section
+            'Cómo funciona DiversIA': 'Wie DiversIA funktioniert',
+            'Tests gamificados': 'Gamifizierte Tests',
+            'Evaluaciones neurocognitivas diseñadas como juegos para identificar tus fortalezas únicas.': 'Neurokognitive Bewertungen als Spiele entwickelt, um Ihre einzigartigen Stärken zu identifizieren.',
+            'Empleo inclusivo': 'Inklusive Beschäftigung',
+            'Conectamos tu perfil con empresas que buscan específicamente talento neurodivergente.': 'Wir verbinden Ihr Profil mit Unternehmen, die gezielt neurodivergente Talente suchen.',
+            'Community': 'Gemeinschaft',
+            'Únete a una comunidad de apoyo donde compartir experiencias y crecer profesionalmente.': 'Treten Sie einer unterstützenden Gemeinschaft bei, um Erfahrungen zu teilen und beruflich zu wachsen.',
+            
+            // Privacy section
+            'Tus datos, bajo tu control': 'Ihre Daten, unter Ihrer Kontrolle',
+            'Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.': 'Wir halten uns an die DSGVO und garantieren maximale Privatsphäre. Ihre Daten werden nur mit Ihrer ausdrücklichen Zustimmung geteilt.',
             
             // Footer
             'Contacto': 'Kontakt',
@@ -142,17 +185,37 @@
             'Idioma': 'Lingua',
             
             // Main content
+            'Plataforma de inclusión laboral': 'Piattaforma di inclusione lavorativa',
+            'para personas neurodivergentes': 'per persone neurodivergenti',
             'Talento que piensa distinto': 'Talenti che pensano diversamente',
             'Conectando talento neurodivergente con oportunidades laborales inclusivas': 'Connettere talenti neurodivergenti con opportunità lavorative inclusive',
+            'Conectamos talento neurodivergente con empresas inclusivas': 'Colleghiamo talenti neurodivergenti con aziende inclusive',
             'Regístrate como persona neurodivergente': 'Registrati come persona neurodivergente',
             'Regístrate como empresa inclusiva': 'Registrati come azienda inclusiva',
             'Únete a nuestra comunidad': 'Unisciti alla nostra comunità',
             'Explora asociaciones': 'Esplora associazioni',
             
+            // How it works section
+            'Cómo funciona DiversIA': 'Come funziona DiversIA',
+            'Tests gamificados': 'Test gamificati',
+            'Evaluaciones neurocognitivas diseñadas como juegos para identificar tus fortalezas únicas.': 'Valutazioni neurocognitive progettate come giochi per identificare le tue forze uniche.',
+            'Empleo inclusivo': 'Impiego inclusivo',
+            'Conectamos tu perfil con empresas que buscan específicamente talento neurodivergente.': 'Colleghiamo il tuo profilo con aziende che cercano specificamente talenti neurodivergenti.',
+            'Community': 'Comunità',
+            'Únete a una comunidad de apoyo donde compartir experiencias y crecer profesionalmente.': 'Unisciti a una comunità di supporto dove condividere esperienze e crescere professionalmente.',
+            
+            // Privacy section
+            'Tus datos, bajo tu control': 'I tuoi dati, sotto il tuo controllo',
+            'Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.': 'Rispettiamo il GDPR e garantiamo la massima privacy. I tuoi dati vengono condivisi solo con il tuo consenso esplicito.',
+            
             // Footer
             'Contacto': 'Contatto',
             'Enlaces': 'Collegamenti',
             'Síguenos': 'Seguici',
+            'Política de Privacidad': 'Politica sulla Privacy',
+            'Aviso Legal': 'Note Legali',
+            'Términos y Condiciones': 'Termini e Condizioni',
+            'Sobre Nosotros': 'Chi Siamo',
             'Todos los derechos reservados': 'Tutti i diritti riservati',
             'Construido con accesibilidad en mente': 'Costruito con l\'accessibilità in mente',
             
@@ -173,17 +236,37 @@
             'Idioma': 'Idioma',
             
             // Main content
+            'Plataforma de inclusión laboral': 'Plataforma de inclusão laboral',
+            'para personas neurodivergentes': 'para pessoas neurodivergentes',
             'Talento que piensa distinto': 'Talentos que pensam diferente',
             'Conectando talento neurodivergente con oportunidades laborales inclusivas': 'Conectando talentos neurodivergentes com oportunidades de trabalho inclusivas',
+            'Conectamos talento neurodivergente con empresas inclusivas': 'Conectamos talentos neurodivergentes com empresas inclusivas',
             'Regístrate como persona neurodivergente': 'Registre-se como pessoa neurodivergente',
             'Regístrate como empresa inclusiva': 'Registre-se como empresa inclusiva',
             'Únete a nuestra comunidad': 'Junte-se à nossa comunidade',
             'Explora asociaciones': 'Explore associações',
             
+            // How it works section
+            'Cómo funciona DiversIA': 'Como funciona a DiversIA',
+            'Tests gamificados': 'Testes gamificados',
+            'Evaluaciones neurocognitivas diseñadas como juegos para identificar tus fortalezas únicas.': 'Avaliações neurocognitivas projetadas como jogos para identificar suas forças únicas.',
+            'Empleo inclusivo': 'Emprego inclusivo',
+            'Conectamos tu perfil con empresas que buscan específicamente talento neurodivergente.': 'Conectamos seu perfil com empresas que procuram especificamente talentos neurodivergentes.',
+            'Community': 'Comunidade',
+            'Únete a una comunidad de apoyo donde compartir experiencias y crecer profesionalmente.': 'Junte-se a uma comunidade de apoio onde compartilhar experiências e crescer profissionalmente.',
+            
+            // Privacy section
+            'Tus datos, bajo tu control': 'Seus dados, sob seu controle',
+            'Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.': 'Cumprimos com o RGPD e garantimos máxima privacidade. Seus dados são compartilhados apenas com seu consentimento explícito.',
+            
             // Footer
             'Contacto': 'Contato',
             'Enlaces': 'Links',
             'Síguenos': 'Siga-nos',
+            'Política de Privacidad': 'Política de Privacidade',
+            'Aviso Legal': 'Aviso Legal',
+            'Términos y Condiciones': 'Termos e Condições',
+            'Sobre Nosotros': 'Sobre Nós',
             'Todos los derechos reservados': 'Todos os direitos reservados',
             'Construido con accesibilidad en mente': 'Construído com acessibilidade em mente',
             
