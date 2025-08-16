@@ -183,6 +183,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 12px;
+                background: #fafbfc;
             }
             
             .message {
@@ -206,20 +207,26 @@
                 border: 1px solid #e9ecef;
                 word-wrap: break-word;
                 max-width: 100%;
+                color: #212529;
+                font-weight: 400;
             }
             
             .user-message .message-content {
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
+                color: #ffffff;
                 border: none;
                 border-radius: 18px 18px 4px 18px;
+                font-weight: 500;
+                text-shadow: none;
             }
             
             .bot-message .message-content {
                 background: #ffffff;
-                border: 1px solid #e2e6ea;
+                border: 1px solid #dee2e6;
                 border-radius: 18px 18px 18px 4px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                color: #212529;
+                font-weight: 400;
             }
             
             .message-time {
@@ -291,16 +298,18 @@
                 align-items: center;
                 gap: 4px;
                 padding: 12px;
-                background: #f1f3f4;
+                background: #ffffff;
+                border: 1px solid #dee2e6;
                 border-radius: 12px;
                 align-self: flex-start;
                 max-width: 80px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             }
             
             .typing-dot {
                 width: 8px;
                 height: 8px;
-                background: #666;
+                background: #667eea;
                 border-radius: 50%;
                 animation: typing 1.4s infinite ease-in-out;
             }
