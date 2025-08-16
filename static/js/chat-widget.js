@@ -441,8 +441,8 @@
     
     async function sendToWebhook(message) {
         try {
-            // URL del webhook de n8n.cloud (path corregido)
-            const n8nWebhookUrl = 'https://pepmorenocreador.app.n8n.cloud/webhook/diversia-chat';
+            // URL del webhook de n8n.cloud (según configuración real)
+            const n8nWebhookUrl = 'https://pepmorenocreador.app.n8n.cloud/webhook-test/diversia-chat';
             
             const response = await fetch(n8nWebhookUrl, {
                 method: 'POST',
