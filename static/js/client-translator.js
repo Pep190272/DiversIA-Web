@@ -56,6 +56,14 @@
             'Tus datos, bajo tu control': 'Your data, under your control',
             'Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.': 'We comply with GDPR and guarantee maximum privacy. Your data is only shared with your explicit consent.',
             
+            // Company info and footer details
+            'Equipo Eternals': 'Eternals Team',
+            'AI Stars League': 'AI Stars League',
+            'Avda Espoia, 762': 'Avda Espoia, 762',
+            '08789 Barcelona, España': '08789 Barcelona, Spain',
+            'diversiaeternals@gmail.com': 'diversiaeternals@gmail.com',
+            'Construido con accesibilidad en mente 🌟': 'Built with accessibility in mind 🌟',
+            
             // Accessibility
             'Accesibilidad': 'Accessibility',
             'Cambiar tamaño de texto': 'Change text size',
@@ -110,6 +118,13 @@
             'Tus datos, bajo tu control': 'Vos données, sous votre contrôle',
             'Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.': 'Nous respectons le RGPD et garantissons une confidentialité maximale. Vos données ne sont partagées qu\'avec votre consentement explicite.',
             
+            // Company info and footer details
+            'Equipo Eternals': 'Équipe Eternals',
+            'AI Stars League': 'AI Stars League',
+            'Avda Espoia, 762': 'Avda Espoia, 762',
+            '08789 Barcelona, España': '08789 Barcelone, Espagne',
+            'diversiaeternals@gmail.com': 'diversiaeternals@gmail.com',
+            
             // Footer
             'Contacto': 'Contact',
             'Enlaces': 'Liens',
@@ -161,6 +176,13 @@
             'Tus datos, bajo tu control': 'Ihre Daten, unter Ihrer Kontrolle',
             'Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.': 'Wir halten uns an die DSGVO und garantieren maximale Privatsphäre. Ihre Daten werden nur mit Ihrer ausdrücklichen Zustimmung geteilt.',
             
+            // Company info and footer details
+            'Equipo Eternals': 'Team Eternals',
+            'AI Stars League': 'AI Stars League',
+            'Avda Espoia, 762': 'Avda Espoia, 762',
+            '08789 Barcelona, España': '08789 Barcelona, Spanien',
+            'diversiaeternals@gmail.com': 'diversiaeternals@gmail.com',
+            
             // Footer
             'Contacto': 'Kontakt',
             'Enlaces': 'Links',
@@ -207,6 +229,13 @@
             // Privacy section
             'Tus datos, bajo tu control': 'I tuoi dati, sotto il tuo controllo',
             'Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.': 'Rispettiamo il GDPR e garantiamo la massima privacy. I tuoi dati vengono condivisi solo con il tuo consenso esplicito.',
+            
+            // Company info and footer details
+            'Equipo Eternals': 'Team Eternals',
+            'AI Stars League': 'AI Stars League',
+            'Avda Espoia, 762': 'Avda Espoia, 762',
+            '08789 Barcelona, España': '08789 Barcellona, Spagna',
+            'diversiaeternals@gmail.com': 'diversiaeternals@gmail.com',
             
             // Footer
             'Contacto': 'Contatto',
@@ -259,6 +288,13 @@
             'Tus datos, bajo tu control': 'Seus dados, sob seu controle',
             'Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.': 'Cumprimos com o RGPD e garantimos máxima privacidade. Seus dados são compartilhados apenas com seu consentimento explícito.',
             
+            // Company info and footer details
+            'Equipo Eternals': 'Equipe Eternals',
+            'AI Stars League': 'AI Stars League',
+            'Avda Espoia, 762': 'Avda Espoia, 762',
+            '08789 Barcelona, España': '08789 Barcelona, Espanha',
+            'diversiaeternals@gmail.com': 'diversiaeternals@gmail.com',
+            
             // Footer
             'Contacto': 'Contato',
             'Enlaces': 'Links',
@@ -274,6 +310,93 @@
             'TDAH': 'TDAH',
             'TEA': 'TEA',
             'Dislexia': 'Dislexia'
+        },
+        
+        'ar': {
+            // Navigation (Arabic)
+            'Inicio': 'الرئيسية',
+            'Personas ND': 'الأشخاص ND',
+            'Empresas': 'الشركات',
+            'Comunidad': 'المجتمع',
+            'Asociaciones': 'الجمعيات',
+            'Nosotros': 'من نحن',
+            'Idioma': 'اللغة',
+            
+            // Main content
+            'Plataforma de inclusión laboral': 'منصة الإدماج المهني',
+            'para personas neurodivergentes': 'للأشخاص ذوي التنوع العصبي',
+            'Conectamos talento neurodivergente con empresas inclusivas': 'نربط المواهب ذات التنوع العصبي بالشركات الشاملة',
+            'Regístrate como persona neurodivergente': 'سجل كشخص ذو تنوع عصبي',
+            'Regístrate como empresa inclusiva': 'سجل كشركة شاملة',
+            
+            // Footer
+            'Contacto': 'اتصل بنا',
+            'Enlaces': 'روابط',
+            'Síguenos': 'تابعنا',
+            'Todos los derechos reservados': 'جميع الحقوق محفوظة',
+            
+            // Conditions
+            'TDAH': 'اضطراب نقص الانتباه',
+            'TEA': 'طيف التوحد',
+            'Dislexia': 'عسر القراءة'
+        },
+        
+        'zh': {
+            // Navigation (Chinese)
+            'Inicio': '首页',
+            'Personas ND': '神经多样性人群',
+            'Empresas': '企业',
+            'Comunidad': '社区',
+            'Asociaciones': '协会',
+            'Nosotros': '关于我们',
+            'Idioma': '语言',
+            
+            // Main content
+            'Plataforma de inclusión laboral': '职业包容平台',
+            'para personas neurodivergentes': '为神经多样性人群',
+            'Conectamos talento neurodivergente con empresas inclusivas': '我们连接神经多样性人才与包容性企业',
+            'Regístrate como persona neurodivergente': '注册为神经多样性人员',
+            'Regístrate como empresa inclusiva': '注册为包容性企业',
+            
+            // Footer
+            'Contacto': '联系我们',
+            'Enlaces': '链接',
+            'Síguenos': '关注我们',
+            'Todos los derechos reservados': '版权所有',
+            
+            // Conditions
+            'TDAH': '注意力缺陷多动障碍',
+            'TEA': '自闭症谱系障碍',
+            'Dislexia': '阅读障碍'
+        },
+        
+        'ja': {
+            // Navigation (Japanese)
+            'Inicio': 'ホーム',
+            'Personas ND': 'ND の人々',
+            'Empresas': '企業',
+            'Comunidad': 'コミュニティ',
+            'Asociaciones': '協会',
+            'Nosotros': '私たちについて',
+            'Idioma': '言語',
+            
+            // Main content
+            'Plataforma de inclusión laboral': '職業包摂プラットフォーム',
+            'para personas neurodivergentes': 'ニューロダイバージェントの人々のため',
+            'Conectamos talento neurodivergente con empresas inclusivas': 'ニューロダイバージェントな才能と包摂的企業を結ぶ',
+            'Regístrate como persona neurodivergente': 'ニューロダイバージェントとして登録',
+            'Regístrate como empresa inclusiva': '包摂的企業として登録',
+            
+            // Footer
+            'Contacto': 'お問い合わせ',
+            'Enlaces': 'リンク',
+            'Síguenos': 'フォローする',
+            'Todos los derechos reservados': 'すべての権利を保有',
+            
+            // Conditions
+            'TDAH': 'ADHD',
+            'TEA': '自閉症スペクトラム障害',
+            'Dislexia': 'ディスレクシア'
         }
     };
     
