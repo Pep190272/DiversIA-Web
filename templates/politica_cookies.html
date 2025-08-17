@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Política de Cookies - DiversIA{% endblock %}
+
+{% block main_content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4">Política de Cookies</h1>
+            
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h4 mb-3">¿Qué son las cookies?</h2>
+                    <p>Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo cuando visitas un sitio web. Nos ayudan a mejorar tu experiencia de navegación y a proporcionarte contenido personalizado.</p>
+
+                    <h2 class="h4 mb-3 mt-4">Tipos de cookies que utilizamos</h2>
+                    
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="cookie-type-card mb-4 p-3 border rounded">
+                                <h3 class="h5 text-primary">🔧 Cookies Necesarias</h3>
+                                <p><strong>Propósito:</strong> Esenciales para el funcionamiento básico del sitio web.</p>
+                                <p><strong>Duración:</strong> Sesión y persistentes</p>
+                                <p><strong>Ejemplos:</strong></p>
+                                <ul>
+                                    <li>Cookies de autenticación de usuario</li>
+                                    <li>Cookies de seguridad CSRF</li>
+                                    <li>Preferencias de idioma y accesibilidad</li>
+                                </ul>
+                                <p><strong>Base legal:</strong> Interés legítimo - necesarias para proporcionar el servicio.</p>
+                            </div>
+
+                            <div class="cookie-type-card mb-4 p-3 border rounded">
+                                <h3 class="h5 text-info">📊 Cookies de Análisis</h3>
+                                <p><strong>Propósito:</strong> Nos ayudan a entender cómo los usuarios interactúan con nuestro sitio web.</p>
+                                <p><strong>Duración:</strong> Hasta 24 meses</p>
+                                <p><strong>Terceros utilizados:</strong></p>
+                                <ul>
+                                    <li><strong>Metricool:</strong> Análisis de tráfico web y redes sociales</li>
+                                    <li>Hash de seguimiento: fabe37fc5c74e614c28f4a6b6d224a76</li>
+                                </ul>
+                                <p><strong>Datos recopilados:</strong> Páginas visitadas, tiempo de permanencia, dispositivo utilizado (anonimizado)</p>
+                                <p><strong>Base legal:</strong> Consentimiento del usuario.</p>
+                            </div>
+
+                            <div class="cookie-type-card mb-4 p-3 border rounded">
+                                <h3 class="h5 text-success">⚙️ Cookies Funcionales</h3>
+                                <p><strong>Propósito:</strong> Mejoran la funcionalidad y personalización del sitio web.</p>
+                                <p><strong>Duración:</strong> Hasta 12 meses</p>
+                                <p><strong>Ejemplos:</strong></p>
+                                <ul>
+                                    <li>Recordar tus preferencias de accesibilidad (tamaño de fuente, contraste)</li>
+                                    <li>Preferencias de idioma</li>
+                                    <li>Chat widget y conversaciones guardadas</li>
+                                </ul>
+                                <p><strong>Base legal:</strong> Consentimiento del usuario.</p>
+                            </div>
+
+                            <div class="cookie-type-card mb-4 p-3 border rounded">
+                                <h3 class="h5 text-warning">🎯 Cookies de Marketing</h3>
+                                <p><strong>Propósito:</strong> Se utilizan para rastrear visitantes y mostrar contenido relevante.</p>
+                                <p><strong>Duración:</strong> Hasta 24 meses</p>
+                                <p><strong>Nota:</strong> Actualmente no utilizamos cookies de marketing, pero nos reservamos el derecho a implementarlas en el futuro con tu consentimiento.</p>
+                                <p><strong>Base legal:</strong> Consentimiento del usuario.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="h4 mb-3 mt-4">Gestión de cookies</h2>
+                    <div class="alert alert-info" role="alert">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i data-lucide="settings" aria-hidden="true"></i>
+                            </div>
+                            <div>
+                                <h5 class="alert-heading">Control de cookies</h5>
+                                <p class="mb-2">Puedes gestionar tus preferencias de cookies en cualquier momento:</p>
+                                <button onclick="window.revokeCookieConsent()" class="btn btn-outline-primary btn-sm">
+                                    Revisar configuración de cookies
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="h5 mb-3">Configuración del navegador</h3>
+                    <p>También puedes controlar las cookies directamente desde tu navegador:</p>
+                    <ul>
+                        <li><strong>Chrome:</strong> Configuración > Privacidad y seguridad > Cookies</li>
+                        <li><strong>Firefox:</strong> Preferencias > Privacidad y seguridad > Cookies</li>
+                        <li><strong>Safari:</strong> Preferencias > Privacidad > Cookies</li>
+                        <li><strong>Edge:</strong> Configuración > Privacidad, búsqueda y servicios > Cookies</li>
+                    </ul>
+
+                    <h2 class="h4 mb-3 mt-4">Transferencias internacionales</h2>
+                    <p>Algunos de nuestros proveedores de servicios (como Metricool) pueden procesar datos fuera de la Unión Europea. Nos aseguramos de que todas las transferencias cumplan con el RGPD mediante:</p>
+                    <ul>
+                        <li>Cláusulas contractuales tipo de la Comisión Europea</li>
+                        <li>Decisiones de adecuación</li>
+                        <li>Medidas de seguridad técnicas y organizativas apropiadas</li>
+                    </ul>
+
+                    <h2 class="h4 mb-3 mt-4">Tus derechos</h2>
+                    <p>Bajo el RGPD, tienes los siguientes derechos respecto a las cookies:</p>
+                    <ul>
+                        <li><strong>Derecho de acceso:</strong> Saber qué cookies utilizamos</li>
+                        <li><strong>Derecho de rectificación:</strong> Corregir información incorrecta</li>
+                        <li><strong>Derecho de supresión:</strong> Eliminar cookies y revocar consentimiento</li>
+                        <li><strong>Derecho de oposición:</strong> Oponerte al tratamiento</li>
+                        <li><strong>Derecho de portabilidad:</strong> Obtener tus datos en formato legible</li>
+                    </ul>
+
+                    <h2 class="h4 mb-3 mt-4">Contacto</h2>
+                    <p>Para cualquier consulta sobre nuestra política de cookies:</p>
+                    <ul>
+                        <li><strong>Email:</strong> diversiaeternals@gmail.com</li>
+                        <li><strong>Teléfono:</strong> 695 260 546</li>
+                        <li><strong>Dirección:</strong> Avda Espoia, 762, Barcelona</li>
+                        <li><strong>Responsable:</strong> Olga Cruz Hernández, CEO</li>
+                    </ul>
+
+                    <h2 class="h4 mb-3 mt-4">Actualizaciones</h2>
+                    <p>Esta política de cookies puede actualizarse periódicamente. Te notificaremos sobre cambios significativos a través de nuestro sitio web o por email.</p>
+
+                    <p class="text-muted mt-4"><small>Última actualización: Enero 2025</small></p>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button onclick="window.revokeCookieConsent()" class="btn btn-primary me-3">
+                    Configurar Cookies
+                </button>
+                <a href="/" class="btn btn-outline-secondary">Volver al inicio</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.cookie-type-card {
+    transition: all 0.3s ease;
+}
+.cookie-type-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

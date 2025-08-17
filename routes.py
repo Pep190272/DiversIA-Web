@@ -42,6 +42,10 @@ def terminos_condiciones():
 def aviso_legal():
     return render_template('aviso-legal.html')
 
+@app.route('/politica-cookies')
+def politica_cookies():
+    return render_template('politica_cookies.html')
+
 @app.route('/sobre-nosotros')
 def sobre_nosotros():
     return render_template('sobre-nosotros.html')

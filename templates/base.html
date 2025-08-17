@@ -185,7 +185,8 @@
                         <li><a href="{{ url_for('politica_privacidad') }}" class="text-muted text-decoration-none">Política de Privacidad</a></li>
                         <li><a href="{{ url_for('aviso_legal') }}" class="text-muted text-decoration-none">Aviso Legal</a></li>
                         <li><a href="{{ url_for('terminos_condiciones') }}" class="text-muted text-decoration-none">Términos y Condiciones</a></li>
-                        <li><a href="{{ url_for('sobre_nosotros') }}" class="text-muted text-decoration-none">Sobre Nosotros</a></li>
+                        <li><a href="{{ url_for('politica_cookies') }}" class="text-muted text-decoration-none">Política de Cookies</a></li>
+                        <li><a href="javascript:void(0)" onclick="window.revokeCookieConsent()" class="text-muted text-decoration-none">Configurar Cookies</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3">
@@ -223,6 +224,7 @@
     
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/accessibility.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cookies-banner.js') }}"></script>
     <script src="{{ url_for('static', filename='js/carousel.js') }}"></script>
     
     <!-- Client Translation System -->
@@ -231,30 +233,7 @@
     <!-- Chat Widget -->
     <script src="{{ url_for('static', filename='js/chat-widget.js') }}"></script>
     
-    <!-- Metricool Analytics -->
-    <script>
-    function loadScript(a){
-        var b=document.getElementsByTagName("head")[0],
-        c=document.createElement("script");
-        c.type="text/javascript",
-        c.src="https://tracker.metricool.com/resources/be.js",
-        c.onreadystatechange=a,
-        c.onload=a,
-        b.appendChild(c)
-    }
-    loadScript(function(){
-        try {
-            if (typeof beTracker !== 'undefined') {
-                beTracker.t({hash:"fabe37fc5c74e614c28f4a6b6d224a76"});
-                console.log('Metricool tracker initialized successfully');
-            } else {
-                console.log('Metricool beTracker not available');
-            }
-        } catch (e) {
-            console.log('Metricool initialization error:', e);
-        }
-    });
-    </script>
+    <!-- Metricool se carga solo con consentimiento de cookies de análisis -->
     
     <!-- Initialize Lucide icons -->
     <script>
