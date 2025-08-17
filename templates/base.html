@@ -230,6 +230,22 @@
     <!-- Chat Widget -->
     <script src="{{ url_for('static', filename='js/chat-widget.js') }}"></script>
     
+    <!-- Metricool Analytics -->
+    <script>
+    function loadScript(a){
+        var b=document.getElementsByTagName("head")[0],
+        c=document.createElement("script");
+        c.type="text/javascript",
+        c.src="https://tracker.metricool.com/resources/be.js",
+        c.onreadystatechange=a,
+        c.onload=a,
+        b.appendChild(c)
+    }
+    loadScript(function(){
+        beTracker.t({hash:"fabe37fc5c74e614c28f4a6b6d224a76"})
+    });
+    </script>
+    
     <!-- Initialize Lucide icons -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {

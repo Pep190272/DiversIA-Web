@@ -441,10 +441,8 @@
     
     async function sendToWebhook(message) {
         try {
-            // URL del webhook de n8n.cloud (según configuración real)
-            const n8nWebhookUrl = 'https://pepmorenocreador.app.n8n.cloud/webhook-test/diversia-chat';
-            
-            const response = await fetch(n8nWebhookUrl, {
+            // Primero intentar con sistema inteligente local
+            const localResponse = await fetch('/webhook/intelligent-response', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -457,56 +455,74 @@
                 })
             });
             
-            console.log('n8n response status:', response.status);
+            if (localResponse.ok) {
+                const data = await localResponse.json();
+                console.log('Local AI response:', data);
+                
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    const botResponse = data.final_response || data.response || 'Respuesta recibida';
+                    addMessage(botResponse, 'bot');
+                }, 1000);
+                return;
+            }
             
-            if (response.ok) {
-                const data = await response.json();
+            // Fallback a n8n si falla el local
+            const n8nWebhookUrl = 'https://pepmorenocreador.app.n8n.cloud/webhook-test/diversia-chat';
+            const n8nResponse = await fetch(n8nWebhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    user_id: getUserId(),
+                    session_id: sessionId,
+                    page: window.location.pathname
+                })
+            });
+            
+            if (n8nResponse.ok) {
+                const data = await n8nResponse.json();
                 console.log('n8n response data:', data);
                 
-                // Usar respuesta real de n8n
                 setTimeout(() => {
                     hideTypingIndicator();
                     const botResponse = data.final_response || data.response || data.message || 'Respuesta recibida';
                     addMessage(botResponse, 'bot');
                 }, 1500);
             } else {
-                console.error('n8n response error:', response.status, response.statusText);
-                throw new Error(`HTTP ${response.status}`);
+                throw new Error(`HTTP ${n8nResponse.status}`);
             }
             
         } catch (error) {
-            console.error('Error sending to n8n cloud:', error);
+            console.error('Both AI systems failed:', error);
             hideTypingIndicator();
-            // Usar respuesta local inteligente como fallback
+            // Último fallback local básico
             addBotResponseLocal(message);
         }
     }
     
     function addBotResponseLocal(userMessage) {
-        // Respuestas locales mejoradas mientras se configura n8n
+        // Respuestas locales básicas como último fallback
+        const message = userMessage.toLowerCase();
         let response = '';
         
-        const message = userMessage.toLowerCase();
-        
-        if (message.includes('registro') || message.includes('registrar')) {
-            response = 'Para registrarte en DiversIA, puedes elegir entre:<br><br>• <strong>Personas neurodivergentes</strong>: Crea tu perfil profesional<br>• <strong>Empresas inclusivas</strong>: Registra tu empresa para contratar talento diverso<br><br>¿Cuál te interesa más?';
-        } else if (message.includes('tdah') || message.includes('adhd')) {
-            response = 'El TDAH (Trastorno por Déficit de Atención e Hiperactividad) es una de las neurodivergencias que apoyamos. Tenemos formularios especializados y recursos específicos para personas con TDAH. ¿Te gustaría conocer más sobre el proceso de registro?';
-        } else if (message.includes('tea') || message.includes('autismo')) {
-            response = 'Apoyamos a personas con TEA (Trastorno del Espectro Autista). Nuestro proceso incluye evaluaciones adaptadas y matching con empresas que valoran la diversidad cognitiva. ¿Qué aspecto te interesa más?';
-        } else if (message.includes('dislexia')) {
-            response = 'Para personas con dislexia, ofrecemos tests especializados y recursos de apoyo. También conectamos con asociaciones como DISFAM que pueden proporcionar evaluaciones profesionales. ¿Necesitas más información?';
-        } else if (message.includes('empresa') || message.includes('contratar')) {
-            response = 'Ayudamos a empresas a encontrar talento neurodivergente excepcional. Nuestro proceso incluye:<br><br>• Matching inteligente<br>• Orientación sobre inclusión<br>• Seguimiento del proceso<br><br>¿Te gustaría registrar tu empresa?';
-        } else if (message.includes('hola') || message.includes('buenas') || message.includes('ayuda')) {
-            response = '¡Hola! Soy el asistente de DiversIA. Estoy aquí para ayudarte con cualquier duda sobre nuestra plataforma de inclusión laboral. Puedo contarte sobre nuestros servicios, el proceso de registro, o cualquier información que necesites. ¿En qué puedo asistirte?';
-        } else if (message.includes('trabajo') || message.includes('empleo')) {
-            response = 'Nuestro sistema de matching inteligente conecta candidatos neurodivergentes con ofertas de trabajo compatibles. Actualmente tenemos ofertas en desarrollo, diseño y análisis de datos. ¿Cuál es tu área de experiencia?';
+        if (message.includes('diversia') || message.includes('que es') || message.includes('qué es')) {
+            response = '<strong>DiversIA</strong> es una plataforma de inclusión laboral especializada en conectar talento neurodivergente con empresas inclusivas.<br><br>🎯 <strong>Características:</strong><br>• Tests gamificados neurocognitivos<br>• Matching inteligente con empresas<br>• Comunidad de apoyo profesional<br><br>👥 <strong>CEO:</strong> Olga Cruz Hernández<br>📍 Avda Espoia, 762, Barcelona<br>📞 695 260 546';
+        } else if (message.includes('ceo') || message.includes('olga')) {
+            response = 'El <strong>CEO de DiversIA</strong> es <strong>Olga Cruz Hernández</strong>.<br><br>📧 diversiaeternals@gmail.com<br>📞 695 260 546<br>📍 Avda Espoia, 762, Barcelona';
+        } else if (message.includes('contacto') || message.includes('teléfono') || message.includes('email')) {
+            response = '📞 <strong>Contacto DiversIA:</strong><br><br>📧 diversiaeternals@gmail.com<br>📞 695 260 546<br>📍 Avda Espoia, 762, Barcelona<br><br>CEO: Olga Cruz Hernández';
+        } else if (message.includes('registro') || message.includes('registrar')) {
+            response = 'Para registrarte en DiversIA:<br><br>👤 <strong>Candidatos neurodivergentes:</strong> Formularios adaptados por tipo (TDAH, TEA, Dislexia)<br>🏢 <strong>Empresas inclusivas:</strong> Registro para empleadores<br><br>¿Cuál te interesa?';
+        } else if (message.includes('tests') || message.includes('gamificado') || message.includes('evaluación')) {
+            response = '🎮 <strong>Tests Gamificados:</strong><br><br>Evaluaciones neurocognitivas diseñadas como juegos para identificar tus fortalezas únicas. Son divertidos, no intimidantes, y revelan tu verdadero potencial profesional.<br><br>¿Te gustaría comenzar tu evaluación?';
         } else {
-            response = 'Gracias por tu mensaje. Puedo ayudarte con información sobre:<br><br>• Registro de personas neurodivergentes<br>• Registro de empresas inclusivas<br>• Tipos de neurodivergencia (TDAH, TEA, Dislexia)<br>• Proceso de matching laboral<br>• Recursos y asociaciones<br><br>¿Sobre qué te gustaría saber más?';
+            response = '¡Hola! Soy el asistente de <strong>DiversIA</strong>, tu plataforma de inclusión laboral para talento neurodivergente.<br><br>🌟 <strong>Puedo ayudarte con:</strong><br>• Información sobre DiversIA y nuestro equipo<br>• Tests gamificados y matching<br>• Registro de candidatos o empresas<br>• Contacto y ubicación<br><br>¿Qué necesitas saber?';
         }
         
-        addMessage(response, 'bot');
+        setTimeout(() => addMessage(response, 'bot'), 800);
     }
     
     function trackUserAction(action, data = {}) {

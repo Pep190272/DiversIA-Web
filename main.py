@@ -1,10 +1,12 @@
 from app import app
 from api_endpoints import api
 from chat_webhook import chat
+from chat_intelligent_endpoint import intelligent_chat
 
 # Register API and webhook blueprints
 app.register_blueprint(api)
 app.register_blueprint(chat)
+app.register_blueprint(intelligent_chat)
 
 # Import AI endpoints
 try:

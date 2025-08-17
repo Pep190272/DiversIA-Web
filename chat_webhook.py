@@ -3,6 +3,13 @@ from datetime import datetime
 import json
 import logging
 
+# Importar sistema inteligente
+try:
+    from chat_intelligent_fallback import get_intelligent_response
+    INTELLIGENT_FALLBACK_AVAILABLE = True
+except ImportError:
+    INTELLIGENT_FALLBACK_AVAILABLE = False
+
 # Chat webhook for n8n integration
 chat = Blueprint('chat', __name__, url_prefix='/webhook')
 
