@@ -96,6 +96,7 @@ Preferred communication style: Simple, everyday language.
 - ✓ Intelligent intent detection for better user experience
 - ✓ Local AI system with fallback to n8n cloud service
 - ✓ Real-time responses about CEO, contact info, services, and processes
+- ✓ Hybrid system: Local responses + n8n tracking for analytics
 
 ### Translation System Enhancement (COMPLETE)
 - ✓ Fixed translator to work without page reloads between language changes

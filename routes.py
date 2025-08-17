@@ -26,6 +26,10 @@ def comunidad():
 def asociaciones():
     return render_template('asociaciones.html')
 
+@app.route('/metricool-verification')
+def metricool_verification():
+    return render_template('metricool_verification.html')
+
 @app.route('/politica-privacidad')
 def politica_privacidad():
     return render_template('politica-privacidad.html')

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{% block meta_description %}DiversIA - Plataforma de inclusión laboral para personas neurodivergentes{% endblock %}">
+    <meta name="google-site-verification" content="fabe37fc5c74e614c28f4a6b6d224a76" />
     <title>{% block title %}DiversIA - Talento que piensa distinto{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
@@ -242,7 +243,16 @@
         b.appendChild(c)
     }
     loadScript(function(){
-        beTracker.t({hash:"fabe37fc5c74e614c28f4a6b6d224a76"})
+        try {
+            if (typeof beTracker !== 'undefined') {
+                beTracker.t({hash:"fabe37fc5c74e614c28f4a6b6d224a76"});
+                console.log('Metricool tracker initialized successfully');
+            } else {
+                console.log('Metricool beTracker not available');
+            }
+        } catch (e) {
+            console.log('Metricool initialization error:', e);
+        }
     });
     </script>
     

@@ -459,6 +459,25 @@
                 const data = await localResponse.json();
                 console.log('Local AI response:', data);
                 
+                // También enviar a n8n para seguimiento sin esperar respuesta
+                try {
+                    await fetch('https://pepmorenocreador.app.n8n.cloud/webhook-test/diversia-chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: message,
+                            user_id: getUserId(),
+                            session_id: sessionId,
+                            page: window.location.pathname,
+                            response: data.final_response,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+                    console.log('Data sent to n8n for tracking');
+                } catch (n8nError) {
+                    console.log('n8n tracking failed (normal if workflow not running):', n8nError.message);
+                }
+                
                 setTimeout(() => {
                     hideTypingIndicator();
                     const botResponse = data.final_response || data.response || 'Respuesta recibida';
@@ -467,7 +486,8 @@
                 return;
             }
             
-            // Fallback a n8n si falla el local
+            // Si falla el local, intentar n8n como backup
+            console.log('Local AI failed, trying n8n webhook as backup...');
             const n8nWebhookUrl = 'https://pepmorenocreador.app.n8n.cloud/webhook-test/diversia-chat';
             const n8nResponse = await fetch(n8nWebhookUrl, {
                 method: 'POST',
@@ -478,7 +498,8 @@
                     message: message,
                     user_id: getUserId(),
                     session_id: sessionId,
-                    page: window.location.pathname
+                    page: window.location.pathname,
+                    fallback_mode: true
                 })
             });
             
@@ -488,15 +509,15 @@
                 
                 setTimeout(() => {
                     hideTypingIndicator();
-                    const botResponse = data.final_response || data.response || data.message || 'Respuesta recibida';
+                    const botResponse = data.final_response || data.response || data.message || 'Respuesta desde n8n recibida';
                     addMessage(botResponse, 'bot');
                 }, 1500);
             } else {
-                throw new Error(`HTTP ${n8nResponse.status}`);
+                throw new Error(`n8n HTTP ${n8nResponse.status}`);
             }
             
         } catch (error) {
-            console.error('Both AI systems failed:', error);
+            console.error('All AI systems failed, using local fallback:', error);
             hideTypingIndicator();
             // Último fallback local básico
             addBotResponseLocal(message);
