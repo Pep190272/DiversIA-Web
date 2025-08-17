@@ -99,11 +99,11 @@
                 <div class="privacy-icon mb-3">
                     <i data-lucide="shield-check" aria-hidden="true"></i>
                 </div>
-                <h2 id="privacy-heading" class="mb-3">Tus datos, bajo tu control</h2>
-                <p class="lead mb-4">
+                <h2 id="privacy-heading" class="mb-3" data-translate="yes">Tus datos, bajo tu control</h2>
+                <p class="lead mb-4" data-translate="yes">
                     Cumplimos con GDPR y garantizamos la máxima privacidad. Tus datos solo se comparten con tu consentimiento explícito.
                 </p>
-                <a href="#" class="btn btn-outline-primary">
+                <a href="{{ url_for('politica_privacidad') }}" class="btn btn-outline-primary" data-translate="yes">
                     <i data-lucide="file-text" aria-hidden="true"></i>
                     Leer política de privacidad
                 </a>
@@ -115,7 +115,7 @@
 <!-- Testimonials Carousel -->
 <section class="testimonials-section py-5" aria-labelledby="testimonials-heading">
     <div class="container">
-        <h2 id="testimonials-heading" class="text-center mb-5">Historias de éxito</h2>
+        <h2 id="testimonials-heading" class="text-center mb-5" data-translate="yes">Historias de éxito</h2>
         <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="false" data-bs-interval="false">
             <div class="carousel-inner">
                 <div class="carousel-item active">
@@ -123,9 +123,9 @@
                         <div class="col-lg-8">
                             <div class="testimonial-card">
                                 <blockquote class="blockquote text-center">
-                                    <p class="mb-4">"Gracias a DiversIA encontré un trabajo que se adapta perfectamente a mi forma de procesar información. Por primera vez siento que mis diferencias son valoradas."</p>
+                                    <p class="mb-4" data-translate="yes">"Gracias a DiversIA encontré un trabajo que se adapta perfectamente a mi forma de procesar información. Por primera vez siento que mis diferencias son valoradas."</p>
                                     <footer class="blockquote-footer">
-                                        <cite title="Ana M.">Ana M., Desarrolladora con TDAH</cite>
+                                        <cite title="Ana M." data-translate="yes">Ana M., Desarrolladora con TDAH</cite>
                                     </footer>
                                 </blockquote>
                             </div>
@@ -137,9 +137,9 @@
                         <div class="col-lg-8">
                             <div class="testimonial-card">
                                 <blockquote class="blockquote text-center">
-                                    <p class="mb-4">"Como empresa, DiversIA nos ayudó a encontrar talentos excepcionales que aportan perspectivas únicas a nuestro equipo."</p>
+                                    <p class="mb-4" data-translate="yes">"Como empresa, DiversIA nos ayudó a encontrar talentos excepcionales que aportan perspectivas únicas a nuestro equipo."</p>
                                     <footer class="blockquote-footer">
-                                        <cite title="Carlos R.">Carlos R., Director de RRHH</cite>
+                                        <cite title="Carlos R." data-translate="yes">Carlos R., Director de RRHH</cite>
                                     </footer>
                                 </blockquote>
                             </div>
@@ -151,9 +151,9 @@
                         <div class="col-lg-8">
                             <div class="testimonial-card">
                                 <blockquote class="blockquote text-center">
-                                    <p class="mb-4">"La plataforma me permitió entender mejor mis fortalezas y encontrar un entorno laboral donde puedo brillar sin estrés."</p>
+                                    <p class="mb-4" data-translate="yes">"La plataforma me permitió entender mejor mis fortalezas y encontrar un entorno laboral donde puedo brillar sin estrés."</p>
                                     <footer class="blockquote-footer">
-                                        <cite title="María L.">María L., Diseñadora con TEA</cite>
+                                        <cite title="María L." data-translate="yes">María L., Diseñadora con TEA</cite>
                                     </footer>
                                 </blockquote>
                             </div>
@@ -187,11 +187,11 @@
     <div class="container">
         <div class="row justify-content-center text-center">
             <div class="col-lg-8">
-                <h2 class="mb-3">¿Listo para encontrar tu lugar?</h2>
-                <p class="lead mb-4">
+                <h2 class="mb-3" data-translate="yes">¿Listo para encontrar tu lugar?</h2>
+                <p class="lead mb-4" data-translate="yes">
                     Únete a miles de personas neurodivergentes que ya han encontrado trabajo a través de DiversIA.
                 </p>
-                <a href="{{ url_for('registro') }}" class="btn btn-light btn-lg">
+                <a href="{{ url_for('registro') }}" class="btn btn-light btn-lg" data-translate="yes">
                     Comenzar ahora
                 </a>
             </div>
