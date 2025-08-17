@@ -6,5 +6,14 @@ from chat_webhook import chat
 app.register_blueprint(api)
 app.register_blueprint(chat)
 
+# Import AI endpoints
+try:
+    from api_endpoints_ai import register_ai_endpoints
+    register_ai_endpoints(app)
+    print("✅ AI endpoints registered successfully")
+except ImportError as e:
+    print(f"⚠️ AI endpoints not available: {e}")
+    print("Basic functionality will work, advanced AI features require additional packages")
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
