@@ -11,11 +11,16 @@ import asyncio
 
 # Importar nuestros módulos de IA (con manejo de errores)
 try:
-    from ai_agent_core import process_chat_message, diversia_agent
+    from ai_simplified import process_chat_message_simple
     AI_AGENT_AVAILABLE = True
 except ImportError as e:
-    logging.warning(f"AI Agent not available: {e}")
-    AI_AGENT_AVAILABLE = False
+    try:
+        from ai_agent_core import process_chat_message, diversia_agent
+        AI_AGENT_AVAILABLE = True
+        process_chat_message_simple = process_chat_message
+    except ImportError as e2:
+        logging.warning(f"AI Agent not available: {e}, {e2}")
+        AI_AGENT_AVAILABLE = False
 
 try:
     from ai_matching_engine import matching_engine, get_candidate_recommendations
@@ -38,7 +43,11 @@ except ImportError as e:
     logging.warning(f"Security Manager not available: {e}")
     SECURITY_MANAGER_AVAILABLE = False
 
-from models import db, Usuario, Empresa
+try:
+    from models import db, Usuario, Empresa
+    MODELS_AVAILABLE = True
+except ImportError:
+    MODELS_AVAILABLE = False
 from sendgrid_helper import send_notification_email
 
 # Crear blueprint para APIs de IA
@@ -74,7 +83,7 @@ def intelligent_chat():
             asyncio.set_event_loop(loop)
             try:
                 result = loop.run_until_complete(
-                    process_chat_message(message, user_id, session_id, page)
+                    process_chat_message_simple(message, user_id, session_id, page)
                 )
                 
                 # Enriquecer con datos del sistema
@@ -398,6 +407,9 @@ def get_match_quality_label(score):
 def get_system_statistics():
     """Obtener estadísticas del sistema"""
     try:
+        if not MODELS_AVAILABLE:
+            return {'total_users': 0, 'total_companies': 0}
+            
         stats = {}
         
         # Contar usuarios
@@ -455,6 +467,8 @@ def generate_intelligent_insights(stats):
 def check_database_health():
     """Verificar salud de la base de datos"""
     try:
+        if not MODELS_AVAILABLE:
+            return False
         # Intentar una consulta simple
         db.session.execute('SELECT 1')
         return True
