@@ -115,6 +115,21 @@
                                 </div>
                             </div>
                             
+                            <!-- Política de Privacidad -->
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    {{ form.aceptar_privacidad(class="form-check-input" + (" is-invalid" if form.aceptar_privacidad.errors else "")) }}
+                                    <label class="form-check-label" for="{{ form.aceptar_privacidad.id }}">
+                                        He leído y acepto la <a href="{{ url_for('politica_privacidad') }}" target="_blank" class="text-decoration-none">Política de Privacidad</a>
+                                    </label>
+                                    {% if form.aceptar_privacidad.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.aceptar_privacidad.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
                             <button type="submit" class="btn btn-primary">
                                 <i data-lucide="check" aria-hidden="true"></i>
                                 Registrar Empresa
@@ -195,6 +210,21 @@
                                 {% endfor %}
                             </div>
                             
+                            <!-- Política de Privacidad -->
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    {{ oferta_form.aceptar_privacidad(class="form-check-input" + (" is-invalid" if oferta_form.aceptar_privacidad.errors else "")) }}
+                                    <label class="form-check-label" for="{{ oferta_form.aceptar_privacidad.id }}">
+                                        He leído y acepto la <a href="{{ url_for('politica_privacidad') }}" target="_blank" class="text-decoration-none">Política de Privacidad</a>
+                                    </label>
+                                    {% if oferta_form.aceptar_privacidad.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in oferta_form.aceptar_privacidad.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
                             <button type="submit" class="btn btn-primary">
                                 <i data-lucide="send" aria-hidden="true"></i>
                                 Publicar Oferta
