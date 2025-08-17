@@ -32,15 +32,15 @@ def metricool_verification():
 
 @app.route('/politica-privacidad')
 def politica_privacidad():
-    return render_template('politica-privacidad.html')
-
-@app.route('/aviso-legal')
-def aviso_legal():
-    return render_template('aviso-legal.html')
+    return render_template('politica_privacidad.html')
 
 @app.route('/terminos-condiciones')
 def terminos_condiciones():
-    return render_template('terminos-condiciones.html')
+    return render_template('terminos_condiciones.html')
+
+@app.route('/aviso-legal')
+def aviso_legal():
+    return render_template('aviso_legal.html')
 
 @app.route('/sobre-nosotros')
 def sobre_nosotros():

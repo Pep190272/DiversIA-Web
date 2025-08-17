@@ -32,6 +32,7 @@ class RegistroGeneralForm(FlaskForm):
     habilidades = TextAreaField('Habilidades y fortalezas', validators=[Optional()])
     intereses_laborales = TextAreaField('Intereses laborales', validators=[Optional()])
     adaptaciones_necesarias = TextAreaField('Adaptaciones necesarias en el trabajo', validators=[Optional()])
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
 
 class RegistroTDAHForm(RegistroGeneralForm):
     # Campos específicos para TDAH
@@ -43,6 +44,7 @@ class RegistroTDAHForm(RegistroGeneralForm):
                                choices=[('', 'Selecciona'), ('bajo', 'Bajo'), ('medio', 'Medio'), ('alto', 'Alto')])
     medicacion_actual = BooleanField('¿Tomas medicación actualmente?')
     estrategias_organizacion = TextAreaField('Estrategias de organización que utilizas')
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
 
 class RegistroDislexiaForm(RegistroGeneralForm):
     # Campos específicos para Dislexia
@@ -56,6 +58,7 @@ class RegistroDislexiaForm(RegistroGeneralForm):
                                                  ('corrector', 'Corrector ortográfico'),
                                                  ('organizadores', 'Organizadores gráficos'),
                                                  ('tiempo_extra', 'Tiempo extra para tareas')])
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
 
 class RegistroTEAForm(RegistroGeneralForm):
     # Campos específicos para TEA
@@ -67,6 +70,7 @@ class RegistroTEAForm(RegistroGeneralForm):
                                                           ('tactil', 'Táctil'), ('olfativa', 'Olfativa')])
     rutinas_importantes = BooleanField('¿Son importantes las rutinas para ti?')
     intereses_especiales = TextAreaField('Intereses especiales o áreas de expertise')
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
 
 class EmpresaRegistroForm(FlaskForm):
     nombre_empresa = StringField('Nombre de la empresa', validators=[DataRequired(), Length(min=2, max=200)])
@@ -80,6 +84,7 @@ class EmpresaRegistroForm(FlaskForm):
                                       ('mediana', 'Mediana (51-250 empleados)'),
                                       ('grande', 'Grande (250+ empleados)')])
     ciudad = StringField('Ciudad', validators=[Optional(), Length(max=100)])
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
 
 class OfertaEmpleoForm(FlaskForm):
     titulo_puesto = StringField('Título del puesto', validators=[DataRequired(), Length(min=2, max=200)])
@@ -105,3 +110,4 @@ class OfertaEmpleoForm(FlaskForm):
                                                        ('dislexia', 'Dislexia'),
                                                        ('discalculia', 'Discalculia'),
                                                        ('todas', 'Todas')])
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
