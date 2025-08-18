@@ -10,7 +10,10 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Lucide Icons -->
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Lucide Icons (fallback) -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
 
@@ -31,57 +34,97 @@
             <div class="row g-2 align-items-center justify-content-between">
                 <!-- Left side: Accessibility controls -->
                 <div class="col-auto d-flex align-items-center gap-2">
-                    <span class="small text-muted">Accesibilidad:</span>
-                    <button type="button" class="btn btn-sm btn-outline-primary" id="font-size-toggle" aria-label="Cambiar tamaño de texto">
-                        <i data-lucide="type" aria-hidden="true"></i>
+                    <span class="small text-muted" data-translate="accessibility">Accesibilidad:</span>
+                    <button type="button" 
+                            class="btn btn-sm btn-outline-primary accessibility-btn" 
+                            id="font-size-toggle" 
+                            aria-label="Cambiar tamaño de texto"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" 
+                            data-translate-title="font_size_tooltip"
+                            title="Aumentar o disminuir el tamaño del texto">
+                        <i class="fas fa-font" aria-hidden="true"></i>
                         <span class="visually-hidden">Texto</span>
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-primary" id="dark-mode-toggle" aria-label="Activar modo oscuro">
-                        <i data-lucide="moon" aria-hidden="true"></i>
+                    <button type="button" 
+                            class="btn btn-sm btn-outline-primary accessibility-btn" 
+                            id="dark-mode-toggle" 
+                            aria-label="Activar modo oscuro"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom"
+                            data-translate-title="dark_mode_tooltip" 
+                            title="Cambiar entre modo claro y oscuro">
+                        <i class="fas fa-moon" aria-hidden="true"></i>
                         <span class="visually-hidden">Modo oscuro</span>
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-primary" id="high-contrast-toggle" aria-label="Activar alto contraste">
-                        <i data-lucide="contrast" aria-hidden="true"></i>
+                    <button type="button" 
+                            class="btn btn-sm btn-outline-primary accessibility-btn" 
+                            id="high-contrast-toggle" 
+                            aria-label="Activar alto contraste"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom"
+                            data-translate-title="high_contrast_tooltip"
+                            title="Activar modo alto contraste negro/blanco">
+                        <i class="fas fa-adjust" aria-hidden="true"></i>
                         <span class="visually-hidden">Alto contraste</span>
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-primary" id="animations-toggle" aria-label="Desactivar animaciones">
-                        <i data-lucide="pause" aria-hidden="true"></i>
+                    <button type="button" 
+                            class="btn btn-sm btn-outline-primary accessibility-btn" 
+                            id="animations-toggle" 
+                            aria-label="Desactivar animaciones"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom"
+                            data-translate-title="animations_tooltip"
+                            title="Activar o desactivar animaciones">
+                        <i class="fas fa-play" aria-hidden="true"></i>
                         <span class="visually-hidden">Animaciones</span>
                     </button>
                 </div>
                 
                 <!-- Right side: Social Media Links -->
                 <div class="col-auto d-flex align-items-center gap-2">
-                    <span class="small text-muted">Síguenos:</span>
+                    <span class="small text-muted" data-translate="follow_us">Síguenos:</span>
                     <a href="https://discord.gg/VZjBPj6M2h" 
                        target="_blank" 
                        rel="noopener noreferrer"
                        class="btn btn-sm btn-outline-primary social-link" 
                        aria-label="Discord de DiversIA"
-                       title="Únete a nuestro Discord">
-                        <i data-lucide="message-circle" aria-hidden="true"></i>
+                       data-bs-toggle="tooltip" 
+                       data-bs-placement="bottom"
+                       data-translate-title="discord_tooltip"
+                       title="Únete a nuestra comunidad en Discord">
+                        <i class="fab fa-discord" aria-hidden="true"></i>
                     </a>
                     <a href="https://instagram.com/diversiaeternals" 
                        target="_blank" 
                        rel="noopener noreferrer"
                        class="btn btn-sm btn-outline-primary social-link" 
                        aria-label="Instagram de DiversIA"
+                       data-bs-toggle="tooltip" 
+                       data-bs-placement="bottom"
+                       data-translate-title="instagram_tooltip"
                        title="Síguenos en Instagram">
-                        <i data-lucide="instagram" aria-hidden="true"></i>
+                        <i class="fab fa-instagram" aria-hidden="true"></i>
                     </a>
                     <a href="https://linkedin.com/company/diversia" 
                        target="_blank" 
                        rel="noopener noreferrer"
                        class="btn btn-sm btn-outline-primary social-link" 
                        aria-label="LinkedIn de DiversIA"
+                       data-bs-toggle="tooltip" 
+                       data-bs-placement="bottom"
+                       data-translate-title="linkedin_tooltip"
                        title="Conéctanos en LinkedIn">
-                        <i data-lucide="linkedin" aria-hidden="true"></i>
+                        <i class="fab fa-linkedin" aria-hidden="true"></i>
                     </a>
                     <a href="mailto:diversiaeternals@gmail.com" 
                        class="btn btn-sm btn-outline-primary social-link" 
                        aria-label="Email de DiversIA"
+                       data-bs-toggle="tooltip" 
+                       data-bs-placement="bottom"
+                       data-translate-title="email_tooltip"
                        title="Envíanos un email">
-                        <i data-lucide="mail" aria-hidden="true"></i>
+                        <i class="fas fa-envelope" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
@@ -263,24 +306,18 @@
     
     <!-- Metricool se carga solo con consentimiento de cookies de análisis -->
     
-    <!-- Initialize Lucide icons -->
+    <!-- Initialize Bootstrap tooltips and Lucide icons -->
     <script>
-        // Initialize icons when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Initialize Lucide icons (fallback)
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
-                
-                // Re-initialize icons after any content updates
-                const observer = new MutationObserver(function(mutations) {
-                    if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
-                    }
-                });
-                
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
             }
         });
     </script>

@@ -70,6 +70,17 @@
             'Activar modo oscuro': 'Enable dark mode',
             'Activar alto contraste': 'Enable high contrast',
             'Desactivar animaciones': 'Disable animations',
+            'Síguenos': 'Follow Us',
+            
+            // Tooltips for accessibility
+            'font_size_tooltip': 'Increase or decrease text size',
+            'dark_mode_tooltip': 'Switch between light and dark mode',
+            'high_contrast_tooltip': 'Activate high contrast black/white mode',
+            'animations_tooltip': 'Enable or disable animations',
+            'discord_tooltip': 'Join our Discord community',
+            'instagram_tooltip': 'Follow us on Instagram', 
+            'linkedin_tooltip': 'Connect with us on LinkedIn',
+            'email_tooltip': 'Send us an email',
             
             // TDAH section
             'TDAH': 'ADHD',
@@ -139,7 +150,17 @@
             // Conditions
             'TDAH': 'TDAH',
             'TEA': 'TSA',
-            'Dislexia': 'Dyslexie'
+            'Dislexia': 'Dyslexie',
+            
+            // Tooltips for accessibility (French)
+            'font_size_tooltip': 'Augmenter ou diminuer la taille du texte',
+            'dark_mode_tooltip': 'Basculer entre le mode clair et sombre',
+            'high_contrast_tooltip': 'Activer le mode haut contraste noir/blanc',
+            'animations_tooltip': 'Activer ou désactiver les animations',
+            'discord_tooltip': 'Rejoignez notre communauté Discord',
+            'instagram_tooltip': 'Suivez-nous sur Instagram',
+            'linkedin_tooltip': 'Connectez-vous avec nous sur LinkedIn',
+            'email_tooltip': 'Envoyez-nous un email'
         },
         
         'de': {
@@ -543,6 +564,24 @@
             const originalPlaceholder = element.getAttribute('placeholder');
             if (dictionary[originalPlaceholder]) {
                 element.setAttribute('placeholder', dictionary[originalPlaceholder]);
+            }
+        });
+        
+        // Translate tooltips with data-translate-title attributes
+        document.querySelectorAll('[data-translate-title]').forEach(element => {
+            const key = element.getAttribute('data-translate-title');
+            if (dictionary[key]) {
+                element.setAttribute('title', dictionary[key]);
+                element.setAttribute('data-bs-original-title', dictionary[key]);
+                
+                // Update Bootstrap tooltip if it exists
+                if (typeof bootstrap !== 'undefined') {
+                    const tooltip = bootstrap.Tooltip.getInstance(element);
+                    if (tooltip) {
+                        tooltip.dispose();
+                        new bootstrap.Tooltip(element);
+                    }
+                }
             }
         });
     }

@@ -396,14 +396,25 @@ footer, .footer {
 }
 
 /* Ensure icons are visible */
-.accessibility-controls i[data-lucide] {
-  width: 16px;
-  height: 16px;
+.accessibility-controls i {
+  width: 16px !important;
+  height: 16px !important;
+  font-size: 14px !important;
 }
 
-.social-link i[data-lucide] {
-  width: 16px;
-  height: 16px;
+.social-link i {
+  width: 16px !important;
+  height: 16px !important;
+  font-size: 14px !important;
+}
+
+/* Font Awesome icons styling */
+.accessibility-controls .fas,
+.accessibility-controls .fab,
+.social-link .fas,
+.social-link .fab {
+  display: inline-block !important;
+  color: currentColor !important;
 }
 
 /* Responsive accessibility bar */
