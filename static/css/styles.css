@@ -435,12 +435,12 @@ footer, .footer {
   display: inline-block;
 }
 
-/* Navbar logo styling */
-.navbar-logo {
+/* Navbar brand styling */
+.navbar-brand {
   transition: transform 0.2s ease;
 }
 
-.navbar-logo:hover {
+.navbar-brand:hover {
   transform: scale(1.05);
 }
 

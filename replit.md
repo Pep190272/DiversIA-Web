@@ -81,7 +81,7 @@ Preferred communication style: Simple, everyday language.
 - ✓ Alto contraste: negro/blanco estricto (#000000/#FFFFFF) sin grises
 - ✓ Eliminados problemas de superposición en controles y footer
 - ✓ Añadidos iconos de redes sociales en barra de accesibilidad (Discord, Instagram, LinkedIn, Email)
-- ✓ Preparado espacio para logotipo en header con medidas específicas
+- ✓ Restaurado texto "DiversIA" en header (usuario prefiere texto sobre logo)
 
 ### Chat System Optimization (COMPLETE)  
 - ✓ Fixed chat responses to be concise and direct
