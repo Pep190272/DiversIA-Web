@@ -1,7 +1,10 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from app import app, db
 from models import User, Company, JobOffer, TestResult
-from forms import RegistroGeneralForm, RegistroTDAHForm, RegistroDislexiaForm, RegistroTEAForm, EmpresaRegistroForm, OfertaEmpleoForm
+from forms import (RegistroGeneralForm, RegistroTDAHForm, RegistroDislexiaForm, RegistroTEAForm, 
+                  RegistroDiscalculiaForm, RegistroTouretteForm, RegistroDispraxiaForm, 
+                  RegistroAnsiedadForm, RegistroBipolarForm, RegistroAltasCapacidadesForm,
+                  EmpresaRegistroForm, OfertaEmpleoForm)
 from sendgrid_helper import send_registration_notification, send_company_registration_notification
 
 @app.route('/')
@@ -225,6 +228,270 @@ def registro_tea():
         flash('¡Registro de TEA completado exitosamente!', 'success')
         return redirect(url_for('index'))
     return render_template('registro-tea.html', form=form)
+
+@app.route('/registro-discalculia', methods=['GET', 'POST'])
+def registro_discalculia():
+    form = RegistroDiscalculiaForm()
+    if form.validate_on_submit():
+        user = User(
+            nombre=form.nombre.data,
+            apellidos=form.apellidos.data,
+            email=form.email.data,
+            fecha_nacimiento=form.fecha_nacimiento.data,
+            telefono=form.telefono.data,
+            ciudad=form.ciudad.data,
+            tipo_neurodivergencia='discalculia',
+            diagnostico_formal=form.diagnostico_formal.data,
+            experiencia_laboral=form.experiencia_laboral.data,
+            formacion_academica=form.formacion_academica.data,
+            habilidades=form.habilidades.data,
+            intereses_laborales=form.intereses_laborales.data,
+            adaptaciones_necesarias=form.adaptaciones_necesarias.data
+        )
+        db.session.add(user)
+        db.session.commit()
+        
+        # Enviar email de notificación
+        user_data = {
+            'nombre': form.nombre.data,
+            'apellidos': form.apellidos.data,
+            'email': form.email.data,
+            'telefono': form.telefono.data,
+            'ciudad': form.ciudad.data,
+            'fecha_nacimiento': form.fecha_nacimiento.data,
+            'tipo_neurodivergencia': 'Discalculia',
+            'diagnostico_formal': form.diagnostico_formal.data,
+            'experiencia_laboral': form.experiencia_laboral.data,
+            'formacion_academica': form.formacion_academica.data,
+            'habilidades': form.habilidades.data,
+            'intereses_laborales': form.intereses_laborales.data,
+            'adaptaciones_necesarias': form.adaptaciones_necesarias.data
+        }
+        send_registration_notification(user_data, "Registro Discalculia")
+        
+        flash('¡Registro de Discalculia completado exitosamente!', 'success')
+        return redirect(url_for('index'))
+    return render_template('registro-discalculia.html', form=form)
+
+@app.route('/registro-tourette', methods=['GET', 'POST'])
+def registro_tourette():
+    form = RegistroTouretteForm()
+    if form.validate_on_submit():
+        user = User(
+            nombre=form.nombre.data,
+            apellidos=form.apellidos.data,
+            email=form.email.data,
+            fecha_nacimiento=form.fecha_nacimiento.data,
+            telefono=form.telefono.data,
+            ciudad=form.ciudad.data,
+            tipo_neurodivergencia='tourette',
+            diagnostico_formal=form.diagnostico_formal.data,
+            experiencia_laboral=form.experiencia_laboral.data,
+            formacion_academica=form.formacion_academica.data,
+            habilidades=form.habilidades.data,
+            intereses_laborales=form.intereses_laborales.data,
+            adaptaciones_necesarias=form.adaptaciones_necesarias.data
+        )
+        db.session.add(user)
+        db.session.commit()
+        
+        # Enviar email de notificación
+        user_data = {
+            'nombre': form.nombre.data,
+            'apellidos': form.apellidos.data,
+            'email': form.email.data,
+            'telefono': form.telefono.data,
+            'ciudad': form.ciudad.data,
+            'fecha_nacimiento': form.fecha_nacimiento.data,
+            'tipo_neurodivergencia': 'Síndrome de Tourette',
+            'diagnostico_formal': form.diagnostico_formal.data,
+            'experiencia_laboral': form.experiencia_laboral.data,
+            'formacion_academica': form.formacion_academica.data,
+            'habilidades': form.habilidades.data,
+            'intereses_laborales': form.intereses_laborales.data,
+            'adaptaciones_necesarias': form.adaptaciones_necesarias.data
+        }
+        send_registration_notification(user_data, "Registro Síndrome de Tourette")
+        
+        flash('¡Registro de Síndrome de Tourette completado exitosamente!', 'success')
+        return redirect(url_for('index'))
+    return render_template('registro-tourette.html', form=form)
+
+@app.route('/registro-dispraxia', methods=['GET', 'POST'])
+def registro_dispraxia():
+    form = RegistroDispraxiaForm()
+    if form.validate_on_submit():
+        user = User(
+            nombre=form.nombre.data,
+            apellidos=form.apellidos.data,
+            email=form.email.data,
+            fecha_nacimiento=form.fecha_nacimiento.data,
+            telefono=form.telefono.data,
+            ciudad=form.ciudad.data,
+            tipo_neurodivergencia='dispraxia',
+            diagnostico_formal=form.diagnostico_formal.data,
+            experiencia_laboral=form.experiencia_laboral.data,
+            formacion_academica=form.formacion_academica.data,
+            habilidades=form.habilidades.data,
+            intereses_laborales=form.intereses_laborales.data,
+            adaptaciones_necesarias=form.adaptaciones_necesarias.data
+        )
+        db.session.add(user)
+        db.session.commit()
+        
+        # Enviar email de notificación
+        user_data = {
+            'nombre': form.nombre.data,
+            'apellidos': form.apellidos.data,
+            'email': form.email.data,
+            'telefono': form.telefono.data,
+            'ciudad': form.ciudad.data,
+            'fecha_nacimiento': form.fecha_nacimiento.data,
+            'tipo_neurodivergencia': 'Dispraxia',
+            'diagnostico_formal': form.diagnostico_formal.data,
+            'experiencia_laboral': form.experiencia_laboral.data,
+            'formacion_academica': form.formacion_academica.data,
+            'habilidades': form.habilidades.data,
+            'intereses_laborales': form.intereses_laborales.data,
+            'adaptaciones_necesarias': form.adaptaciones_necesarias.data
+        }
+        send_registration_notification(user_data, "Registro Dispraxia")
+        
+        flash('¡Registro de Dispraxia completado exitosamente!', 'success')
+        return redirect(url_for('index'))
+    return render_template('registro-dispraxia.html', form=form)
+
+@app.route('/registro-ansiedad', methods=['GET', 'POST'])
+def registro_ansiedad():
+    form = RegistroAnsiedadForm()
+    if form.validate_on_submit():
+        user = User(
+            nombre=form.nombre.data,
+            apellidos=form.apellidos.data,
+            email=form.email.data,
+            fecha_nacimiento=form.fecha_nacimiento.data,
+            telefono=form.telefono.data,
+            ciudad=form.ciudad.data,
+            tipo_neurodivergencia='ansiedad',
+            diagnostico_formal=form.diagnostico_formal.data,
+            experiencia_laboral=form.experiencia_laboral.data,
+            formacion_academica=form.formacion_academica.data,
+            habilidades=form.habilidades.data,
+            intereses_laborales=form.intereses_laborales.data,
+            adaptaciones_necesarias=form.adaptaciones_necesarias.data
+        )
+        db.session.add(user)
+        db.session.commit()
+        
+        # Enviar email de notificación
+        user_data = {
+            'nombre': form.nombre.data,
+            'apellidos': form.apellidos.data,
+            'email': form.email.data,
+            'telefono': form.telefono.data,
+            'ciudad': form.ciudad.data,
+            'fecha_nacimiento': form.fecha_nacimiento.data,
+            'tipo_neurodivergencia': 'Trastornos de Ansiedad',
+            'diagnostico_formal': form.diagnostico_formal.data,
+            'experiencia_laboral': form.experiencia_laboral.data,
+            'formacion_academica': form.formacion_academica.data,
+            'habilidades': form.habilidades.data,
+            'intereses_laborales': form.intereses_laborales.data,
+            'adaptaciones_necesarias': form.adaptaciones_necesarias.data
+        }
+        send_registration_notification(user_data, "Registro Trastornos de Ansiedad")
+        
+        flash('¡Registro de Trastornos de Ansiedad completado exitosamente!', 'success')
+        return redirect(url_for('index'))
+    return render_template('registro-ansiedad.html', form=form)
+
+@app.route('/registro-bipolar', methods=['GET', 'POST'])
+def registro_bipolar():
+    form = RegistroBipolarForm()
+    if form.validate_on_submit():
+        user = User(
+            nombre=form.nombre.data,
+            apellidos=form.apellidos.data,
+            email=form.email.data,
+            fecha_nacimiento=form.fecha_nacimiento.data,
+            telefono=form.telefono.data,
+            ciudad=form.ciudad.data,
+            tipo_neurodivergencia='bipolar',
+            diagnostico_formal=form.diagnostico_formal.data,
+            experiencia_laboral=form.experiencia_laboral.data,
+            formacion_academica=form.formacion_academica.data,
+            habilidades=form.habilidades.data,
+            intereses_laborales=form.intereses_laborales.data,
+            adaptaciones_necesarias=form.adaptaciones_necesarias.data
+        )
+        db.session.add(user)
+        db.session.commit()
+        
+        # Enviar email de notificación
+        user_data = {
+            'nombre': form.nombre.data,
+            'apellidos': form.apellidos.data,
+            'email': form.email.data,
+            'telefono': form.telefono.data,
+            'ciudad': form.ciudad.data,
+            'fecha_nacimiento': form.fecha_nacimiento.data,
+            'tipo_neurodivergencia': 'Trastorno Bipolar',
+            'diagnostico_formal': form.diagnostico_formal.data,
+            'experiencia_laboral': form.experiencia_laboral.data,
+            'formacion_academica': form.formacion_academica.data,
+            'habilidades': form.habilidades.data,
+            'intereses_laborales': form.intereses_laborales.data,
+            'adaptaciones_necesarias': form.adaptaciones_necesarias.data
+        }
+        send_registration_notification(user_data, "Registro Trastorno Bipolar")
+        
+        flash('¡Registro de Trastorno Bipolar completado exitosamente!', 'success')
+        return redirect(url_for('index'))
+    return render_template('registro-bipolar.html', form=form)
+
+@app.route('/registro-altas-capacidades', methods=['GET', 'POST'])
+def registro_altas_capacidades():
+    form = RegistroAltasCapacidadesForm()
+    if form.validate_on_submit():
+        user = User(
+            nombre=form.nombre.data,
+            apellidos=form.apellidos.data,
+            email=form.email.data,
+            fecha_nacimiento=form.fecha_nacimiento.data,
+            telefono=form.telefono.data,
+            ciudad=form.ciudad.data,
+            tipo_neurodivergencia='altas_capacidades',
+            diagnostico_formal=form.diagnostico_formal.data,
+            experiencia_laboral=form.experiencia_laboral.data,
+            formacion_academica=form.formacion_academica.data,
+            habilidades=form.habilidades.data,
+            intereses_laborales=form.intereses_laborales.data,
+            adaptaciones_necesarias=form.adaptaciones_necesarias.data
+        )
+        db.session.add(user)
+        db.session.commit()
+        
+        # Enviar email de notificación
+        user_data = {
+            'nombre': form.nombre.data,
+            'apellidos': form.apellidos.data,
+            'email': form.email.data,
+            'telefono': form.telefono.data,
+            'ciudad': form.ciudad.data,
+            'fecha_nacimiento': form.fecha_nacimiento.data,
+            'tipo_neurodivergencia': 'Altas Capacidades',
+            'diagnostico_formal': form.diagnostico_formal.data,
+            'experiencia_laboral': form.experiencia_laboral.data,
+            'formacion_academica': form.formacion_academica.data,
+            'habilidades': form.habilidades.data,
+            'intereses_laborales': form.intereses_laborales.data,
+            'adaptaciones_necesarias': form.adaptaciones_necesarias.data
+        }
+        send_registration_notification(user_data, "Registro Altas Capacidades")
+        
+        flash('¡Registro de Altas Capacidades completado exitosamente!', 'success')
+        return redirect(url_for('index'))
+    return render_template('registro-altas-capacidades.html', form=form)
 
 @app.route('/empresa-registro', methods=['POST'])
 def empresa_registro():

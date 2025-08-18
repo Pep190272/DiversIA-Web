@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Registro Discalculia - DiversIA{% endblock %}
+{% block meta_description %}Registro especializado para personas con discalculia. Formulario adaptado para entender mejor tus necesidades matemáticas.{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white;">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <div class="icon-circle me-3" style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 50%;">
+                            <span style="font-size: 2rem;">🔢</span>
+                        </div>
+                        <h1 class="h3 mb-0">Registro Discalculia</h1>
+                    </div>
+                    <p class="mb-0">Formulario especializado para personas con dificultades matemáticas</p>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Información Personal -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.nombre.label }}</label>
+                                {{ form.nombre(class="form-control") }}
+                                {% if form.nombre.errors %}
+                                    <div class="text-danger small">{{ form.nombre.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.apellidos.label }}</label>
+                                {{ form.apellidos(class="form-control") }}
+                                {% if form.apellidos.errors %}
+                                    <div class="text-danger small">{{ form.apellidos.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.email.label }}</label>
+                                {{ form.email(class="form-control") }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small">{{ form.email.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.fecha_nacimiento.label }}</label>
+                                {{ form.fecha_nacimiento(class="form-control") }}
+                                {% if form.fecha_nacimiento.errors %}
+                                    <div class="text-danger small">{{ form.fecha_nacimiento.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Campos específicos de Discalculia -->
+                        <h5 class="text-primary mb-3">🔢 Información sobre Discalculia</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.dificultades_matematicas.label }}</label>
+                            <div class="row">
+                                {% for option in form.dificultades_matematicas %}
+                                    <div class="col-md-6 mb-2">
+                                        <div class="form-check">
+                                            {{ option(class="form-check-input") }}
+                                            {{ option.label(class="form-check-label") }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.herramientas_calculo.label }}</label>
+                            <div class="row">
+                                {% for option in form.herramientas_calculo %}
+                                    <div class="col-md-6 mb-2">
+                                        <div class="form-check">
+                                            {{ option(class="form-check-input") }}
+                                            {{ option.label(class="form-check-label") }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Campos comunes -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.telefono.label }}</label>
+                                {{ form.telefono(class="form-control") }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.ciudad.label }}</label>
+                                {{ form.ciudad(class="form-control") }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.diagnostico_formal(class="form-check-input") }}
+                                {{ form.diagnostico_formal.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.habilidades.label }}</label>
+                            {{ form.habilidades(class="form-control", rows="3") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.adaptaciones_necesarias.label }}</label>
+                            {{ form.adaptaciones_necesarias(class="form-control", rows="3") }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.aceptar_privacidad(class="form-check-input") }}
+                                {{ form.aceptar_privacidad.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Completar Registro</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

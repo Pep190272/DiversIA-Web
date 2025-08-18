@@ -23,6 +23,10 @@ class RegistroGeneralForm(FlaskForm):
                                           ('dislexia', 'Dislexia'),
                                           ('discalculia', 'Discalculia'),
                                           ('tourette', 'Síndrome de Tourette'),
+                                          ('dispraxia', 'Dispraxia'),
+                                          ('ansiedad', 'Trastornos de Ansiedad'),
+                                          ('bipolar', 'Trastorno Bipolar'),
+                                          ('altas_capacidades', 'Altas Capacidades'),
                                           ('otro', 'Otro')
                                       ], validators=[DataRequired()])
     
@@ -72,6 +76,89 @@ class RegistroTEAForm(RegistroGeneralForm):
     intereses_especiales = TextAreaField('Intereses especiales o áreas de expertise')
     aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
 
+class RegistroDiscalculiaForm(RegistroGeneralForm):
+    # Campos específicos para Discalculia
+    dificultades_matematicas = MultiCheckboxField('Dificultades matemáticas',
+                                                choices=[('calculo_basico', 'Cálculo básico'),
+                                                       ('numeros_grandes', 'Números grandes'),
+                                                       ('tiempo_dinero', 'Tiempo y dinero'),
+                                                       ('geometria', 'Geometría')])
+    herramientas_calculo = MultiCheckboxField('Herramientas de apoyo',
+                                            choices=[('calculadora', 'Calculadora'),
+                                                   ('apps_matematicas', 'Apps matemáticas'),
+                                                   ('tiempo_extra', 'Tiempo extra'),
+                                                   ('explicaciones_visuales', 'Explicaciones visuales')])
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
+
+class RegistroTouretteForm(RegistroGeneralForm):
+    # Campos específicos para Síndrome de Tourette
+    tipos_tics = MultiCheckboxField('Tipos de tics',
+                                  choices=[('motores', 'Tics motores'),
+                                         ('vocales', 'Tics vocales'),
+                                         ('complejos', 'Tics complejos')])
+    frecuencia_tics = SelectField('Frecuencia de tics',
+                                choices=[('', 'Selecciona'), ('baja', 'Ocasionales'),
+                                       ('media', 'Moderados'), ('alta', 'Frecuentes')])
+    medicacion_tics = BooleanField('¿Tomas medicación para los tics?')
+    estrategias_control = TextAreaField('Estrategias para controlar los tics')
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
+
+class RegistroDispraxiaForm(RegistroGeneralForm):
+    # Campos específicos para Dispraxia
+    dificultades_coordinacion = MultiCheckboxField('Dificultades de coordinación',
+                                                 choices=[('motora_gruesa', 'Motora gruesa'),
+                                                        ('motora_fina', 'Motora fina'),
+                                                        ('planificacion_movimiento', 'Planificación del movimiento'),
+                                                        ('equilibrio', 'Equilibrio')])
+    herramientas_organizacion = MultiCheckboxField('Herramientas de organización',
+                                                 choices=[('agenda_visual', 'Agenda visual'),
+                                                        ('recordatorios', 'Recordatorios'),
+                                                        ('rutinas_estructuradas', 'Rutinas estructuradas')])
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
+
+class RegistroAnsiedadForm(RegistroGeneralForm):
+    # Campos específicos para Trastornos de Ansiedad
+    tipo_ansiedad = MultiCheckboxField('Tipo de ansiedad',
+                                     choices=[('generalizada', 'Ansiedad generalizada'),
+                                            ('social', 'Ansiedad social'),
+                                            ('panico', 'Trastorno de pánico'),
+                                            ('especifica', 'Fobia específica')])
+    tecnicas_manejo = MultiCheckboxField('Técnicas de manejo',
+                                       choices=[('respiracion', 'Técnicas de respiración'),
+                                              ('mindfulness', 'Mindfulness'),
+                                              ('terapia', 'Terapia psicológica'),
+                                              ('medicacion', 'Medicación')])
+    desencadenantes_laborales = TextAreaField('Desencadenantes en el ambiente laboral')
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
+
+class RegistroBipolarForm(RegistroGeneralForm):
+    # Campos específicos para Trastorno Bipolar
+    tipo_bipolar = SelectField('Tipo de trastorno bipolar',
+                             choices=[('', 'Selecciona'), ('tipo1', 'Tipo I'),
+                                    ('tipo2', 'Tipo II'), ('ciclotimia', 'Ciclotimia')])
+    estabilidad_actual = SelectField('Estabilidad actual',
+                                   choices=[('', 'Selecciona'), ('estable', 'Estable'),
+                                          ('episodio_leve', 'Episodio leve'),
+                                          ('en_tratamiento', 'En tratamiento activo')])
+    medicacion_estabilizador = BooleanField('¿Tomas estabilizadores del ánimo?')
+    apoyo_terapeutico = BooleanField('¿Tienes apoyo terapéutico regular?')
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
+
+class RegistroAltasCapacidadesForm(RegistroGeneralForm):
+    # Campos específicos para Altas Capacidades
+    area_talento = MultiCheckboxField('Áreas de talento',
+                                    choices=[('matematicas', 'Matemáticas'),
+                                           ('linguisticas', 'Lingüísticas'),
+                                           ('artisticas', 'Artísticas'),
+                                           ('cientificas', 'Científicas'),
+                                           ('tecnologicas', 'Tecnológicas')])
+    nivel_ci = SelectField('Nivel de CI (si conoces)',
+                         choices=[('', 'No lo conozco'), ('130-145', '130-145'),
+                                ('145-160', '145-160'), ('160+', '160+')])
+    desafios_sociales = BooleanField('¿Has experimentado desafíos sociales por tus altas capacidades?')
+    necesidades_estimulo = TextAreaField('Necesidades de estímulo intelectual')
+    aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])
+
 class EmpresaRegistroForm(FlaskForm):
     nombre_empresa = StringField('Nombre de la empresa', validators=[DataRequired(), Length(min=2, max=200)])
     email_contacto = EmailField('Email de contacto', validators=[DataRequired(), Email()])
@@ -109,5 +196,10 @@ class OfertaEmpleoForm(FlaskForm):
                                                        ('tea', 'TEA'),
                                                        ('dislexia', 'Dislexia'),
                                                        ('discalculia', 'Discalculia'),
+                                                       ('tourette', 'Síndrome de Tourette'),
+                                                       ('dispraxia', 'Dispraxia'),
+                                                       ('ansiedad', 'Trastornos de Ansiedad'),
+                                                       ('bipolar', 'Trastorno Bipolar'),
+                                                       ('altas_capacidades', 'Altas Capacidades'),
                                                        ('todas', 'Todas')])
     aceptar_privacidad = BooleanField('He leído y acepto la Política de Privacidad', validators=[DataRequired()])

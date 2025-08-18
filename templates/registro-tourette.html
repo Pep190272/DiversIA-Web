@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Registro Síndrome de Tourette - DiversIA{% endblock %}
+{% block meta_description %}Registro especializado para personas con Síndrome de Tourette. Formulario adaptado para entender mejor tus necesidades.{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #6c757d, #495057); color: white;">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <div class="icon-circle me-3" style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 50%;">
+                            <span style="font-size: 2rem;">🎯</span>
+                        </div>
+                        <h1 class="h3 mb-0">Registro Síndrome de Tourette</h1>
+                    </div>
+                    <p class="mb-0">Formulario especializado para personas con Síndrome de Tourette</p>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Información Personal -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.nombre.label }}</label>
+                                {{ form.nombre(class="form-control") }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.apellidos.label }}</label>
+                                {{ form.apellidos(class="form-control") }}
+                            </div>
+                        </div>
+                        
+                        <!-- Campos específicos de Tourette -->
+                        <h5 class="text-primary mb-3">🎯 Información sobre Síndrome de Tourette</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.tipos_tics.label }}</label>
+                            <div class="row">
+                                {% for option in form.tipos_tics %}
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            {{ option(class="form-check-input") }}
+                                            {{ option.label(class="form-check-label") }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.frecuencia_tics.label }}</label>
+                            {{ form.frecuencia_tics(class="form-select") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.medicacion_tics(class="form-check-input") }}
+                                {{ form.medicacion_tics.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.estrategias_control.label }}</label>
+                            {{ form.estrategias_control(class="form-control", rows="3") }}
+                        </div>
+                        
+                        <!-- Resto del formulario -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.habilidades.label }}</label>
+                            {{ form.habilidades(class="form-control", rows="3") }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.aceptar_privacidad(class="form-check-input") }}
+                                {{ form.aceptar_privacidad.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-secondary btn-lg">Completar Registro</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
