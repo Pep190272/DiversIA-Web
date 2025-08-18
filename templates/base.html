@@ -43,7 +43,7 @@
                             data-bs-placement="bottom" 
                             data-translate-title="font_size_tooltip"
                             title="Aumentar o disminuir el tamaño del texto">
-                        <i class="fas fa-font" aria-hidden="true"></i>
+                        <span class="icon-fallback">🔤</span><i class="fas fa-font" aria-hidden="true"></i>
                         <span class="visually-hidden">Texto</span>
                     </button>
                     <button type="button" 
@@ -54,7 +54,7 @@
                             data-bs-placement="bottom"
                             data-translate-title="dark_mode_tooltip" 
                             title="Cambiar entre modo claro y oscuro">
-                        <i class="fas fa-moon" aria-hidden="true"></i>
+                        <span class="icon-fallback">🌙</span><i class="fas fa-moon" aria-hidden="true"></i>
                         <span class="visually-hidden">Modo oscuro</span>
                     </button>
                     <button type="button" 
@@ -65,7 +65,7 @@
                             data-bs-placement="bottom"
                             data-translate-title="high_contrast_tooltip"
                             title="Activar modo alto contraste negro/blanco">
-                        <i class="fas fa-adjust" aria-hidden="true"></i>
+                        <span class="icon-fallback">⚫⚪</span><i class="fas fa-adjust" aria-hidden="true"></i>
                         <span class="visually-hidden">Alto contraste</span>
                     </button>
                     <button type="button" 
@@ -76,7 +76,7 @@
                             data-bs-placement="bottom"
                             data-translate-title="animations_tooltip"
                             title="Activar o desactivar animaciones">
-                        <i class="fas fa-play" aria-hidden="true"></i>
+                        <span class="icon-fallback">▶️</span><i class="fas fa-play" aria-hidden="true"></i>
                         <span class="visually-hidden">Animaciones</span>
                     </button>
                 </div>
@@ -93,7 +93,7 @@
                        data-bs-placement="bottom"
                        data-translate-title="discord_tooltip"
                        title="Únete a nuestra comunidad en Discord">
-                        <i class="fab fa-discord" aria-hidden="true"></i>
+                        <span class="icon-fallback">💬</span><i class="fab fa-discord" aria-hidden="true"></i>
                     </a>
                     <a href="https://instagram.com/diversiaeternals" 
                        target="_blank" 
@@ -104,7 +104,7 @@
                        data-bs-placement="bottom"
                        data-translate-title="instagram_tooltip"
                        title="Síguenos en Instagram">
-                        <i class="fab fa-instagram" aria-hidden="true"></i>
+                        <span class="icon-fallback">📷</span><i class="fab fa-instagram" aria-hidden="true"></i>
                     </a>
                     <a href="https://linkedin.com/company/diversia" 
                        target="_blank" 
@@ -115,7 +115,7 @@
                        data-bs-placement="bottom"
                        data-translate-title="linkedin_tooltip"
                        title="Conéctanos en LinkedIn">
-                        <i class="fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="icon-fallback">💼</span><i class="fab fa-linkedin" aria-hidden="true"></i>
                     </a>
                     <a href="mailto:diversiaeternals@gmail.com" 
                        class="btn btn-sm btn-outline-primary social-link" 
@@ -124,7 +124,7 @@
                        data-bs-placement="bottom"
                        data-translate-title="email_tooltip"
                        title="Envíanos un email">
-                        <i class="fas fa-envelope" aria-hidden="true"></i>
+                        <span class="icon-fallback">✉️</span><i class="fas fa-envelope" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
@@ -136,13 +136,11 @@
         <div class="container">
             <!-- DiversIA Logo Area -->
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}" aria-label="DiversIA - Ir a inicio">
-                <!-- Logo placeholder - Medidas recomendadas: 150x50px (PNG/SVG) -->
-                <img src="{{ url_for('static', filename='images/logo-header.png') }}" 
+                <img src="{{ url_for('static', filename='images/logo.png') }}" 
                      alt="DiversIA Logo" 
                      class="navbar-logo me-2"
-                     style="height: 40px; width: auto;"
-                     onerror="this.style.display='none';">
-                <strong>DiversIA</strong>
+                     style="height: 40px; width: auto; max-width: 150px;"
+                     onerror="this.innerHTML='<strong>DiversIA</strong>';">
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 

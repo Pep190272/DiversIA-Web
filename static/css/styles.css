@@ -417,6 +417,33 @@ footer, .footer {
   color: currentColor !important;
 }
 
+/* Icon fallback system */
+.icon-fallback {
+  font-size: 14px;
+  margin-right: 2px;
+}
+
+/* Hide emoji fallback when Font Awesome loads */
+.fas:not(:empty) + .icon-fallback,
+.fab:not(:empty) + .icon-fallback {
+  display: none;
+}
+
+/* Show emoji when Font Awesome fails */
+.fas:empty ~ .icon-fallback,
+.fab:empty ~ .icon-fallback {
+  display: inline-block;
+}
+
+/* Navbar logo styling */
+.navbar-logo {
+  transition: transform 0.2s ease;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.05);
+}
+
 /* Responsive accessibility bar */
 @media (max-width: 768px) {
   .accessibility-controls .row {
