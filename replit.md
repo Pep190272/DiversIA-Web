@@ -65,6 +65,7 @@ Preferred communication style: Simple, everyday language.
 - **SendGrid API**: Automated email notifications to diversiaeternals@gmail.com
 - **CRM Export Module**: CSV and JSON export capabilities for HubSpot, Salesforce integration
 - **Social Media Integration**: Direct links to Discord, Instagram, LinkedIn, and email contact
+- **Telegram Support**: Official support channel https://t.me/DiversiaSupport for real-time assistance
 
 ### Security & Deployment
 - **Environment Configuration**: Secure configuration via environment variables
@@ -72,7 +73,25 @@ Preferred communication style: Simple, everyday language.
 - **Session Management**: Secure session handling with configurable secret keys
 - **WSGI Deployment**: Production-ready with ProxyFix middleware
 
-## Recent Updates (2025-01-18)
+## Recent Updates (2025-08-18)
+
+### Neurodiversity Expansion & Resources Implementation (COMPLETE)
+- ✓ Expanded from 3 to 9 neurodivergence types: TDAH, TEA, Dislexia, Discalculia, Tourette, Dispraxia, Ansiedad, Bipolar, Altas Capacidades
+- ✓ Created specialized registration forms for each neurodivergence type with specific fields
+- ✓ Implemented comprehensive 27-page PDF guide for job preparation targeting neurodivergent individuals
+- ✓ Added functional video resources section with authentic educational content from recognized organizations
+- ✓ Created podcast planning page with launch strategy and technical requirements
+- ✓ Integrated official Telegram support channel: https://t.me/DiversiaSupport
+- ✓ All contact systems now fully functional (email and Telegram)
+- ✓ Resource downloads and links working with real educational content
+
+### Educational Content Integration (COMPLETE)
+- ✓ Curated authentic video resources from NeurodiverSí, Microsoft, Fundación Neurodiversidad, FLEDNI
+- ✓ All resources are free, in Spanish, and from verified neurodiversity organizations
+- ✓ Content covers inclusion strategies, business cases, practical adaptations, and professional training
+- ✓ Implemented categorized resource structure (Educational, Success Cases, Training, Professional)
+
+## Previous Updates (2025-01-18)
 
 ### Accessibility System Redesign (COMPLETE)
 - ✓ Rediseñado sistema de accesibilidad para claridad total
