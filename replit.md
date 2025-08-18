@@ -72,7 +72,17 @@ Preferred communication style: Simple, everyday language.
 - **Session Management**: Secure session handling with configurable secret keys
 - **WSGI Deployment**: Production-ready with ProxyFix middleware
 
-## Recent Updates (2025-01-17)
+## Recent Updates (2025-01-18)
+
+### Chat System Optimization (COMPLETE)
+- ✓ Fixed chat responses to be concise and direct
+- ✓ Simple greetings ("Hola") now return short, friendly responses
+- ✓ Detailed information only provided when specifically requested
+- ✓ Improved user experience with appropriate response length
+- ✓ Banner de cookies RGPD compliant implementado completamente
+- ✓ Sistema de traducción corregido para todas las secciones
+
+## Previous Updates (2025-01-17)
 
 ### Intelligent AI Agent System (IMPLEMENTED)
 - ✓ Fully functional AI agent powered by Mistral AI

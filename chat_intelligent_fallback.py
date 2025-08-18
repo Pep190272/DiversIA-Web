@@ -69,6 +69,12 @@ class DiversIAIntelligentFallback:
     
     def detect_intent(self, message: str) -> str:
         """Detectar intención del mensaje"""
+        
+        # Detectar saludos simples primero
+        greetings = ['hola', 'buenas', 'hello', 'hi', 'hey', 'saludos']
+        if any(greeting in message.lower() for greeting in greetings) and len(message.split()) <= 2:
+            return 'simple_greeting'
+        
         # Patrones específicos para detectar intenciones
         patterns = {
             'company_info': [
@@ -121,7 +127,10 @@ class DiversIAIntelligentFallback:
     def generate_response(self, message: str, intent: str) -> str:
         """Generar respuesta basada en la intención"""
         
-        if intent == 'company_info':
+        if intent == 'simple_greeting':
+            return "¡Hola! Soy el asistente de DiversIA. ¿En qué puedo ayudarte?"
+        
+        elif intent == 'company_info':
             return f"""**DiversIA** es una plataforma de inclusión laboral especializada en conectar talento neurodivergente con empresas inclusivas.
 
 🎯 **Cómo funciona:**
@@ -243,19 +252,20 @@ Ayudamos a empresas a encontrar y retener talento neurodivergente excepcional.
 ¿Qué tipo de posiciones están buscando cubrir?"""
 
         else:  # general
-            return """¡Hola! Soy el asistente inteligente de **DiversIA**, tu plataforma de inclusión laboral para talento neurodivergente.
+            # Detectar si es solo un saludo
+            if any(word in message.lower() for word in ['hola', 'buenas', 'hello', 'hi', 'hey']):
+                return "¡Hola! Soy el asistente de DiversIA. ¿En qué puedo ayudarte?"
+            
+            # Para otras consultas generales
+            return """¡Hola! Soy el asistente de DiversIA.
 
-🌟 **Puedo ayudarte con:**
-• Información sobre DiversIA y nuestro equipo
-• Tests gamificados y evaluaciones neurocognitivas
-• Registro como candidato neurodivergente o empresa inclusiva
-• Información sobre TDAH, TEA y Dislexia
-• Proceso de matching y búsqueda de empleo
-• Contacto y ubicación
+Puedo ayudarte con:
+• Información sobre registro
+• Tipos de neurodivergencia  
+• Proceso de matching
+• Recursos disponibles
 
-💡 **CEO:** Olga Cruz Hernández | 📞 695 260 546 | 📧 diversiaeternals@gmail.com
-
-¿Qué te gustaría saber específicamente?"""
+¿Qué necesitas saber?"""
 
     def _format_list(self, items: list) -> str:
         """Formatear lista como bullets"""
