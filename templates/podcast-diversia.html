@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Podcast DiversIA - DiversIA{% endblock %}
+{% block meta_description %}Podcast oficial de DiversIA con historias inspiradoras de éxito laboral neurodivergente.{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold mb-3">
+                    <span class="icon-fallback">🎧</span><i data-lucide="headphones" aria-hidden="true"></i>
+                    Podcast DiversIA
+                </h1>
+                <p class="lead">Historias inspiradoras de éxito laboral neurodivergente</p>
+            </div>
+
+            <!-- Estado del Podcast -->
+            <div class="card mb-5">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-primary">
+                        <span class="icon-fallback">🚀</span><i data-lucide="rocket" aria-hidden="true"></i>
+                        ¡Próximamente!
+                    </h3>
+                    <p class="card-text lead">
+                        Estamos preparando el lanzamiento del podcast oficial de DiversIA con contenido exclusivo.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Plan del Podcast -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span class="icon-fallback">🎯</span><i data-lucide="target" aria-hidden="true"></i>
+                                Contenido Planeado
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li><span class="icon-fallback">✓</span> Entrevistas con profesionales neurodivergentes exitosos</li>
+                                <li><span class="icon-fallback">✓</span> Casos de éxito empresarial en inclusión</li>
+                                <li><span class="icon-fallback">✓</span> Consejos prácticos para la búsqueda de empleo</li>
+                                <li><span class="icon-fallback">✓</span> Historias de superación personal</li>
+                                <li><span class="icon-fallback">✓</span> Entrevistas con CEOs inclusivos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <span class="icon-fallback">📋</span><i data-lucide="calendar" aria-hidden="true"></i>
+                                Formato Propuesto
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li><span class="icon-fallback">⏱️</span> Episodios de 20-30 minutos</li>
+                                <li><span class="icon-fallback">📅</span> Publicación quincenal</li>
+                                <li><span class="icon-fallback">🔤</span> Disponible con transcripciones</li>
+                                <li><span class="icon-fallback">🎵</span> Audio optimizado para todas las neurodivergencias</li>
+                                <li><span class="icon-fallback">🌐</span> Disponible en múltiples plataformas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cómo crear el podcast -->
+            <div class="card bg-light mb-5">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        <span class="icon-fallback">🎙️</span><i data-lucide="mic" aria-hidden="true"></i>
+                        Pasos para Crear el Podcast
+                    </h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Recursos Gratuitos Necesarios:</h6>
+                            <ul class="small">
+                                <li><strong>Grabación:</strong> Audacity (software gratuito)</li>
+                                <li><strong>Hosting:</strong> Anchor.fm (gratis con Spotify)</li>
+                                <li><strong>Micrófono:</strong> Samson Go Mic (económico)</li>
+                                <li><strong>Distribución:</strong> Anchor distribuye automáticamente</li>
+                                <li><strong>Edición:</strong> GarageBand (Mac) o Audacity</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Plataformas de Distribución:</h6>
+                            <ul class="small">
+                                <li>Spotify (via Anchor)</li>
+                                <li>Apple Podcasts</li>
+                                <li>Google Podcasts</li>
+                                <li>YouTube (versión video opcional)</li>
+                                <li>Ivoox (plataforma española)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suscripción a noticias -->
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Mantente Informado</h5>
+                    <p class="card-text">
+                        Te notificaremos cuando esté disponible el primer episodio.
+                    </p>
+                    <a href="mailto:diversiaeternals@gmail.com?subject=Notificar%20Podcast%20DiversIA" 
+                       class="btn btn-primary">
+                        <span class="icon-fallback">📧</span><i data-lucide="mail" aria-hidden="true"></i>
+                        Quiero ser notificado
+                    </a>
+                </div>
+            </div>
+
+            <!-- Volver -->
+            <div class="text-center mt-5">
+                <a href="{{ url_for('personas_nd') }}" class="btn btn-outline-primary">
+                    <span class="icon-fallback">⬅️</span><i data-lucide="arrow-left" aria-hidden="true"></i>
+                    Volver a Recursos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

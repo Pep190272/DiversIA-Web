@@ -493,6 +493,60 @@ def registro_altas_capacidades():
         return redirect(url_for('index'))
     return render_template('registro-altas-capacidades.html', form=form)
 
+@app.route('/descargar-guia-laboral')
+def descargar_guia_laboral():
+    """Ruta para descargar la guía de preparación laboral"""
+    try:
+        with open('static/resources/guia-preparacion-laboral.md', 'r', encoding='utf-8') as file:
+            content = file.read()
+        
+        # Crear respuesta con el contenido del archivo
+        response = app.response_class(
+            content,
+            mimetype='text/markdown',
+            headers={'Content-Disposition': 'attachment; filename=Guia_Preparacion_Laboral_DiversIA.md'}
+        )
+        return response
+    except FileNotFoundError:
+        flash('La guía no está disponible en este momento. Por favor, inténtalo más tarde.', 'error')
+        return redirect(url_for('personas_nd'))
+
+@app.route('/videos-informativos')
+def videos_informativos():
+    """Página con videos informativos sobre neurodiversidad"""
+    videos = [
+        {
+            'titulo': 'Neurodiversidad y Empleo - NeurodiverSí',
+            'descripcion': 'Serie educativa sobre inclusión laboral para personas neurodivergentes',
+            'url': 'https://neurodiversi.org/neurovideo/',
+            'categoria': 'Educativo'
+        },
+        {
+            'titulo': 'Microsoft: El futuro del trabajo es neurodiverso',
+            'descripcion': 'Iniciativas de inclusión laboral de Microsoft para personas neurodivergentes',
+            'url': 'https://news.microsoft.com/source/latam/noticias-de-microsoft/el-futuro-del-trabajo-es-neurodiverso/',
+            'categoria': 'Casos de éxito'
+        },
+        {
+            'titulo': 'Fundación Neurodiversidad - Capacitaciones',
+            'descripcion': 'Cursos gratuitos y congresos sobre neurodiversidad e inclusión',
+            'url': 'https://fundacionneurodiversidad.tiendup.com/',
+            'categoria': 'Formación'
+        },
+        {
+            'titulo': 'FLEDNI - Diplomatura en Neurodiversidad',
+            'descripcion': 'Formación profesional sobre neurodiversidad desde perspectiva crítica',
+            'url': 'https://fledni.org/',
+            'categoria': 'Profesional'
+        }
+    ]
+    return render_template('videos-informativos.html', videos=videos)
+
+@app.route('/podcast-diversia')
+def podcast_diversia():
+    """Página del podcast DiversIA"""
+    return render_template('podcast-diversia.html')
+
 @app.route('/empresa-registro', methods=['POST'])
 def empresa_registro():
     form = EmpresaRegistroForm()

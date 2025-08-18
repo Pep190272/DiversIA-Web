@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Videos Informativos - DiversIA{% endblock %}
+{% block meta_description %}Recursos audiovisuales sobre neurodiversidad, inclusión laboral y casos de éxito empresarial.{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold mb-3">
+                    <span class="icon-fallback">📹</span><i data-lucide="video" aria-hidden="true"></i>
+                    Videos Informativos
+                </h1>
+                <p class="lead">Recursos audiovisuales para entender mejor la neurodiversidad en el ámbito laboral</p>
+            </div>
+
+            <div class="row g-4 mb-5">
+                {% for video in videos %}
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="badge bg-primary me-2">{{ video.categoria }}</div>
+                            </div>
+                            <h5 class="card-title">{{ video.titulo }}</h5>
+                            <p class="card-text text-muted">{{ video.descripcion }}</p>
+                            <a href="{{ video.url }}" target="_blank" rel="noopener noreferrer" 
+                               class="btn btn-outline-primary">
+                                <span class="icon-fallback">🔗</span><i data-lucide="external-link" aria-hidden="true"></i>
+                                Ver Contenido
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Información adicional -->
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        <span class="icon-fallback">💡</span><i data-lucide="lightbulb" aria-hidden="true"></i>
+                        ¿Por qué estos recursos?
+                    </h4>
+                    <p class="card-text">
+                        Hemos seleccionado estos recursos por su calidad educativa y enfoque práctico. 
+                        Todos son gratuitos y están disponibles en español, creados por organizaciones 
+                        reconocidas en el ámbito de la neurodiversidad e inclusión laboral.
+                    </p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h6>Temas Cubiertos:</h6>
+                            <ul class="list-unstyled">
+                                <li><span class="icon-fallback">✓</span> Inclusión laboral</li>
+                                <li><span class="icon-fallback">✓</span> Casos de éxito empresarial</li>
+                                <li><span class="icon-fallback">✓</span> Adaptaciones en el trabajo</li>
+                                <li><span class="icon-fallback">✓</span> Sensibilización y formación</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Audiencia:</h6>
+                            <ul class="list-unstyled">
+                                <li><span class="icon-fallback">👥</span> Personas neurodivergentes</li>
+                                <li><span class="icon-fallback">🏢</span> Empresas y RRHH</li>
+                                <li><span class="icon-fallback">👨‍👩‍👧‍👦</span> Familias y cuidadores</li>
+                                <li><span class="icon-fallback">🎓</span> Profesionales de la educación</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="text-center mt-5">
+                <a href="{{ url_for('personas_nd') }}" class="btn btn-primary btn-lg">
+                    <span class="icon-fallback">⬅️</span><i data-lucide="arrow-left" aria-hidden="true"></i>
+                    Volver a Recursos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -164,7 +164,7 @@
                         </div>
                         <h4 class="card-title h6">Guía de Preparación Laboral</h4>
                         <p class="card-text">Consejos para entrevistas y adaptaciones en el lugar de trabajo.</p>
-                        <a href="#" class="btn btn-sm btn-outline-primary">Descargar PDF</a>
+                        <a href="{{ url_for('descargar_guia_laboral') }}" class="btn btn-sm btn-outline-primary">Descargar PDF</a>
                     </div>
                 </div>
             </div>
@@ -176,7 +176,7 @@
                         </div>
                         <h4 class="card-title h6">Videos Informativos</h4>
                         <p class="card-text">Serie de videos sobre neurodiversidad en el trabajo.</p>
-                        <a href="#" class="btn btn-sm btn-outline-primary">Ver Videos</a>
+                        <a href="{{ url_for('videos_informativos') }}" class="btn btn-sm btn-outline-primary">Ver Videos</a>
                     </div>
                 </div>
             </div>
@@ -188,7 +188,7 @@
                         </div>
                         <h4 class="card-title h6">Podcast DiversIA</h4>
                         <p class="card-text">Historias inspiradoras de éxito laboral neurodivergente.</p>
-                        <a href="#" class="btn btn-sm btn-outline-primary">Escuchar</a>
+                        <a href="{{ url_for('podcast_diversia') }}" class="btn btn-sm btn-outline-primary">Escuchar</a>
                     </div>
                 </div>
             </div>
@@ -206,13 +206,13 @@
                     Nuestro equipo está aquí para apoyarte en cada paso del proceso.
                 </p>
                 <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                    <a href="#" class="btn btn-light">
-                        <i data-lucide="mail" aria-hidden="true"></i>
+                    <a href="mailto:diversiaeternals@gmail.com" class="btn btn-light">
+                        <span class="icon-fallback">✉️</span><i data-lucide="mail" aria-hidden="true"></i>
                         Contactar por email
                     </a>
-                    <a href="#" class="btn btn-outline-light">
-                        <i data-lucide="message-circle" aria-hidden="true"></i>
-                        Chat en vivo
+                    <a href="https://t.me/+DiversiaSupport" target="_blank" class="btn btn-outline-light">
+                        <span class="icon-fallback">💬</span><i data-lucide="message-circle" aria-hidden="true"></i>
+                        Chat Telegram
                     </a>
                 </div>
             </div>
