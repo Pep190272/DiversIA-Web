@@ -386,6 +386,33 @@ footer, .footer {
   color: #000000 !important;
 }
 
+/* Social Media Links Styling */
+.social-link {
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  transform: translateY(-1px);
+}
+
+/* Responsive accessibility bar */
+@media (max-width: 768px) {
+  .accessibility-controls .row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .accessibility-controls .col-auto {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .accessibility-controls .d-flex {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
 /* Custom Bootstrap Overrides */
 .btn-primary {
   background-color: var(--primary-cyan);

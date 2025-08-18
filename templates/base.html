@@ -28,33 +28,61 @@
     <!-- Accessibility Controls -->
     <div id="accessibility-controls" class="accessibility-controls" role="toolbar" aria-label="Controles de accesibilidad">
         <div class="container-fluid">
-            <div class="row g-2 align-items-center">
-                <div class="col-auto">
+            <div class="row g-2 align-items-center justify-content-between">
+                <!-- Left side: Accessibility controls -->
+                <div class="col-auto d-flex align-items-center gap-2">
                     <span class="small text-muted">Accesibilidad:</span>
-                </div>
-                <div class="col-auto">
                     <button type="button" class="btn btn-sm btn-outline-primary" id="font-size-toggle" aria-label="Cambiar tamaño de texto">
                         <i data-lucide="type" aria-hidden="true"></i>
                         <span class="visually-hidden">Texto</span>
                     </button>
-                </div>
-                <div class="col-auto">
                     <button type="button" class="btn btn-sm btn-outline-primary" id="dark-mode-toggle" aria-label="Activar modo oscuro">
                         <i data-lucide="moon" aria-hidden="true"></i>
                         <span class="visually-hidden">Modo oscuro</span>
                     </button>
-                </div>
-                <div class="col-auto">
                     <button type="button" class="btn btn-sm btn-outline-primary" id="high-contrast-toggle" aria-label="Activar alto contraste">
                         <i data-lucide="contrast" aria-hidden="true"></i>
                         <span class="visually-hidden">Alto contraste</span>
                     </button>
-                </div>
-                <div class="col-auto">
                     <button type="button" class="btn btn-sm btn-outline-primary" id="animations-toggle" aria-label="Desactivar animaciones">
                         <i data-lucide="pause" aria-hidden="true"></i>
                         <span class="visually-hidden">Animaciones</span>
                     </button>
+                </div>
+                
+                <!-- Right side: Social Media Links -->
+                <div class="col-auto d-flex align-items-center gap-2">
+                    <span class="small text-muted">Síguenos:</span>
+                    <a href="https://discord.gg/VZjBPj6M2h" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="btn btn-sm btn-outline-primary social-link" 
+                       aria-label="Discord de DiversIA"
+                       title="Únete a nuestro Discord">
+                        <i data-lucide="message-circle" aria-hidden="true"></i>
+                    </a>
+                    <a href="https://instagram.com/diversiaeternals" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="btn btn-sm btn-outline-primary social-link" 
+                       aria-label="Instagram de DiversIA"
+                       title="Síguenos en Instagram">
+                        <i data-lucide="instagram" aria-hidden="true"></i>
+                    </a>
+                    <a href="https://linkedin.com/company/diversia" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="btn btn-sm btn-outline-primary social-link" 
+                       aria-label="LinkedIn de DiversIA"
+                       title="Conéctanos en LinkedIn">
+                        <i data-lucide="linkedin" aria-hidden="true"></i>
+                    </a>
+                    <a href="mailto:diversiaeternals@gmail.com" 
+                       class="btn btn-sm btn-outline-primary social-link" 
+                       aria-label="Email de DiversIA"
+                       title="Envíanos un email">
+                        <i data-lucide="mail" aria-hidden="true"></i>
+                    </a>
                 </div>
             </div>
         </div>
