@@ -395,6 +395,17 @@ footer, .footer {
   transform: translateY(-1px);
 }
 
+/* Ensure icons are visible */
+.accessibility-controls i[data-lucide] {
+  width: 16px;
+  height: 16px;
+}
+
+.social-link i[data-lucide] {
+  width: 16px;
+  height: 16px;
+}
+
 /* Responsive accessibility bar */
 @media (max-width: 768px) {
   .accessibility-controls .row {
@@ -410,6 +421,10 @@ footer, .footer {
   .accessibility-controls .d-flex {
     justify-content: center;
     flex-wrap: wrap;
+  }
+  
+  .accessibility-controls .gap-2 {
+    gap: 0.5rem !important;
   }
 }
 

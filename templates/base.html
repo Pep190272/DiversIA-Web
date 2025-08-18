@@ -265,9 +265,22 @@
     
     <!-- Initialize Lucide icons -->
     <script>
+        // Initialize icons when page loads
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
+                
+                // Re-initialize icons after any content updates
+                const observer = new MutationObserver(function(mutations) {
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                });
+                
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
             }
         });
     </script>
