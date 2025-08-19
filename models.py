@@ -62,6 +62,70 @@ class JobOffer(db.Model):
     def __repr__(self):
         return f'<JobOffer {self.titulo}>'
 
+class Asociacion(db.Model):
+    """Modelo para asociaciones de neurodiversidad"""
+    id = db.Column(db.Integer, primary_key=True)
+    nombre_asociacion = db.Column(db.String(200), nullable=False)
+    acronimo = db.Column(db.String(20), nullable=True)
+    pais = db.Column(db.String(10), nullable=False)
+    otro_pais = db.Column(db.String(100), nullable=True)
+    
+    # Información legal
+    tipo_documento = db.Column(db.String(100), nullable=False)
+    numero_documento = db.Column(db.String(50), nullable=False)
+    descripcion_otro_documento = db.Column(db.String(200), nullable=True)
+    
+    # Información de la asociación
+    neurodivergencias_atendidas = db.Column(db.Text, nullable=False)  # JSON string
+    servicios = db.Column(db.Text, nullable=False)  # JSON string
+    ciudad = db.Column(db.String(100), nullable=False)
+    direccion = db.Column(db.String(200), nullable=True)
+    telefono = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    sitio_web = db.Column(db.String(200), nullable=True)
+    descripcion = db.Column(db.Text, nullable=False)
+    
+    # Información operativa
+    años_funcionamiento = db.Column(db.String(20), nullable=False)
+    numero_socios = db.Column(db.String(20), nullable=False)
+    certificaciones = db.Column(db.Text, nullable=True)  # JSON string
+    
+    # Contacto
+    contacto_nombre = db.Column(db.String(100), nullable=False)
+    contacto_cargo = db.Column(db.String(100), nullable=False)
+    
+    # Estado y verificación
+    estado = db.Column(db.String(20), default='pendiente')  # pendiente, verificada, rechazada
+    fecha_solicitud = db.Column(db.DateTime, default=db.func.current_timestamp())
+    fecha_verificacion = db.Column(db.DateTime, nullable=True)
+    notas_verificacion = db.Column(db.Text, nullable=True)
+    
+    # Campos de auditoría
+    ip_solicitud = db.Column(db.String(45), nullable=True)
+    user_agent = db.Column(db.String(500), nullable=True)
+    
+    def __repr__(self):
+        return f'<Asociacion {self.nombre_asociacion}>'
+    
+    def to_dict(self):
+        """Convierte el objeto a diccionario para JSON"""
+        import json
+        return {
+            'id': self.id,
+            'nombre_asociacion': self.nombre_asociacion,
+            'acronimo': self.acronimo,
+            'pais': self.pais,
+            'ciudad': self.ciudad,
+            'neurodivergencias_atendidas': json.loads(self.neurodivergencias_atendidas) if self.neurodivergencias_atendidas else [],
+            'servicios': json.loads(self.servicios) if self.servicios else [],
+            'telefono': self.telefono,
+            'email': self.email,
+            'sitio_web': self.sitio_web,
+            'descripcion': self.descripcion,
+            'estado': self.estado,
+            'fecha_solicitud': self.fecha_solicitud.isoformat() if self.fecha_solicitud else None
+        }
+
 class TestResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

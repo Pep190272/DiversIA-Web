@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+
+{% block title %}Registro de Asociación - DiversIA{% endblock %}
+{% block meta_description %}Formulario para registrar tu asociación de neurodiversidad en el directorio de DiversIA{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold mb-3">
+                    <span class="icon-fallback">🏛️</span><i data-lucide="building" aria-hidden="true"></i>
+                    Registro de Asociación
+                </h1>
+                <p class="lead">Únete a nuestro directorio de asociaciones comprometidas con la neurodiversidad</p>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Información Básica -->
+                        <div class="form-section mb-5">
+                            <h3 class="form-section-title mb-4">
+                                <span class="icon-fallback">📋</span><i data-lucide="clipboard" aria-hidden="true"></i>
+                                Información Básica
+                            </h3>
+                            
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    {{ form.nombre_asociacion.label(class="form-label required") }}
+                                    {{ form.nombre_asociacion(class="form-control" + (" is-invalid" if form.nombre_asociacion.errors else "")) }}
+                                    {% if form.nombre_asociacion.errors %}
+                                        <div class="invalid-feedback">{{ form.nombre_asociacion.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    {{ form.acronimo.label(class="form-label") }}
+                                    {{ form.acronimo(class="form-control") }}
+                                    <small class="form-text text-muted">Ej: AETAPI, FEAADAH</small>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.pais.label(class="form-label required") }}
+                                    {{ form.pais(class="form-select" + (" is-invalid" if form.pais.errors else ""), id="pais_select") }}
+                                    {% if form.pais.errors %}
+                                        <div class="invalid-feedback">{{ form.pais.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3" id="otro_pais_div" style="display: none;">
+                                    {{ form.otro_pais.label(class="form-label") }}
+                                    {{ form.otro_pais(class="form-control") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Verificación Legal -->
+                        <div class="form-section mb-5">
+                            <h3 class="form-section-title mb-4">
+                                <span class="icon-fallback">⚖️</span><i data-lucide="scale" aria-hidden="true"></i>
+                                Verificación Legal
+                            </h3>
+                            <div class="alert alert-info">
+                                <strong>Importante:</strong> Para verificar la legitimidad de tu asociación, necesitamos documentación oficial según las leyes de tu país.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    {{ form.tipo_documento.label(class="form-label required") }}
+                                    {{ form.tipo_documento(class="form-select" + (" is-invalid" if form.tipo_documento.errors else ""), id="tipo_documento_select") }}
+                                    {% if form.tipo_documento.errors %}
+                                        <div class="invalid-feedback">{{ form.tipo_documento.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    {{ form.numero_documento.label(class="form-label required") }}
+                                    {{ form.numero_documento(class="form-control" + (" is-invalid" if form.numero_documento.errors else "")) }}
+                                    {% if form.numero_documento.errors %}
+                                        <div class="invalid-feedback">{{ form.numero_documento.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div id="descripcion_documento_div" style="display: none;">
+                                {{ form.descripcion_otro_documento.label(class="form-label") }}
+                                {{ form.descripcion_otro_documento(class="form-control") }}
+                                <small class="form-text text-muted">Especifica qué tipo de documento proporcionas</small>
+                            </div>
+                        </div>
+
+                        <!-- Servicios y Neurodivergencias -->
+                        <div class="form-section mb-5">
+                            <h3 class="form-section-title mb-4">
+                                <span class="icon-fallback">🎯</span><i data-lucide="target" aria-hidden="true"></i>
+                                Servicios y Especialización
+                            </h3>
+                            
+                            <div class="mb-4">
+                                {{ form.neurodivergencias_atendidas.label(class="form-label required") }}
+                                <div class="row">
+                                    {% for option in form.neurodivergencias_atendidas %}
+                                        <div class="col-md-4 mb-2">
+                                            <div class="form-check">
+                                                {{ option(class="form-check-input") }}
+                                                {{ option.label(class="form-check-label") }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.neurodivergencias_atendidas.errors %}
+                                    <div class="text-danger small">{{ form.neurodivergencias_atendidas.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.servicios.label(class="form-label required") }}
+                                <div class="row">
+                                    {% for option in form.servicios %}
+                                        <div class="col-md-4 mb-2">
+                                            <div class="form-check">
+                                                {{ option(class="form-check-input") }}
+                                                {{ option.label(class="form-check-label") }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.servicios.errors %}
+                                    <div class="text-danger small">{{ form.servicios.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Información de Contacto -->
+                        <div class="form-section mb-5">
+                            <h3 class="form-section-title mb-4">
+                                <span class="icon-fallback">📞</span><i data-lucide="phone" aria-hidden="true"></i>
+                                Información de Contacto
+                            </h3>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.ciudad.label(class="form-label required") }}
+                                    {{ form.ciudad(class="form-control" + (" is-invalid" if form.ciudad.errors else "")) }}
+                                    {% if form.ciudad.errors %}
+                                        <div class="invalid-feedback">{{ form.ciudad.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.direccion.label(class="form-label") }}
+                                    {{ form.direccion(class="form-control") }}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.telefono.label(class="form-label required") }}
+                                    {{ form.telefono(class="form-control" + (" is-invalid" if form.telefono.errors else "")) }}
+                                    {% if form.telefono.errors %}
+                                        <div class="invalid-feedback">{{ form.telefono.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.email.label(class="form-label required") }}
+                                    {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                                    {% if form.email.errors %}
+                                        <div class="invalid-feedback">{{ form.email.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.sitio_web.label(class="form-label") }}
+                                {{ form.sitio_web(class="form-control", placeholder="https://www.ejemplo.com") }}
+                                {% if form.sitio_web.errors %}
+                                    <div class="text-danger small">{{ form.sitio_web.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.descripcion.label(class="form-label required") }}
+                                {{ form.descripcion(class="form-control" + (" is-invalid" if form.descripcion.errors else ""), rows="4") }}
+                                {% if form.descripcion.errors %}
+                                    <div class="invalid-feedback">{{ form.descripcion.errors[0] }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">Describe la misión, visión y principales actividades de tu asociación</small>
+                            </div>
+                        </div>
+
+                        <!-- Información Organizacional -->
+                        <div class="form-section mb-5">
+                            <h3 class="form-section-title mb-4">
+                                <span class="icon-fallback">📊</span><i data-lucide="bar-chart" aria-hidden="true"></i>
+                                Información Organizacional
+                            </h3>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.años_funcionamiento.label(class="form-label required") }}
+                                    {{ form.años_funcionamiento(class="form-select" + (" is-invalid" if form.años_funcionamiento.errors else "")) }}
+                                    {% if form.años_funcionamiento.errors %}
+                                        <div class="invalid-feedback">{{ form.años_funcionamiento.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.numero_socios.label(class="form-label required") }}
+                                    {{ form.numero_socios(class="form-select" + (" is-invalid" if form.numero_socios.errors else "")) }}
+                                    {% if form.numero_socios.errors %}
+                                        <div class="invalid-feedback">{{ form.numero_socios.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.certificaciones.label(class="form-label") }}
+                                <div class="row">
+                                    {% for option in form.certificaciones %}
+                                        <div class="col-md-4 mb-2">
+                                            <div class="form-check">
+                                                {{ option(class="form-check-input") }}
+                                                {{ option.label(class="form-check-label") }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Persona de Contacto -->
+                        <div class="form-section mb-5">
+                            <h3 class="form-section-title mb-4">
+                                <span class="icon-fallback">👤</span><i data-lucide="user" aria-hidden="true"></i>
+                                Persona de Contacto
+                            </h3>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form.contacto_nombre.label(class="form-label required") }}
+                                    {{ form.contacto_nombre(class="form-control" + (" is-invalid" if form.contacto_nombre.errors else "")) }}
+                                    {% if form.contacto_nombre.errors %}
+                                        <div class="invalid-feedback">{{ form.contacto_nombre.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form.contacto_cargo.label(class="form-label required") }}
+                                    {{ form.contacto_cargo(class="form-control" + (" is-invalid" if form.contacto_cargo.errors else "")) }}
+                                    {% if form.contacto_cargo.errors %}
+                                        <div class="invalid-feedback">{{ form.contacto_cargo.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aceptación -->
+                        <div class="form-section mb-4">
+                            <h3 class="form-section-title mb-4">
+                                <span class="icon-fallback">✅</span><i data-lucide="check-circle" aria-hidden="true"></i>
+                                Confirmación
+                            </h3>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    {{ form.aceptar_verificacion(class="form-check-input" + (" is-invalid" if form.aceptar_verificacion.errors else "")) }}
+                                    {{ form.aceptar_verificacion.label(class="form-check-label") }}
+                                    {% if form.aceptar_verificacion.errors %}
+                                        <div class="invalid-feedback">{{ form.aceptar_verificacion.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    {{ form.aceptar_privacidad(class="form-check-input" + (" is-invalid" if form.aceptar_privacidad.errors else "")) }}
+                                    {{ form.aceptar_privacidad.label(class="form-check-label") }}
+                                    {% if form.aceptar_privacidad.errors %}
+                                        <div class="invalid-feedback">{{ form.aceptar_privacidad.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Información sobre el proceso -->
+                        <div class="alert alert-primary">
+                            <h5><span class="icon-fallback">ℹ️</span> Proceso de Verificación</h5>
+                            <ul class="mb-0">
+                                <li>Revisaremos la información y documentación proporcionada</li>
+                                <li>El proceso de verificación puede tomar de 3 a 7 días hábiles</li>
+                                <li>Te notificaremos por email el estado de tu solicitud</li>
+                                <li>Una vez aprobada, tu asociación aparecerá en nuestro directorio público</li>
+                            </ul>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('asociaciones') }}" class="btn btn-outline-secondary">
+                                <span class="icon-fallback">⬅️</span><i data-lucide="arrow-left" aria-hidden="true"></i>
+                                Volver al Directorio
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <span class="icon-fallback">📤</span><i data-lucide="send" aria-hidden="true"></i>
+                                Enviar Solicitud
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar/ocultar campo de otro país
+    const paisSelect = document.getElementById('pais_select');
+    const otroPaisDiv = document.getElementById('otro_pais_div');
+    
+    paisSelect.addEventListener('change', function() {
+        if (this.value === 'OTHER') {
+            otroPaisDiv.style.display = 'block';
+        } else {
+            otroPaisDiv.style.display = 'none';
+        }
+    });
+    
+    // Mostrar/ocultar descripción de otro documento
+    const tipoDocumentoSelect = document.getElementById('tipo_documento_select');
+    const descripcionDocumentoDiv = document.getElementById('descripcion_documento_div');
+    
+    tipoDocumentoSelect.addEventListener('change', function() {
+        if (this.value === 'otro') {
+            descripcionDocumentoDiv.style.display = 'block';
+        } else {
+            descripcionDocumentoDiv.style.display = 'none';
+        }
+    });
+    
+    // Verificar estado inicial
+    if (paisSelect.value === 'OTHER') {
+        otroPaisDiv.style.display = 'block';
+    }
+    if (tipoDocumentoSelect.value === 'otro') {
+        descripcionDocumentoDiv.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

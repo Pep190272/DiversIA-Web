@@ -4,7 +4,7 @@ from models import User, Company, JobOffer, TestResult
 from forms import (RegistroGeneralForm, RegistroTDAHForm, RegistroDislexiaForm, RegistroTEAForm, 
                   RegistroDiscalculiaForm, RegistroTouretteForm, RegistroDispraxiaForm, 
                   RegistroAnsiedadForm, RegistroBipolarForm, RegistroAltasCapacidadesForm,
-                  EmpresaRegistroForm, OfertaEmpleoForm)
+                  EmpresaForm, OfertaTrabajoForm)
 from sendgrid_helper import send_registration_notification, send_company_registration_notification
 
 @app.route('/')
@@ -17,8 +17,8 @@ def personas_nd():
 
 @app.route('/empresas')
 def empresas():
-    form = EmpresaRegistroForm()
-    oferta_form = OfertaEmpleoForm()
+    form = EmpresaForm()
+    oferta_form = OfertaTrabajoForm()
     return render_template('empresas.html', form=form, oferta_form=oferta_form)
 
 @app.route('/comunidad')
@@ -546,6 +546,100 @@ def videos_informativos():
 def podcast_diversia():
     """Página del podcast DiversIA"""
     return render_template('podcast-diversia.html')
+
+@app.route('/registro-asociacion', methods=['GET', 'POST'])
+def registro_asociacion():
+    """Formulario para registro de nuevas asociaciones"""
+    from forms import AsociacionForm
+    from models import Asociacion
+    import json
+    from flask import request
+    
+    form = AsociacionForm()
+    
+    if form.validate_on_submit():
+        try:
+            # Crear nueva asociación
+            nueva_asociacion = Asociacion()
+            
+            # Información básica
+            nueva_asociacion.nombre_asociacion = form.nombre_asociacion.data
+            nueva_asociacion.acronimo = form.acronimo.data
+            nueva_asociacion.pais = form.pais.data
+            nueva_asociacion.otro_pais = form.otro_pais.data if form.pais.data == 'OTHER' else None
+            
+            # Información legal
+            nueva_asociacion.tipo_documento = form.tipo_documento.data
+            nueva_asociacion.numero_documento = form.numero_documento.data
+            nueva_asociacion.descripcion_otro_documento = form.descripcion_otro_documento.data
+            
+            # Servicios y neurodivergencias (convertir listas a JSON)
+            nueva_asociacion.neurodivergencias_atendidas = json.dumps(form.neurodivergencias_atendidas.data)
+            nueva_asociacion.servicios = json.dumps(form.servicios.data)
+            nueva_asociacion.certificaciones = json.dumps(form.certificaciones.data) if form.certificaciones.data else None
+            
+            # Información de contacto
+            nueva_asociacion.ciudad = form.ciudad.data
+            nueva_asociacion.direccion = form.direccion.data
+            nueva_asociacion.telefono = form.telefono.data
+            nueva_asociacion.email = form.email.data
+            nueva_asociacion.sitio_web = form.sitio_web.data
+            nueva_asociacion.descripcion = form.descripcion.data
+            
+            # Información operativa
+            nueva_asociacion.años_funcionamiento = form.años_funcionamiento.data
+            nueva_asociacion.numero_socios = form.numero_socios.data
+            
+            # Contacto responsable
+            nueva_asociacion.contacto_nombre = form.contacto_nombre.data
+            nueva_asociacion.contacto_cargo = form.contacto_cargo.data
+            
+            # Información de auditoría
+            nueva_asociacion.ip_solicitud = request.remote_addr
+            nueva_asociacion.user_agent = request.user_agent.string[:500]
+            nueva_asociacion.estado = 'pendiente'  # Por defecto pendiente de verificación
+            
+            # Guardar en base de datos
+            db.session.add(nueva_asociacion)
+            db.session.commit()
+            
+            # Enviar notificación por email
+            try:
+                from sendgrid_helper import send_notification_email
+                
+                # Preparar datos para la notificación
+                asociacion_data = {
+                    'nombre_asociacion': nueva_asociacion.nombre_asociacion,
+                    'pais': nueva_asociacion.pais,
+                    'ciudad': nueva_asociacion.ciudad,
+                    'email': nueva_asociacion.email,
+                    'telefono': nueva_asociacion.telefono,
+                    'neurodivergencias': ', '.join(form.neurodivergencias_atendidas.data),
+                    'servicios': ', '.join(form.servicios.data),
+                    'contacto_nombre': nueva_asociacion.contacto_nombre,
+                    'contacto_cargo': nueva_asociacion.contacto_cargo,
+                    'tipo_documento': nueva_asociacion.tipo_documento,
+                    'numero_documento': nueva_asociacion.numero_documento,
+                    'años_funcionamiento': nueva_asociacion.años_funcionamiento,
+                    'numero_socios': nueva_asociacion.numero_socios
+                }
+                
+                send_notification_email(asociacion_data, "Nueva Solicitud de Asociación")
+                
+            except ImportError:
+                print("SendGrid no disponible - notificación no enviada")
+            except Exception as e:
+                print(f"Error enviando notificación: {e}")
+            
+            flash('¡Solicitud de asociación enviada exitosamente! La revisaremos y nos pondremos en contacto contigo pronto.', 'success')
+            return redirect(url_for('asociaciones'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('Error al procesar la solicitud. Por favor, inténtalo de nuevo.', 'error')
+            print(f"Error en registro de asociación: {e}")
+    
+    return render_template('registro-asociacion.html', form=form)
 
 @app.route('/empresa-registro', methods=['POST'])
 def empresa_registro():
