@@ -206,10 +206,10 @@
                     Nuestro equipo está aquí para apoyarte en cada paso del proceso.
                 </p>
                 <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                    <a href="mailto:diversiaeternals@gmail.com" class="btn btn-light">
+                    <button onclick="openEmail()" class="btn btn-light">
                         <span class="icon-fallback">✉️</span><i data-lucide="mail" aria-hidden="true"></i>
                         Contactar por email
-                    </a>
+                    </button>
                     <a href="https://t.me/DiversiaSupport" target="_blank" class="btn btn-outline-light">
                         <span class="icon-fallback">💬</span><i data-lucide="message-circle" aria-hidden="true"></i>
                         Chat Telegram
@@ -219,4 +219,34 @@
         </div>
     </div>
 </section>
+
+<script>
+function openEmail() {
+    // Intentar abrir el cliente de correo
+    var emailTo = 'diversiaeternals@gmail.com';
+    var subject = 'Consulta DiversIA';
+    var body = 'Hola equipo DiversIA,\n\nEscribo para consultar sobre:\n\n[Describe tu consulta aquí]\n\nGracias';
+    
+    var mailtoLink = 'mailto:' + emailTo + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    
+    // Crear un enlace temporal y hacer clic
+    var tempLink = document.createElement('a');
+    tempLink.href = mailtoLink;
+    tempLink.style.display = 'none';
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    document.body.removeChild(tempLink);
+    
+    // Si no funciona, mostrar el email para copiar
+    setTimeout(function() {
+        if (confirm('¿No se abrió tu cliente de correo?\n\nHaz clic en OK para copiar el email al portapapeles:\ndiversiaeternals@gmail.com')) {
+            navigator.clipboard.writeText('diversiaeternals@gmail.com').then(function() {
+                alert('Email copiado al portapapeles: diversiaeternals@gmail.com');
+            }).catch(function() {
+                alert('Email de contacto: diversiaeternals@gmail.com\n\nPor favor cópialo manualmente.');
+            });
+        }
+    }, 1000);
+}
+</script>
 {% endblock %}
