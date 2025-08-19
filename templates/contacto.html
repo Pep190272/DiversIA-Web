@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Contacto - DiversIA{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold mb-3">Contacta con Nosotros</h1>
+                <p class="lead text-muted">Estamos aquí para ayudarte en tu camino hacia la inclusión laboral</p>
+            </div>
+
+            <!-- Métodos de contacto rápido -->
+            <div class="row mb-5">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="condition-badge general mx-auto mb-3">
+                                <i data-lucide="mail" class="condition-icon"></i>
+                            </div>
+                            <h5 class="card-title">Email Directo</h5>
+                            <p class="card-text text-muted">Contacta directamente con nuestro equipo</p>
+                            <button onclick="openEmail()" class="btn btn-primary">
+                                diversiaeternals@gmail.com
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="condition-badge tdah mx-auto mb-3">
+                                <i data-lucide="message-circle" class="condition-icon"></i>
+                            </div>
+                            <h5 class="card-title">Telegram</h5>
+                            <p class="card-text text-muted">Chat directo para soporte inmediato</p>
+                            <a href="https://t.me/DiversiaSupport" target="_blank" class="btn btn-primary">
+                                Chat Telegram
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de contacto -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="h4 mb-4">Envíanos un Mensaje</h3>
+                    <form action="/enviar-contacto" method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre" class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="asunto" class="form-label">Asunto *</label>
+                            <select class="form-select" id="asunto" name="asunto" required>
+                                <option value="">Selecciona un tema</option>
+                                <option value="registro">Ayuda con registro</option>
+                                <option value="tests">Información sobre tests</option>
+                                <option value="empresas">Información para empresas</option>
+                                <option value="recursos">Recursos y materiales</option>
+                                <option value="tecnico">Soporte técnico</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mensaje" class="form-label">Mensaje *</label>
+                            <textarea class="form-control" id="mensaje" name="mensaje" rows="5" required placeholder="Cuéntanos en qué podemos ayudarte..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="acepto" name="acepto" required>
+                                <label class="form-check-label" for="acepto">
+                                    Acepto que mis datos sean utilizados para responder a mi consulta según nuestra <a href="/politica-privacidad" target="_blank">Política de Privacidad</a>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i data-lucide="send" class="me-2"></i>
+                                Enviar Mensaje
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="row mt-5">
+                <div class="col-md-4 text-center mb-3">
+                    <div class="condition-badge tea mx-auto mb-3">
+                        <i data-lucide="clock" class="condition-icon"></i>
+                    </div>
+                    <h6>Tiempo de Respuesta</h6>
+                    <p class="text-muted small">24-48 horas laborables</p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <div class="condition-badge dislexia mx-auto mb-3">
+                        <i data-lucide="shield-check" class="condition-icon"></i>
+                    </div>
+                    <h6>Datos Seguros</h6>
+                    <p class="text-muted small">Cumplimiento RGPD</p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <div class="condition-badge general mx-auto mb-3">
+                        <i data-lucide="heart" class="condition-icon"></i>
+                    </div>
+                    <h6>Soporte Especializado</h6>
+                    <p class="text-muted small">Equipo experto en neurodiversidad</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openEmail() {
+    var emailTo = 'diversiaeternals@gmail.com';
+    var subject = 'Consulta desde DiversIA';
+    var body = 'Hola equipo DiversIA,\n\nEscribo para consultar sobre:\n\n[Describe tu consulta aquí]\n\nGracias';
+    
+    var mailtoLink = 'mailto:' + emailTo + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    
+    var tempLink = document.createElement('a');
+    tempLink.href = mailtoLink;
+    tempLink.style.display = 'none';
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    document.body.removeChild(tempLink);
+    
+    setTimeout(function() {
+        if (confirm('¿No se abrió tu cliente de correo?\n\nHaz clic en OK para copiar el email al portapapeles:\ndiversiaeternals@gmail.com')) {
+            navigator.clipboard.writeText('diversiaeternals@gmail.com').then(function() {
+                alert('Email copiado al portapapeles: diversiaeternals@gmail.com');
+            }).catch(function() {
+                alert('Email de contacto: diversiaeternals@gmail.com\n\nPor favor cópialo manualmente.');
+            });
+        }
+    }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
+{% endblock %}

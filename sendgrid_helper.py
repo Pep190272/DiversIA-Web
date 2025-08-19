@@ -33,6 +33,53 @@ def send_email(to_email: str, subject: str, html_content: str, text_content: str
         print(f"Error enviando email: {e}")
         return False
 
+def send_contact_notification(nombre, email, asunto, mensaje):
+    """
+    Envía notificación de contacto desde el formulario
+    """
+    subject = f"Nuevo Mensaje de Contacto DiversIA - {asunto}"
+    
+    html_content = f"""
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .header {{ background: linear-gradient(135deg, #6366F1, #8B5CF6); color: white; padding: 20px; text-align: center; }}
+            .content {{ padding: 20px; }}
+            .info-section {{ margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; }}
+            .label {{ font-weight: bold; color: #495057; }}
+            .value {{ margin-left: 10px; }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>💬 Nuevo Mensaje de Contacto</h1>
+            <p>Desde el formulario web de DiversIA</p>
+        </div>
+        <div class="content">
+            <div class="info-section">
+                <h3>Información del Contacto</h3>
+                <p><span class="label">Nombre:</span><span class="value">{nombre}</span></p>
+                <p><span class="label">Email:</span><span class="value">{email}</span></p>
+                <p><span class="label">Asunto:</span><span class="value">{asunto}</span></p>
+            </div>
+            
+            <div class="info-section">
+                <h3>Mensaje</h3>
+                <p>{mensaje}</p>
+            </div>
+            
+            <div class="info-section">
+                <p><strong>Responder a:</strong> {email}</p>
+                <p><em>Este mensaje fue enviado desde el formulario de contacto de DiversIA.</em></p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return send_email('diversiaeternals@gmail.com', subject, html_content)
+
 def send_registration_notification(user_data, registration_type="General"):
     """
     Envía notificación de nuevo registro a diversiaeternals@gmail.com

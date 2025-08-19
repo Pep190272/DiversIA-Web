@@ -53,6 +53,39 @@ def politica_cookies():
 def sobre_nosotros():
     return render_template('sobre-nosotros.html')
 
+@app.route('/contacto')
+def contacto():
+    return render_template('contacto.html')
+
+@app.route('/enviar-contacto', methods=['POST'])
+def enviar_contacto():
+    try:
+        nombre = request.form.get('nombre')
+        email = request.form.get('email')
+        asunto = request.form.get('asunto')
+        mensaje = request.form.get('mensaje')
+        
+        if not all([nombre, email, asunto, mensaje]):
+            flash('Por favor completa todos los campos requeridos.', 'error')
+            return redirect(url_for('contacto'))
+        
+        # Enviar notificación por email
+        try:
+            from sendgrid_helper import send_contact_notification
+            success = send_contact_notification(nombre, email, asunto, mensaje)
+        except ImportError:
+            success = False
+        
+        if success:
+            flash('¡Mensaje enviado correctamente! Te responderemos en 24-48 horas.', 'success')
+        else:
+            flash('Hubo un problema al enviar el mensaje. Por favor contacta directamente a diversiaeternals@gmail.com', 'warning')
+            
+    except Exception as e:
+        flash('Error al enviar el mensaje. Por favor intenta de nuevo.', 'error')
+    
+    return redirect(url_for('contacto'))
+
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     form = RegistroGeneralForm()

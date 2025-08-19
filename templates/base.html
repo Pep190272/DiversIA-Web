@@ -172,6 +172,10 @@
                         <a class="nav-link" href="{{ url_for('sobre_nosotros') }}"
                            {% if request.endpoint == 'sobre_nosotros' %}aria-current="page"{% endif %}>Nosotros</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('contacto') }}"
+                           {% if request.endpoint == 'contacto' %}aria-current="page"{% endif %}>Contacto</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i data-lucide="globe" aria-hidden="true"></i> Idioma
