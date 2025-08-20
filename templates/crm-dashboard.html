@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+
+{% block title %}CRM Dashboard - DiversIA{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-6 fw-bold">CRM Dashboard</h1>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="refreshData()">
+                        <i data-lucide="refresh-cw" class="me-2"></i>Actualizar
+                    </button>
+                    <button class="btn btn-primary" onclick="exportData()">
+                        <i data-lucide="download" class="me-2"></i>Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Usuarios ND</h6>
+                            <h2 class="mb-0" id="totalUsers">-</h2>
+                        </div>
+                        <i data-lucide="users" class="text-white-50" style="width: 48px; height: 48px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Empresas</h6>
+                            <h2 class="mb-0" id="totalCompanies">-</h2>
+                        </div>
+                        <i data-lucide="building" class="text-white-50" style="width: 48px; height: 48px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Ofertas Activas</h6>
+                            <h2 class="mb-0" id="activeOffers">-</h2>
+                        </div>
+                        <i data-lucide="briefcase" class="text-white-50" style="width: 48px; height: 48px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Asociaciones</h6>
+                            <h2 class="mb-0" id="totalAssociations">-</h2>
+                        </div>
+                        <i data-lucide="heart-handshake" class="text-white-50" style="width: 48px; height: 48px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pestañas del CRM -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <ul class="nav nav-tabs card-header-tabs" id="crmTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button" role="tab">
+                                <i data-lucide="users" class="me-2"></i>Contactos
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="companies-tab" data-bs-toggle="tab" data-bs-target="#companies" type="button" role="tab">
+                                <i data-lucide="building" class="me-2"></i>Empresas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="offers-tab" data-bs-toggle="tab" data-bs-target="#offers" type="button" role="tab">
+                                <i data-lucide="briefcase" class="me-2"></i>Ofertas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="associations-tab" data-bs-toggle="tab" data-bs-target="#associations" type="button" role="tab">
+                                <i data-lucide="heart-handshake" class="me-2"></i>Asociaciones
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="crmTabContent">
+                        <!-- Contactos -->
+                        <div class="tab-pane fade show active" id="contacts" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Contactos (Usuarios Neurodivergentes)</h5>
+                                <button class="btn btn-primary btn-sm" onclick="addContact()">
+                                    <i data-lucide="plus" class="me-1"></i>Nuevo Contacto
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Email</th>
+                                            <th>Teléfono</th>
+                                            <th>Neurodivergencia</th>
+                                            <th>Ciudad</th>
+                                            <th>Fecha Registro</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="contactsTable">
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">Cargando contactos...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Empresas -->
+                        <div class="tab-pane fade" id="companies" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Empresas Registradas</h5>
+                                <button class="btn btn-primary btn-sm" onclick="addCompany()">
+                                    <i data-lucide="plus" class="me-1"></i>Nueva Empresa
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Empresa</th>
+                                            <th>Email</th>
+                                            <th>Sector</th>
+                                            <th>Tamaño</th>
+                                            <th>Ciudad</th>
+                                            <th>Ofertas</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="companiesTable">
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">Cargando empresas...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Ofertas -->
+                        <div class="tab-pane fade" id="offers" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Ofertas de Trabajo</h5>
+                                <button class="btn btn-primary btn-sm" onclick="addOffer()">
+                                    <i data-lucide="plus" class="me-1"></i>Nueva Oferta
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Empresa</th>
+                                            <th>Ubicación</th>
+                                            <th>Salario</th>
+                                            <th>Estado</th>
+                                            <th>Fecha</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="offersTable">
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">Cargando ofertas...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Asociaciones -->
+                        <div class="tab-pane fade" id="associations" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Asociaciones Registradas</h5>
+                                <span class="badge bg-info">Solo lectura</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Acrónimo</th>
+                                            <th>País</th>
+                                            <th>Documento</th>
+                                            <th>Número</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="associationsTable">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">Cargando asociaciones...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript para CRM -->
+<script>
+class DiversiaCRM {
+    constructor() {
+        this.apiBase = window.location.origin;
+        this.init();
+    }
+
+    async init() {
+        await this.loadStats();
+        await this.loadContacts();
+        await this.loadCompanies();
+        await this.loadOffers();
+        await this.loadAssociations();
+        
+        // Inicializar iconos
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+
+    async loadStats() {
+        try {
+            const response = await fetch(`${this.apiBase}/api/stats`);
+            const stats = await response.json();
+            
+            document.getElementById('totalUsers').textContent = stats.total_users;
+            document.getElementById('totalCompanies').textContent = stats.total_companies;
+            document.getElementById('activeOffers').textContent = stats.active_job_offers;
+            document.getElementById('totalAssociations').textContent = stats.total_associations;
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
+
+    async loadContacts() {
+        try {
+            const response = await fetch(`${this.apiBase}/api/contacts`);
+            const contacts = await response.json();
+            
+            const tbody = document.getElementById('contactsTable');
+            tbody.innerHTML = '';
+            
+            contacts.forEach(contact => {
+                const row = `
+                    <tr>
+                        <td><strong>${contact.name}</strong></td>
+                        <td>${contact.email}</td>
+                        <td>${contact.phone || '-'}</td>
+                        <td><span class="badge bg-primary">${contact.neurodivergence}</span></td>
+                        <td>${contact.city || '-'}</td>
+                        <td>${contact.created_at ? new Date(contact.created_at).toLocaleDateString() : '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" onclick="crm.deleteContact(${contact.id})">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        } catch (error) {
+            console.error('Error loading contacts:', error);
+        }
+    }
+
+    async loadCompanies() {
+        try {
+            const response = await fetch(`${this.apiBase}/api/companies`);
+            const companies = await response.json();
+            
+            const tbody = document.getElementById('companiesTable');
+            tbody.innerHTML = '';
+            
+            companies.forEach(company => {
+                const row = `
+                    <tr>
+                        <td><strong>${company.name}</strong></td>
+                        <td>${company.email}</td>
+                        <td>${company.sector || '-'}</td>
+                        <td>${company.size || '-'}</td>
+                        <td>${company.city || '-'}</td>
+                        <td><span class="badge bg-info">${company.job_offers_count}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" onclick="crm.deleteCompany(${company.id})">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        } catch (error) {
+            console.error('Error loading companies:', error);
+        }
+    }
+
+    async loadOffers() {
+        try {
+            const response = await fetch(`${this.apiBase}/api/job-offers`);
+            const offers = await response.json();
+            
+            const tbody = document.getElementById('offersTable');
+            tbody.innerHTML = '';
+            
+            offers.forEach(offer => {
+                const statusBadge = offer.active ? 
+                    '<span class="badge bg-success">Activa</span>' : 
+                    '<span class="badge bg-secondary">Inactiva</span>';
+                
+                const row = `
+                    <tr>
+                        <td><strong>${offer.title}</strong></td>
+                        <td>${offer.company_name}</td>
+                        <td>${offer.location || '-'}</td>
+                        <td>${offer.salary || '-'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${offer.created_at ? new Date(offer.created_at).toLocaleDateString() : '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" onclick="crm.deleteOffer(${offer.id})">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        } catch (error) {
+            console.error('Error loading offers:', error);
+        }
+    }
+
+    async loadAssociations() {
+        try {
+            const response = await fetch(`${this.apiBase}/api/associations`);
+            const associations = await response.json();
+            
+            const tbody = document.getElementById('associationsTable');
+            tbody.innerHTML = '';
+            
+            associations.forEach(assoc => {
+                const row = `
+                    <tr>
+                        <td><strong>${assoc.name}</strong></td>
+                        <td>${assoc.acronym || '-'}</td>
+                        <td>${assoc.country}</td>
+                        <td>${assoc.document_type}</td>
+                        <td>${assoc.document_number}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        } catch (error) {
+            console.error('Error loading associations:', error);
+        }
+    }
+
+    async deleteContact(id) {
+        if (confirm('¿Estás seguro de que quieres eliminar este contacto?')) {
+            try {
+                await fetch(`${this.apiBase}/api/contacts/${id}`, { method: 'DELETE' });
+                await this.loadContacts();
+                await this.loadStats();
+            } catch (error) {
+                console.error('Error deleting contact:', error);
+            }
+        }
+    }
+
+    async deleteCompany(id) {
+        if (confirm('¿Estás seguro de que quieres eliminar esta empresa y todas sus ofertas?')) {
+            try {
+                await fetch(`${this.apiBase}/api/companies/${id}`, { method: 'DELETE' });
+                await this.loadCompanies();
+                await this.loadOffers();
+                await this.loadStats();
+            } catch (error) {
+                console.error('Error deleting company:', error);
+            }
+        }
+    }
+
+    async deleteOffer(id) {
+        if (confirm('¿Estás seguro de que quieres eliminar esta oferta?')) {
+            try {
+                await fetch(`${this.apiBase}/api/job-offers/${id}`, { method: 'DELETE' });
+                await this.loadOffers();
+                await this.loadStats();
+            } catch (error) {
+                console.error('Error deleting offer:', error);
+            }
+        }
+    }
+}
+
+// Inicializar CRM
+const crm = new DiversiaCRM();
+
+// Funciones globales
+function refreshData() {
+    crm.init();
+}
+
+function exportData() {
+    // Implementar exportación
+    alert('Función de exportación en desarrollo');
+}
+
+function addContact() {
+    alert('Función para añadir contacto en desarrollo');
+}
+
+function addCompany() {
+    alert('Función para añadir empresa en desarrollo');
+}
+
+function addOffer() {
+    alert('Función para añadir oferta en desarrollo');
+}
+</script>
+{% endblock %}

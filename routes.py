@@ -57,6 +57,10 @@ def sobre_nosotros():
 def contacto():
     return render_template('contacto.html')
 
+@app.route('/crm')
+def crm_dashboard():
+    return render_template('crm-dashboard.html')
+
 @app.route('/enviar-contacto', methods=['POST'])
 def enviar_contacto():
     try:

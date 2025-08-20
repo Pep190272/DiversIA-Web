@@ -1,4 +1,5 @@
 from app import app
+import api_crm  # Importar las rutas de la API CRM
 from api_endpoints import api
 from chat_webhook import chat
 from chat_intelligent_endpoint import intelligent_chat
