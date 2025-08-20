@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Empresa - CRM DiversIA{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="me-2">🏢</i>
+                        Editar Empresa
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form id="editCompanyForm">
+                        <input type="hidden" id="company_id" name="company_id">
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="name" class="form-label fw-semibold">Nombre de la Empresa *</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="sector" class="form-label fw-semibold">Sector</label>
+                                <select class="form-select" id="sector" name="sector">
+                                    <option value="Tecnología">Tecnología</option>
+                                    <option value="Educación">Educación</option>
+                                    <option value="Salud">Salud</option>
+                                    <option value="Retail">Retail</option>
+                                    <option value="Servicios">Servicios</option>
+                                    <option value="Manufactura">Manufactura</option>
+                                    <option value="Finanzas">Finanzas</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label fw-semibold">Email de Contacto *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-semibold">Teléfono</label>
+                                <input type="tel" class="form-control" id="phone" name="phone">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label fw-semibold">Ciudad</label>
+                                <input type="text" class="form-control" id="city" name="city">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="size" class="form-label fw-semibold">Tamaño de la Empresa</label>
+                                <select class="form-select" id="size" name="size">
+                                    <option value="1-10">1-10 empleados</option>
+                                    <option value="11-50">11-50 empleados</option>
+                                    <option value="51-200">51-200 empleados</option>
+                                    <option value="201-500">201-500 empleados</option>
+                                    <option value="500+">Más de 500 empleados</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="website" class="form-label fw-semibold">Sitio Web</label>
+                            <input type="url" class="form-control" id="website" name="website">
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Guardar Cambios
+                            </button>
+                            <a href="{{ url_for('crm_dashboard') }}" class="btn btn-outline-secondary">
+                                Volver al CRM
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const companyId = urlParams.get('id');
+    
+    if (companyId) {
+        document.getElementById('company_id').value = companyId;
+        loadCompanyData(companyId);
+    }
+    
+    document.getElementById('editCompanyForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const companyData = {
+            name: formData.get('name'),
+            sector: formData.get('sector'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            city: formData.get('city'),
+            size: formData.get('size'),
+            website: formData.get('website')
+        };
+        
+        try {
+            const response = await fetch(`/api/companies/${companyId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(companyData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Empresa actualizada correctamente');
+                window.location.href = '/crm';
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+});
+
+async function loadCompanyData(companyId) {
+    try {
+        const response = await fetch('/api/companies');
+        const companies = await response.json();
+        
+        const company = companies.find(c => c.id == companyId);
+        
+        if (company) {
+            document.getElementById('name').value = company.name;
+            document.getElementById('sector').value = company.sector || 'Tecnología';
+            document.getElementById('email').value = company.email;
+            document.getElementById('phone').value = company.phone || '';
+            document.getElementById('city').value = company.city || '';
+            document.getElementById('size').value = company.size || '1-10';
+            document.getElementById('website').value = company.website || '';
+        } else {
+            alert('Empresa no encontrada');
+            window.location.href = '/crm';
+        }
+    } catch (error) {
+        alert('Error al cargar datos: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

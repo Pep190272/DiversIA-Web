@@ -459,8 +459,11 @@ class DiversiaCRM {
                         <td>${contact.city || '-'}</td>
                         <td>${contact.created_at ? new Date(contact.created_at).toLocaleDateString() : '-'}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-danger" onclick="crm.deleteContact(${contact.id})">
-                                <i data-lucide="trash-2"></i>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editContact(${contact.id})" title="Editar contacto">
+                                Editar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteContact(${contact.id})" title="Eliminar contacto">
+                                Eliminar
                             </button>
                         </td>
                     </tr>
@@ -494,8 +497,11 @@ class DiversiaCRM {
                         <td>${company.city || '-'}</td>
                         <td><span class="badge bg-info">${company.job_offers_count}</span></td>
                         <td>
-                            <button class="btn btn-sm btn-outline-danger" onclick="crm.deleteCompany(${company.id})">
-                                <i data-lucide="trash-2"></i>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editCompany(${company.id})" title="Editar empresa">
+                                Editar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCompany(${company.id})" title="Eliminar empresa">
+                                Eliminar
                             </button>
                         </td>
                     </tr>
@@ -736,6 +742,50 @@ function addCompany() {
 
 function addOffer() {
     alert('Función para añadir oferta en desarrollo');
+}
+
+async function deleteContact(contactId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este contacto?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${window.location.origin}/api/contacts/${contactId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            crm.loadContacts();
+            crm.loadStats();
+        } else {
+            alert('Error al eliminar el contacto');
+        }
+    } catch (error) {
+        console.error('Error deleting contact:', error);
+        alert('Error al eliminar el contacto');
+    }
+}
+
+async function deleteCompany(companyId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta empresa?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${window.location.origin}/api/companies/${companyId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            crm.loadCompanies();
+            crm.loadStats();
+        } else {
+            alert('Error al eliminar la empresa');
+        }
+    } catch (error) {
+        console.error('Error deleting company:', error);
+        alert('Error al eliminar la empresa');
+    }
 }
 </script>
 {% endblock %}

@@ -103,6 +103,22 @@ def edit_task():
         return redirect('/admin/login')
     return render_template('admin/edit_task.html')
 
+@app.route('/admin/edit-contact')
+def edit_contact():
+    from flask import session, redirect, flash
+    if 'admin_id' not in session:
+        flash('Debes iniciar sesión como administrador.', 'error')
+        return redirect('/admin/login')
+    return render_template('admin/edit_contact.html')
+
+@app.route('/admin/edit-company')
+def edit_company():
+    from flask import session, redirect, flash
+    if 'admin_id' not in session:
+        flash('Debes iniciar sesión como administrador.', 'error')
+        return redirect('/admin/login')
+    return render_template('admin/edit_company.html')
+
 @app.route('/enviar-contacto', methods=['POST'])
 def enviar_contacto():
     try:

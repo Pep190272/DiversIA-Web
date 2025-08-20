@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Contacto - CRM DiversIA{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="me-2">👤</i>
+                        Editar Contacto
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form id="editContactForm">
+                        <input type="hidden" id="contact_id" name="contact_id">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label fw-semibold">Nombre Completo *</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label fw-semibold">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-semibold">Teléfono</label>
+                                <input type="tel" class="form-control" id="phone" name="phone">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label fw-semibold">Ciudad</label>
+                                <input type="text" class="form-control" id="city" name="city">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="neurodivergence" class="form-label fw-semibold">Neurodivergencia</label>
+                                <select class="form-select" id="neurodivergence" name="neurodivergence">
+                                    <option value="TDAH">TDAH</option>
+                                    <option value="TEA">TEA (Autismo)</option>
+                                    <option value="Dislexia">Dislexia</option>
+                                    <option value="Discalculia">Discalculia</option>
+                                    <option value="Tourette">Tourette</option>
+                                    <option value="Ansiedad">Ansiedad</option>
+                                    <option value="Bipolar">Bipolar</option>
+                                    <option value="Altas Capacidades">Altas Capacidades</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="formal_diagnosis" class="form-label fw-semibold">Diagnóstico Formal</label>
+                                <select class="form-select" id="formal_diagnosis" name="formal_diagnosis">
+                                    <option value="true">Sí</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                Guardar Cambios
+                            </button>
+                            <a href="{{ url_for('crm_dashboard') }}" class="btn btn-outline-secondary">
+                                Volver al CRM
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const contactId = urlParams.get('id');
+    
+    if (contactId) {
+        document.getElementById('contact_id').value = contactId;
+        loadContactData(contactId);
+    }
+    
+    document.getElementById('editContactForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const contactData = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            city: formData.get('city'),
+            neurodivergence: formData.get('neurodivergence'),
+            formal_diagnosis: formData.get('formal_diagnosis') === 'true'
+        };
+        
+        try {
+            const response = await fetch(`/api/contacts/${contactId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(contactData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Contacto actualizado correctamente');
+                window.location.href = '/crm';
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+});
+
+async function loadContactData(contactId) {
+    try {
+        const response = await fetch('/api/contacts');
+        const contacts = await response.json();
+        
+        const contact = contacts.find(c => c.id == contactId);
+        
+        if (contact) {
+            document.getElementById('name').value = contact.name;
+            document.getElementById('email').value = contact.email;
+            document.getElementById('phone').value = contact.phone || '';
+            document.getElementById('city').value = contact.city || '';
+            document.getElementById('neurodivergence').value = contact.neurodivergence;
+            document.getElementById('formal_diagnosis').value = contact.formal_diagnosis ? 'true' : 'false';
+        } else {
+            alert('Contacto no encontrado');
+            window.location.href = '/crm';
+        }
+    } catch (error) {
+        alert('Error al cargar datos: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

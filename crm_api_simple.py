@@ -46,7 +46,28 @@ def api_employees():
             }
             
             SAMPLE_CRM_DATA['employees'].append(new_employee)
-            return add_cors_headers(jsonify({'message': 'Empleado creado correctamente', 'id': new_id})), 201
+            
+            # Enviar email de bienvenida al empleado
+            try:
+                from employee_email_service import send_employee_welcome_email, send_admin_notification
+                
+                # Enviar email de bienvenida
+                email_sent = send_employee_welcome_email(new_employee)
+                
+                # Notificar a administradores
+                admin_notified = send_admin_notification(new_employee)
+                
+                response_message = 'Empleado creado correctamente'
+                if email_sent:
+                    response_message += ' - Email de activación enviado'
+                if admin_notified:
+                    response_message += ' - Administradores notificados'
+                    
+            except Exception as e:
+                print(f"⚠️ Error enviando emails: {e}")
+                response_message = 'Empleado creado correctamente (sin notificación por email)'
+                
+            return add_cors_headers(jsonify({'message': response_message, 'id': new_id})), 201
             
         except Exception as e:
             return add_cors_headers(jsonify({'error': f'Error al crear empleado: {str(e)}'})), 500
@@ -207,19 +228,130 @@ def api_stats():
     except Exception as e:
         return add_cors_headers(jsonify({'error': f'Error al cargar estadísticas: {str(e)}'})), 500
 
-# API CONTACTOS (para compatibilidad)
-@app.route('/api/contacts')
+# API CONTACTOS
+@app.route('/api/contacts', methods=['GET', 'POST'])
 def api_contacts():
     if not require_admin():
         return jsonify({'error': 'No autorizado'}), 401
-    return add_cors_headers(jsonify(SAMPLE_CRM_DATA.get('contacts', [])))
+    
+    if request.method == 'GET':
+        return add_cors_headers(jsonify(SAMPLE_CRM_DATA.get('contacts', [])))
+    
+    elif request.method == 'POST':
+        try:
+            data = request.get_json()
+            new_id = max([c['id'] for c in SAMPLE_CRM_DATA['contacts']], default=0) + 1
+            
+            new_contact = {
+                'id': new_id,
+                'name': data.get('name'),
+                'email': data.get('email'),
+                'phone': data.get('phone', ''),
+                'city': data.get('city', ''),
+                'neurodivergence': data.get('neurodivergence', 'TDAH'),
+                'formal_diagnosis': data.get('formal_diagnosis', False),
+                'created_at': '2024-12-20T10:00:00',
+                'source': 'Manual'
+            }
+            
+            SAMPLE_CRM_DATA['contacts'].append(new_contact)
+            return add_cors_headers(jsonify({'message': 'Contacto creado', 'id': new_id})), 201
+        except Exception as e:
+            return add_cors_headers(jsonify({'error': str(e)})), 500
 
-# API EMPRESAS (para compatibilidad)  
-@app.route('/api/companies')
+@app.route('/api/contacts/<int:contact_id>', methods=['PUT', 'DELETE'])
+def manage_contact(contact_id):
+    if not require_admin():
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    if request.method == 'DELETE':
+        initial_count = len(SAMPLE_CRM_DATA['contacts'])
+        SAMPLE_CRM_DATA['contacts'] = [c for c in SAMPLE_CRM_DATA['contacts'] if c['id'] != contact_id]
+        
+        if len(SAMPLE_CRM_DATA['contacts']) < initial_count:
+            return add_cors_headers(jsonify({'message': 'Contacto eliminado'}))
+        else:
+            return add_cors_headers(jsonify({'error': 'No encontrado'})), 404
+    
+    elif request.method == 'PUT':
+        data = request.get_json()
+        contact = next((c for c in SAMPLE_CRM_DATA['contacts'] if c['id'] == contact_id), None)
+        
+        if contact:
+            contact.update({
+                'name': data.get('name', contact['name']),
+                'email': data.get('email', contact['email']),
+                'phone': data.get('phone', contact['phone']),
+                'city': data.get('city', contact['city']),
+                'neurodivergence': data.get('neurodivergence', contact['neurodivergence']),
+                'formal_diagnosis': data.get('formal_diagnosis', contact['formal_diagnosis'])
+            })
+            return add_cors_headers(jsonify({'message': 'Contacto actualizado'}))
+        else:
+            return add_cors_headers(jsonify({'error': 'No encontrado'})), 404
+
+# API EMPRESAS
+@app.route('/api/companies', methods=['GET', 'POST'])
 def api_companies():
     if not require_admin():
         return jsonify({'error': 'No autorizado'}), 401
-    return add_cors_headers(jsonify(SAMPLE_CRM_DATA.get('companies', [])))
+    
+    if request.method == 'GET':
+        return add_cors_headers(jsonify(SAMPLE_CRM_DATA.get('companies', [])))
+    
+    elif request.method == 'POST':
+        try:
+            data = request.get_json()
+            new_id = max([c['id'] for c in SAMPLE_CRM_DATA['companies']], default=0) + 1
+            
+            new_company = {
+                'id': new_id,
+                'name': data.get('name'),
+                'sector': data.get('sector', 'Tecnología'),
+                'email': data.get('email'),
+                'phone': data.get('phone', ''),
+                'city': data.get('city', ''),
+                'size': data.get('size', '1-10'),
+                'website': data.get('website', ''),
+                'created_at': '2024-12-20T10:00:00'
+            }
+            
+            SAMPLE_CRM_DATA['companies'].append(new_company)
+            return add_cors_headers(jsonify({'message': 'Empresa creada', 'id': new_id})), 201
+        except Exception as e:
+            return add_cors_headers(jsonify({'error': str(e)})), 500
+
+@app.route('/api/companies/<int:company_id>', methods=['PUT', 'DELETE'])
+def manage_company(company_id):
+    if not require_admin():
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    if request.method == 'DELETE':
+        initial_count = len(SAMPLE_CRM_DATA['companies'])
+        SAMPLE_CRM_DATA['companies'] = [c for c in SAMPLE_CRM_DATA['companies'] if c['id'] != company_id]
+        
+        if len(SAMPLE_CRM_DATA['companies']) < initial_count:
+            return add_cors_headers(jsonify({'message': 'Empresa eliminada'}))
+        else:
+            return add_cors_headers(jsonify({'error': 'No encontrada'})), 404
+    
+    elif request.method == 'PUT':
+        data = request.get_json()
+        company = next((c for c in SAMPLE_CRM_DATA['companies'] if c['id'] == company_id), None)
+        
+        if company:
+            company.update({
+                'name': data.get('name', company['name']),
+                'sector': data.get('sector', company['sector']),
+                'email': data.get('email', company['email']),
+                'phone': data.get('phone', company['phone']),
+                'city': data.get('city', company['city']),
+                'size': data.get('size', company['size']),
+                'website': data.get('website', company['website'])
+            })
+            return add_cors_headers(jsonify({'message': 'Empresa actualizada'}))
+        else:
+            return add_cors_headers(jsonify({'error': 'No encontrada'})), 404
 
 # API OFERTAS (para compatibilidad)
 @app.route('/api/offers')
