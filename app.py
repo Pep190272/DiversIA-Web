@@ -47,3 +47,35 @@ with app.app_context():
     except Exception as e:
         print(f"⚠️ Database error: {e}")
         print("Application will run with limited functionality")
+
+# Cargar endpoints de prueba del sistema
+@app.route('/test/email-system')
+def test_email_system_endpoint():
+    """Endpoint para probar el sistema de emails desde el navegador"""
+    try:
+        from test_email_system import run_email_test_only
+        result = run_email_test_only()
+        from flask import jsonify
+        return jsonify({
+            'success': result,
+            'message': 'Prueba de emails completada' if result else 'Error en prueba de emails - revisa SENDGRID_API_KEY',
+            'details': 'Revisa los logs del servidor para más información'
+        })
+    except Exception as e:
+        from flask import jsonify
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+
+@app.route('/test/crm-integration')
+def test_crm_integration_endpoint():
+    """Endpoint para probar la integración del CRM"""
+    try:
+        from test_email_system import test_crm_integration
+        result = test_crm_integration()
+        from flask import jsonify
+        return jsonify({
+            'success': result,
+            'message': 'Prueba de CRM completada' if result else 'Error en prueba de CRM'
+        })
+    except Exception as e:
+        from flask import jsonify
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500

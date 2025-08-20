@@ -51,11 +51,15 @@ def api_employees():
             try:
                 from employee_email_service import send_employee_welcome_email, send_admin_notification
                 
+                print(f"📧 Intentando enviar emails para: {new_employee['email']}")
+                
                 # Enviar email de bienvenida
                 email_sent = send_employee_welcome_email(new_employee)
+                print(f"📧 Email bienvenida resultado: {email_sent}")
                 
                 # Notificar a administradores
                 admin_notified = send_admin_notification(new_employee)
+                print(f"📧 Notificación admin resultado: {admin_notified}")
                 
                 response_message = 'Empleado creado correctamente'
                 if email_sent:
@@ -65,7 +69,9 @@ def api_employees():
                     
             except Exception as e:
                 print(f"⚠️ Error enviando emails: {e}")
-                response_message = 'Empleado creado correctamente (sin notificación por email)'
+                import traceback
+                traceback.print_exc()
+                response_message = 'Empleado creado correctamente (sin notificación por email - verifique configuración SendGrid)'
                 
             return add_cors_headers(jsonify({'message': response_message, 'id': new_id})), 201
             

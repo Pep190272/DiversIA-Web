@@ -97,7 +97,7 @@ def send_employee_welcome_email(employee_data):
         
         # Crear el mensaje
         message = Mail(
-            from_email='noreply@diversia.com',
+            from_email='diversiaeternals@gmail.com',  # Email verificado
             to_emails=employee_data['email'],
             subject=f'¡Bienvenido a DiversIA, {employee_data["first_name"]}! - Activa tu cuenta',
             html_content=html_content
@@ -168,7 +168,7 @@ def send_admin_notification(employee_data):
         """
         
         message = Mail(
-            from_email='noreply@diversia.com',
+            from_email='diversiaeternals@gmail.com',  # Email verificado
             to_emails='diversiaeternals@gmail.com',  # Email del administrador
             subject=f'Nuevo empleado: {employee_data["first_name"]} {employee_data["last_name"]}',
             html_content=html_content

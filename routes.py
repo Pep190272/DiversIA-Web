@@ -155,12 +155,27 @@ def enviar_contacto():
             flash('Por favor completa todos los campos requeridos.', 'error')
             return redirect(url_for('contacto'))
         
-        # Enviar notificación por email
+        # Enviar notificación por email y añadir al CRM
         try:
             from sendgrid_helper import send_contact_notification
             success = send_contact_notification(nombre, email, asunto, mensaje)
         except ImportError:
             success = False
+        
+        # NUEVA FUNCIONALIDAD: Añadir formulario de contacto al CRM
+        try:
+            from form_integration_service import process_form_submission
+            contact_data = {
+                'nombre': nombre,
+                'email': email,
+                'mensaje': mensaje,
+                'tipo_interes': asunto
+            }
+            crm_id = process_form_submission('contacto', contact_data, 'web_form_contacto')
+            if crm_id:
+                print(f"✅ Mensaje de contacto añadido al CRM para seguimiento")
+        except Exception as e:
+            print(f"⚠️ Error añadiendo contacto al CRM: {e}")
         
         if success:
             flash('¡Mensaje enviado correctamente! Te responderemos en 24-48 horas.', 'success')
@@ -212,7 +227,16 @@ def registro():
         }
         send_registration_notification(user_data, "Registro General")
         
-        flash('¡Registro completado exitosamente!', 'success')
+        # NUEVA FUNCIONALIDAD: Integración automática con CRM
+        try:
+            from form_integration_service import process_form_submission
+            crm_id = process_form_submission('registro_persona', user_data, 'web_form_registro_general')
+            if crm_id:
+                print(f"✅ Usuario añadido automáticamente al CRM con ID: {crm_id}")
+        except Exception as e:
+            print(f"⚠️ Error integrando con CRM: {e}")
+        
+        flash('¡Registro completado exitosamente! Tu información se ha añadido a nuestra base de datos para conectarte con oportunidades laborales.', 'success')
         return redirect(url_for('index'))
     return render_template('registro.html', form=form)
 
@@ -750,7 +774,30 @@ def registro_asociacion():
             except Exception as e:
                 print(f"Error enviando notificación: {e}")
             
-            flash('¡Solicitud de asociación enviada exitosamente! La revisaremos y nos pondremos en contacto contigo pronto.', 'success')
+            # NUEVA FUNCIONALIDAD: Integración automática con CRM
+            try:
+                from form_integration_service import process_form_submission
+                association_data_crm = {
+                    'nombre_asociacion': nueva_asociacion.nombre_asociacion,
+                    'acronimo': nueva_asociacion.acronimo,
+                    'pais': nueva_asociacion.pais,
+                    'ciudad': nueva_asociacion.ciudad,
+                    'tipo_documento': nueva_asociacion.tipo_documento,
+                    'numero_documento': nueva_asociacion.numero_documento,
+                    'email': nueva_asociacion.email,
+                    'telefono': nueva_asociacion.telefono,
+                    'sitio_web': nueva_asociacion.sitio_web,
+                    'descripcion': nueva_asociacion.descripcion,
+                    'numero_miembros': nueva_asociacion.numero_socios,
+                    'año_fundacion': 2024 - nueva_asociacion.años_funcionamiento if nueva_asociacion.años_funcionamiento else None
+                }
+                crm_id = process_form_submission('registro_asociacion', association_data_crm, 'web_form_asociacion')
+                if crm_id:
+                    print(f"✅ Asociación añadida automáticamente al CRM con ID: {crm_id}")
+            except Exception as e:
+                print(f"⚠️ Error integrando asociación con CRM: {e}")
+            
+            flash('¡Solicitud de asociación enviada exitosamente! Tu asociación se ha añadido a nuestra red. La revisaremos y nos pondremos en contacto contigo pronto.', 'success')
             return redirect(url_for('asociaciones'))
             
         except Exception as e:
@@ -791,7 +838,16 @@ def empresa_registro():
         }
         send_company_registration_notification(company_data)
         
-        flash('¡Empresa registrada exitosamente!', 'success')
+        # NUEVA FUNCIONALIDAD: Integración automática con CRM
+        try:
+            from form_integration_service import process_form_submission
+            crm_id = process_form_submission('registro_empresa', company_data, 'web_form_empresa')
+            if crm_id:
+                print(f"✅ Empresa añadida automáticamente al CRM con ID: {crm_id}")
+        except Exception as e:
+            print(f"⚠️ Error integrando empresa con CRM: {e}")
+        
+        flash('¡Empresa registrada exitosamente! Te contactaremos pronto para comenzar tu programa de inclusión laboral.', 'success')
     return redirect(url_for('empresas'))
 
 @app.route('/ofertas-empleo', methods=['POST'])
