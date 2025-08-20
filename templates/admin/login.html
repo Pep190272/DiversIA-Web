@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - DiversIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-header {
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .login-body {
+            padding: 2rem;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #5856EB, #7C3AED);
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            padding: 12px 16px;
+            transition: border-color 0.3s;
+        }
+        .form-control:focus {
+            border-color: #6366F1;
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+        }
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <h2 class="mb-0">🔐 Admin Login</h2>
+            <p class="mb-0 mt-2 opacity-75">Panel de Administración DiversIA</p>
+        </div>
+        <div class="login-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="username" class="form-label fw-semibold">Usuario</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="username" 
+                           name="username" 
+                           placeholder="admin" 
+                           required 
+                           autofocus>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label fw-semibold">Contraseña</label>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           name="password" 
+                           placeholder="••••••••" 
+                           required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-login text-white">
+                        Iniciar Sesión
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('index') }}" class="text-decoration-none text-muted">
+                    ← Volver a DiversIA
+                </a>
+            </div>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    <strong>Admin inicial:</strong> admin / diversia2025
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

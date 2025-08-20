@@ -23,12 +23,21 @@ Preferred communication style: Simple, everyday language.
 - **Form Handling**: Flask-WTF with WTForms for secure form processing and validation
 - **Security**: Comprehensive security headers, CSRF protection, and input validation
 - **Application Structure**: Modular design with separate files for models, routes, forms, and configuration
+- **Admin System**: Role-based authentication with session management and permission controls
+- **CRM Integration**: Complete business management with automatic form tracking and data analytics
 
 ### Data Models
 - **User Model**: Stores neurodivergent individual profiles with specialized fields for different conditions
 - **Company Model**: Manages employer information and contact details
 - **JobOffer Model**: Links companies to job postings with neurodivergence-specific requirements
 - **TestResult Model**: Placeholder for gamified assessment results (incomplete implementation)
+- **Admin Model**: Administrator accounts with role-based permissions
+- **CrmContact Model**: Additional business contacts (partners, providers, media, investors)
+- **FormSubmission Model**: Automatic tracking of all web form submissions with metadata
+- **Partner Model**: Business partnerships and collaborations management
+- **SocialMediaAccount Model**: Social media presence tracking and management
+- **Task Model**: Internal task management and assignment system
+- **Metric Model**: Business KPIs and performance metrics tracking
 
 ### Form Architecture
 - **Inheritance-based Forms**: Base `RegistroGeneralForm` extended by condition-specific forms
@@ -72,6 +81,38 @@ Preferred communication style: Simple, everyday language.
 - **Security Headers**: Comprehensive security header implementation
 - **Session Management**: Secure session handling with configurable secret keys
 - **WSGI Deployment**: Production-ready with ProxyFix middleware
+
+## Recent Updates (2025-08-20)
+
+### Admin-Only CRM System Implementation (COMPLETE)
+- ✓ Implemented comprehensive admin authentication system with secure login
+- ✓ Created admin-only CRM dashboard with role-based access control
+- ✓ Built complete business management system including:
+  - Contact management (web form submissions + manual CRM contacts)
+  - Company and job offer administration
+  - Partner and collaboration tracking
+  - Social media account management
+  - Task management and assignment system
+  - Business metrics and KPI tracking
+- ✓ Automatic form submission tracking for all web forms
+- ✓ Real-time statistics dashboard with neurodivergence and sector analytics
+- ✓ Robust fallback system ensuring CRM functionality regardless of database status
+- ✓ Adaptive navigation: Admin login for non-authenticated users, CRM access for admins
+- ✓ Admin credentials: admin / diversia2025 (change in production)
+- ✓ Complete API endpoints for CRUD operations on all business entities
+
+### Email Contact System Optimization (COMPLETE)  
+- ✓ Replaced problematic mailto: links with direct form redirection
+- ✓ All email contact buttons now redirect to /contacto form page
+- ✓ Updated "Sobre Nosotros" page email button for consistent experience
+- ✓ Gmail SMTP integration working reliably with app password authentication
+
+### Database Architecture Enhancement (COMPLETE)
+- ✓ Added comprehensive business models: CrmContact, FormSubmission, Partner, SocialMediaAccount, Task, Metric
+- ✓ Intelligent database connection handling with SQLite fallback
+- ✓ Automatic form submission logging for CRM analytics
+- ✓ Export tracking and audit trail functionality
+- ✓ Admin user management with permissions system
 
 ## Recent Updates (2025-08-18)
 

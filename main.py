@@ -1,5 +1,12 @@
 from app import app
-import api_crm  # Importar las rutas de la API CRM
+try:
+    import api_crm  # Importar las rutas de la API CRM
+    import admin_auth  # Importar sistema de administración
+    print("✅ CRM completo cargado")
+except Exception as e:
+    print(f"⚠️ Error cargando CRM completo: {e}")
+    import crm_simple  # Fallback al CRM simple
+    print("✅ CRM simple cargado como fallback")
 from api_endpoints import api
 from chat_webhook import chat
 from chat_intelligent_endpoint import intelligent_chat

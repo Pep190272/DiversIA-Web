@@ -134,8 +134,6 @@ class TestResult(db.Model):
     results_data = db.Column(db.JSON, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __repr__(self):
-        return f'<TestResult {self.test_type} for User {self.user_id}>'
     completed_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
@@ -176,3 +174,112 @@ class Association(db.Model):
 
     def __repr__(self):
         return f'<Association {self.nombre}>'
+
+# ============ MODELOS ADICIONALES PARA CRM COMPLETO ============
+
+class CrmContact(db.Model):
+    """Contactos adicionales del CRM (no usuarios web)"""
+    __tablename__ = 'crm_contacts'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(120), nullable=True)
+    phone = db.Column(db.String(20), nullable=True)
+    company = db.Column(db.String(200), nullable=True)
+    position = db.Column(db.String(100), nullable=True)
+    contact_type = db.Column(db.String(50), nullable=False)  # 'partner', 'provider', 'media', 'investor'
+    source = db.Column(db.String(100), nullable=True)  # Dónde se obtuvo el contacto
+    notes = db.Column(db.Text, nullable=True)
+    tags = db.Column(db.String(500), nullable=True)  # Etiquetas separadas por comas
+    last_contact = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_by = db.Column(db.Integer, nullable=True)  # ID del admin que lo creó
+
+    def __repr__(self):
+        return f'<CrmContact {self.name}>'
+
+class FormSubmission(db.Model):
+    """Registro de todas las submisiones de formularios"""
+    __tablename__ = 'form_submissions'
+    id = db.Column(db.Integer, primary_key=True)
+    form_type = db.Column(db.String(50), nullable=False)  # 'contact', 'user_registration', 'company_registration'
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)
+    form_data = db.Column(db.Text, nullable=False)  # JSON con todos los datos del formulario
+    ip_address = db.Column(db.String(45), nullable=True)
+    user_agent = db.Column(db.String(500), nullable=True)
+    processed = db.Column(db.Boolean, default=False)
+    processed_at = db.Column(db.DateTime, nullable=True)
+    processed_by = db.Column(db.Integer, nullable=True)  # ID del admin que lo procesó
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<FormSubmission {self.form_type} - {self.id}>'
+
+class Partner(db.Model):
+    """Partners y colaboradores"""
+    __tablename__ = 'partners'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    company = db.Column(db.String(200), nullable=True)
+    partnership_type = db.Column(db.String(100), nullable=False)  # 'strategic', 'technology', 'content', 'funding'
+    contact_email = db.Column(db.String(120), nullable=True)
+    contact_phone = db.Column(db.String(20), nullable=True)
+    website = db.Column(db.String(300), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    contract_start = db.Column(db.Date, nullable=True)
+    contract_end = db.Column(db.Date, nullable=True)
+    status = db.Column(db.String(50), default='active')  # 'active', 'inactive', 'pending', 'terminated'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Partner {self.name}>'
+
+class SocialMediaAccount(db.Model):
+    """Cuentas de redes sociales"""
+    __tablename__ = 'social_media_accounts'
+    id = db.Column(db.Integer, primary_key=True)
+    platform = db.Column(db.String(50), nullable=False)  # 'instagram', 'linkedin', 'discord', 'telegram', 'twitter'
+    username = db.Column(db.String(100), nullable=False)
+    url = db.Column(db.String(300), nullable=False)
+    followers_count = db.Column(db.Integer, default=0)
+    engagement_rate = db.Column(db.Float, default=0.0)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+    managed_by = db.Column(db.String(100), nullable=True)  # Quién gestiona la cuenta
+    notes = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<SocialMedia {self.platform} - {self.username}>'
+
+class Task(db.Model):
+    """Sistema de tareas y seguimiento"""
+    __tablename__ = 'tasks'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    priority = db.Column(db.String(20), default='medium')  # 'low', 'medium', 'high', 'urgent'
+    status = db.Column(db.String(20), default='pending')  # 'pending', 'in_progress', 'completed', 'cancelled'
+    category = db.Column(db.String(50), nullable=True)  # 'development', 'marketing', 'content', 'admin'
+    assigned_to = db.Column(db.String(100), nullable=True)
+    due_date = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True)
+    created_by = db.Column(db.Integer, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Task {self.title}>'
+
+class Metric(db.Model):
+    """Métricas y KPIs del negocio"""
+    __tablename__ = 'metrics'
+    id = db.Column(db.Integer, primary_key=True)
+    metric_name = db.Column(db.String(100), nullable=False)
+    metric_value = db.Column(db.Float, nullable=False)
+    metric_type = db.Column(db.String(50), nullable=False)  # 'users', 'revenue', 'engagement', 'conversion'
+    date_recorded = db.Column(db.Date, nullable=False)
+    source = db.Column(db.String(100), nullable=True)  # Fuente de la métrica
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Metric {self.metric_name}: {self.metric_value}>'

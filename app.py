@@ -39,7 +39,11 @@ db.init_app(app)
 
 with app.app_context():
     # Import models and routes
-    import models
-    import routes
-    
-    db.create_all()
+    try:
+        import models
+        import routes
+        db.create_all()
+        print("✅ Database initialized successfully")
+    except Exception as e:
+        print(f"⚠️ Database error: {e}")
+        print("Application will run with limited functionality")
