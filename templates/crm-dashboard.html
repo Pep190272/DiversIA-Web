@@ -373,10 +373,10 @@ class DiversiaCRM {
                     <td><span class="badge bg-${employee.is_active ? 'success' : 'danger'}">${employee.is_active ? 'Activo' : 'Inactivo'}</span></td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee(${employee.id})" title="Editar empleado">
-                            📝
+                            Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(${employee.id})" title="Eliminar empleado">
-                            🗑️
+                            Eliminar
                         </button>
                     </td>
                 </tr>
@@ -418,10 +418,10 @@ class DiversiaCRM {
                     <td>${task.due_date || 'Sin fecha'}</td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary me-1" onclick="editTask(${task.id})" title="Editar tarea">
-                            📝
+                            Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${task.id})" title="Eliminar tarea">
-                            🗑️
+                            Eliminar
                         </button>
                     </td>
                 </tr>
