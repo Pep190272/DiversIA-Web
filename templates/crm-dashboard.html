@@ -372,11 +372,11 @@ class DiversiaCRM {
                     <td>${employee.hire_date}</td>
                     <td><span class="badge bg-${employee.is_active ? 'success' : 'danger'}">${employee.is_active ? 'Activo' : 'Inactivo'}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee(${employee.id})">
-                            <i data-lucide="edit-3"></i>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee(${employee.id})" title="Editar empleado">
+                            📝
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(${employee.id})">
-                            <i data-lucide="trash-2"></i>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(${employee.id})" title="Eliminar empleado">
+                            🗑️
                         </button>
                     </td>
                 </tr>
@@ -417,11 +417,11 @@ class DiversiaCRM {
                     <td>${task.actual_hours}h</td>
                     <td>${task.due_date || 'Sin fecha'}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editTask(${task.id})">
-                            <i data-lucide="edit-3"></i>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editTask(${task.id})" title="Editar tarea">
+                            📝
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${task.id})">
-                            <i data-lucide="trash-2"></i>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${task.id})" title="Eliminar tarea">
+                            🗑️
                         </button>
                     </td>
                 </tr>
