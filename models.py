@@ -283,3 +283,114 @@ class Metric(db.Model):
 
     def __repr__(self):
         return f'<Metric {self.metric_name}: {self.metric_value}>'
+
+# ============ SISTEMA DE EMPLEADOS Y GESTIÓN AVANZADA ============
+
+class Employee(db.Model):
+    """Empleados de DiversIA"""
+    __tablename__ = 'employees'
+    id = db.Column(db.Integer, primary_key=True)
+    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'), nullable=True)  # Relación con sistema admin
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    phone = db.Column(db.String(20), nullable=True)
+    position = db.Column(db.String(100), nullable=False)
+    department = db.Column(db.String(100), nullable=True)
+    hire_date = db.Column(db.Date, nullable=False)
+    salary = db.Column(db.Float, nullable=True)
+    is_active = db.Column(db.Boolean, default=True)
+    role = db.Column(db.String(50), default='empleado')  # 'admin', 'colaborador', 'empleado'
+    skills = db.Column(db.Text, nullable=True)  # JSON con habilidades
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relaciones
+    tasks = db.relationship('EmployeeTask', back_populates='assigned_employee', lazy=True)
+
+    def __repr__(self):
+        return f'<Employee {self.first_name} {self.last_name}>'
+
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+class EmployeeTask(db.Model):
+    """Tareas asignadas a empleados"""
+    __tablename__ = 'employee_tasks'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    priority = db.Column(db.String(20), default='medium')  # 'low', 'medium', 'high', 'urgent'
+    status = db.Column(db.String(20), default='pending')  # 'pending', 'in_progress', 'completed', 'cancelled'
+    category = db.Column(db.String(50), nullable=True)  # 'development', 'marketing', 'content', 'admin', 'research'
+    
+    # Asignación
+    assigned_to_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
+    assigned_by_id = db.Column(db.Integer, db.ForeignKey('admin.id'), nullable=True)
+    
+    # Tiempo
+    estimated_hours = db.Column(db.Float, nullable=True)
+    actual_hours = db.Column(db.Float, nullable=True)
+    due_date = db.Column(db.DateTime, nullable=True)
+    started_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True)
+    
+    # Metadata
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relaciones
+    assigned_employee = db.relationship('Employee', back_populates='tasks')
+
+    def __repr__(self):
+        return f'<EmployeeTask {self.title}>'
+
+    def get_progress_percentage(self):
+        if self.status == 'completed':
+            return 100
+        elif self.status == 'in_progress':
+            return 50
+        else:
+            return 0
+
+class UserInvitation(db.Model):
+    """Invitaciones de usuarios al sistema"""
+    __tablename__ = 'user_invitations'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), nullable=False)
+    invited_by_id = db.Column(db.Integer, db.ForeignKey('admin.id'), nullable=False)
+    role = db.Column(db.String(50), nullable=False)  # 'colaborador', 'empleado'
+    invitation_token = db.Column(db.String(255), unique=True, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    is_used = db.Column(db.Boolean, default=False)
+    used_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Datos adicionales para el empleado
+    first_name = db.Column(db.String(100), nullable=True)
+    last_name = db.Column(db.String(100), nullable=True)
+    position = db.Column(db.String(100), nullable=True)
+    department = db.Column(db.String(100), nullable=True)
+
+    def __repr__(self):
+        return f'<UserInvitation {self.email} - {self.role}>'
+
+    def is_expired(self):
+        return datetime.utcnow() > self.expires_at
+
+class TimeTracking(db.Model):
+    """Seguimiento de tiempo trabajado"""
+    __tablename__ = 'time_tracking'
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'), nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey('employee_tasks.id'), nullable=True)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=True)
+    duration_minutes = db.Column(db.Integer, nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    date_worked = db.Column(db.Date, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<TimeTracking {self.employee_id} - {self.date_worked}>'

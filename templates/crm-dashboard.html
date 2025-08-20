@@ -98,6 +98,16 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="employees-tab" data-bs-toggle="tab" data-bs-target="#employees" type="button" role="tab">
+                                <i data-lucide="users-2" class="me-2"></i>Empleados
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tasks-tab" data-bs-toggle="tab" data-bs-target="#tasks" type="button" role="tab">
+                                <i data-lucide="list-checks" class="me-2"></i>Tareas
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
                             <button class="nav-link" id="associations-tab" data-bs-toggle="tab" data-bs-target="#associations" type="button" role="tab">
                                 <i data-lucide="heart-handshake" class="me-2"></i>Asociaciones
                             </button>
@@ -196,6 +206,79 @@
                             </div>
                         </div>
 
+                        <!-- Empleados Tab -->
+                        <div class="tab-pane fade" id="employees" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Gestión de Empleados</h5>
+                                <div>
+                                    <a href="/admin/invite-user" class="btn btn-success btn-sm me-2">
+                                        <i data-lucide="user-plus" class="me-1"></i>Invitar Usuario
+                                    </a>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="refreshEmployees()">
+                                        <i data-lucide="refresh-cw" class="me-1"></i>Actualizar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Email</th>
+                                            <th>Posición</th>
+                                            <th>Departamento</th>
+                                            <th>Rol</th>
+                                            <th>Fecha Ingreso</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="employeesTable">
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted">Cargando empleados...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Tareas Tab -->
+                        <div class="tab-pane fade" id="tasks" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Gestión de Tareas</h5>
+                                <div>
+                                    <button class="btn btn-success btn-sm me-2" onclick="showCreateTaskModal()">
+                                        <i data-lucide="plus" class="me-1"></i>Nueva Tarea
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="refreshTasks()">
+                                        <i data-lucide="refresh-cw" class="me-1"></i>Actualizar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Tarea</th>
+                                            <th>Asignado a</th>
+                                            <th>Prioridad</th>
+                                            <th>Estado</th>
+                                            <th>Categoría</th>
+                                            <th>Tiempo Est.</th>
+                                            <th>Tiempo Real</th>
+                                            <th>Fecha Límite</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tasksTable">
+                                        <tr>
+                                            <td colspan="9" class="text-center text-muted">Cargando tareas...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                         <!-- Asociaciones -->
                         <div class="tab-pane fade" id="associations" role="tabpanel">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -241,6 +324,8 @@ class DiversiaCRM {
         await this.loadContacts();
         await this.loadCompanies();
         await this.loadOffers();
+        await this.loadEmployees();
+        await this.loadTasks();
         await this.loadAssociations();
         
         // Inicializar iconos
@@ -257,9 +342,99 @@ class DiversiaCRM {
             document.getElementById('totalUsers').textContent = stats.total_users;
             document.getElementById('totalCompanies').textContent = stats.total_companies;
             document.getElementById('activeOffers').textContent = stats.active_job_offers;
-            document.getElementById('totalAssociations').textContent = stats.total_associations;
+            document.getElementById('totalEmployees').textContent = stats.total_employees || 0;
         } catch (error) {
             console.error('Error loading stats:', error);
+        }
+    }
+
+    async loadEmployees() {
+        try {
+            const response = await fetch(`${this.apiBase}/api/employees`);
+            const employees = await response.json();
+            
+            const tbody = document.getElementById('employeesTable');
+            if (employees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No hay empleados registrados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = employees.map(employee => `
+                <tr>
+                    <td><strong>${employee.first_name} ${employee.last_name}</strong></td>
+                    <td>${employee.email}</td>
+                    <td>${employee.position}</td>
+                    <td><span class="badge bg-secondary">${employee.department}</span></td>
+                    <td><span class="badge bg-${employee.role === 'admin' ? 'danger' : employee.role === 'colaborador' ? 'warning' : 'info'}">${employee.role}</span></td>
+                    <td>${employee.hire_date}</td>
+                    <td><span class="badge bg-${employee.is_active ? 'success' : 'danger'}">${employee.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee(${employee.id})">
+                            <i data-lucide="edit-3"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(${employee.id})">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading employees:', error);
+        }
+    }
+
+    async loadTasks() {
+        try {
+            const response = await fetch(`${this.apiBase}/api/tasks`);
+            const tasks = await response.json();
+            
+            const tbody = document.getElementById('tasksTable');
+            if (tasks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No hay tareas asignadas</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = tasks.map(task => `
+                <tr>
+                    <td>
+                        <strong>${task.title}</strong>
+                        <br><small class="text-muted">${task.description || 'Sin descripción'}</small>
+                    </td>
+                    <td>${task.assigned_to}</td>
+                    <td><span class="badge bg-${this.getPriorityColor(task.priority)}">${task.priority}</span></td>
+                    <td>
+                        <select class="form-select form-select-sm" onchange="updateTaskStatus(${task.id}, this.value)">
+                            <option value="pending" ${task.status === 'pending' ? 'selected' : ''}>Pendiente</option>
+                            <option value="in_progress" ${task.status === 'in_progress' ? 'selected' : ''}>En Marcha</option>
+                            <option value="completed" ${task.status === 'completed' ? 'selected' : ''}>Realizada</option>
+                        </select>
+                    </td>
+                    <td><span class="badge bg-info">${task.category}</span></td>
+                    <td>${task.estimated_hours}h</td>
+                    <td>${task.actual_hours}h</td>
+                    <td>${task.due_date || 'Sin fecha'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editTask(${task.id})">
+                            <i data-lucide="edit-3"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${task.id})">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading tasks:', error);
+        }
+    }
+
+    getPriorityColor(priority) {
+        switch(priority) {
+            case 'urgent': return 'danger';
+            case 'high': return 'warning';
+            case 'medium': return 'primary';
+            case 'low': return 'secondary';
+            default: return 'secondary';
         }
     }
 
@@ -433,6 +608,94 @@ class DiversiaCRM {
             }
         }
     }
+}
+
+// Funciones globales para el CRM
+async function updateTaskStatus(taskId, status) {
+    try {
+        const response = await fetch(`${window.location.origin}/api/tasks/${taskId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: status })
+        });
+        
+        if (response.ok) {
+            // Actualizar la tabla
+            crm.loadTasks();
+            crm.loadStats();
+        } else {
+            alert('Error al actualizar el estado de la tarea');
+        }
+    } catch (error) {
+        console.error('Error updating task status:', error);
+        alert('Error al actualizar el estado de la tarea');
+    }
+}
+
+async function deleteEmployee(employeeId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este empleado?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${window.location.origin}/api/employees/${employeeId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            crm.loadEmployees();
+            crm.loadStats();
+        } else {
+            alert('Error al eliminar el empleado');
+        }
+    } catch (error) {
+        console.error('Error deleting employee:', error);
+        alert('Error al eliminar el empleado');
+    }
+}
+
+async function deleteTask(taskId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${window.location.origin}/api/tasks/${taskId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            crm.loadTasks();
+            crm.loadStats();
+        } else {
+            alert('Error al eliminar la tarea');
+        }
+    } catch (error) {
+        console.error('Error deleting task:', error);
+        alert('Error al eliminar la tarea');
+    }
+}
+
+function editEmployee(employeeId) {
+    alert('Función de edición de empleado en desarrollo. ID: ' + employeeId);
+}
+
+function editTask(taskId) {
+    alert('Función de edición de tarea en desarrollo. ID: ' + taskId);
+}
+
+function showCreateTaskModal() {
+    alert('Modal de creación de tarea en desarrollo');
+}
+
+function refreshEmployees() {
+    crm.loadEmployees();
+}
+
+function refreshTasks() {
+    crm.loadTasks();
 }
 
 // Inicializar CRM

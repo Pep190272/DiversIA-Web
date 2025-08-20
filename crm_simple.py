@@ -20,6 +20,64 @@ ADMIN_USERS = {
 
 # Datos de ejemplo para el CRM
 SAMPLE_CRM_DATA = {
+    'employees': [
+        {
+            'id': 1,
+            'first_name': 'Ana',
+            'last_name': 'Martínez',
+            'email': 'ana.martinez@diversia.com',
+            'position': 'Desarrolladora Frontend',
+            'department': 'Desarrollo',
+            'role': 'empleado',
+            'hire_date': '2024-01-15',
+            'is_active': True,
+            'tasks_count': 3,
+            'completed_tasks': 1
+        },
+        {
+            'id': 2,
+            'first_name': 'Carlos',
+            'last_name': 'Ruiz',
+            'email': 'carlos.ruiz@diversia.com',
+            'position': 'Community Manager',
+            'department': 'Marketing',
+            'role': 'colaborador',
+            'hire_date': '2024-02-01',
+            'is_active': True,
+            'tasks_count': 2,
+            'completed_tasks': 2
+        }
+    ],
+    'tasks': [
+        {
+            'id': 1,
+            'title': 'Mejorar accesibilidad web',
+            'description': 'Implementar mejoras de accesibilidad en formularios',
+            'assigned_to': 'Ana Martínez',
+            'assigned_to_id': 1,
+            'priority': 'high',
+            'status': 'in_progress',
+            'category': 'development',
+            'estimated_hours': 8.0,
+            'actual_hours': 4.5,
+            'due_date': '2025-08-25',
+            'created_at': '2025-08-20'
+        },
+        {
+            'id': 2,
+            'title': 'Campaña redes sociales',
+            'description': 'Crear contenido para campaña de inclusión',
+            'assigned_to': 'Carlos Ruiz',
+            'assigned_to_id': 2,
+            'priority': 'medium',
+            'status': 'completed',
+            'category': 'marketing',
+            'estimated_hours': 6.0,
+            'actual_hours': 5.5,
+            'due_date': '2025-08-22',
+            'created_at': '2025-08-18'
+        }
+    ],
     'contacts': [
         {
             'id': 1,
@@ -187,6 +245,10 @@ def api_stats_simple():
         'total_job_offers': len(SAMPLE_CRM_DATA['job_offers']),
         'active_job_offers': len([offer for offer in SAMPLE_CRM_DATA['job_offers'] if offer['active']]),
         'total_associations': len(SAMPLE_CRM_DATA['associations']),
+        'total_employees': len(SAMPLE_CRM_DATA['employees']),
+        'total_tasks': len(SAMPLE_CRM_DATA['tasks']),
+        'completed_tasks': len([task for task in SAMPLE_CRM_DATA['tasks'] if task['status'] == 'completed']),
+        'pending_tasks': len([task for task in SAMPLE_CRM_DATA['tasks'] if task['status'] == 'pending']),
         'users_by_neurodivergence': {
             'TDAH': 1,
             'TEA': 1,
@@ -200,6 +262,80 @@ def api_stats_simple():
     }
     
     return jsonify(stats)
+
+# ============ EMPLEADOS ============
+@app.route('/api/employees')
+def api_employees_simple():
+    if 'admin_id' not in session:
+        return jsonify({'error': 'No autorizado'}), 401
+    return jsonify(SAMPLE_CRM_DATA['employees'])
+
+@app.route('/api/employees/<int:employee_id>', methods=['DELETE'])
+def delete_employee_simple(employee_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    # Simular eliminación
+    SAMPLE_CRM_DATA['employees'] = [e for e in SAMPLE_CRM_DATA['employees'] if e['id'] != employee_id]
+    return jsonify({'message': 'Employee deleted successfully'})
+
+# ============ TAREAS ============
+@app.route('/api/tasks')
+def api_tasks_simple():
+    if 'admin_id' not in session:
+        return jsonify({'error': 'No autorizado'}), 401
+    return jsonify(SAMPLE_CRM_DATA['tasks'])
+
+@app.route('/api/tasks', methods=['POST'])
+def create_task_simple():
+    if 'admin_id' not in session:
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    data = request.json
+    new_task = {
+        'id': len(SAMPLE_CRM_DATA['tasks']) + 1,
+        'title': data.get('title', ''),
+        'description': data.get('description', ''),
+        'assigned_to_id': data.get('assigned_to_id'),
+        'assigned_to': next((e['first_name'] + ' ' + e['last_name'] for e in SAMPLE_CRM_DATA['employees'] if e['id'] == data.get('assigned_to_id')), 'Sin asignar'),
+        'priority': data.get('priority', 'medium'),
+        'status': 'pending',
+        'category': data.get('category', 'general'),
+        'estimated_hours': data.get('estimated_hours', 0),
+        'actual_hours': 0,
+        'due_date': data.get('due_date'),
+        'created_at': datetime.now().strftime('%Y-%m-%d')
+    }
+    
+    SAMPLE_CRM_DATA['tasks'].append(new_task)
+    return jsonify({'message': 'Task created successfully', 'task': new_task}), 201
+
+@app.route('/api/tasks/<int:task_id>', methods=['PUT'])
+def update_task_simple(task_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    data = request.json
+    task = next((t for t in SAMPLE_CRM_DATA['tasks'] if t['id'] == task_id), None)
+    
+    if not task:
+        return jsonify({'error': 'Task not found'}), 404
+    
+    # Actualizar campos
+    task['status'] = data.get('status', task['status'])
+    task['actual_hours'] = data.get('actual_hours', task['actual_hours'])
+    task['priority'] = data.get('priority', task['priority'])
+    
+    return jsonify({'message': 'Task updated successfully', 'task': task})
+
+@app.route('/api/tasks/<int:task_id>', methods=['DELETE'])
+def delete_task_simple(task_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    # Simular eliminación
+    SAMPLE_CRM_DATA['tasks'] = [t for t in SAMPLE_CRM_DATA['tasks'] if t['id'] != task_id]
+    return jsonify({'message': 'Task deleted successfully'})
 
 # ============ ENDPOINTS PARA ELIMINAR (SIMULADO) ============
 @app.route('/api/contacts/<int:contact_id>', methods=['DELETE'])

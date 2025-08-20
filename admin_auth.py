@@ -1,8 +1,10 @@
 from functools import wraps
 from flask import session, request, redirect, url_for, flash, render_template
 from app import app, db
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
+import secrets
+import uuid
 
 # Modelo para administradores
 class Admin(db.Model):
