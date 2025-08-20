@@ -24,6 +24,74 @@ SAMPLE_CRM_DATA = {
         {
             'id': 1,
             'first_name': 'Ana',
+            'last_name': 'García',
+            'email': 'ana.garcia@diversia.com',
+            'position': 'Desarrolladora Frontend',
+            'department': 'Desarrollo',
+            'role': 'empleado',
+            'hire_date': '2024-01-15',
+            'is_active': True,
+            'salary': 35000
+        },
+        {
+            'id': 2,
+            'first_name': 'Carlos',
+            'last_name': 'López',
+            'email': 'carlos.lopez@diversia.com',
+            'position': 'Especialista en Marketing',
+            'department': 'Marketing',
+            'role': 'colaborador',
+            'hire_date': '2024-02-01',
+            'is_active': True,
+            'salary': 32000
+        },
+        {
+            'id': 3,
+            'first_name': 'María',
+            'last_name': 'Rodríguez',
+            'email': 'maria.rodriguez@diversia.com',
+            'position': 'Diseñadora UX/UI',
+            'department': 'Diseño',
+            'role': 'empleado',
+            'hire_date': '2024-03-01',
+            'is_active': True,
+            'salary': 34000
+        }
+    ],
+    'tasks': [
+        {
+            'id': 1,
+            'title': 'Actualizar diseño de landing page',
+            'description': 'Mejorar la accesibilidad del sitio web principal',
+            'priority': 'high',
+            'status': 'in_progress',
+            'category': 'diseño',
+            'assigned_to': 'Ana García',
+            'assigned_to_id': 1,
+            'estimated_hours': 8,
+            'actual_hours': 4,
+            'due_date': '2024-12-30',
+            'created_at': '2024-12-15T10:00:00'
+        },
+        {
+            'id': 2,
+            'title': 'Campaña de redes sociales',
+            'description': 'Crear contenido para promover la inclusión laboral',
+            'priority': 'medium',
+            'status': 'pending',
+            'category': 'marketing',
+            'assigned_to': 'Carlos López',
+            'assigned_to_id': 2,
+            'estimated_hours': 6,
+            'actual_hours': 0,
+            'due_date': '2025-01-05',
+            'created_at': '2024-12-16T14:00:00'
+        }
+    ],
+    'old_employees': [
+        {
+            'id': 1,
+            'first_name': 'Ana',
             'last_name': 'Martínez',
             'email': 'ana.martinez@diversia.com',
             'position': 'Desarrolladora Frontend',

@@ -10,18 +10,13 @@ try:
 except Exception as e:
     print(f"⚠️ Error cargando admin_auth: {e}")
 
-# Cargar CRM funcional simple (sin errores)
+# Cargar CRM simple y su API
 try:
-    import crm_functional_simple  # noqa: F401
-    print("✅ CRM funcional simple cargado correctamente")
+    import crm_simple  # noqa: F401
+    import crm_api_simple  # noqa: F401
+    print("✅ CRM simple y API cargados correctamente")
 except Exception as e:
-    print(f"⚠️ Error cargando CRM funcional: {e}")
-    # Fallback al CRM simple
-    try:
-        import crm_simple  # noqa: F401
-        print("✅ CRM simple cargado como fallback")
-    except Exception as e2:
-        print(f"⚠️ Error cargando CRM simple: {e2}")
+    print(f"⚠️ Error cargando CRM: {e}")
 from api_endpoints import api
 from chat_webhook import chat
 from chat_intelligent_endpoint import intelligent_chat
