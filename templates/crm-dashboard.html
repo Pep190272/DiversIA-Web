@@ -211,8 +211,11 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="mb-0">Gestión de Empleados</h5>
                                 <div>
-                                    <a href="/admin/invite-user" class="btn btn-success btn-sm me-2">
-                                        <i data-lucide="user-plus" class="me-1"></i>Invitar Usuario
+                                    <a href="/admin/create-employee" class="btn btn-success btn-sm me-2">
+                                        <i data-lucide="user-plus" class="me-1"></i>Nuevo Empleado
+                                    </a>
+                                    <a href="/admin/invite-user" class="btn btn-warning btn-sm me-2">
+                                        <i data-lucide="mail" class="me-1"></i>Invitar Usuario
                                     </a>
                                     <button class="btn btn-outline-primary btn-sm" onclick="refreshEmployees()">
                                         <i data-lucide="refresh-cw" class="me-1"></i>Actualizar
@@ -247,9 +250,9 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="mb-0">Gestión de Tareas</h5>
                                 <div>
-                                    <button class="btn btn-success btn-sm me-2" onclick="showCreateTaskModal()">
+                                    <a href="/admin/create-task" class="btn btn-success btn-sm me-2">
                                         <i data-lucide="plus" class="me-1"></i>Nueva Tarea
-                                    </button>
+                                    </a>
                                     <button class="btn btn-outline-primary btn-sm" onclick="refreshTasks()">
                                         <i data-lucide="refresh-cw" class="me-1"></i>Actualizar
                                     </button>
@@ -687,7 +690,11 @@ function editTask(taskId) {
 }
 
 function showCreateTaskModal() {
-    alert('Modal de creación de tarea en desarrollo');
+    window.location.href = '/admin/create-task';
+}
+
+function showCreateEmployeeModal() {
+    window.location.href = '/admin/create-employee';
 }
 
 function refreshEmployees() {

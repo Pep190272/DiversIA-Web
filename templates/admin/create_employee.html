@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Empleado - CRM DiversIA{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i data-lucide="user-plus" class="me-2"></i>
+                        Agregar Nuevo Empleado
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form id="createEmployeeForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label fw-semibold">Nombre *</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label fw-semibold">Apellidos *</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="position" class="form-label fw-semibold">Posición *</label>
+                                <input type="text" class="form-control" id="position" name="position" required 
+                                       placeholder="ej. Desarrollador Frontend">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="department" class="form-label fw-semibold">Departamento</label>
+                                <select class="form-select" id="department" name="department">
+                                    <option value="">Seleccionar departamento</option>
+                                    <option value="Desarrollo">Desarrollo</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Recursos Humanos">Recursos Humanos</option>
+                                    <option value="Administración">Administración</option>
+                                    <option value="Ventas">Ventas</option>
+                                    <option value="Soporte">Soporte</option>
+                                    <option value="Diseño">Diseño</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="role" class="form-label fw-semibold">Rol *</label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="">Seleccionar rol</option>
+                                    <option value="empleado">Empleado</option>
+                                    <option value="colaborador">Colaborador</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="hire_date" class="form-label fw-semibold">Fecha de Ingreso *</label>
+                                <input type="date" class="form-control" id="hire_date" name="hire_date" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="salary" class="form-label fw-semibold">Salario (€)</label>
+                                <input type="number" class="form-control" id="salary" name="salary" 
+                                       min="0" step="100" placeholder="ej. 35000">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-semibold">Teléfono</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       placeholder="+34 600 000 000">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="skills" class="form-label fw-semibold">Habilidades</label>
+                            <textarea class="form-control" id="skills" name="skills" rows="2" 
+                                      placeholder="Ej: JavaScript, React, Node.js, Git, Figma..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label fw-semibold">Notas Adicionales</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i data-lucide="check" class="me-2"></i>
+                                Crear Empleado
+                            </button>
+                            <a href="{{ url_for('crm_dashboard') }}" class="btn btn-outline-secondary">
+                                <i data-lucide="arrow-left" class="me-2"></i>
+                                Volver al CRM
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar fecha por defecto (hoy)
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('hire_date').value = today;
+    
+    // Manejar envío del formulario
+    document.getElementById('createEmployeeForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const employeeData = {
+            first_name: formData.get('first_name'),
+            last_name: formData.get('last_name'),
+            email: formData.get('email'),
+            position: formData.get('position'),
+            department: formData.get('department'),
+            role: formData.get('role'),
+            hire_date: formData.get('hire_date'),
+            salary: parseFloat(formData.get('salary')) || 0,
+            phone: formData.get('phone'),
+            skills: formData.get('skills'),
+            notes: formData.get('notes')
+        };
+        
+        try {
+            const response = await fetch('/api/employees', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(employeeData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Empleado creado correctamente');
+                window.location.href = '/crm';
+            } else {
+                alert('Error al crear el empleado: ' + result.error);
+            }
+        } catch (error) {
+            alert('Error al crear el empleado: ' + error.message);
+        }
+    });
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
+{% endblock %}

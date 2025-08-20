@@ -17,26 +17,44 @@ def handle_contacts():
     """Gestión de contactos (usuarios neurodivergentes)"""
     try:
         if request.method == 'GET':
-            try:
-                users = User.query.all()
-                contacts = []
-                for user in users:
-                    contacts.append({
-                        'id': user.id,
-                        'name': f"{user.nombre} {user.apellidos}",
-                        'email': user.email,
-                        'phone': user.telefono,
-                        'city': user.ciudad,
-                        'source': 'Registro Web',
-                        'type': 'Usuario ND',
-                        'neurodivergence': user.tipo_neurodivergencia,
-                        'created_at': user.created_at.isoformat() if user.created_at else None,
-                        'exported_to_crm': getattr(user, 'exported_to_crm', False)
-                    })
-                return add_cors_headers(jsonify(contacts))
-            except Exception as e:
-                # Fallback si la base de datos no está disponible
-                return add_cors_headers(jsonify([]))
+        try:
+            users = User.query.all()
+            contacts = []
+            for user in users:
+                contacts.append({
+                    'id': user.id,
+                    'name': f"{user.nombre} {user.apellidos}",
+                    'email': user.email,
+                    'phone': user.telefono,
+                    'city': user.ciudad,
+                    'source': 'Registro Web',
+                    'type': 'Usuario ND',
+                    'neurodivergence': user.tipo_neurodivergencia,
+                    'created_at': user.created_at.isoformat() if user.created_at else None,
+                    'exported_to_crm': getattr(user, 'exported_to_crm', False)
+                })
+            return add_cors_headers(jsonify(contacts))
+        except Exception as e:
+            # Fallback si la base de datos no está disponible
+            return add_cors_headers(jsonify([]))
+        
+    elif request.method == 'POST':
+        data = request.json
+        new_user = User(
+            nombre=data.get('name', ''),
+            apellidos=data.get('last_name', ''),
+            email=data.get('email', ''),
+            telefono=data.get('phone', ''),
+            ciudad=data.get('city', ''),
+            tipo_neurodivergencia=data.get('neurodivergence', 'General'),
+            diagnostico_formal=data.get('formal_diagnosis', False)
+        )
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            return add_cors_headers(jsonify({'message': 'Contact added successfully', 'id': new_user.id})), 201
+        except Exception as e:
+            return add_cors_headers(jsonify({'error': 'Database not available'})), 503
     
     elif request.method == 'POST':
         data = request.json
