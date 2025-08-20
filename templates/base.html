@@ -153,12 +153,17 @@
                            {% if request.endpoint == 'index' %}aria-current="page"{% endif %}>Inicio</a>
                     </li>
                     
-                    <!-- Dropdown Comunidad -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('comunidad') }}"
+                           {% if request.endpoint == 'comunidad' %}aria-current="page"{% endif %}>Comunidad</a>
+                    </li>
+                    
+                    <!-- Dropdown Registro -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="comunidadDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Comunidad
+                        <a class="nav-link dropdown-toggle" href="#" id="registroDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Registro
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="comunidadDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="registroDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('personas_nd') }}">
                                 <i data-lucide="users" class="me-2" style="width: 16px; height: 16px;"></i>Personas ND
                             </a></li>
