@@ -152,22 +152,25 @@
                         <a class="nav-link" href="{{ url_for('index') }}" 
                            {% if request.endpoint == 'index' %}aria-current="page"{% endif %}>Inicio</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('personas_nd') }}"
-                           {% if request.endpoint == 'personas_nd' %}aria-current="page"{% endif %}>Personas ND</a>
+                    
+                    <!-- Dropdown Comunidad -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="comunidadDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Comunidad
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="comunidadDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('personas_nd') }}">
+                                <i data-lucide="users" class="me-2" style="width: 16px; height: 16px;"></i>Personas ND
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('empresas') }}">
+                                <i data-lucide="building" class="me-2" style="width: 16px; height: 16px;"></i>Empresas
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('asociaciones') }}">
+                                <i data-lucide="heart-handshake" class="me-2" style="width: 16px; height: 16px;"></i>Asociaciones
+                            </a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('empresas') }}"
-                           {% if request.endpoint == 'empresas' %}aria-current="page"{% endif %}>Empresas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('comunidad') }}"
-                           {% if request.endpoint == 'comunidad' %}aria-current="page"{% endif %}>Comunidad</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('asociaciones') }}"
-                           {% if request.endpoint == 'asociaciones' %}aria-current="page"{% endif %}>Asociaciones</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('sobre_nosotros') }}"
                            {% if request.endpoint == 'sobre_nosotros' %}aria-current="page"{% endif %}>Nosotros</a>
@@ -176,24 +179,45 @@
                         <a class="nav-link" href="{{ url_for('contacto') }}"
                            {% if request.endpoint == 'contacto' %}aria-current="page"{% endif %}>Contacto</a>
                     </li>
+                    
+                    <!-- Dropdown Login/Admin -->
                     {% if session.get('admin_id') %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('crm_dashboard') }}"
-                           {% if request.endpoint == 'crm_dashboard' %}aria-current="page"{% endif %}>CRM</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/logout">Cerrar Sesión</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i data-lucide="user-check" class="me-1" style="width: 16px; height: 16px;"></i>{{ session.get('admin_username', 'Admin') }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('crm_dashboard') }}">
+                                <i data-lucide="database" class="me-2" style="width: 16px; height: 16px;"></i>CRM
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('es')">🇪🇸 Español</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('en')">🇺🇸 English</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('fr')">🇫🇷 Français</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('de')">🇩🇪 Deutsch</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('it')">🇮🇹 Italiano</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('pt')">🇵🇹 Português</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('ar')">🇸🇦 العربية</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('zh')">🇨🇳 中文</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('ja')">🇯🇵 日本語</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="resetTranslation()">🔄 Original</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/admin/logout">
+                                <i data-lucide="log-out" class="me-2" style="width: 16px; height: 16px;"></i>Cerrar Sesión
+                            </a></li>
+                        </ul>
                     </li>
                     {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/login">Admin</a>
-                    </li>
-                    {% endif %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i data-lucide="globe" aria-hidden="true"></i> Idioma
+                        <a class="nav-link dropdown-toggle" href="#" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i data-lucide="log-in" class="me-1" style="width: 16px; height: 16px;"></i>Login
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="loginDropdown">
+                            <li><a class="dropdown-item" href="/admin/login">
+                                <i data-lucide="user" class="me-2" style="width: 16px; height: 16px;"></i>Acceso Admin
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('es')">🇪🇸 Español</a></li>
                             <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('en')">🇺🇸 English</a></li>
                             <li><a class="dropdown-item" href="javascript:void(0)" onclick="translateTo('fr')">🇫🇷 Français</a></li>
@@ -207,6 +231,7 @@
                             <li><a class="dropdown-item" href="javascript:void(0)" onclick="resetTranslation()">🔄 Original</a></li>
                         </ul>
                     </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
