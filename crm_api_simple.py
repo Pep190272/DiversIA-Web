@@ -353,18 +353,152 @@ def manage_company(company_id):
         else:
             return add_cors_headers(jsonify({'error': 'No encontrada'})), 404
 
-# API OFERTAS (para compatibilidad)
-@app.route('/api/offers')
+# API OFERTAS
+@app.route('/api/offers', methods=['GET', 'POST'])
 def api_offers():
     if not require_admin():
         return jsonify({'error': 'No autorizado'}), 401
-    return add_cors_headers(jsonify(SAMPLE_CRM_DATA.get('job_offers', [])))
+    
+    if request.method == 'GET':
+        return add_cors_headers(jsonify(SAMPLE_CRM_DATA.get('job_offers', [])))
+    
+    elif request.method == 'POST':
+        try:
+            data = request.get_json()
+            new_id = max([o['id'] for o in SAMPLE_CRM_DATA['job_offers']], default=0) + 1
+            
+            new_offer = {
+                'id': new_id,
+                'title': data.get('title'),
+                'company_name': data.get('company_name'),
+                'location': data.get('location', ''),
+                'salary': data.get('salary', ''),
+                'contract_type': data.get('contract_type', 'full-time'),
+                'experience_level': data.get('experience_level', 'entry'),
+                'remote_work': data.get('remote_work', 'none'),
+                'description': data.get('description', ''),
+                'requirements': data.get('requirements', ''),
+                'contact_email': data.get('contact_email', ''),
+                'application_deadline': data.get('application_deadline'),
+                'active': data.get('active', True),
+                'created_at': '2024-12-20T10:00:00'
+            }
+            
+            SAMPLE_CRM_DATA['job_offers'].append(new_offer)
+            return add_cors_headers(jsonify({'message': 'Oferta creada', 'id': new_id})), 201
+        except Exception as e:
+            return add_cors_headers(jsonify({'error': str(e)})), 500
 
-# API ASOCIACIONES (para compatibilidad)
-@app.route('/api/associations')
+@app.route('/api/offers/<int:offer_id>', methods=['PUT', 'DELETE'])
+def manage_offer(offer_id):
+    if not require_admin():
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    if request.method == 'DELETE':
+        initial_count = len(SAMPLE_CRM_DATA['job_offers'])
+        SAMPLE_CRM_DATA['job_offers'] = [o for o in SAMPLE_CRM_DATA['job_offers'] if o['id'] != offer_id]
+        
+        if len(SAMPLE_CRM_DATA['job_offers']) < initial_count:
+            return add_cors_headers(jsonify({'message': 'Oferta eliminada'}))
+        else:
+            return add_cors_headers(jsonify({'error': 'No encontrada'})), 404
+    
+    elif request.method == 'PUT':
+        data = request.get_json()
+        offer = next((o for o in SAMPLE_CRM_DATA['job_offers'] if o['id'] == offer_id), None)
+        
+        if offer:
+            offer.update({
+                'title': data.get('title', offer['title']),
+                'company_name': data.get('company_name', offer['company_name']),
+                'location': data.get('location', offer['location']),
+                'salary': data.get('salary', offer['salary']),
+                'contract_type': data.get('contract_type', offer['contract_type']),
+                'experience_level': data.get('experience_level', offer['experience_level']),
+                'remote_work': data.get('remote_work', offer['remote_work']),
+                'description': data.get('description', offer['description']),
+                'requirements': data.get('requirements', offer['requirements']),
+                'contact_email': data.get('contact_email', offer['contact_email']),
+                'application_deadline': data.get('application_deadline', offer['application_deadline']),
+                'active': data.get('active', offer['active'])
+            })
+            return add_cors_headers(jsonify({'message': 'Oferta actualizada'}))
+        else:
+            return add_cors_headers(jsonify({'error': 'No encontrada'})), 404
+
+# API ASOCIACIONES
+@app.route('/api/associations', methods=['GET', 'POST'])
 def api_associations():
     if not require_admin():
         return jsonify({'error': 'No autorizado'}), 401
-    return add_cors_headers(jsonify(SAMPLE_CRM_DATA.get('associations', [])))
+    
+    if request.method == 'GET':
+        return add_cors_headers(jsonify(SAMPLE_CRM_DATA.get('associations', [])))
+    
+    elif request.method == 'POST':
+        try:
+            data = request.get_json()
+            new_id = max([a['id'] for a in SAMPLE_CRM_DATA['associations']], default=0) + 1
+            
+            new_association = {
+                'id': new_id,
+                'name': data.get('name'),
+                'acronym': data.get('acronym', ''),
+                'country': data.get('country'),
+                'city': data.get('city', ''),
+                'document_type': data.get('document_type', 'CIF'),
+                'document_number': data.get('document_number', ''),
+                'focus_area': data.get('focus_area', 'General'),
+                'type': data.get('type', 'Asociación'),
+                'email': data.get('email', ''),
+                'phone': data.get('phone', ''),
+                'website': data.get('website', ''),
+                'description': data.get('description', ''),
+                'services': data.get('services', ''),
+                'created_at': '2024-12-20T10:00:00'
+            }
+            
+            SAMPLE_CRM_DATA['associations'].append(new_association)
+            return add_cors_headers(jsonify({'message': 'Asociación creada', 'id': new_id})), 201
+        except Exception as e:
+            return add_cors_headers(jsonify({'error': str(e)})), 500
+
+@app.route('/api/associations/<int:association_id>', methods=['PUT', 'DELETE'])
+def manage_association(association_id):
+    if not require_admin():
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    if request.method == 'DELETE':
+        initial_count = len(SAMPLE_CRM_DATA['associations'])
+        SAMPLE_CRM_DATA['associations'] = [a for a in SAMPLE_CRM_DATA['associations'] if a['id'] != association_id]
+        
+        if len(SAMPLE_CRM_DATA['associations']) < initial_count:
+            return add_cors_headers(jsonify({'message': 'Asociación eliminada'}))
+        else:
+            return add_cors_headers(jsonify({'error': 'No encontrada'})), 404
+    
+    elif request.method == 'PUT':
+        data = request.get_json()
+        association = next((a for a in SAMPLE_CRM_DATA['associations'] if a['id'] == association_id), None)
+        
+        if association:
+            association.update({
+                'name': data.get('name', association['name']),
+                'acronym': data.get('acronym', association['acronym']),
+                'country': data.get('country', association['country']),
+                'city': data.get('city', association['city']),
+                'document_type': data.get('document_type', association['document_type']),
+                'document_number': data.get('document_number', association['document_number']),
+                'focus_area': data.get('focus_area', association['focus_area']),
+                'type': data.get('type', association['type']),
+                'email': data.get('email', association['email']),
+                'phone': data.get('phone', association['phone']),
+                'website': data.get('website', association['website']),
+                'description': data.get('description', association['description']),
+                'services': data.get('services', association['services'])
+            })
+            return add_cors_headers(jsonify({'message': 'Asociación actualizada'}))
+        else:
+            return add_cors_headers(jsonify({'error': 'No encontrada'})), 404
 
 print("✅ API CRM Simple cargada correctamente")

@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}CRM Dashboard - Vista Embudo - DiversIA{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h3 mb-1">CRM Dashboard - Vista Embudo de Ventas</h2>
+                    <p class="text-muted mb-0">Visualización del proceso de conversión y flujo de oportunidades</p>
+                </div>
+                <div class="btn-group">
+                    <a href="/crm" class="btn btn-outline-primary">Vista Tabla</a>
+                    <button class="btn btn-primary">Vista Embudo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Métricas Generales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="text-primary mb-2">
+                        <i class="h2">👥</i>
+                    </div>
+                    <h3 class="h4 mb-1" id="totalLeads">0</h3>
+                    <p class="text-muted small mb-0">Total Leads</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="text-success mb-2">
+                        <i class="h2">💼</i>
+                    </div>
+                    <h3 class="h4 mb-1" id="activeOffers">0</h3>
+                    <p class="text-muted small mb-0">Ofertas Activas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="text-warning mb-2">
+                        <i class="h2">📊</i>
+                    </div>
+                    <h3 class="h4 mb-1" id="conversionRate">0%</h3>
+                    <p class="text-muted small mb-0">Tasa Conversión</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="text-info mb-2">
+                        <i class="h2">💰</i>
+                    </div>
+                    <h3 class="h4 mb-1" id="avgSalary">0€</h3>
+                    <p class="text-muted small mb-0">Salario Promedio</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Embudo de Ventas Visual -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h5 class="card-title text-white mb-0">Embudo de Conversión - Proceso de Inclusión Laboral</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="funnel-container">
+                        <!-- Etapa 1: Leads/Contactos -->
+                        <div class="funnel-stage" data-stage="leads">
+                            <div class="funnel-section" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); width: 100%;">
+                                <div class="funnel-content">
+                                    <h6 class="text-white mb-1">1. Contactos Registrados</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-white">
+                                            <strong id="funnelContacts">0</strong> personas neurodivergentes
+                                        </span>
+                                        <small class="text-white-50">100%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Etapa 2: Empresas Interesadas -->
+                        <div class="funnel-stage" data-stage="companies">
+                            <div class="funnel-section" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); width: 85%;">
+                                <div class="funnel-content">
+                                    <h6 class="text-white mb-1">2. Empresas Registradas</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-white">
+                                            <strong id="funnelCompanies">0</strong> empresas inclusivas
+                                        </span>
+                                        <small class="text-white-50" id="companiesPercent">85%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Etapa 3: Ofertas Publicadas -->
+                        <div class="funnel-stage" data-stage="offers">
+                            <div class="funnel-section" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); width: 70%;">
+                                <div class="funnel-content">
+                                    <h6 class="text-white mb-1">3. Ofertas de Trabajo</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-white">
+                                            <strong id="funnelOffers">0</strong> ofertas activas
+                                        </span>
+                                        <small class="text-white-50" id="offersPercent">70%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Etapa 4: Matching -->
+                        <div class="funnel-stage" data-stage="matching">
+                            <div class="funnel-section" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); width: 55%;">
+                                <div class="funnel-content">
+                                    <h6 class="text-dark mb-1">4. Matching & Aplicaciones</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-dark">
+                                            <strong id="funnelMatching">0</strong> conexiones realizadas
+                                        </span>
+                                        <small class="text-dark opacity-75" id="matchingPercent">55%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Etapa 5: Contrataciones -->
+                        <div class="funnel-stage" data-stage="hired">
+                            <div class="funnel-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 40%;">
+                                <div class="funnel-content">
+                                    <h6 class="text-white mb-1">5. Contrataciones Exitosas</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-white">
+                                            <strong id="funnelHired">0</strong> personas empleadas
+                                        </span>
+                                        <small class="text-white-50" id="hiredPercent">40%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Tendencias -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Tendencia Mensual</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="trendChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Distribución por Neurodivergencia</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="neurodivergenceChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.funnel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 0;
+}
+
+.funnel-stage {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.funnel-section {
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.funnel-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.funnel-content {
+    text-align: center;
+    padding: 15px 20px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .funnel-section {
+        width: 95% !important;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+class FunnelDashboard {
+    constructor() {
+        this.apiBase = window.location.origin;
+        this.init();
+    }
+
+    async init() {
+        await this.loadFunnelData();
+        this.initCharts();
+    }
+
+    async loadFunnelData() {
+        try {
+            // Cargar datos de todas las APIs
+            const [contactsRes, companiesRes, offersRes, statsRes] = await Promise.all([
+                fetch(`${this.apiBase}/api/contacts`),
+                fetch(`${this.apiBase}/api/companies`), 
+                fetch(`${this.apiBase}/api/offers`),
+                fetch(`${this.apiBase}/api/stats`)
+            ]);
+
+            const contacts = await contactsRes.json();
+            const companies = await companiesRes.json();
+            const offers = await offersRes.json();
+            const stats = await statsRes.json();
+
+            // Calcular métricas del embudo
+            const totalContacts = contacts.length;
+            const totalCompanies = companies.length;
+            const activeOffers = offers.filter(o => o.active).length;
+            
+            // Datos simulados para el embudo
+            const matching = Math.floor(totalContacts * 0.55);
+            const hired = Math.floor(totalContacts * 0.4);
+            const avgSalary = 32000; // Promedio estimado
+
+            // Actualizar métricas generales
+            document.getElementById('totalLeads').textContent = totalContacts;
+            document.getElementById('activeOffers').textContent = activeOffers;
+            document.getElementById('conversionRate').textContent = `${Math.round((hired/totalContacts)*100)}%`;
+            document.getElementById('avgSalary').textContent = `${avgSalary.toLocaleString()}€`;
+
+            // Actualizar embudo
+            document.getElementById('funnelContacts').textContent = totalContacts;
+            document.getElementById('funnelCompanies').textContent = totalCompanies;
+            document.getElementById('funnelOffers').textContent = activeOffers;
+            document.getElementById('funnelMatching').textContent = matching;
+            document.getElementById('funnelHired').textContent = hired;
+
+            // Actualizar porcentajes
+            if (totalContacts > 0) {
+                document.getElementById('companiesPercent').textContent = `${Math.round((totalCompanies/totalContacts)*100)}%`;
+                document.getElementById('offersPercent').textContent = `${Math.round((activeOffers/totalContacts)*100)}%`;
+                document.getElementById('matchingPercent').textContent = `${Math.round((matching/totalContacts)*100)}%`;
+                document.getElementById('hiredPercent').textContent = `${Math.round((hired/totalContacts)*100)}%`;
+            }
+
+        } catch (error) {
+            console.error('Error loading funnel data:', error);
+        }
+    }
+
+    initCharts() {
+        // Gráfico de tendencias
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Contactos',
+                    data: [12, 19, 25, 32, 45, 52],
+                    borderColor: '#4facfe',
+                    backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Contrataciones',
+                    data: [5, 8, 12, 15, 22, 28],
+                    borderColor: '#43e97b',
+                    backgroundColor: 'rgba(67, 233, 123, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Gráfico de neurodivergencias
+        const neuroCtx = document.getElementById('neurodivergenceChart').getContext('2d');
+        new Chart(neuroCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['TDAH', 'TEA', 'Dislexia', 'Ansiedad', 'Otros'],
+                datasets: [{
+                    data: [30, 25, 20, 15, 10],
+                    backgroundColor: [
+                        '#4facfe',
+                        '#43e97b',
+                        '#fa709a',
+                        '#fee140',
+                        '#667eea'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Inicializar dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    new FunnelDashboard();
+});
+</script>
+{% endblock %}

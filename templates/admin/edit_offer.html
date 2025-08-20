@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Oferta Laboral - CRM DiversIA{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">
+                        <i class="me-2">💼</i>
+                        Editar Oferta Laboral
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form id="editOfferForm">
+                        <input type="hidden" id="offer_id" name="offer_id">
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="title" class="form-label fw-semibold">Título del Puesto *</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="active" class="form-label fw-semibold">Estado</label>
+                                <select class="form-select" id="active" name="active">
+                                    <option value="true">Activa</option>
+                                    <option value="false">Inactiva</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="company_name" class="form-label fw-semibold">Empresa *</label>
+                                <input type="text" class="form-control" id="company_name" name="company_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="location" class="form-label fw-semibold">Ubicación</label>
+                                <input type="text" class="form-control" id="location" name="location">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="salary" class="form-label fw-semibold">Salario</label>
+                                <input type="text" class="form-control" id="salary" name="salary" placeholder="ej. 30,000-45,000€">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="contract_type" class="form-label fw-semibold">Tipo de Contrato</label>
+                                <select class="form-select" id="contract_type" name="contract_type">
+                                    <option value="full-time">Tiempo Completo</option>
+                                    <option value="part-time">Media Jornada</option>
+                                    <option value="contract">Por Contrato</option>
+                                    <option value="internship">Prácticas</option>
+                                    <option value="freelance">Freelance</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="experience_level" class="form-label fw-semibold">Nivel de Experiencia</label>
+                                <select class="form-select" id="experience_level" name="experience_level">
+                                    <option value="entry">Entrada</option>
+                                    <option value="junior">Junior</option>
+                                    <option value="mid">Intermedio</option>
+                                    <option value="senior">Senior</option>
+                                    <option value="lead">Lead/Manager</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="remote_work" class="form-label fw-semibold">Trabajo Remoto</label>
+                                <select class="form-select" id="remote_work" name="remote_work">
+                                    <option value="none">Presencial</option>
+                                    <option value="hybrid">Híbrido</option>
+                                    <option value="full">Completamente Remoto</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold">Descripción del Puesto</label>
+                            <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="requirements" class="form-label fw-semibold">Requisitos</label>
+                            <textarea class="form-control" id="requirements" name="requirements" rows="3"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_email" class="form-label fw-semibold">Email de Contacto</label>
+                                <input type="email" class="form-control" id="contact_email" name="contact_email">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="application_deadline" class="form-label fw-semibold">Fecha Límite</label>
+                                <input type="date" class="form-control" id="application_deadline" name="application_deadline">
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-info text-white">
+                                Guardar Cambios
+                            </button>
+                            <a href="{{ url_for('crm_dashboard') }}" class="btn btn-outline-secondary">
+                                Volver al CRM
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const offerId = urlParams.get('id');
+    
+    if (offerId) {
+        document.getElementById('offer_id').value = offerId;
+        loadOfferData(offerId);
+    }
+    
+    document.getElementById('editOfferForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const offerData = {
+            title: formData.get('title'),
+            company_name: formData.get('company_name'),
+            location: formData.get('location'),
+            salary: formData.get('salary'),
+            contract_type: formData.get('contract_type'),
+            experience_level: formData.get('experience_level'),
+            remote_work: formData.get('remote_work'),
+            description: formData.get('description'),
+            requirements: formData.get('requirements'),
+            contact_email: formData.get('contact_email'),
+            application_deadline: formData.get('application_deadline'),
+            active: formData.get('active') === 'true'
+        };
+        
+        try {
+            const response = await fetch(`/api/offers/${offerId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(offerData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Oferta actualizada correctamente');
+                window.location.href = '/crm';
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+});
+
+async function loadOfferData(offerId) {
+    try {
+        const response = await fetch('/api/offers');
+        const offers = await response.json();
+        
+        const offer = offers.find(o => o.id == offerId);
+        
+        if (offer) {
+            document.getElementById('title').value = offer.title;
+            document.getElementById('company_name').value = offer.company_name;
+            document.getElementById('location').value = offer.location || '';
+            document.getElementById('salary').value = offer.salary || '';
+            document.getElementById('contract_type').value = offer.contract_type || 'full-time';
+            document.getElementById('experience_level').value = offer.experience_level || 'entry';
+            document.getElementById('remote_work').value = offer.remote_work || 'none';
+            document.getElementById('description').value = offer.description || '';
+            document.getElementById('requirements').value = offer.requirements || '';
+            document.getElementById('contact_email').value = offer.contact_email || '';
+            document.getElementById('application_deadline').value = offer.application_deadline || '';
+            document.getElementById('active').value = offer.active ? 'true' : 'false';
+        } else {
+            alert('Oferta no encontrada');
+            window.location.href = '/crm';
+        }
+    } catch (error) {
+        alert('Error al cargar datos: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

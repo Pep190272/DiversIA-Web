@@ -70,6 +70,14 @@ def crm_dashboard():
         flash('Error interno del servidor. Inténtalo de nuevo.', 'error')
         return redirect('/')
 
+@app.route('/crm/funnel')
+def crm_funnel_dashboard():
+    from flask import session, redirect, flash
+    if 'admin_id' not in session:
+        flash('Debes iniciar sesión como administrador.', 'error')
+        return redirect('/admin/login')
+    return render_template('crm-dashboard-funnel.html')
+
 # Rutas para formularios del CRM
 @app.route('/admin/create-task')
 def create_task():
@@ -118,6 +126,22 @@ def edit_company():
         flash('Debes iniciar sesión como administrador.', 'error')
         return redirect('/admin/login')
     return render_template('admin/edit_company.html')
+
+@app.route('/admin/edit-offer')
+def edit_offer():
+    from flask import session, redirect, flash
+    if 'admin_id' not in session:
+        flash('Debes iniciar sesión como administrador.', 'error')
+        return redirect('/admin/login')
+    return render_template('admin/edit_offer.html')
+
+@app.route('/admin/edit-association')
+def edit_association():
+    from flask import session, redirect, flash
+    if 'admin_id' not in session:
+        flash('Debes iniciar sesión como administrador.', 'error')
+        return redirect('/admin/login')
+    return render_template('admin/edit_association.html')
 
 @app.route('/enviar-contacto', methods=['POST'])
 def enviar_contacto():

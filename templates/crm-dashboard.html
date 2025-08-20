@@ -9,10 +9,14 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="display-6 fw-bold">CRM Dashboard</h1>
                 <div class="d-flex gap-2">
+                    <div class="btn-group me-2">
+                        <button class="btn btn-primary">Vista Tabla</button>
+                        <a href="/crm/funnel" class="btn btn-outline-primary">Vista Embudo</a>
+                    </div>
                     <button class="btn btn-outline-primary" onclick="refreshData()">
                         <i data-lucide="refresh-cw" class="me-2"></i>Actualizar
                     </button>
-                    <button class="btn btn-primary" onclick="exportData()">
+                    <button class="btn btn-outline-info" onclick="exportData()">
                         <i data-lucide="download" class="me-2"></i>Exportar
                     </button>
                 </div>
@@ -286,7 +290,9 @@
                         <div class="tab-pane fade" id="associations" role="tabpanel">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="mb-0">Asociaciones Registradas</h5>
-                                <span class="badge bg-info">Solo lectura</span>
+                                <button class="btn btn-primary btn-sm" onclick="addAssociation()">
+                                    <i data-lucide="plus" class="me-1"></i>Nueva Asociación
+                                </button>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-hover">
@@ -295,13 +301,15 @@
                                             <th>Nombre</th>
                                             <th>Acrónimo</th>
                                             <th>País</th>
-                                            <th>Documento</th>
-                                            <th>Número</th>
+                                            <th>Área de Enfoque</th>
+                                            <th>Tipo</th>
+                                            <th>Email</th>
+                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody id="associationsTable">
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted">Cargando asociaciones...</td>
+                                            <td colspan="7" class="text-center text-muted">Cargando asociaciones...</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -539,8 +547,11 @@ class DiversiaCRM {
                         <td>${statusBadge}</td>
                         <td>${offer.created_at ? new Date(offer.created_at).toLocaleDateString() : '-'}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-danger" onclick="crm.deleteOffer(${offer.id})">
-                                <i data-lucide="trash-2"></i>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editOffer(${offer.id})" title="Editar oferta">
+                                Editar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteOffer(${offer.id})" title="Eliminar oferta">
+                                Eliminar
                             </button>
                         </td>
                     </tr>
@@ -564,14 +575,23 @@ class DiversiaCRM {
             const tbody = document.getElementById('associationsTable');
             tbody.innerHTML = '';
             
-            associations.forEach(assoc => {
+            associations.forEach(association => {
                 const row = `
                     <tr>
-                        <td><strong>${assoc.name}</strong></td>
-                        <td>${assoc.acronym || '-'}</td>
-                        <td>${assoc.country}</td>
-                        <td>${assoc.document_type}</td>
-                        <td>${assoc.document_number}</td>
+                        <td><strong>${association.name}</strong></td>
+                        <td>${association.acronym || '-'}</td>
+                        <td>${association.country}</td>
+                        <td><span class="badge bg-secondary">${association.focus_area || 'General'}</span></td>
+                        <td>${association.type || 'Asociación'}</td>
+                        <td>${association.email || '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editAssociation(${association.id})" title="Editar asociación">
+                                Editar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteAssociation(${association.id})" title="Eliminar asociación">
+                                Eliminar
+                            </button>
+                        </td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
@@ -703,6 +723,14 @@ function editCompany(companyId) {
     window.location.href = `/admin/edit-company?id=${companyId}`;
 }
 
+function editOffer(offerId) {
+    window.location.href = `/admin/edit-offer?id=${offerId}`;
+}
+
+function editAssociation(associationId) {
+    window.location.href = `/admin/edit-association?id=${associationId}`;
+}
+
 function showCreateTaskModal() {
     window.location.href = '/admin/create-task';
 }
@@ -742,6 +770,10 @@ function addCompany() {
 
 function addOffer() {
     alert('Función para añadir oferta en desarrollo');
+}
+
+function addAssociation() {
+    alert('Función para añadir asociación en desarrollo');
 }
 
 async function deleteContact(contactId) {
@@ -785,6 +817,50 @@ async function deleteCompany(companyId) {
     } catch (error) {
         console.error('Error deleting company:', error);
         alert('Error al eliminar la empresa');
+    }
+}
+
+async function deleteOffer(offerId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta oferta?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${window.location.origin}/api/offers/${offerId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            crm.loadOffers();
+            crm.loadStats();
+        } else {
+            alert('Error al eliminar la oferta');
+        }
+    } catch (error) {
+        console.error('Error deleting offer:', error);
+        alert('Error al eliminar la oferta');
+    }
+}
+
+async function deleteAssociation(associationId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta asociación?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${window.location.origin}/api/associations/${associationId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            crm.loadAssociations();
+            crm.loadStats();
+        } else {
+            alert('Error al eliminar la asociación');
+        }
+    } catch (error) {
+        console.error('Error deleting association:', error);
+        alert('Error al eliminar la asociación');
     }
 }
 </script>

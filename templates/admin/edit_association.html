@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Asociación - CRM DiversIA{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0">
+                        <i class="me-2">🏛️</i>
+                        Editar Asociación
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form id="editAssociationForm">
+                        <input type="hidden" id="association_id" name="association_id">
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="name" class="form-label fw-semibold">Nombre de la Asociación *</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="acronym" class="form-label fw-semibold">Acrónimo</label>
+                                <input type="text" class="form-control" id="acronym" name="acronym" placeholder="ej. FEAADAH">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="country" class="form-label fw-semibold">País *</label>
+                                <select class="form-select" id="country" name="country" required>
+                                    <option value="">Seleccionar país</option>
+                                    <option value="España">España</option>
+                                    <option value="México">México</option>
+                                    <option value="Argentina">Argentina</option>
+                                    <option value="Colombia">Colombia</option>
+                                    <option value="Chile">Chile</option>
+                                    <option value="Perú">Perú</option>
+                                    <option value="Ecuador">Ecuador</option>
+                                    <option value="Uruguay">Uruguay</option>
+                                    <option value="Paraguay">Paraguay</option>
+                                    <option value="Bolivia">Bolivia</option>
+                                    <option value="Venezuela">Venezuela</option>
+                                    <option value="Costa Rica">Costa Rica</option>
+                                    <option value="Panamá">Panamá</option>
+                                    <option value="Guatemala">Guatemala</option>
+                                    <option value="Honduras">Honduras</option>
+                                    <option value="El Salvador">El Salvador</option>
+                                    <option value="Nicaragua">Nicaragua</option>
+                                    <option value="República Dominicana">República Dominicana</option>
+                                    <option value="Cuba">Cuba</option>
+                                    <option value="Puerto Rico">Puerto Rico</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label fw-semibold">Ciudad</label>
+                                <input type="text" class="form-control" id="city" name="city">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="document_type" class="form-label fw-semibold">Tipo de Documento</label>
+                                <select class="form-select" id="document_type" name="document_type">
+                                    <option value="CIF">CIF (España)</option>
+                                    <option value="NIT">NIT</option>
+                                    <option value="RFC">RFC (México)</option>
+                                    <option value="RUC">RUC</option>
+                                    <option value="CUIT">CUIT (Argentina)</option>
+                                    <option value="RUT">RUT (Chile/Uruguay)</option>
+                                    <option value="CNPJ">CNPJ (Brasil)</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="document_number" class="form-label fw-semibold">Número de Documento</label>
+                                <input type="text" class="form-control" id="document_number" name="document_number">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="focus_area" class="form-label fw-semibold">Área de Enfoque</label>
+                                <select class="form-select" id="focus_area" name="focus_area">
+                                    <option value="TDAH">TDAH</option>
+                                    <option value="TEA">TEA (Autismo)</option>
+                                    <option value="Dislexia">Dislexia</option>
+                                    <option value="Discalculia">Discalculia</option>
+                                    <option value="Tourette">Tourette</option>
+                                    <option value="Ansiedad">Ansiedad</option>
+                                    <option value="Bipolar">Bipolar</option>
+                                    <option value="Altas Capacidades">Altas Capacidades</option>
+                                    <option value="Dispraxia">Dispraxia</option>
+                                    <option value="General">Neurodivergencia General</option>
+                                    <option value="Inclusión Laboral">Inclusión Laboral</option>
+                                    <option value="Educación">Educación Inclusiva</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="type" class="form-label fw-semibold">Tipo de Organización</label>
+                                <select class="form-select" id="type" name="type">
+                                    <option value="Asociación">Asociación</option>
+                                    <option value="Fundación">Fundación</option>
+                                    <option value="ONG">ONG</option>
+                                    <option value="Instituto">Instituto</option>
+                                    <option value="Federación">Federación</option>
+                                    <option value="Confederación">Confederación</option>
+                                    <option value="Centro">Centro Especializado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label fw-semibold">Email de Contacto</label>
+                                <input type="email" class="form-control" id="email" name="email">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-semibold">Teléfono</label>
+                                <input type="tel" class="form-control" id="phone" name="phone">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="website" class="form-label fw-semibold">Sitio Web</label>
+                            <input type="url" class="form-control" id="website" name="website">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold">Descripción</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="services" class="form-label fw-semibold">Servicios que Ofrece</label>
+                            <textarea class="form-control" id="services" name="services" rows="2" placeholder="ej. Diagnóstico, Terapia, Talleres, Formación..."></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-secondary">
+                                Guardar Cambios
+                            </button>
+                            <a href="{{ url_for('crm_dashboard') }}" class="btn btn-outline-secondary">
+                                Volver al CRM
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const associationId = urlParams.get('id');
+    
+    if (associationId) {
+        document.getElementById('association_id').value = associationId;
+        loadAssociationData(associationId);
+    }
+    
+    document.getElementById('editAssociationForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const associationData = {
+            name: formData.get('name'),
+            acronym: formData.get('acronym'),
+            country: formData.get('country'),
+            city: formData.get('city'),
+            document_type: formData.get('document_type'),
+            document_number: formData.get('document_number'),
+            focus_area: formData.get('focus_area'),
+            type: formData.get('type'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            website: formData.get('website'),
+            description: formData.get('description'),
+            services: formData.get('services')
+        };
+        
+        try {
+            const response = await fetch(`/api/associations/${associationId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(associationData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Asociación actualizada correctamente');
+                window.location.href = '/crm';
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+});
+
+async function loadAssociationData(associationId) {
+    try {
+        const response = await fetch('/api/associations');
+        const associations = await response.json();
+        
+        const association = associations.find(a => a.id == associationId);
+        
+        if (association) {
+            document.getElementById('name').value = association.name;
+            document.getElementById('acronym').value = association.acronym || '';
+            document.getElementById('country').value = association.country;
+            document.getElementById('city').value = association.city || '';
+            document.getElementById('document_type').value = association.document_type || 'CIF';
+            document.getElementById('document_number').value = association.document_number || '';
+            document.getElementById('focus_area').value = association.focus_area || 'General';
+            document.getElementById('type').value = association.type || 'Asociación';
+            document.getElementById('email').value = association.email || '';
+            document.getElementById('phone').value = association.phone || '';
+            document.getElementById('website').value = association.website || '';
+            document.getElementById('description').value = association.description || '';
+            document.getElementById('services').value = association.services || '';
+        } else {
+            alert('Asociación no encontrada');
+            window.location.href = '/crm';
+        }
+    } catch (error) {
+        alert('Error al cargar datos: ' + error.message);
+    }
+}
+</script>
+{% endblock %}
