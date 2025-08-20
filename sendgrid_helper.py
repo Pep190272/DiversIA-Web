@@ -8,7 +8,7 @@ def send_email(to_email: str, subject: str, html_content: str, text_content: str
     Envía un email usando Gmail SMTP
     """
     gmail_user = os.environ.get('GMAIL_USER', 'diversiaeternals@gmail.com')
-    gmail_password = os.environ.get('GMAIL_PASSWORD')
+    gmail_password = os.environ.get('GMAIL_PASSWORD', 'bsrhgpdykvesrmhm')
     
     if not gmail_password:
         print('Error: GMAIL_PASSWORD no está configurada')
