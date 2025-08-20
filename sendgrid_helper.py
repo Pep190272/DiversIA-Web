@@ -1,34 +1,48 @@
 import os
-import sys
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Email, To, Content
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 def send_email(to_email: str, subject: str, html_content: str, text_content: str = None):
     """
-    Envía un email usando SendGrid
+    Envía un email usando Gmail SMTP
     """
-    sendgrid_key = os.environ.get('SENDGRID_API_KEY')
-    if not sendgrid_key:
-        print('Error: SENDGRID_API_KEY no está configurada')
+    gmail_user = os.environ.get('GMAIL_USER', 'diversiaeternals@gmail.com')
+    gmail_password = os.environ.get('GMAIL_PASSWORD')
+    
+    if not gmail_password:
+        print('Error: GMAIL_PASSWORD no está configurada')
         return False
     
-    sg = SendGridAPIClient(sendgrid_key)
-    
-    message = Mail(
-        from_email=Email('noreply@diversia.app', 'DiversIA Platform'),
-        to_emails=To(to_email),
-        subject=subject
-    )
-    
-    if html_content:
-        message.content = Content("text/html", html_content)
-    elif text_content:
-        message.content = Content("text/plain", text_content)
-    
     try:
-        response = sg.send(message)
-        print(f"Email enviado exitosamente. Status: {response.status_code}")
+        # Crear el mensaje
+        msg = MIMEMultipart('alternative')
+        msg['From'] = f'DiversIA Platform <{gmail_user}>'
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        
+        # Añadir contenido
+        if text_content:
+            part1 = MIMEText(text_content, 'plain', 'utf-8')
+            msg.attach(part1)
+        
+        if html_content:
+            part2 = MIMEText(html_content, 'html', 'utf-8')
+            msg.attach(part2)
+        
+        # Conectar con Gmail SMTP
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(gmail_user, gmail_password)
+        
+        # Enviar email
+        text = msg.as_string()
+        server.sendmail(gmail_user, to_email, text)
+        server.quit()
+        
+        print(f"Email enviado exitosamente a {to_email}")
         return True
+        
     except Exception as e:
         print(f"Error enviando email: {e}")
         return False
