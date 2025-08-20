@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Tarea - CRM DiversIA{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">
+                        <i class="me-2">📝</i>
+                        Editar Tarea
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form id="editTaskForm">
+                        <input type="hidden" id="task_id" name="task_id">
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="title" class="form-label fw-semibold">Título de la Tarea *</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="priority" class="form-label fw-semibold">Prioridad</label>
+                                <select class="form-select" id="priority" name="priority">
+                                    <option value="low">Baja</option>
+                                    <option value="medium">Media</option>
+                                    <option value="high">Alta</option>
+                                    <option value="urgent">Urgente</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold">Descripción</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="assigned_to_id" class="form-label fw-semibold">Asignado a *</label>
+                                <select class="form-select" id="assigned_to_id" name="assigned_to_id" required>
+                                    <option value="">Seleccionar empleado</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label fw-semibold">Categoría</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="development">Desarrollo</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="content">Contenido</option>
+                                    <option value="admin">Administración</option>
+                                    <option value="research">Investigación</option>
+                                    <option value="support">Soporte</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="status" class="form-label fw-semibold">Estado</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="pending">Pendiente</option>
+                                    <option value="in_progress">En Marcha</option>
+                                    <option value="completed">Realizada</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="estimated_hours" class="form-label fw-semibold">Tiempo Estimado (h)</label>
+                                <input type="number" class="form-control" id="estimated_hours" name="estimated_hours" 
+                                       min="0.5" step="0.5">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="actual_hours" class="form-label fw-semibold">Tiempo Real (h)</label>
+                                <input type="number" class="form-control" id="actual_hours" name="actual_hours" 
+                                       min="0" step="0.5">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="due_date" class="form-label fw-semibold">Fecha Límite</label>
+                            <input type="date" class="form-control" id="due_date" name="due_date">
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-info text-white">
+                                <i class="me-2">💾</i>
+                                Guardar Cambios
+                            </button>
+                            <a href="{{ url_for('crm_dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="me-2">↩️</i>
+                                Volver al CRM
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener ID de la tarea desde la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get('id');
+    
+    if (taskId) {
+        document.getElementById('task_id').value = taskId;
+        loadTaskData(taskId);
+    }
+    
+    // Cargar empleados para el dropdown
+    loadEmployees();
+    
+    // Manejar envío del formulario
+    document.getElementById('editTaskForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const taskData = {
+            title: formData.get('title'),
+            description: formData.get('description'),
+            priority: formData.get('priority'),
+            status: formData.get('status'),
+            category: formData.get('category'),
+            assigned_to_id: parseInt(formData.get('assigned_to_id')),
+            estimated_hours: parseFloat(formData.get('estimated_hours')) || 0,
+            actual_hours: parseFloat(formData.get('actual_hours')) || 0,
+            due_date: formData.get('due_date')
+        };
+        
+        try {
+            const response = await fetch(`/api/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(taskData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Tarea actualizada correctamente');
+                window.location.href = '/crm';
+            } else {
+                alert('Error al actualizar la tarea: ' + result.error);
+            }
+        } catch (error) {
+            alert('Error al actualizar la tarea: ' + error.message);
+        }
+    });
+});
+
+async function loadTaskData(taskId) {
+    try {
+        const response = await fetch('/api/tasks');
+        const tasks = await response.json();
+        
+        const task = tasks.find(t => t.id == taskId);
+        
+        if (task) {
+            document.getElementById('title').value = task.title;
+            document.getElementById('description').value = task.description || '';
+            document.getElementById('priority').value = task.priority;
+            document.getElementById('status').value = task.status;
+            document.getElementById('category').value = task.category;
+            document.getElementById('assigned_to_id').value = task.assigned_to_id;
+            document.getElementById('estimated_hours').value = task.estimated_hours;
+            document.getElementById('actual_hours').value = task.actual_hours;
+            document.getElementById('due_date').value = task.due_date;
+        } else {
+            alert('Tarea no encontrada');
+            window.location.href = '/crm';
+        }
+    } catch (error) {
+        alert('Error al cargar datos de la tarea: ' + error.message);
+    }
+}
+
+async function loadEmployees() {
+    try {
+        const response = await fetch('/api/employees');
+        const employees = await response.json();
+        
+        const select = document.getElementById('assigned_to_id');
+        employees.forEach(employee => {
+            const option = document.createElement('option');
+            option.value = employee.id;
+            option.textContent = `${employee.first_name} ${employee.last_name} - ${employee.position}`;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading employees:', error);
+    }
+}
+</script>
+{% endblock %}

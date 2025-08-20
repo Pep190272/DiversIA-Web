@@ -87,6 +87,22 @@ def create_employee():
         return redirect('/admin/login')
     return render_template('admin/create_employee.html')
 
+@app.route('/admin/edit-employee')
+def edit_employee():
+    from flask import session, redirect, flash
+    if 'admin_id' not in session:
+        flash('Debes iniciar sesión como administrador.', 'error')
+        return redirect('/admin/login')
+    return render_template('admin/edit_employee.html')
+
+@app.route('/admin/edit-task')
+def edit_task():
+    from flask import session, redirect, flash
+    if 'admin_id' not in session:
+        flash('Debes iniciar sesión como administrador.', 'error')
+        return redirect('/admin/login')
+    return render_template('admin/edit_task.html')
+
 @app.route('/enviar-contacto', methods=['POST'])
 def enviar_contacto():
     try:

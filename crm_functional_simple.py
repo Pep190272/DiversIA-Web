@@ -193,6 +193,34 @@ def api_tasks():
         except Exception as e:
             return add_cors_headers(jsonify({'error': f'Error al crear tarea: {str(e)}'})), 500
 
+@app.route('/api/employees/<int:employee_id>', methods=['PUT'])
+def update_employee(employee_id):
+    if not require_admin():
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    try:
+        data = request.get_json()
+        employee = next((e for e in CRM_DATA['employees'] if e['id'] == employee_id), None)
+        
+        if employee:
+            employee.update({
+                'first_name': data.get('first_name', employee['first_name']),
+                'last_name': data.get('last_name', employee['last_name']),
+                'email': data.get('email', employee['email']),
+                'position': data.get('position', employee['position']),
+                'department': data.get('department', employee['department']),
+                'role': data.get('role', employee['role']),
+                'hire_date': data.get('hire_date', employee['hire_date']),
+                'salary': data.get('salary', employee['salary']),
+                'is_active': data.get('is_active', employee['is_active'])
+            })
+            return add_cors_headers(jsonify({'message': 'Empleado actualizado correctamente'}))
+        else:
+            return add_cors_headers(jsonify({'error': 'Empleado no encontrado'})), 404
+            
+    except Exception as e:
+        return add_cors_headers(jsonify({'error': f'Error al actualizar: {str(e)}'})), 500
+
 @app.route('/api/tasks/<int:task_id>', methods=['DELETE', 'PUT'])
 def manage_task(task_id):
     if not require_admin():
@@ -217,8 +245,25 @@ def manage_task(task_id):
             task = next((t for t in CRM_DATA['tasks'] if t['id'] == task_id), None)
             
             if task:
-                task['status'] = data.get('status', task['status'])
-                task['actual_hours'] = data.get('actual_hours', task['actual_hours'])
+                # Buscar empleado asignado si cambió
+                if 'assigned_to_id' in data:
+                    assigned_employee = next((e for e in CRM_DATA['employees'] if e['id'] == data['assigned_to_id']), None)
+                    if assigned_employee:
+                        task['assigned_to'] = f"{assigned_employee['first_name']} {assigned_employee['last_name']}"
+                        task['assigned_to_id'] = data['assigned_to_id']
+                
+                # Actualizar otros campos
+                task.update({
+                    'title': data.get('title', task['title']),
+                    'description': data.get('description', task['description']),
+                    'priority': data.get('priority', task['priority']),
+                    'status': data.get('status', task['status']),
+                    'category': data.get('category', task['category']),
+                    'estimated_hours': data.get('estimated_hours', task['estimated_hours']),
+                    'actual_hours': data.get('actual_hours', task['actual_hours']),
+                    'due_date': data.get('due_date', task['due_date'])
+                })
+                
                 return add_cors_headers(jsonify({'message': 'Tarea actualizada correctamente'}))
             else:
                 return add_cors_headers(jsonify({'error': 'Tarea no encontrada'})), 404

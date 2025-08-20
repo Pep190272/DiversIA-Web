@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Empleado - CRM DiversIA{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="me-2">📝</i>
+                        Editar Empleado
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form id="editEmployeeForm">
+                        <input type="hidden" id="employee_id" name="employee_id">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label fw-semibold">Nombre *</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label fw-semibold">Apellidos *</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="position" class="form-label fw-semibold">Posición *</label>
+                                <input type="text" class="form-control" id="position" name="position" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="department" class="form-label fw-semibold">Departamento</label>
+                                <select class="form-select" id="department" name="department">
+                                    <option value="">Seleccionar departamento</option>
+                                    <option value="Desarrollo">Desarrollo</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Recursos Humanos">Recursos Humanos</option>
+                                    <option value="Administración">Administración</option>
+                                    <option value="Ventas">Ventas</option>
+                                    <option value="Soporte">Soporte</option>
+                                    <option value="Diseño">Diseño</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="role" class="form-label fw-semibold">Rol *</label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="">Seleccionar rol</option>
+                                    <option value="empleado">Empleado</option>
+                                    <option value="colaborador">Colaborador</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="hire_date" class="form-label fw-semibold">Fecha de Ingreso *</label>
+                                <input type="date" class="form-control" id="hire_date" name="hire_date" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="salary" class="form-label fw-semibold">Salario (€)</label>
+                                <input type="number" class="form-control" id="salary" name="salary" 
+                                       min="0" step="100">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="is_active" class="form-label fw-semibold">Estado</label>
+                                <select class="form-select" id="is_active" name="is_active">
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="me-2">💾</i>
+                                Guardar Cambios
+                            </button>
+                            <a href="{{ url_for('crm_dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="me-2">↩️</i>
+                                Volver al CRM
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener ID del empleado desde la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const employeeId = urlParams.get('id');
+    
+    if (employeeId) {
+        document.getElementById('employee_id').value = employeeId;
+        loadEmployeeData(employeeId);
+    }
+    
+    // Manejar envío del formulario
+    document.getElementById('editEmployeeForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const employeeData = {
+            first_name: formData.get('first_name'),
+            last_name: formData.get('last_name'),
+            email: formData.get('email'),
+            position: formData.get('position'),
+            department: formData.get('department'),
+            role: formData.get('role'),
+            hire_date: formData.get('hire_date'),
+            salary: parseFloat(formData.get('salary')) || 0,
+            is_active: formData.get('is_active') === 'true'
+        };
+        
+        try {
+            const response = await fetch(`/api/employees/${employeeId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(employeeData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Empleado actualizado correctamente');
+                window.location.href = '/crm';
+            } else {
+                alert('Error al actualizar el empleado: ' + result.error);
+            }
+        } catch (error) {
+            alert('Error al actualizar el empleado: ' + error.message);
+        }
+    });
+});
+
+async function loadEmployeeData(employeeId) {
+    try {
+        const response = await fetch('/api/employees');
+        const employees = await response.json();
+        
+        const employee = employees.find(emp => emp.id == employeeId);
+        
+        if (employee) {
+            document.getElementById('first_name').value = employee.first_name;
+            document.getElementById('last_name').value = employee.last_name;
+            document.getElementById('email').value = employee.email;
+            document.getElementById('position').value = employee.position;
+            document.getElementById('department').value = employee.department;
+            document.getElementById('role').value = employee.role;
+            document.getElementById('hire_date').value = employee.hire_date;
+            document.getElementById('salary').value = employee.salary;
+            document.getElementById('is_active').value = employee.is_active ? 'true' : 'false';
+        } else {
+            alert('Empleado no encontrado');
+            window.location.href = '/crm';
+        }
+    } catch (error) {
+        alert('Error al cargar datos del empleado: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

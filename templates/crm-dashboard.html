@@ -682,11 +682,19 @@ async function deleteTask(taskId) {
 }
 
 function editEmployee(employeeId) {
-    alert('Función de edición de empleado en desarrollo. ID: ' + employeeId);
+    window.location.href = `/admin/edit-employee?id=${employeeId}`;
 }
 
 function editTask(taskId) {
-    alert('Función de edición de tarea en desarrollo. ID: ' + taskId);
+    window.location.href = `/admin/edit-task?id=${taskId}`;
+}
+
+function editContact(contactId) {
+    window.location.href = `/admin/edit-contact?id=${contactId}`;
+}
+
+function editCompany(companyId) {
+    window.location.href = `/admin/edit-company?id=${companyId}`;
 }
 
 function showCreateTaskModal() {
