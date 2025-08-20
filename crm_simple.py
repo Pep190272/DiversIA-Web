@@ -11,8 +11,8 @@ from datetime import datetime
 
 # Sistema de admin simple en memoria
 ADMIN_USERS = {
-    'admin': {
-        'password_hash': hashlib.sha256('diversia2025'.encode()).hexdigest(),
+    'DiversiaEternals': {
+        'password_hash': hashlib.sha256('diversia3ternal$2025'.encode()).hexdigest(),
         'email': 'diversiaeternals@gmail.com',
         'is_super_admin': True
     }
@@ -230,4 +230,4 @@ def delete_offer_simple(offer_id):
     return jsonify({'message': 'Job offer deleted successfully'})
 
 print("✅ CRM simple inicializado - funciona sin base de datos")
-print("Credenciales: admin / diversia2025")
+print("Credenciales: DiversiaEternals / diversia3ternal$2025")

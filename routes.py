@@ -59,11 +59,16 @@ def contacto():
 
 @app.route('/crm')
 def crm_dashboard():
-    from flask import session, redirect, url_for, flash
-    if 'admin_id' not in session:
-        flash('Debes iniciar sesión como administrador para acceder al CRM.', 'error')
-        return redirect('/admin/login')
-    return render_template('crm-dashboard.html')
+    try:
+        from flask import session, redirect, flash
+        if 'admin_id' not in session:
+            flash('Debes iniciar sesión como administrador para acceder al CRM.', 'error')
+            return redirect('/admin/login')
+        return render_template('crm-dashboard.html')
+    except Exception as e:
+        print(f"Error en CRM dashboard: {e}")
+        flash('Error interno del servidor. Inténtalo de nuevo.', 'error')
+        return redirect('/')
 
 @app.route('/enviar-contacto', methods=['POST'])
 def enviar_contacto():

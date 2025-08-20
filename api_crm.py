@@ -4,9 +4,8 @@ from models import User, Company, JobOffer, Asociacion
 from datetime import datetime
 import json
 
-# CORS headers for API requests
-@app.after_request
-def after_request(response):
+# CORS headers for API requests - solo aplicar a rutas API
+def add_cors_headers(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
@@ -16,23 +15,28 @@ def after_request(response):
 @app.route('/api/contacts', methods=['GET', 'POST'])
 def handle_contacts():
     """Gestión de contactos (usuarios neurodivergentes)"""
-    if request.method == 'GET':
-        users = User.query.all()
-        contacts = []
-        for user in users:
-            contacts.append({
-                'id': user.id,
-                'name': f"{user.nombre} {user.apellidos}",
-                'email': user.email,
-                'phone': user.telefono,
-                'city': user.ciudad,
-                'source': 'Registro Web',
-                'type': 'Usuario ND',
-                'neurodivergence': user.tipo_neurodivergencia,
-                'created_at': user.created_at.isoformat() if user.created_at else None,
-                'exported_to_crm': user.exported_to_crm
-            })
-        return jsonify(contacts)
+    try:
+        if request.method == 'GET':
+            try:
+                users = User.query.all()
+                contacts = []
+                for user in users:
+                    contacts.append({
+                        'id': user.id,
+                        'name': f"{user.nombre} {user.apellidos}",
+                        'email': user.email,
+                        'phone': user.telefono,
+                        'city': user.ciudad,
+                        'source': 'Registro Web',
+                        'type': 'Usuario ND',
+                        'neurodivergence': user.tipo_neurodivergencia,
+                        'created_at': user.created_at.isoformat() if user.created_at else None,
+                        'exported_to_crm': getattr(user, 'exported_to_crm', False)
+                    })
+                return add_cors_headers(jsonify(contacts))
+            except Exception as e:
+                # Fallback si la base de datos no está disponible
+                return add_cors_headers(jsonify([]))
     
     elif request.method == 'POST':
         data = request.json
@@ -46,9 +50,14 @@ def handle_contacts():
             tipo_neurodivergencia=data.get('neurodivergence', 'General'),
             diagnostico_formal=data.get('formal_diagnosis', False)
         )
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify({'message': 'Contact added successfully', 'id': new_user.id}), 201
+            try:
+                db.session.add(new_user)
+                db.session.commit()
+                return add_cors_headers(jsonify({'message': 'Contact added successfully', 'id': new_user.id})), 201
+            except Exception as e:
+                return add_cors_headers(jsonify({'error': 'Database not available'})), 503
+    except Exception as e:
+        return add_cors_headers(jsonify({'error': 'Internal server error'})), 500
 
 @app.route('/api/contacts/<int:contact_id>', methods=['DELETE', 'PUT'])
 def manage_contact(contact_id):

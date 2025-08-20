@@ -107,14 +107,14 @@ def create_initial_admin():
     with app.app_context():
         if not Admin.query.first():
             admin = Admin(
-                username='admin',
+                username='DiversiaEternals',
                 email='diversiaeternals@gmail.com',
                 is_super_admin=True
             )
-            admin.set_password('diversia2025')  # Cambiar esta contraseña
+            admin.set_password('diversia3ternal$2025')
             db.session.add(admin)
             db.session.commit()
-            print("✅ Admin inicial creado: admin/diversia2025")
+            print("✅ Admin inicial creado: DiversiaEternals/diversia3ternal$2025")
 
 # Inicializar admin al arrancar
 try:
