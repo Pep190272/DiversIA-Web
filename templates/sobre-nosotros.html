@@ -269,10 +269,10 @@
                         </div>
                     </div>
                     <div class="mt-4">
-                        <button onclick="openEmail()" class="btn btn-primary btn-lg">
+                        <a href="{{ url_for('contacto') }}" class="btn btn-primary btn-lg">
                             <i data-lucide="mail" class="me-2"></i>
                             diversiaeternals@gmail.com
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -288,32 +288,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function openEmail() {
-    // Intentar abrir el cliente de correo
-    var emailTo = 'diversiaeternals@gmail.com';
-    var subject = 'Consulta DiversIA - Equipo Eternals';
-    var body = 'Hola Olga y Pep,\n\nEscribo para consultar sobre:\n\n[Describe tu consulta aquí]\n\nUn saludo';
-    
-    var mailtoLink = 'mailto:' + emailTo + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-    
-    // Crear un enlace temporal y hacer clic
-    var tempLink = document.createElement('a');
-    tempLink.href = mailtoLink;
-    tempLink.style.display = 'none';
-    document.body.appendChild(tempLink);
-    tempLink.click();
-    document.body.removeChild(tempLink);
-    
-    // Si no funciona, mostrar el email para copiar
-    setTimeout(function() {
-        if (confirm('¿No se abrió tu cliente de correo?\n\nHaz clic en OK para copiar el email al portapapeles:\ndiversiaeternals@gmail.com')) {
-            navigator.clipboard.writeText('diversiaeternals@gmail.com').then(function() {
-                alert('Email copiado al portapapeles: diversiaeternals@gmail.com');
-            }).catch(function() {
-                alert('Email de contacto: diversiaeternals@gmail.com\n\nPor favor cópialo manualmente.');
-            });
-        }
-    }, 1000);
-}
+
 </script>
 {% endblock %}
