@@ -47,6 +47,30 @@ def api_employees():
             
             SAMPLE_CRM_DATA['employees'].append(new_employee)
             
+            # Guardar permanentemente en el CRM
+            try:
+                from crm_persistence import save_persistent_crm_data, add_employee_persistent
+                
+                # Método persistente mejorado
+                persistent_employee = add_employee_persistent({
+                    'first_name': data.get('first_name'),
+                    'last_name': data.get('last_name'),
+                    'email': data.get('email'),
+                    'position': data.get('position'),
+                    'department': data.get('department'),
+                    'role': data.get('role', 'empleado'),
+                    'hire_date': data.get('hire_date'),
+                    'salary': data.get('salary', 0)
+                })
+                
+                if persistent_employee:
+                    print(f"✅ Empleado guardado persistentemente: {persistent_employee['first_name']} {persistent_employee['last_name']}")
+                else:
+                    print("⚠️ Error guardando empleado persistentemente")
+                    
+            except Exception as e:
+                print(f"⚠️ Error en persistencia: {e}")
+            
             # Enviar email de bienvenida al empleado
             try:
                 from employee_email_service import send_employee_welcome_email, send_admin_notification

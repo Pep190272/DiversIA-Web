@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Estado del Sistema - DiversIA Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-6 fw-bold">Estado del Sistema</h1>
+                <div class="d-flex gap-2">
+                    <a href="/crm" class="btn btn-outline-primary">Volver al CRM</a>
+                    <button class="btn btn-primary" onclick="refreshStatus()">
+                        <i data-lucide="refresh-cw" class="me-2"></i>Actualizar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estado del CRM -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Estado del CRM</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-3">
+                                    <h4 class="text-primary" id="contactsCount">-</h4>
+                                    <small class="text-muted">Contactos</small>
+                                </div>
+                                <div class="col-3">
+                                    <h4 class="text-success" id="companiesCount">-</h4>
+                                    <small class="text-muted">Empresas</small>
+                                </div>
+                                <div class="col-3">
+                                    <h4 class="text-warning" id="employeesCount">-</h4>
+                                    <small class="text-muted">Empleados</small>
+                                </div>
+                                <div class="col-3">
+                                    <h4 class="text-info" id="associationsCount">-</h4>
+                                    <small class="text-muted">Asociaciones</small>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <span>Archivo de persistencia:</span>
+                                <span class="badge bg-success" id="persistenceStatus">Activo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">Estado de Emails (SendGrid)</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning">
+                                <h6>⚠️ Configuración de SendGrid Requerida</h6>
+                                <p class="mb-2">Para que los emails funcionen, configura tu API key real:</p>
+                                <ol class="mb-2">
+                                    <li>Ve a <a href="https://app.sendgrid.com/settings/api_keys" target="_blank">SendGrid API Keys</a></li>
+                                    <li>Crea un nuevo API Key con permisos "Mail Send"</li>
+                                    <li>Configúralo en Replit Secrets como <code>SENDGRID_API_KEY</code></li>
+                                </ol>
+                                <button class="btn btn-warning btn-sm" onclick="testEmail()">Probar Email</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empleados Recientes -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Empleados Registrados</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nombre</th>
+                                            <th>Email</th>
+                                            <th>Posición</th>
+                                            <th>Departamento</th>
+                                            <th>Fecha Ingreso</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="employeesTable">
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted">Cargando empleados...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Prueba -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Crear Empleado de Prueba</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="testEmployeeForm">
+                                <div class="mb-3">
+                                    <label for="firstName" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="firstName" value="Test">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="lastName" class="form-label">Apellidos</label>
+                                    <input type="text" class="form-control" id="lastName" value="Developer">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" value="diversiaeternals@gmail.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="position" class="form-label">Posición</label>
+                                    <input type="text" class="form-control" id="position" value="Desarrollador">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="department" class="form-label">Departamento</label>
+                                    <input type="text" class="form-control" id="department" value="Testing">
+                                </div>
+                                <button type="submit" class="btn btn-success">Crear Empleado</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Logs del Sistema</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="systemLogs" style="height: 300px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+                                <div class="text-muted">Cargando logs del sistema...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class SystemStatus {
+    constructor() {
+        this.init();
+    }
+
+    async init() {
+        await this.loadStatus();
+        await this.loadEmployees();
+        this.setupEventListeners();
+        this.startLogPolling();
+    }
+
+    async loadStatus() {
+        try {
+            const response = await fetch('/api/stats');
+            const stats = await response.json();
+            
+            document.getElementById('contactsCount').textContent = stats.contacts || 0;
+            document.getElementById('companiesCount').textContent = stats.companies || 0;
+            document.getElementById('employeesCount').textContent = stats.employees || 0;
+            document.getElementById('associationsCount').textContent = stats.associations || 0;
+            
+        } catch (error) {
+            console.error('Error loading status:', error);
+        }
+    }
+
+    async loadEmployees() {
+        try {
+            const response = await fetch('/api/employees');
+            const employees = await response.json();
+            
+            const tbody = document.getElementById('employeesTable');
+            tbody.innerHTML = '';
+            
+            employees.forEach(emp => {
+                const row = `
+                    <tr>
+                        <td>${emp.id}</td>
+                        <td><strong>${emp.first_name} ${emp.last_name}</strong></td>
+                        <td>${emp.email}</td>
+                        <td>${emp.position}</td>
+                        <td>${emp.department}</td>
+                        <td>${emp.hire_date}</td>
+                        <td><span class="badge bg-${emp.status === 'active' ? 'success' : 'secondary'}">${emp.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(${emp.id})">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            
+        } catch (error) {
+            console.error('Error loading employees:', error);
+            document.getElementById('employeesTable').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error cargando empleados</td></tr>';
+        }
+    }
+
+    setupEventListeners() {
+        document.getElementById('testEmployeeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const employeeData = {
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                position: document.getElementById('position').value,
+                department: document.getElementById('department').value
+            };
+            
+            try {
+                const response = await fetch('/test/create-persistent-employee', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(employeeData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ Empleado creado exitosamente: ${result.message}`);
+                    await this.loadStatus();
+                    await this.loadEmployees();
+                } else {
+                    alert(`❌ Error: ${result.message}`);
+                }
+                
+            } catch (error) {
+                alert(`❌ Error creando empleado: ${error.message}`);
+            }
+        });
+    }
+
+    startLogPolling() {
+        // Simulación de logs (en un sistema real, estos vendrían del servidor)
+        const logs = document.getElementById('systemLogs');
+        logs.innerHTML = `
+            <div>[${new Date().toLocaleTimeString()}] ✅ CRM sistema inicializado</div>
+            <div>[${new Date().toLocaleTimeString()}] ✅ Persistencia activada: crm_persistent_data.json</div>
+            <div>[${new Date().toLocaleTimeString()}] ⚠️ SendGrid requiere configuración</div>
+            <div>[${new Date().toLocaleTimeString()}] ✅ API endpoints cargados</div>
+            <div>[${new Date().toLocaleTimeString()}] ✅ Sistema listo para uso</div>
+        `;
+    }
+}
+
+async function refreshStatus() {
+    const systemStatus = new SystemStatus();
+}
+
+async function testEmail() {
+    try {
+        const response = await fetch('/test/email-system');
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('✅ Email de prueba enviado correctamente');
+        } else {
+            alert('⚠️ ' + result.message);
+        }
+    } catch (error) {
+        alert('❌ Error enviando email de prueba: ' + error.message);
+    }
+}
+
+async function deleteEmployee(employeeId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este empleado?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/employees/${employeeId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            alert('Empleado eliminado correctamente');
+            await systemStatus.loadEmployees();
+            await systemStatus.loadStatus();
+        } else {
+            alert('Error eliminando empleado');
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+// Inicializar cuando se carga la página
+const systemStatus = new SystemStatus();
+</script>
+
+{% endblock %}

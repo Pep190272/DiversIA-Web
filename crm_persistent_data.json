@@ -1,0 +1,175 @@
+{
+  "contacts": [
+    {
+      "id": 1,
+      "name": "Ana García",
+      "email": "ana@example.com",
+      "phone": "+34 600 123 456",
+      "city": "Madrid",
+      "neurodivergence": "TDAH",
+      "formal_diagnosis": true,
+      "created_at": "2024-01-15",
+      "source": "manual"
+    },
+    {
+      "id": 2,
+      "name": "Carlos López",
+      "email": "carlos@example.com",
+      "phone": "+34 655 987 654",
+      "city": "Barcelona",
+      "neurodivergence": "TEA",
+      "formal_diagnosis": true,
+      "created_at": "2024-02-20",
+      "source": "manual"
+    }
+  ],
+  "companies": [
+    {
+      "id": 1,
+      "name": "TechInclusiva S.L.",
+      "sector": "Tecnología",
+      "email": "rrhh@techinclusiva.com",
+      "phone": "+34 900 555 123",
+      "city": "Madrid",
+      "size": "50-100",
+      "website": "https://techinclusiva.com",
+      "created_at": "2024-01-10",
+      "source": "manual"
+    },
+    {
+      "id": 2,
+      "name": "ConsultoríaND",
+      "sector": "Consultoría",
+      "email": "contacto@consultoriaND.es",
+      "phone": "+34 910 444 789",
+      "city": "Valencia",
+      "size": "10-50",
+      "website": "https://consultoriand.es",
+      "created_at": "2024-03-05",
+      "source": "manual"
+    }
+  ],
+  "employees": [
+    {
+      "id": 1,
+      "first_name": "Alex",
+      "last_name": "Martínez",
+      "email": "alex@diversia.com",
+      "position": "Desarrolladora",
+      "department": "Desarrollo",
+      "role": "empleado",
+      "hire_date": "2024-01-15",
+      "status": "active",
+      "created_at": "2024-01-15"
+    },
+    {
+      "id": 2,
+      "first_name": "Pep",
+      "last_name": "Moreno",
+      "email": "jose190272@gmail.com",
+      "position": "Desarrollador",
+      "department": "Desarrollo",
+      "role": "empleado",
+      "hire_date": "2025-08-20",
+      "status": "active",
+      "is_active": true,
+      "salary": 35000,
+      "created_at": "2025-08-20T20:35:16.398142"
+    }
+  ],
+  "job_offers": [
+    {
+      "id": 1,
+      "company_id": 1,
+      "title": "Desarrollador Frontend Junior",
+      "description": "Posición para desarrollador frontend con conocimientos de React",
+      "requirements": "React, JavaScript, HTML, CSS",
+      "location": "Madrid",
+      "type": "Tiempo completo",
+      "salary_range": "25000-35000",
+      "remote_work": true,
+      "accommodations": "Horarios flexibles, workspace silencioso",
+      "status": "active",
+      "created_at": "2024-03-15"
+    },
+    {
+      "id": 2,
+      "company_id": 2,
+      "title": "Analista de Datos",
+      "description": "Análisis de datos para proyectos de inclusión",
+      "requirements": "Python, SQL, Excel avanzado",
+      "location": "Valencia",
+      "type": "Tiempo completo",
+      "salary_range": "30000-40000",
+      "remote_work": true,
+      "accommodations": "Pausas regulares, comunicación escrita",
+      "status": "active",
+      "created_at": "2024-04-01"
+    }
+  ],
+  "associations": [
+    {
+      "id": 1,
+      "name": "Fundación TDAH Madrid",
+      "acronym": "FTM",
+      "country": "España",
+      "city": "Madrid",
+      "document_type": "CIF",
+      "document_number": "G12345678",
+      "focus_area": "TDAH",
+      "type": "Fundación",
+      "email": "info@tdahmadrid.org",
+      "phone": "+34 915 555 123",
+      "website": "https://tdahmadrid.org",
+      "created_at": "2024-02-01",
+      "source": "manual"
+    },
+    {
+      "id": 2,
+      "name": "Asociación TEA Andalucía",
+      "acronym": "ATEA",
+      "country": "España",
+      "city": "Sevilla",
+      "document_type": "CIF",
+      "document_number": "G87654321",
+      "focus_area": "TEA",
+      "type": "Asociación",
+      "email": "contacto@tea-andalucia.org",
+      "phone": "+34 954 777 888",
+      "website": "https://tea-andalucia.org",
+      "created_at": "2024-03-10",
+      "source": "manual"
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Revisar candidatos TDAH",
+      "assigned_to": "Ana García",
+      "priority": "Alta",
+      "status": "En progreso",
+      "category": "Recruitment",
+      "estimated_time": "2h",
+      "actual_time": "1.5h",
+      "due_date": "2024-12-30",
+      "created_at": "2024-12-15"
+    },
+    {
+      "id": 2,
+      "title": "Contactar empresa TechInclusiva",
+      "assigned_to": "Carlos López",
+      "priority": "Media",
+      "status": "Pendiente",
+      "category": "Sales",
+      "estimated_time": "1h",
+      "actual_time": "0h",
+      "due_date": "2024-12-25",
+      "created_at": "2024-12-20"
+    }
+  ],
+  "metadata": {
+    "last_updated": "2025-08-20T20:35:16.398202",
+    "version": "1.0",
+    "total_interactions": 2
+  }
+}

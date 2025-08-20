@@ -79,3 +79,56 @@ def test_crm_integration_endpoint():
     except Exception as e:
         from flask import jsonify
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+
+@app.route('/test/create-persistent-employee', methods=['POST'])
+def create_persistent_employee_test():
+    """Crear empleado con persistencia garantizada"""
+    try:
+        from flask import request, jsonify
+        from crm_persistence import add_employee_persistent, fix_sendgrid_email_system
+        
+        # Datos del empleado (usar datos del request o valores por defecto)
+        employee_data = {
+            'first_name': request.json.get('first_name', 'Test'),
+            'last_name': request.json.get('last_name', 'Employee'),
+            'email': request.json.get('email', 'diversiaeternals@gmail.com'),
+            'position': request.json.get('position', 'Desarrollador de Prueba'),
+            'department': request.json.get('department', 'Testing'),
+            'role': 'empleado',
+            'salary': 35000
+        }
+        
+        # Crear empleado persistente
+        persistent_employee = add_employee_persistent(employee_data)
+        
+        # Verificar SendGrid
+        sendgrid_ok = fix_sendgrid_email_system()
+        
+        if persistent_employee:
+            return jsonify({
+                'success': True,
+                'message': f'Empleado {persistent_employee["first_name"]} {persistent_employee["last_name"]} creado y guardado persistentemente',
+                'employee_id': persistent_employee['id'],
+                'sendgrid_status': 'configurado' if sendgrid_ok else 'requiere configuración'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Error creando empleado persistente'
+            }), 500
+            
+    except Exception as e:
+        from flask import jsonify
+        return jsonify({
+            'success': False, 
+            'message': f'Error: {str(e)}'
+        }), 500
+
+@app.route('/admin/system-status')
+def admin_system_status():
+    """Página de estado del sistema para administradores"""
+    from flask import session, redirect, flash, render_template
+    if 'admin_id' not in session:
+        flash('Debes iniciar sesión como administrador.', 'error')
+        return redirect('/admin/login')
+    return render_template('admin/system_status.html')
