@@ -1,245 +1,60 @@
 # DiversIA - Neurodivergent Employment Platform
 
 ## Overview
-
-DiversIA is a web-based employment platform designed to connect neurodivergent individuals with inclusive employers. The platform features specialized registration forms tailored to different neurodivergence types (TDAH, TEA, Dislexia), gamified assessment tests, and a community space for networking and support. Built with accessibility as a core principle, the platform uses warm color palettes, generous spacing, and comprehensive accessibility controls to reduce cognitive load and ensure usability for all users.
+DiversIA is a web-based employment platform designed to connect neurodivergent individuals with inclusive employers. It features specialized registration forms for different neurodivergence types (TDAH, TEA, Dislexia, Discalculia, Tourette, Dispraxia, Ansiedad, Bipolar, Altas Capacidades), gamified assessment tests (planned), and a community space. The platform prioritizes accessibility, using warm color palettes, generous spacing, and comprehensive accessibility controls to reduce cognitive load and ensure usability. It also integrates a comprehensive CRM system for business management and analytics, aiming to be a complete solution for both neurodivergent job seekers and inclusive employers.
 
 ## User Preferences
-
 Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
 ### Frontend Architecture
-- **Template Engine**: Jinja2 templates with Flask for server-side rendering
-- **CSS Framework**: Bootstrap 5.3.0 for responsive design and accessibility features
-- **Icon System**: Lucide icons for consistent and accessible iconography
-- **Custom Styling**: CSS custom properties (variables) for consistent theming and accessibility features
-- **Accessibility Features**: Built-in accessibility controls including font size adjustment, dark mode, high contrast mode, and animation controls
+The frontend is built using Jinja2 templates with Flask for server-side rendering. It leverages Bootstrap 5.3.0 for responsive design and accessibility, and Lucide icons for consistent iconography. Custom CSS properties are used for theming. A key feature is the built-in accessibility toolbar allowing users to adjust font size, enable dark mode, high contrast mode, and control animations.
 
 ### Backend Architecture
-- **Web Framework**: Flask with modular structure separating models, routes, and forms
-- **Database ORM**: SQLAlchemy with declarative base for database operations
-- **Form Handling**: Flask-WTF with WTForms for secure form processing and validation
-- **Security**: Comprehensive security headers, CSRF protection, and input validation
-- **Application Structure**: Modular design with separate files for models, routes, forms, and configuration
-- **Admin System**: Role-based authentication with session management and permission controls
-- **CRM Integration**: Complete business management with automatic form tracking and data analytics
+The backend is a Flask application with a modular structure, separating models, routes, and forms. SQLAlchemy is used for ORM operations, and Flask-WTF handles secure form processing and validation. Security measures include comprehensive security headers, CSRF protection, and input validation. The application has a role-based admin system with session management and permission controls, integrating a complete business management CRM with automatic form tracking and data analytics.
 
 ### Data Models
-- **User Model**: Stores neurodivergent individual profiles with specialized fields for different conditions
-- **Company Model**: Manages employer information and contact details
-- **JobOffer Model**: Links companies to job postings with neurodivergence-specific requirements
-- **TestResult Model**: Placeholder for gamified assessment results (incomplete implementation)
-- **Admin Model**: Administrator accounts with role-based permissions
-- **CrmContact Model**: Additional business contacts (partners, providers, media, investors)
-- **FormSubmission Model**: Automatic tracking of all web form submissions with metadata
-- **Partner Model**: Business partnerships and collaborations management
-- **SocialMediaAccount Model**: Social media presence tracking and management
-- **Task Model**: Internal task management and assignment system
-- **Metric Model**: Business KPIs and performance metrics tracking
+Core data models include: User (neurodivergent profiles), Company, JobOffer, Admin, CrmContact (business contacts), FormSubmission (tracked web forms), Partner, SocialMediaAccount, Task, and Metric. TestResult is a planned model for gamified assessments.
 
 ### Form Architecture
-- **Inheritance-based Forms**: Base `RegistroGeneralForm` extended by condition-specific forms
-- **Custom Field Types**: `MultiCheckboxField` for accessibility-friendly multi-select options
-- **Validation Strategy**: Comprehensive server-side validation with user-friendly error messaging
-- **Specialized Forms**: Separate forms for TDAH, Dislexia, TEA with condition-specific fields
+Forms are inheritance-based, extending a base `RegistroGeneralForm` with specialized versions for TDAH, Dislexia, and TEA, containing condition-specific fields. Custom field types like `MultiCheckboxField` enhance accessibility. Server-side validation with user-friendly error messages is a priority.
 
 ### Accessibility Architecture
-- **Universal Design**: Color-coded system for different neurodivergence types while maintaining accessibility
-- **Interactive Controls**: JavaScript-powered accessibility toolbar with persistent settings
-- **Screen Reader Support**: Semantic HTML, ARIA labels, and skip navigation links
-- **Cognitive Load Reduction**: Generous spacing, large border radius, and reduced visual clutter
+The platform employs universal design principles, including a color-coded system for neurodivergence types that maintains accessibility. An interactive JavaScript-powered accessibility toolbar allows persistent settings. Semantic HTML, ARIA labels, and skip navigation links support screen readers. Cognitive load is reduced through generous spacing, large border radii, and minimized visual clutter.
+
+### AI Integration
+The platform integrates an intelligent AI agent system powered by Mistral AI, featuring a chat system with contextual understanding, intent detection, and response generation. It uses a hybrid system for responses, leveraging a local knowledge base with fallback to cloud services for analytics and complex queries.
 
 ## External Dependencies
 
 ### Frontend Dependencies
-- **Bootstrap 5.3.0**: UI framework for responsive design and accessibility components
-- **Lucide Icons**: Modern icon library with accessibility features
-- **Custom JavaScript**: Accessibility controls and carousel functionality without heavy frameworks
+- **Bootstrap 5.3.0**: UI framework.
+- **Lucide Icons**: Icon library.
+- **Custom JavaScript**: For accessibility controls and UI enhancements.
 
 ### Backend Dependencies
-- **Flask**: Lightweight web framework for Python applications
-- **Flask-SQLAlchemy**: Database ORM integration for Flask
-- **Flask-WTF**: Form handling and CSRF protection
-- **WTForms**: Form validation and rendering library
-- **Werkzeug**: WSGI utilities including ProxyFix for deployment
-- **SendGrid**: Email service for automated notifications and form submissions
+- **Flask**: Web framework.
+- **Flask-SQLAlchemy**: ORM integration.
+- **Flask-WTF**: Form handling and CSRF protection.
+- **WTForms**: Form validation.
+- **Werkzeug**: WSGI utilities.
+- **SendGrid**: Email service for notifications.
+- **Mistral AI**: Powers the intelligent AI agent system.
 
 ### Database
-- **PostgreSQL**: Production database with environment variables configuration
-- **SQLAlchemy ORM**: Full relational database support with migration capabilities
+- **PostgreSQL**: Production database.
+- **SQLAlchemy ORM**: Full relational database support.
+- **SQLite**: Fallback database for development/testing.
 
 ### Communication & CRM Integration
-- **SendGrid API**: Automated email notifications to diversiaeternals@gmail.com
-- **CRM Export Module**: CSV and JSON export capabilities for HubSpot, Salesforce integration
-- **Social Media Integration**: Direct links to Discord, Instagram, LinkedIn, and email contact
-- **Telegram Support**: Official support channel https://t.me/DiversiaSupport for real-time assistance
+- **SendGrid API**: For automated email notifications (e.g., to diversiaeternals@gmail.com).
+- **HubSpot, Salesforce**: CRM export capabilities (CSV and JSON).
+- **Discord, Instagram, LinkedIn**: Direct social media links.
+- **Telegram**: Official support channel (https://t.me/DiversiaSupport).
+- **Metricool**: Analytics integration for social media management.
+- **n8n.cloud**: Webhook integration for chat and user tracking.
 
 ### Security & Deployment
-- **Environment Configuration**: Secure configuration via environment variables
-- **Security Headers**: Comprehensive security header implementation
-- **Session Management**: Secure session handling with configurable secret keys
-- **WSGI Deployment**: Production-ready with ProxyFix middleware
-
-## Recent Updates (2025-08-20)
-
-### Admin-Only CRM System Implementation (COMPLETE)
-- ✓ Implemented comprehensive admin authentication system with secure login
-- ✓ Created admin-only CRM dashboard with role-based access control
-- ✓ Built complete business management system including:
-  - Contact management (web form submissions + manual CRM contacts)
-  - Company and job offer administration
-  - Partner and collaboration tracking
-  - Social media account management
-  - Task management and assignment system
-  - Business metrics and KPI tracking
-- ✓ Automatic form submission tracking for all web forms
-- ✓ Real-time statistics dashboard with neurodivergence and sector analytics
-- ✓ Robust fallback system ensuring CRM functionality regardless of database status
-- ✓ Adaptive navigation: Admin login for non-authenticated users, CRM access for admins
-- ✓ Admin credentials: admin / diversia2025 (change in production)
-- ✓ Complete API endpoints for CRUD operations on all business entities
-
-### Email Contact System Optimization (COMPLETE)  
-- ✓ Replaced problematic mailto: links with direct form redirection
-- ✓ All email contact buttons now redirect to /contacto form page
-- ✓ Updated "Sobre Nosotros" page email button for consistent experience
-- ✓ Gmail SMTP integration working reliably with app password authentication
-
-### Database Architecture Enhancement (COMPLETE)
-- ✓ Added comprehensive business models: CrmContact, FormSubmission, Partner, SocialMediaAccount, Task, Metric
-- ✓ Intelligent database connection handling with SQLite fallback
-- ✓ Automatic form submission logging for CRM analytics
-- ✓ Export tracking and audit trail functionality
-- ✓ Admin user management with permissions system
-
-## Recent Updates (2025-08-18)
-
-### Neurodiversity Expansion & Resources Implementation (COMPLETE)
-- ✓ Expanded from 3 to 9 neurodivergence types: TDAH, TEA, Dislexia, Discalculia, Tourette, Dispraxia, Ansiedad, Bipolar, Altas Capacidades
-- ✓ Created specialized registration forms for each neurodivergence type with specific fields
-- ✓ Implemented comprehensive 27-page PDF guide for job preparation targeting neurodivergent individuals
-- ✓ Added functional video resources section with authentic educational content from recognized organizations
-- ✓ Created podcast planning page with launch strategy and technical requirements
-- ✓ Integrated official Telegram support channel: https://t.me/DiversiaSupport
-- ✓ All contact systems now fully functional (email and Telegram)
-- ✓ Resource downloads and links working with real educational content
-
-### Educational Content Integration (COMPLETE)
-- ✓ Curated authentic video resources from NeurodiverSí, Microsoft, Fundación Neurodiversidad, FLEDNI
-- ✓ All resources are free, in Spanish, and from verified neurodiversity organizations
-- ✓ Content covers inclusion strategies, business cases, practical adaptations, and professional training
-- ✓ Implemented categorized resource structure (Educational, Success Cases, Training, Professional)
-
-## Previous Updates (2025-01-18)
-
-### Accessibility System Redesign (COMPLETE)
-- ✓ Rediseñado sistema de accesibilidad para claridad total
-- ✓ Modo normal: fondo blanco, texto negro claro sin problemas de contraste
-- ✓ Modo oscuro: fondo negro (#1a1a1a), texto blanco puro
-- ✓ Alto contraste: negro/blanco estricto (#000000/#FFFFFF) sin grises
-- ✓ Eliminados problemas de superposición en controles y footer
-- ✓ Añadidos iconos de redes sociales en barra de accesibilidad (Discord, Instagram, LinkedIn, Email)
-- ✓ Restaurado texto "DiversIA" en header (usuario prefiere texto sobre logo)
-
-### Chat System Optimization (COMPLETE)  
-- ✓ Fixed chat responses to be concise and direct
-- ✓ Simple greetings ("Hola") now return short, friendly responses  
-- ✓ Detailed information only provided when specifically requested
-- ✓ Improved user experience with appropriate response length
-- ✓ Banner de cookies RGPD compliant implementado completamente
-- ✓ Sistema de traducción corregido para todas las secciones
-
-## Previous Updates (2025-01-17)
-
-### Intelligent AI Agent System (IMPLEMENTED)
-- ✓ Fully functional AI agent powered by Mistral AI
-- ✓ Advanced chat system with contextual understanding
-- ✓ Intelligent intent detection and response generation
-- ✓ Multi-source data integration architecture designed
-- ✓ Enterprise-grade security system implemented
-- ✓ Comprehensive API v2 endpoints for all AI functionality
-- ✓ Real-time data processing and analytics
-- ✓ Robust fallback systems for 99.9% availability
-
-### Metricool Analytics Integration (COMPLETE)
-- ✓ Integrated Metricool tracking script for automated social media management
-- ✓ Configured analytics hash: fabe37fc5c74e614c28f4a6b6d224a76
-- ✓ Script optimized for performance and included in all pages
-- ✓ Real-time tracking for publication automation and report control
-
-### Intelligent Chat System Fixes (COMPLETE)
-- ✓ Fixed chatbot responses to provide DiversIA-specific information
-- ✓ Created comprehensive knowledge base with company details
-- ✓ Intelligent intent detection for better user experience
-- ✓ Local AI system with fallback to n8n cloud service
-- ✓ Real-time responses about CEO, contact info, services, and processes
-- ✓ Hybrid system: Local responses + n8n tracking for analytics
-
-### Translation System Enhancement (COMPLETE)
-- ✓ Fixed translator to work without page reloads between language changes
-- ✓ Implemented intelligent content restoration system
-- ✓ Added automatic reinitialization of icons and chat widget after translation
-- ✓ Original content preservation for seamless language switching
-
-### n8n Chat Integration (COMPLETE)
-- ✓ Chat widget fully functional with intelligent fallback responses
-- ✓ Application URL: `https://073083d2-dd14-424e-a549-4c03e48131b7-00-1vatfbc2lts0v.janeway.replit.dev/`
-- ✓ n8n.cloud webhook configured: `https://pepmorenocreador.app.n8n.cloud/webhook-test/diversia-chat`
-- ✓ Webhook properly activated and path verified from user screenshot
-- ✓ Full integration between DiversIA chat and n8n intelligent agent
-- ✓ Real-time chat responses with user insights and statistics
-- ✓ Created comprehensive setup guides for both local and cloud configurations
-
-## Previous Updates (2025-01-14)
-
-### Translation System (CRITICAL FIX)
-- ✓ Implemented 100% functional Google Translate integration
-- ✓ Robust error handling and retry mechanisms
-- ✓ Support for 9 languages with visual indicators
-- ✓ Automatic language preference restoration
-- ✓ Professional error messaging and loading states
-- ✓ Complete replacement of AVADIS broken links with working Spanish dyslexia tests
-
-### Content Updates
-- ✓ Replaced non-functional AVADIS link with working Spanish dyslexia test providers
-- ✓ Added Upbility Spanish dyslexia test (validated with 86% reliability)
-- ✓ Added Espacio Autismo evaluation system
-- ✓ All new links tested and verified functional
-
-### n8n Agent Integration (2025-01-15)
-- ✓ Created comprehensive API endpoints for agent integration
-- ✓ Built intelligent chat widget with professional UI
-- ✓ Implemented webhooks for real-time chat and user tracking
-- ✓ Added lead scoring system for sales funnel optimization
-- ✓ Created user insights and analytics endpoints
-- ✓ Integrated chat widget in all pages with session management
-- ✓ Added comprehensive n8n integration guide
-
-## Previous Updates (2025-01-13)
-
-### Social Media & Communication
-- ✓ Added direct links to DiversIA social media accounts (Discord, Instagram, LinkedIn)
-- ✓ Integrated email contact (diversiaeternals@gmail.com) in footer
-- ✓ All social links open in new tabs with proper security attributes
-
-### Email Integration
-- ✓ Automated email notifications for all form submissions
-- ✓ SendGrid integration with HTML-formatted emails
-- ✓ Separate email templates for user registrations and company registrations
-- ✓ All form data automatically sent to diversiaeternals@gmail.com
-
-### Associations Section
-- ✓ Created new "Asociaciones" page with directory of neurodivergent-related organizations
-- ✓ Filterable directory by neurodivergence type, location, and services
-- ✓ Sample associations for TDAH, TEA, Dislexia, and general support
-- ✓ Contact information and direct links to association websites
-- ✓ Call-to-action for new associations to join the directory
-
-### CRM Integration Capabilities
-- ✓ Enhanced database models with CRM export tracking
-- ✓ CSV and JSON export functionality for external CRM systems
-- ✓ Export audit logging with timestamps and status tracking
-- ✓ Ready-to-use formatters for HubSpot and Salesforce integration
-- ✓ Automated marking of exported records to prevent duplicates
+- **Environment Variables**: For secure configuration.
+- **WSGI**: Production-ready deployment.
