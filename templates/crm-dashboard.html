@@ -490,7 +490,7 @@ class DiversiaCRM {
                         if (data.success) {
                             this.employees = data.employees;
                             this.updateAllDropdowns();
-                            console.log('✅ ' + this.employees.length + ' empleados cargados para asignación');
+                            console.log(\`✅ \${this.employees.length} empleados cargados para asignación\`);
                         }
                     } catch (error) {
                         console.error('Error cargando empleados para asignación:', error);
@@ -536,7 +536,7 @@ class DiversiaCRM {
                             id: employee.id,
                             name: employee.name
                         });
-                        option.textContent = employee.name + ' (' + employee.position + ')';
+                        option.textContent = \`\${employee.name} (\${employee.position})\`;
                         
                         if (employee.name === currentAssignment) {
                             option.selected = true;
@@ -555,7 +555,7 @@ class DiversiaCRM {
                     try {
                         const assignmentData = JSON.parse(selectedValue);
                         
-                        const response = await fetch('/api/tasks/' + taskId + '/assign', {
+                        const response = await fetch(\`/api/tasks/\${taskId}/assign\`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -567,11 +567,11 @@ class DiversiaCRM {
                         const result = await response.json();
                         
                         if (result.success) {
-                            this.showNotification('✅ Tarea asignada a ' + assignmentData.name, 'success');
+                            this.showNotification(\`✅ Tarea asignada a \${assignmentData.name}\`, 'success');
                             selectElement.style.backgroundColor = '#d4edda';
                             setTimeout(() => selectElement.style.backgroundColor = '', 2000);
                         } else {
-                            this.showNotification('❌ Error: ' + result.error, 'error');
+                            this.showNotification(\`❌ Error: \${result.error}\`, 'error');
                         }
                         
                     } catch (error) {
@@ -582,9 +582,12 @@ class DiversiaCRM {
                 
                 showNotification(message, type = 'info') {
                     const toast = document.createElement('div');
-                    toast.className = 'alert alert-' + (type === 'success' ? 'success' : 'danger') + ' alert-dismissible fade show position-fixed';
+                    toast.className = \`alert alert-\${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed\`;
                     toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-                    toast.innerHTML = '<div>' + message + '</div><button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                    toast.innerHTML = \`
+                        \${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    \`;
                     
                     document.body.appendChild(toast);
                     setTimeout(() => toast.remove(), 3000);
