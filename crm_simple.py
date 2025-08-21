@@ -318,7 +318,7 @@ def api_stats_simple():
         'total_users': len(SAMPLE_CRM_DATA['contacts']),
         'total_companies': len(SAMPLE_CRM_DATA['companies']),
         'total_job_offers': len(SAMPLE_CRM_DATA['job_offers']),
-        'active_job_offers': len([offer for offer in SAMPLE_CRM_DATA['job_offers'] if offer['active']]),
+        'active_job_offers': len([offer for offer in SAMPLE_CRM_DATA.get('job_offers', []) if offer.get('active', True)]),
         'total_associations': len(SAMPLE_CRM_DATA['associations']),
         'total_employees': len(SAMPLE_CRM_DATA['employees']),
         'total_tasks': len(SAMPLE_CRM_DATA['tasks']),

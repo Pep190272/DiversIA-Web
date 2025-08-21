@@ -343,6 +343,9 @@ class DiversiaCRM {
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
+        
+        // Inicializar sistema de asignación de tareas después de cargar datos
+        this.initTaskAssignments();
     }
 
     async loadStats() {
@@ -409,20 +412,22 @@ class DiversiaCRM {
                 <tr>
                     <td>
                         <strong>${task.title}</strong>
-                        <br><small class="text-muted">${task.description || 'Sin descripción'}</small>
+                        <br><small class="text-muted">${task.description || task.notes || 'Sin descripción'}</small>
                     </td>
-                    <td>${task.assigned_to}</td>
+                    <td>
+                        <span class="task-assignment" data-task-id="${task.id}">${task.assigned_to}</span>
+                    </td>
                     <td><span class="badge bg-${this.getPriorityColor(task.priority)}">${task.priority}</span></td>
                     <td>
                         <select class="form-select form-select-sm" onchange="updateTaskStatus(${task.id}, this.value)">
-                            <option value="pending" ${task.status === 'pending' ? 'selected' : ''}>Pendiente</option>
-                            <option value="in_progress" ${task.status === 'in_progress' ? 'selected' : ''}>En Marcha</option>
-                            <option value="completed" ${task.status === 'completed' ? 'selected' : ''}>Realizada</option>
+                            <option value="Pendiente" ${task.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="En progreso" ${task.status === 'En progreso' ? 'selected' : ''}>En Progreso</option>
+                            <option value="Completada" ${task.status === 'Completada' ? 'selected' : ''}>Completada</option>
                         </select>
                     </td>
                     <td><span class="badge bg-info">${task.category}</span></td>
-                    <td>${task.estimated_hours}h</td>
-                    <td>${task.actual_hours}h</td>
+                    <td>${task.estimated_time || task.estimated_hours || '0h'}</td>
+                    <td>${task.actual_time || task.actual_hours || '0h'}</td>
                     <td>${task.due_date || 'Sin fecha'}</td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary me-1" onclick="editTask(${task.id})" title="Editar tarea">
@@ -440,13 +445,164 @@ class DiversiaCRM {
     }
 
     getPriorityColor(priority) {
-        switch(priority) {
+        switch(priority?.toLowerCase()) {
+            case 'urgente':
+            case 'crítica': 
             case 'urgent': return 'danger';
+            case 'alta':
             case 'high': return 'warning';
+            case 'media':
             case 'medium': return 'primary';
+            case 'baja':
             case 'low': return 'secondary';
             default: return 'secondary';
         }
+    }
+    
+    initTaskAssignments() {
+        // Inicializar sistema de asignación de tareas si está disponible
+        setTimeout(() => {
+            if (window.taskAssignmentManager) {
+                window.taskAssignmentManager.refresh();
+            } else {
+                // Crear instancia del manager si no existe
+                this.createTaskAssignmentManager();
+            }
+        }, 500);
+    }
+    
+    createTaskAssignmentManager() {
+        // Crear script dinámicamente para el sistema de asignaciones
+        const script = document.createElement('script');
+        script.innerHTML = \`
+            class TaskAssignmentManager {
+                constructor() {
+                    this.employees = [];
+                    this.loadEmployees();
+                    this.initializeAssignmentDropdowns();
+                }
+                
+                async loadEmployees() {
+                    try {
+                        const response = await fetch('/api/employees');
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.employees = data.employees;
+                            this.updateAllDropdowns();
+                            console.log(\`✅ \${this.employees.length} empleados cargados para asignación\`);
+                        }
+                    } catch (error) {
+                        console.error('Error cargando empleados para asignación:', error);
+                    }
+                }
+                
+                initializeAssignmentDropdowns() {
+                    document.querySelectorAll('.task-assignment').forEach(element => {
+                        this.createAssignmentDropdown(element);
+                    });
+                }
+                
+                createAssignmentDropdown(element) {
+                    const taskId = element.dataset.taskId;
+                    const currentAssignment = element.textContent.trim();
+                    
+                    const select = document.createElement('select');
+                    select.className = 'form-select form-select-sm';
+                    select.dataset.taskId = taskId;
+                    select.style.minWidth = '160px';
+                    
+                    select.addEventListener('change', (e) => {
+                        this.handleAssignmentChange(e.target);
+                    });
+                    
+                    element.parentNode.replaceChild(select, element);
+                    this.updateDropdown(select, currentAssignment);
+                }
+                
+                updateAllDropdowns() {
+                    document.querySelectorAll('select[data-task-id]').forEach(select => {
+                        const currentValue = select.value;
+                        this.updateDropdown(select, currentValue);
+                    });
+                }
+                
+                updateDropdown(selectElement, currentAssignment = '') {
+                    selectElement.innerHTML = '<option value="">Seleccionar empleado...</option>';
+                    
+                    this.employees.forEach(employee => {
+                        const option = document.createElement('option');
+                        option.value = JSON.stringify({
+                            id: employee.id,
+                            name: employee.name
+                        });
+                        option.textContent = \`\${employee.name} (\${employee.position})\`;
+                        
+                        if (employee.name === currentAssignment) {
+                            option.selected = true;
+                        }
+                        
+                        selectElement.appendChild(option);
+                    });
+                }
+                
+                async handleAssignmentChange(selectElement) {
+                    const taskId = selectElement.dataset.taskId;
+                    const selectedValue = selectElement.value;
+                    
+                    if (!selectedValue) return;
+                    
+                    try {
+                        const assignmentData = JSON.parse(selectedValue);
+                        
+                        const response = await fetch(\`/api/tasks/\${taskId}/assign\`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                assigned_to_id: assignmentData.id,
+                                assigned_to_name: assignmentData.name
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            this.showNotification(\`✅ Tarea asignada a \${assignmentData.name}\`, 'success');
+                            selectElement.style.backgroundColor = '#d4edda';
+                            setTimeout(() => selectElement.style.backgroundColor = '', 2000);
+                        } else {
+                            this.showNotification(\`❌ Error: \${result.error}\`, 'error');
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error asignando tarea:', error);
+                        this.showNotification('❌ Error de conexión', 'error');
+                    }
+                }
+                
+                showNotification(message, type = 'info') {
+                    const toast = document.createElement('div');
+                    toast.className = \`alert alert-\${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed\`;
+                    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                    toast.innerHTML = \`
+                        \${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    \`;
+                    
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3000);
+                }
+                
+                refresh() {
+                    this.loadEmployees();
+                }
+            }
+            
+            // Inicializar manager
+            window.taskAssignmentManager = new TaskAssignmentManager();
+        \`;
+        
+        document.head.appendChild(script);
     }
 
     async loadContacts() {

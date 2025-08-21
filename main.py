@@ -37,6 +37,13 @@ try:
     
 except Exception as e:
     print(f"⚠️ Error cargando gestor de persistencia: {e}")
+
+# Cargar sistema de asignación de tareas
+try:
+    import task_assignment_system  # noqa: F401
+    print("✅ Sistema de asignación de tareas cargado")
+except Exception as e:
+    print(f"⚠️ Error cargando sistema de asignación: {e}")
 from api_endpoints import api
 from chat_webhook import chat
 from chat_intelligent_endpoint import intelligent_chat

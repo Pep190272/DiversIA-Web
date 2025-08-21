@@ -157,7 +157,7 @@
       "created_at": "2024-08-01",
       "completed_at": "2024-08-01",
       "assigned_to_id": 1,
-      "updated_at": "2025-08-21T08:57:05.274181"
+      "updated_at": "2025-08-21T08:56:09.034575"
     },
     {
       "id": 2,
@@ -278,8 +278,8 @@
     }
   ],
   "metadata": {
-    "last_updated": "2025-08-21T08:57:05.275896",
+    "last_updated": "2025-08-21T08:56:09.034936",
     "version": "1.0",
-    "total_interactions": 7
+    "total_interactions": 6
   }
 }
