@@ -911,262 +911,85 @@ def podcast_diversia():
 @app.route('/registro-asociacion', methods=['GET', 'POST'])
 def registro_asociacion():
     """Formulario para registro de nuevas asociaciones"""
-    from forms import AsociacionForm
-    from models import Asociacion
-    import json
-    from flask import request
-    
-    form = AsociacionForm()
-    
-    if form.validate_on_submit():
+    if request.method == 'POST':
         try:
-            # Crear nueva asociación
-            nueva_asociacion = Asociacion()
+            # Recoger datos del formulario
+            data = {
+                'nombre_asociacion': request.form.get('nombre_asociacion'),
+                'acronimo': request.form.get('acronimo'),
+                'pais': request.form.get('pais'),
+                'ciudad': request.form.get('ciudad'),
+                'email': request.form.get('email'),
+                'telefono': request.form.get('telefono'),
+                'tipo_documento': request.form.get('tipo_documento'),
+                'numero_documento': request.form.get('numero_documento'),
+                'neurodivergencias_atendidas': ','.join(request.form.getlist('neurodivergencias_atendidas')),
+                'servicios': ','.join(request.form.getlist('servicios')),
+                'descripcion': request.form.get('descripcion'),
+                'años_funcionamiento': request.form.get('anos_funcionamiento'),
+                'contacto_nombre': request.form.get('contacto_nombre'),
+                'contacto_cargo': request.form.get('contacto_cargo')
+            }
             
-            # Información básica
-            nueva_asociacion.nombre_asociacion = form.nombre_asociacion.data
-            nueva_asociacion.acronimo = form.acronimo.data
-            nueva_asociacion.pais = form.pais.data
-            nueva_asociacion.otro_pais = form.otro_pais.data if form.pais.data == 'OTHER' else None
+            # Crear asociación en SQLite
+            from models import Asociacion
+            from app import db
             
-            # Información legal
-            nueva_asociacion.tipo_documento = form.tipo_documento.data
-            nueva_asociacion.numero_documento = form.numero_documento.data
-            nueva_asociacion.descripcion_otro_documento = form.descripcion_otro_documento.data
+            asociacion = Asociacion(
+                nombre_asociacion=data['nombre_asociacion'],
+                acronimo=data['acronimo'],
+                pais=data['pais'],
+                ciudad=data['ciudad'],
+                email=data['email'],
+                telefono=data['telefono'],
+                tipo_documento=data['tipo_documento'],
+                numero_documento=data['numero_documento'],
+                neurodivergencias_atendidas=data['neurodivergencias_atendidas'],
+                servicios=data['servicios'],
+                descripcion=data['descripcion'],
+                años_funcionamiento=int(data['años_funcionamiento']) if data['años_funcionamiento'] else None,
+                contacto_nombre=data['contacto_nombre'],
+                contacto_cargo=data['contacto_cargo']
+            )
             
-            # Servicios y neurodivergencias (convertir listas a JSON)
-            nueva_asociacion.neurodivergencias_atendidas = json.dumps(form.neurodivergencias_atendidas.data)
-            nueva_asociacion.servicios = json.dumps(form.servicios.data)
-            nueva_asociacion.certificaciones = json.dumps(form.certificaciones.data) if form.certificaciones.data else None
-            
-            # Información de contacto
-            nueva_asociacion.ciudad = form.ciudad.data
-            nueva_asociacion.direccion = form.direccion.data
-            nueva_asociacion.telefono = form.telefono.data
-            nueva_asociacion.email = form.email.data
-            nueva_asociacion.sitio_web = form.sitio_web.data
-            nueva_asociacion.descripcion = form.descripcion.data
-            
-            # Información operativa
-            nueva_asociacion.años_funcionamiento = form.años_funcionamiento.data
-            nueva_asociacion.numero_socios = form.numero_socios.data
-            
-            # Contacto responsable
-            nueva_asociacion.contacto_nombre = form.contacto_nombre.data
-            nueva_asociacion.contacto_cargo = form.contacto_cargo.data
-            
-            # Información de auditoría
-            nueva_asociacion.ip_solicitud = request.remote_addr
-            nueva_asociacion.user_agent = request.user_agent.string[:500]
-            nueva_asociacion.estado = 'pendiente'  # Por defecto pendiente de verificación
-            
-            # Guardar en base de datos
-            db.session.add(nueva_asociacion)
+            db.session.add(asociacion)
             db.session.commit()
             
-            # Enviar notificación por email
-            try:
-                from sendgrid_helper import send_notification_email
-                
-                # Preparar datos para la notificación
-                asociacion_data = {
-                    'nombre_asociacion': nueva_asociacion.nombre_asociacion,
-                    'pais': nueva_asociacion.pais,
-                    'ciudad': nueva_asociacion.ciudad,
-                    'email': nueva_asociacion.email,
-                    'telefono': nueva_asociacion.telefono,
-                    'neurodivergencias': ', '.join(form.neurodivergencias_atendidas.data),
-                    'servicios': ', '.join(form.servicios.data),
-                    'contacto_nombre': nueva_asociacion.contacto_nombre,
-                    'contacto_cargo': nueva_asociacion.contacto_cargo,
-                    'tipo_documento': nueva_asociacion.tipo_documento,
-                    'numero_documento': nueva_asociacion.numero_documento,
-                    'años_funcionamiento': nueva_asociacion.años_funcionamiento,
-                    'numero_socios': nueva_asociacion.numero_socios
-                }
-                
-                send_notification_email(asociacion_data, "Nueva Solicitud de Asociación")
-                
-            except ImportError:
-                print("SendGrid no disponible - notificación no enviada")
-            except Exception as e:
-                print(f"Error enviando notificación: {e}")
+            # Enviar email de notificación
+            from sendgrid_helper import send_email
+            subject = f"Nueva Asociación Registrada - {data['nombre_asociacion']}"
+            html_content = f"""
+            <h2>🏢 Nueva Asociación Registrada</h2>
+            <p><strong>Nombre:</strong> {data['nombre_asociacion']}</p>
+            <p><strong>País:</strong> {data['pais']}</p>
+            <p><strong>Ciudad:</strong> {data['ciudad']}</p>
+            <p><strong>Email:</strong> {data['email']}</p>
+            <p><strong>Neurodivergencias:</strong> {data['neurodivergencias_atendidas']}</p>
+            <p><strong>Servicios:</strong> {data['servicios']}</p>
+            <hr>
+            <p>Panel: <a href="http://localhost:5000/admin/login-new">CRM</a></p>
+            """
             
-            # NUEVA FUNCIONALIDAD: Integración automática con CRM
+            email_success = send_email('diversiaeternals@gmail.com', subject, html_content)
+            print(f"✅ Email asociación enviado: {email_success}")
+            
+            # Guardar en CRM
             try:
                 from form_integration_service import process_form_submission
-                association_data_crm = {
-                    'nombre_asociacion': nueva_asociacion.nombre_asociacion,
-                    'acronimo': nueva_asociacion.acronimo,
-                    'pais': nueva_asociacion.pais,
-                    'ciudad': nueva_asociacion.ciudad,
-                    'tipo_documento': nueva_asociacion.tipo_documento,
-                    'numero_documento': nueva_asociacion.numero_documento,
-                    'email': nueva_asociacion.email,
-                    'telefono': nueva_asociacion.telefono,
-                    'sitio_web': nueva_asociacion.sitio_web,
-                    'descripcion': nueva_asociacion.descripcion,
-                    'numero_miembros': nueva_asociacion.numero_socios,
-                    'año_fundacion': 2024 - nueva_asociacion.años_funcionamiento if nueva_asociacion.años_funcionamiento else None
-                }
-                crm_id = process_form_submission('registro_asociacion', association_data_crm, 'web_form_asociacion')
+                crm_id = process_form_submission('registro_asociacion', data, 'web_form_asociacion')
                 if crm_id:
-                    print(f"✅ Asociación añadida automáticamente al CRM con ID: {crm_id}")
+                    print(f"✅ Asociación añadida al CRM con ID: {crm_id}")
             except Exception as e:
                 print(f"⚠️ Error integrando asociación con CRM: {e}")
             
-            flash('¡Solicitud de asociación enviada exitosamente! Tu asociación se ha añadido a nuestra red. La revisaremos y nos pondremos en contacto contigo pronto.', 'success')
-            return redirect(url_for('asociaciones'))
+            flash('¡Asociación registrada exitosamente! Te contactaremos pronto.', 'success')
+            return redirect(url_for('registro_asociacion'))
             
         except Exception as e:
-            db.session.rollback()
-            flash('Error al procesar la solicitud. Por favor, inténtalo de nuevo.', 'error')
-            print(f"Error en registro de asociación: {e}")
+            print(f"❌ Error registrando asociación: {e}")
+            flash('Error al registrar la asociación. Por favor intenta de nuevo.', 'error')
     
-    return render_template('registro-asociacion.html', form=form)
-
-@app.route('/empresa-registro', methods=['POST'])
-def empresa_registro():
-    form = EmpresaRegistroForm()
-    if form.validate_on_submit():
-        company = Company(
-            nombre_empresa=form.nombre_empresa.data,
-            email_contacto=form.email_contacto.data,
-            telefono=form.telefono.data,
-            sector=form.sector.data,
-            tamano_empresa=form.tamano_empresa.data,
-            ciudad=form.ciudad.data
-        )
-        db.session.add(company)
-        db.session.commit()
-        
-        # Enviar email de notificación
-        company_data = {
-            'nombre': form.nombre_empresa.data,
-            'contacto_email': form.email_contacto.data,
-            'contacto_telefono': form.telefono.data,
-            'sector': form.sector.data,
-            'tamaño': form.tamano_empresa.data,
-            'ubicacion': form.ciudad.data,
-            'sitio_web': 'N/A',
-            'contacto_nombre': 'N/A',
-            'experiencia_neurodivergentes': False,
-            'politicas_inclusion': 'N/A',
-            'adaptaciones_disponibles': 'N/A'
-        }
-        send_company_registration_notification(company_data)
-        
-        # NUEVA FUNCIONALIDAD: Integración automática con CRM
-        try:
-            from form_integration_service import process_form_submission
-            crm_id = process_form_submission('registro_empresa', company_data, 'web_form_empresa')
-            if crm_id:
-                print(f"✅ Empresa añadida automáticamente al CRM con ID: {crm_id}")
-        except Exception as e:
-            print(f"⚠️ Error integrando empresa con CRM: {e}")
-        
-        flash('¡Empresa registrada exitosamente! Te contactaremos pronto para comenzar tu programa de inclusión laboral.', 'success')
-    return redirect(url_for('empresas'))
-
-@app.route('/ofertas-empleo', methods=['POST'])
-def crear_oferta():
-    try:
-        # Obtener datos del formulario directamente
-        data = {
-            'titulo_puesto': request.form.get('titulo_puesto'),
-            'descripcion': request.form.get('descripcion'),
-            'tipo_contrato': request.form.get('tipo_contrato'),
-            'modalidad_trabajo': request.form.get('modalidad_trabajo'),
-            'salario_min': request.form.get('salario_min'),
-            'salario_max': request.form.get('salario_max'),
-            'requisitos': request.form.get('requisitos'),
-            'adaptaciones_disponibles': request.form.get('adaptaciones_disponibles'),
-            'neurodivergencias_target': request.form.getlist('neurodivergencias_target')
-        }
-        
-        # Buscar la última empresa registrada como company_id por defecto
-        last_company = Company.query.order_by(Company.id.desc()).first()
-        company_id = last_company.id if last_company else 1
-        
-        # Crear oferta de trabajo
-        offer = JobOffer(
-            company_id=company_id,
-            titulo_puesto=data['titulo_puesto'],
-            descripcion=data['descripcion'],
-            tipo_contrato=data['tipo_contrato'],
-            modalidad_trabajo=data['modalidad_trabajo'],
-            salario_min=int(data['salario_min']) if data['salario_min'] else None,
-            salario_max=int(data['salario_max']) if data['salario_max'] else None,
-            requisitos=data['requisitos'],
-            adaptaciones_disponibles=data['adaptaciones_disponibles'],
-            neurodivergencias_target=','.join(data['neurodivergencias_target']) if data['neurodivergencias_target'] else ''
-        )
-        
-        # Guardar en base de datos
-        db.session.add(offer)
-        db.session.commit()
-        
-        # Enviar notificación por email
-        from sendgrid_helper import send_email
-        subject = f"Nueva Oferta de Trabajo - {data['titulo_puesto']}"
-        html_content = f"""
-        <h2>💼 Nueva Oferta de Trabajo</h2>
-        <p><strong>Puesto:</strong> {data['titulo_puesto']}</p>
-        <p><strong>Tipo:</strong> {data['tipo_contrato']}</p>
-        <p><strong>Modalidad:</strong> {data['modalidad_trabajo']}</p>
-        <p><strong>Salario:</strong> {data['salario_min']} - {data['salario_max']} €</p>
-        <p><strong>Descripción:</strong> {data['descripcion']}</p>
-        <p><strong>Empresa ID:</strong> {company_id}</p>
-        <hr>
-        <p>Panel: <a href="http://localhost:5000/admin/login-new">CRM</a></p>
-        """
-        email_success = send_email('diversiaeternals@gmail.com', subject, html_content)
-        print(f"✅ Email oferta enviado: {email_success}")
-        
-        # Integrar con CRM
-        try:
-            from form_integration_service import process_form_submission
-            crm_data = {
-                'titulo_puesto': data['titulo_puesto'],
-                'descripcion': data['descripcion'],
-                'tipo_contrato': data['tipo_contrato'],
-                'modalidad_trabajo': data['modalidad_trabajo'],
-                'salario_min': data['salario_min'],
-                'salario_max': data['salario_max'],
-                'company_id': company_id,
-                'created_at': datetime.now().isoformat()
-            }
-            crm_id = process_form_submission('oferta_trabajo', crm_data, 'web_form_oferta')
-            if crm_id:
-                print(f"✅ Oferta añadida al CRM con ID: {crm_id}")
-        except Exception as e:
-            print(f"⚠️ Error integrando oferta con CRM: {e}")
-        
-        flash('¡Oferta de trabajo publicada exitosamente!', 'success')
-        
-    except Exception as e:
-        print(f"❌ Error creando oferta: {e}")
-        flash('Error al crear la oferta. Por favor intenta de nuevo.', 'error')
-        
-    return redirect(url_for('empresas'))
-
-@app.route('/api/ofertas')
-def api_ofertas():
-    ofertas = JobOffer.query.filter_by(activa=True).all()
-    return jsonify([{
-        'id': oferta.id,
-        'titulo': oferta.titulo_puesto,
-        'empresa': oferta.company.nombre_empresa,
-        'modalidad': oferta.modalidad_trabajo,
-        'fecha': oferta.created_at.strftime('%d/%m/%Y')
-    } for oferta in ofertas])
-
-# Error handlers
-@app.errorhandler(404)
-def not_found_error(error):
-    return render_template('404.html'), 404
-
-@app.errorhandler(500)
-def internal_error(error):
-    db.session.rollback()
-    return render_template('500.html'), 500
+    return render_template('registro-asociacion.html')
+            
+            # NUEVA FUNCIONALIDAD: Integración automática con CRM
+            try:
