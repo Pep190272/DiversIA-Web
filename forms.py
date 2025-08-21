@@ -21,6 +21,19 @@ class RegistroGeneralForm(FlaskForm):
     experiencia_laboral = TextAreaField('Experiencia laboral', validators=[Optional()])
     formacion_academica = TextAreaField('Formación académica', validators=[Optional()])
     intereses_laborales = TextAreaField('Intereses laborales', validators=[Optional()])
+    tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', choices=[
+        ('', 'Selecciona tu tipo'),
+        ('tdah', 'TDAH'),
+        ('tea', 'TEA (Espectro Autista)'),
+        ('dislexia', 'Dislexia'),
+        ('discalculia', 'Discalculia'),
+        ('tourette', 'Síndrome de Tourette'),
+        ('dispraxia', 'Dispraxia'),
+        ('ansiedad', 'Trastornos de Ansiedad'),
+        ('bipolar', 'Trastorno Bipolar'),
+        ('altas_capacidades', 'Altas Capacidades'),
+        ('otro', 'Otro')
+    ], validators=[DataRequired(message='Selecciona tu tipo de neurodivergencia')])
     motivaciones = TextAreaField('Motivaciones y objetivos profesionales', validators=[Optional()])
     aceptar_privacidad = BooleanField('Acepto la política de privacidad', validators=[DataRequired(message='Debes aceptar la política de privacidad')])
 

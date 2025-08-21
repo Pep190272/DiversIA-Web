@@ -5,6 +5,12 @@ DiversIA is a web-based employment platform designed to connect neurodivergent i
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
+System reliability: Critical requirement - zero tolerance for 500 errors on main routes.
+
+## System Reliability
+- All form fields MUST be defined in forms.py before being used in templates
+- Route validator (route_validator.py) automatically checks critical routes
+- Critical routes that must never fail: /, /empresas, /personas-nd, /comunidad, /registro, /registro-tdah, /registro-tea, /registro-dislexia, /test, /comenzar
 
 ## System Architecture
 

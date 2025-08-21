@@ -53,6 +53,17 @@ def politica_cookies():
 def sobre_nosotros():
     return render_template('sobre-nosotros.html')
 
+# Rutas para los botones principales del inicio
+@app.route('/test')
+def test():
+    """Ruta para "Haz mi test" - redirige al registro general"""
+    return redirect(url_for('registro'))
+
+@app.route('/comenzar')
+def comenzar():
+    """Ruta para "Comenzar ahora" - redirige a personas neurodivergentes"""
+    return redirect(url_for('personas_nd'))
+
 @app.route('/contacto')
 def contacto():
     return render_template('contacto.html')
