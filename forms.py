@@ -15,7 +15,12 @@ class RegistroGeneralForm(FlaskForm):
     fecha_nacimiento = DateField('Fecha de Nacimiento', validators=[DataRequired(message='La fecha de nacimiento es obligatoria')])
     telefono = StringField('Teléfono', validators=[Optional()])
     ciudad = StringField('Ciudad', validators=[DataRequired(message='La ciudad es obligatoria')])
-    diagnostico_formal = BooleanField('¿Tienes un diagnóstico formal?')
+    diagnostico_formal = SelectField('¿Tienes un diagnóstico formal?', choices=[
+        ('', 'Selecciona una opción'),
+        ('si', 'Sí, tengo diagnóstico formal'),
+        ('no', 'No tengo diagnóstico formal'),
+        ('proceso', 'Estoy en proceso de diagnóstico')
+    ], validators=[Optional()])
     habilidades = TextAreaField('Habilidades y fortalezas', validators=[Optional()])
     adaptaciones_necesarias = TextAreaField('Adaptaciones que necesitas en el trabajo', validators=[Optional()])
     experiencia_laboral = TextAreaField('Experiencia laboral', validators=[Optional()])

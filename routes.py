@@ -916,22 +916,55 @@ def registro_asociacion():
     
     if request.method == 'POST' and form.validate_on_submit():
         try:
-            # Recoger datos del formulario
+            # Verificar y convertir años_funcionamiento
+            años_funcionamiento_valor = form.años_funcionamiento.data
+            try:
+                años_funcionamiento_int = int(años_funcionamiento_valor) if años_funcionamiento_valor else None
+            except (ValueError, TypeError):
+                años_funcionamiento_int = None
+            
+            # Crear nueva asociación en base de datos
+            nueva_asociacion = Asociacion(
+                nombre_asociacion=form.nombre_asociacion.data,
+                acronimo=form.acronimo.data,
+                pais=form.pais.data,
+                ciudad=form.ciudad.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                tipo_documento=form.tipo_documento.data,
+                numero_documento=form.numero_documento.data,
+                neurodivergencias_atendidas=','.join(form.neurodivergencias_atendidas.data or []),
+                servicios=','.join(form.servicios.data or []),
+                descripcion=form.descripcion.data,
+                años_funcionamiento=años_funcionamiento_int,
+                contacto_nombre=form.contacto_nombre.data,
+                contacto_cargo=form.contacto_cargo.data,
+                estado='verificando_documentacion',
+                ip_solicitud=request.remote_addr,
+                user_agent=request.user_agent.string[:500] if request.user_agent else None
+            )
+            
+            db.session.add(nueva_asociacion)
+            db.session.commit()
+            
+            # Recoger datos para email y CRM
             data = {
-                'nombre_asociacion': form.nombre_asociacion.data,
-                'acronimo': form.acronimo.data,
-                'pais': form.pais.data,
-                'ciudad': form.ciudad.data,
-                'email': form.email.data,
-                'telefono': form.telefono.data,
-                'tipo_documento': form.tipo_documento.data,
-                'numero_documento': form.numero_documento.data,
-                'neurodivergencias_atendidas': ','.join(form.neurodivergencias_atendidas.data or []),
-                'servicios': ','.join(form.servicios.data or []),
-                'descripcion': form.descripcion.data,
-                'años_funcionamiento': form.años_funcionamiento.data,
-                'contacto_nombre': form.contacto_nombre.data,
-                'contacto_cargo': form.contacto_cargo.data
+                'id': nueva_asociacion.id,
+                'nombre_asociacion': nueva_asociacion.nombre_asociacion,
+                'acronimo': nueva_asociacion.acronimo,
+                'pais': nueva_asociacion.pais,
+                'ciudad': nueva_asociacion.ciudad,
+                'email': nueva_asociacion.email,
+                'telefono': nueva_asociacion.telefono,
+                'tipo_documento': nueva_asociacion.tipo_documento,
+                'numero_documento': nueva_asociacion.numero_documento,
+                'neurodivergencias_atendidas': nueva_asociacion.neurodivergencias_atendidas,
+                'servicios': nueva_asociacion.servicios,
+                'descripcion': nueva_asociacion.descripcion,
+                'años_funcionamiento': años_funcionamiento_int,
+                'contacto_nombre': nueva_asociacion.contacto_nombre,
+                'contacto_cargo': nueva_asociacion.contacto_cargo,
+                'estado': nueva_asociacion.estado
             }
             
             # Crear asociación en SQLite
@@ -998,3 +1031,25 @@ def registro_asociacion():
 def verificacion_documentos():
     """Página de confirmación y subida de documentos para asociaciones"""
     return render_template('verificacion-documentos.html')
+
+# API para obtener asociaciones (para CRM)
+@app.route('/api/associations')
+def api_associations():
+    """API para obtener todas las asociaciones"""
+    asociaciones = Asociacion.query.all()
+    data = []
+    
+    for asoc in asociaciones:
+        data.append({
+            'id': asoc.id,
+            'name': asoc.nombre_asociacion,
+            'acronym': asoc.acronimo,
+            'country': asoc.pais,
+            'city': asoc.ciudad,
+            'email': asoc.email,
+            'neurodivergences': asoc.neurodivergencias_atendidas,
+            'status': asoc.estado,
+            'created_at': asoc.created_at.isoformat() if asoc.created_at else None
+        })
+    
+    return jsonify(data)
