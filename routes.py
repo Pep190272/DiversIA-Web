@@ -1028,9 +1028,50 @@ def crear_oferta():
             adaptaciones_disponibles=form.adaptaciones_disponibles.data,
             neurodivergencias_target=','.join(form.neurodivergencias_target.data or [])
         )
+        # Enviar notificación por email
+        offer_data = {
+            'titulo_puesto': form.titulo_puesto.data,
+            'tipo_contrato': form.tipo_contrato.data,
+            'modalidad_trabajo': form.modalidad_trabajo.data,
+            'salario_min': form.salario_min.data,
+            'salario_max': form.salario_max.data,
+            'descripcion': form.descripcion.data,
+            'requisitos': form.requisitos.data,
+            'adaptaciones_disponibles': form.adaptaciones_disponibles.data,
+            'neurodivergencias_target': ','.join(form.neurodivergencias_target.data or [])
+        }
+        
+        try:
+            from sendgrid_helper import send_email
+            titulo = offer_data.get('titulo_puesto', 'Sin título')
+            subject = f"Nueva Oferta de Trabajo - {titulo}"
+            html_content = f"""
+            <h2>💼 Nueva Oferta de Trabajo</h2>
+            <p><strong>Puesto:</strong> {offer_data.get('titulo_puesto', 'No especificado')}</p>
+            <p><strong>Tipo:</strong> {offer_data.get('tipo_contrato', 'No especificado')}</p>
+            <p><strong>Modalidad:</strong> {offer_data.get('modalidad_trabajo', 'No especificado')}</p>
+            <p><strong>Salario:</strong> {offer_data.get('salario_min', 'N/A')} - {offer_data.get('salario_max', 'N/A')} €</p>
+            <p><strong>Descripción:</strong> {offer_data.get('descripcion', 'No especificada')}</p>
+            <hr>
+            <p>Panel: <a href="http://localhost:5000/admin/login-new">CRM</a></p>
+            """
+            send_email('diversiaeternals@gmail.com', subject, html_content)
+            print("✅ Email de notificación de oferta enviado")
+        except Exception as e:
+            print(f"⚠️ Error enviando email de notificación: {e}")
+        
+        # Guardar en CRM
+        try:
+            from form_integration_service import process_form_submission
+            crm_id = process_form_submission('oferta_trabajo', offer_data, 'web_form_oferta')
+            if crm_id:
+                print(f"✅ Oferta añadida al CRM con ID: {crm_id}")
+        except Exception as e:
+            print(f"⚠️ Error integrando oferta con CRM: {e}")
+        
         db.session.add(offer)
         db.session.commit()
-        flash('¡Oferta de empleo creada exitosamente!', 'success')
+        flash('¡Oferta de empleo creada exitosamente! Se ha enviado una notificación por email.', 'success')
     return redirect(url_for('empresas'))
 
 @app.route('/api/ofertas')
