@@ -19,6 +19,8 @@ class RegistroGeneralForm(FlaskForm):
     habilidades = TextAreaField('Habilidades y fortalezas', validators=[Optional()])
     adaptaciones_necesarias = TextAreaField('Adaptaciones que necesitas en el trabajo', validators=[Optional()])
     experiencia_laboral = TextAreaField('Experiencia laboral', validators=[Optional()])
+    formacion_academica = TextAreaField('Formación académica', validators=[Optional()])
+    intereses_laborales = TextAreaField('Intereses laborales', validators=[Optional()])
     motivaciones = TextAreaField('Motivaciones y objetivos profesionales', validators=[Optional()])
     aceptar_privacidad = BooleanField('Acepto la política de privacidad', validators=[DataRequired(message='Debes aceptar la política de privacidad')])
 
@@ -87,7 +89,16 @@ class RegistroTEAForm(RegistroGeneralForm):
         ('muy_sustancial', 'Apoyo muy sustancial')
     ], validators=[Optional()])
     
-    sensibilidades = MultiCheckboxField('Sensibilidades sensoriales', choices=[
+    # Campos específicos requeridos por la plantilla TEA
+    nivel_comunicacion = SelectField('Nivel de comunicación', choices=[
+        ('', 'Selecciona una opción'),
+        ('verbal_fluido', 'Comunicación verbal fluida'),
+        ('verbal_limitado', 'Comunicación verbal limitada'),
+        ('no_verbal', 'Comunicación no verbal'),
+        ('alternativa', 'Comunicación alternativa')
+    ], validators=[Optional()])
+    
+    sensibilidades_sensoriales = MultiCheckboxField('Sensibilidades sensoriales', choices=[
         ('auditiva', 'Sensibilidad auditiva'),
         ('visual', 'Sensibilidad visual'),
         ('tactil', 'Sensibilidad táctil'),
@@ -96,6 +107,8 @@ class RegistroTEAForm(RegistroGeneralForm):
         ('vestibular', 'Sensibilidad vestibular'),
         ('propioceptiva', 'Sensibilidad propioceptiva')
     ])
+    
+    rutinas_importantes = BooleanField('¿Son importantes las rutinas en tu día a día?')
     
     comunicacion_preferida = SelectField('Forma de comunicación preferida', choices=[
         ('', 'Selecciona una opción'),
@@ -361,26 +374,31 @@ class RegistroAltasCapacidadesForm(RegistroGeneralForm):
     
     necesidades_estimulo = TextAreaField('Necesidades específicas de estimulación intelectual en el trabajo', validators=[Optional()])
 
-# Formulario para empresas
-class EmpresaForm(FlaskForm):
-    nombre_empresa = StringField('Nombre de la Empresa', validators=[DataRequired()])
-    sector = StringField('Sector', validators=[DataRequired()])
-    tamaño = SelectField('Tamaño de la Empresa', choices=[
-        ('startup', 'Startup (1-10 empleados)'),
-        ('pequeña', 'Pequeña (11-50 empleados)'),
-        ('mediana', 'Mediana (51-250 empleados)'),
-        ('grande', 'Grande (250+ empleados)')
-    ], validators=[DataRequired()])
-    contacto_nombre = StringField('Nombre del Contacto', validators=[DataRequired()])
-    contacto_email = StringField('Email de Contacto', validators=[DataRequired(), Email()])
-    telefono = StringField('Teléfono', validators=[Optional()])
-    ciudad = StringField('Ciudad', validators=[DataRequired()])
-    descripcion = TextAreaField('Descripción de la Empresa', validators=[Optional()])
-    
-    # Campos específicos para inclusión
-    politicas_inclusion = BooleanField('¿Tienen políticas de inclusión activas?')
-    experiencia_neurodivergentes = BooleanField('¿Han trabajado antes con personas neurodivergentes?')
-    adaptaciones_disponibles = MultiCheckboxField('Adaptaciones que pueden ofrecer', choices=[
+# EmpresaForm ya está definido anteriormente en la línea 173, esta es una duplicación
+
+# Formulario para ofertas de trabajo
+class OfertaTrabajoForm(FlaskForm):
+    titulo = StringField('Título del Puesto', validators=[DataRequired()])
+    titulo_puesto = StringField('Título del Puesto', validators=[DataRequired()])
+    descripcion = TextAreaField('Descripción del Puesto', validators=[DataRequired()])
+    tipo_contrato = SelectField('Tipo de contrato', choices=[
+        ('', 'Selecciona tipo'),
+        ('completo', 'Tiempo completo'),
+        ('parcial', 'Tiempo parcial'),
+        ('temporal', 'Temporal'),
+        ('practicas', 'Prácticas')
+    ], validators=[Optional()])
+    modalidad_trabajo = SelectField('Modalidad de trabajo', choices=[
+        ('', 'Selecciona modalidad'),
+        ('presencial', 'Presencial'),
+        ('remoto', 'Remoto'),
+        ('hibrido', 'Híbrido')
+    ], validators=[Optional()])
+    salario_min = StringField('Salario mínimo', validators=[Optional()])
+    salario_max = StringField('Salario máximo', validators=[Optional()])
+    requisitos = TextAreaField('Requisitos', validators=[DataRequired()])
+    beneficios = TextAreaField('Beneficios y Adaptaciones', validators=[Optional()])
+    adaptaciones_disponibles = MultiCheckboxField('Adaptaciones disponibles', choices=[
         ('horario_flexible', 'Horario flexible'),
         ('trabajo_remoto', 'Trabajo remoto'),
         ('ambiente_tranquilo', 'Espacios de trabajo tranquilos'),
@@ -390,16 +408,7 @@ class EmpresaForm(FlaskForm):
         ('pausas_extra', 'Pausas adicionales'),
         ('instrucciones_escritas', 'Instrucciones por escrito')
     ])
-    
     aceptar_privacidad = BooleanField('Acepto la política de privacidad', validators=[DataRequired()])
-
-# Formulario para ofertas de trabajo
-class OfertaTrabajoForm(FlaskForm):
-    titulo = StringField('Título del Puesto', validators=[DataRequired()])
-    descripcion = TextAreaField('Descripción del Puesto', validators=[DataRequired()])
-    requisitos = TextAreaField('Requisitos', validators=[DataRequired()])
-    beneficios = TextAreaField('Beneficios y Adaptaciones', validators=[Optional()])
-    salario_min = StringField('Salario Mínimo', validators=[Optional()])
     salario_max = StringField('Salario Máximo', validators=[Optional()])
     modalidad = SelectField('Modalidad de Trabajo', choices=[
         ('presencial', 'Presencial'),
