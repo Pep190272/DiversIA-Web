@@ -990,6 +990,3 @@ def registro_asociacion():
             flash('Error al registrar la asociación. Por favor intenta de nuevo.', 'error')
     
     return render_template('registro-asociacion.html')
-            
-            # NUEVA FUNCIONALIDAD: Integración automática con CRM
-            try:
