@@ -126,9 +126,9 @@ def contacto():
 def crm_dashboard():
     try:
         from flask import session, redirect, flash
-        if 'admin_logged_in' not in session or not session['admin_logged_in']:
+        if 'admin_user_id' not in session:
             flash('Debes iniciar sesión como administrador para acceder al CRM.', 'error')
-            return redirect('/admin/login')
+            return redirect('/admin/login-new')
         return render_template('crm-dashboard.html')
     except Exception as e:
         print(f"Error en CRM dashboard: {e}")

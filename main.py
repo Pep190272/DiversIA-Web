@@ -3,18 +3,17 @@ from app import app
 # Importar rutas después de crear la app
 import routes  # noqa: F401
 
-# Sistema de autenticación simplificado (sin base de datos)
+# Sistema de autenticación final (con PostgreSQL)
 try:
-    import admin_auth_simple  # noqa: F401
-    print("✅ Sistema de autenticación admin simplificado cargado")
+    import admin_final  # noqa: F401
+    print("✅ Sistema de autenticación admin final cargado")
 except Exception as e:
-    print(f"⚠️ Error cargando admin_auth_simple: {e}")
+    print(f"⚠️ Error cargando admin_final: {e}")
 
-# Cargar CRM simple y su API
+# Cargar solo CRM API (sin conflictos de rutas)
 try:
-    import crm_simple  # noqa: F401
     import crm_api_simple  # noqa: F401
-    print("✅ CRM simple y API cargados correctamente")
+    print("✅ CRM API cargado correctamente")
 except Exception as e:
     print(f"⚠️ Error cargando CRM: {e}")
 from api_endpoints import api

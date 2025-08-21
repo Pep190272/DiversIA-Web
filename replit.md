@@ -8,9 +8,11 @@ Preferred communication style: Simple, everyday language.
 System reliability: Critical requirement - zero tolerance for 500 errors on main routes.
 
 ## System Reliability
-- All form fields MUST be defined in forms.py before being used in templates
+- All form fields MUST be defined in forms.py before being used in templates  
 - Route validator (route_validator.py) automatically checks critical routes
 - Critical routes that must never fail: /, /empresas, /personas-nd, /comunidad, /registro, /registro-tdah, /registro-tea, /registro-dislexia, /test, /comenzar
+- Admin login fixed: Access via /admin/login-new with credentials DiversiaEternals / diversia3ternal$2025
+- System works with PostgreSQL when active, automatically falls back to memory storage when disabled
 
 ## System Architecture
 
