@@ -1,32 +1,44 @@
-# Instrucciones para crear contraseña de aplicación de Gmail
+# Configuración de Contraseña de Aplicación Gmail
 
-## Pasos corregidos:
+## Enlaces Directos
 
-1. **Ve directamente a**: https://myaccount.google.com/security
-   (NO uses la configuración de Chrome)
+### Opción 1: Enlace directo a contraseñas de aplicaciones
+```
+https://myaccount.google.com/apppasswords
+```
 
-2. **Inicia sesión** con diversiaeternals@gmail.com
+### Opción 2: Paso a paso manual
+1. **Ir a configuración de cuenta Google:**
+   ```
+   https://myaccount.google.com/security
+   ```
 
-3. **Busca la sección "Verificación en 2 pasos"**
-   - Si no está activa, actívala primero
-   - Sigue el proceso de configuración
+2. **Activar verificación en 2 pasos** (si no está activa):
+   - Busca "Verificación en 2 pasos"
+   - Actívala siguiendo los pasos
 
-4. **Una vez activada la verificación en 2 pasos**:
-   - Vuelve a https://myaccount.google.com/security
-   - Busca la sección "Contraseñas de aplicación" o "App passwords"
-   - Si no aparece, busca en el buscador de la página "contraseñas de aplicación"
-
-5. **Crear la contraseña**:
-   - Haz clic en "Contraseñas de aplicación"
+3. **Crear contraseña de aplicación:**
+   - En la misma página de seguridad
+   - Busca "Contraseñas de aplicaciones"
    - Selecciona "Correo" como aplicación
-   - Selecciona "Otro" como dispositivo y escribe "DiversIA"
-   - Google te dará una contraseña de 16 caracteres
-   - Cópiala exactamente como aparece (sin espacios)
+   - Copia la contraseña generada (16 caracteres)
 
-## Alternativa más directa:
-Ve directamente a: https://myaccount.google.com/apppasswords
+## Alternativa Rápida
 
-## Nota importante:
-- Debes usar la contraseña de aplicación, NO tu contraseña normal de Gmail
-- La contraseña de aplicación tiene 16 caracteres sin espacios
-- Solo aparece una vez, así que cópiala bien
+Si tienes problemas con las contraseñas de aplicaciones, también puedes:
+
+1. **Usar Gmail con "Acceso de aplicaciones menos seguras"** (temporalmente)
+2. **Configurar otro email** (Outlook, Yahoo, etc.)
+3. **Usar el sistema de notificaciones interno** (sin email externo)
+
+## Estado Actual
+
+- ✅ Sistema de email creado y configurado
+- ⏳ Pendiente: configurar EMAIL_PASSWORD
+- 🔧 Alternativa: sistema funciona sin email (notificaciones internas)
+
+## Notas Técnicas
+
+El sistema está diseñado para funcionar con o sin email configurado:
+- **Con EMAIL_PASSWORD**: Envía emails automáticos a diversiaeternals@gmail.com
+- **Sin EMAIL_PASSWORD**: Guarda las notificaciones en el CRM para revisión manual

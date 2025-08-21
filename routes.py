@@ -220,17 +220,24 @@ def enviar_contacto():
             flash('Por favor completa todos los campos requeridos.', 'error')
             return redirect(url_for('contacto'))
         
-        # Enviar notificación por email usando sistema fiable
+        # Intentar enviar email, usar sistema de respaldo si falla
+        email_sent = False
         try:
             from email_system_reliable import send_contact_notification
-            success = send_contact_notification(nombre, email, asunto, mensaje)
-            if success:
+            email_sent = send_contact_notification(nombre, email, asunto, mensaje)
+            if email_sent:
                 print(f"✅ Email de contacto enviado exitosamente a diversiaeternals@gmail.com")
-            else:
-                print(f"⚠️ Email no enviado - revisar configuración EMAIL_PASSWORD")
-        except ImportError as e:
-            print(f"⚠️ Sistema de email no disponible: {e}")
-            success = False
+        except ImportError:
+            print(f"⚠️ Sistema de email principal no disponible")
+        
+        # Sistema de respaldo - siempre guarda la notificación
+        try:
+            from email_fallback_system import send_contact_notification_fallback
+            fallback_saved = send_contact_notification_fallback(nombre, email, asunto, mensaje)
+            if not email_sent and fallback_saved:
+                print(f"✅ Notificación guardada para revisión manual en el CRM")
+        except ImportError:
+            print(f"⚠️ Sistema de respaldo no disponible")
         
         # NUEVA FUNCIONALIDAD: Añadir formulario de contacto al CRM
         try:
