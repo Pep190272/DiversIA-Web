@@ -18,6 +18,8 @@ class RegistroGeneralForm(FlaskForm):
     diagnostico_formal = BooleanField('¿Tienes un diagnóstico formal?')
     habilidades = TextAreaField('Habilidades y fortalezas', validators=[Optional()])
     adaptaciones_necesarias = TextAreaField('Adaptaciones que necesitas en el trabajo', validators=[Optional()])
+    experiencia_laboral = TextAreaField('Experiencia laboral', validators=[Optional()])
+    motivaciones = TextAreaField('Motivaciones y objetivos profesionales', validators=[Optional()])
     aceptar_privacidad = BooleanField('Acepto la política de privacidad', validators=[DataRequired(message='Debes aceptar la política de privacidad')])
 
 # Formularios específicos por neurodivergencia
@@ -29,7 +31,33 @@ class RegistroTDAHForm(RegistroGeneralForm):
         ('combinado', 'Tipo combinado')
     ], validators=[Optional()])
     
+    # Campos específicos requeridos por la plantilla
+    nivel_atencion = SelectField('Nivel de atención', choices=[
+        ('', 'Selecciona una opción'),
+        ('bajo', 'Bajo - Me distraigo muy fácilmente'),
+        ('medio', 'Medio - A veces tengo dificultades'),
+        ('alto', 'Alto - Generalmente puedo mantener la atención')
+    ], validators=[Optional()])
+    
+    impulsividad = SelectField('Nivel de impulsividad', choices=[
+        ('', 'Selecciona una opción'),
+        ('bajo', 'Bajo - Raramente actúo sin pensar'),
+        ('medio', 'Medio - A veces soy impulsivo'),
+        ('alto', 'Alto - Frecuentemente actúo sin pensar')
+    ], validators=[Optional()])
+    
+    hiperactividad = SelectField('Nivel de hiperactividad', choices=[
+        ('', 'Selecciona una opción'),
+        ('bajo', 'Bajo - Puedo estar quieto fácilmente'),
+        ('medio', 'Medio - A veces necesito moverme'),
+        ('alto', 'Alto - Necesito moverme constantemente')
+    ], validators=[Optional()])
+    
     medicacion = BooleanField('¿Tomas medicación para el TDAH?')
+    medicacion_actual = BooleanField('¿Actualmente tomas medicación?')
+    
+    estrategias_organizacion = TextAreaField('Estrategias de organización', validators=[Optional()], 
+        description='Describe las estrategias que te ayudan a mantenerte organizado')
     
     estrategias_concentracion = MultiCheckboxField('Estrategias que te ayudan a concentrarte', choices=[
         ('musica', 'Música de fondo'),
@@ -124,12 +152,109 @@ class RegistroDiscalculiaForm(RegistroGeneralForm):
     herramientas_calculo = MultiCheckboxField('Herramientas de apoyo para cálculos', choices=[
         ('calculadora', 'Calculadora'),
         ('software_matematico', 'Software matemático'),
-        ('tablas_multiplicar', 'Tablas de multiplicar'),
-        ('apoyo_visual', 'Materiales visuales'),
-        ('step_by_step', 'Guías paso a paso'),
-        ('tiempo_extra', 'Tiempo adicional'),
-        ('formulas_referencia', 'Fórmulas de referencia')
+        ('graficos', 'Representaciones gráficas'),
+        ('manipulativos', 'Materiales manipulativos')
     ])
+
+# Formulario para empresas
+class EmpresaForm(FlaskForm):
+    nombre_empresa = StringField('Nombre de la empresa', 
+        validators=[DataRequired(message='El nombre de la empresa es obligatorio')])
+    
+    email_contacto = StringField('Email de contacto', 
+        validators=[DataRequired(message='El email es obligatorio'), 
+                   Email(message='Introduce un email válido')])
+    
+    telefono = StringField('Teléfono', validators=[Optional()])
+    
+    ciudad = StringField('Ciudad', 
+        validators=[DataRequired(message='La ciudad es obligatoria')])
+    
+    sector = SelectField('Sector', choices=[
+        ('', 'Selecciona un sector'),
+        ('tecnologia', 'Tecnología'),
+        ('salud', 'Salud'),
+        ('educacion', 'Educación'),
+        ('finanzas', 'Finanzas'),
+        ('retail', 'Retail'),
+        ('manufactura', 'Manufactura'),
+        ('servicios', 'Servicios'),
+        ('consultoria', 'Consultoría'),
+        ('medios', 'Medios y Comunicación'),
+        ('ong', 'ONG y Organizaciones Sociales'),
+        ('otro', 'Otro')
+    ], validators=[DataRequired(message='Selecciona un sector')])
+    
+    tamano_empresa = SelectField('Tamaño de la empresa', choices=[
+        ('', 'Selecciona el tamaño'),
+        ('startup', 'Startup (1-10 empleados)'),
+        ('pequena', 'Pequeña (11-50 empleados)'),
+        ('mediana', 'Mediana (51-200 empleados)'),
+        ('grande', 'Grande (201-1000 empleados)'),
+        ('corporacion', 'Corporación (1000+ empleados)')
+    ], validators=[DataRequired(message='Selecciona el tamaño de la empresa')])
+    
+    website = StringField('Sitio web', validators=[Optional(), URL(message='Introduce una URL válida')])
+    
+    descripcion = TextAreaField('Descripción de la empresa', validators=[Optional()])
+    
+    experiencia_inclusion = TextAreaField('Experiencia previa con inclusión laboral', validators=[Optional()])
+    
+    aceptar_privacidad = BooleanField('Acepto la política de privacidad', 
+        validators=[DataRequired(message='Debes aceptar la política de privacidad')])
+
+# Formulario para ofertas de trabajo
+class OfertaTrabajoForm(FlaskForm):
+    titulo = StringField('Título del puesto', 
+        validators=[DataRequired(message='El título es obligatorio')])
+    
+    descripcion = TextAreaField('Descripción del puesto', 
+        validators=[DataRequired(message='La descripción es obligatoria')])
+    
+    requisitos = TextAreaField('Requisitos', 
+        validators=[DataRequired(message='Los requisitos son obligatorios')])
+    
+    ubicacion = StringField('Ubicación', 
+        validators=[DataRequired(message='La ubicación es obligatoria')])
+    
+    tipo_contrato = SelectField('Tipo de contrato', choices=[
+        ('', 'Selecciona tipo de contrato'),
+        ('tiempo_completo', 'Tiempo completo'),
+        ('tiempo_parcial', 'Tiempo parcial'),
+        ('temporal', 'Temporal'),
+        ('practicas', 'Prácticas'),
+        ('freelance', 'Freelance')
+    ], validators=[DataRequired(message='Selecciona el tipo de contrato')])
+    
+    salario_min = StringField('Salario mínimo', validators=[Optional()])
+    salario_max = StringField('Salario máximo', validators=[Optional()])
+    
+    trabajo_remoto = BooleanField('¿Permite trabajo remoto?')
+    
+    adaptaciones_disponibles = TextAreaField('Adaptaciones disponibles para neurodivergentes', 
+        validators=[Optional()])
+    
+    beneficios = TextAreaField('Beneficios adicionales', validators=[Optional()])
+
+# Formulario para administrador CRM - Empleados
+class EmpleadoForm(FlaskForm):
+    first_name = StringField('Nombre', validators=[DataRequired(message='El nombre es obligatorio')])
+    last_name = StringField('Apellidos', validators=[DataRequired(message='Los apellidos son obligatorios')])
+    email = StringField('Email', validators=[DataRequired(message='El email es obligatorio'), Email(message='Email válido requerido')])
+    position = StringField('Posición', validators=[DataRequired(message='La posición es obligatoria')])
+    department = StringField('Departamento', validators=[DataRequired(message='El departamento es obligatorio')])
+    hire_date = DateField('Fecha de contratación', validators=[DataRequired(message='La fecha es obligatoria')])
+    salary = StringField('Salario', validators=[Optional()])
+    role = SelectField('Rol', choices=[
+        ('empleado', 'Empleado'),
+        ('manager', 'Manager'),
+        ('admin', 'Administrador')
+    ], default='empleado', validators=[DataRequired()])
+    status = SelectField('Estado', choices=[
+        ('active', 'Activo'),
+        ('inactive', 'Inactivo'),
+        ('pending', 'Pendiente')
+    ], default='active', validators=[DataRequired()])
 
 class RegistroTouretteForm(RegistroGeneralForm):
     tipos_tics = MultiCheckboxField('Tipos de tics que experimentas', choices=[
