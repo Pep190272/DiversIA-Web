@@ -23,6 +23,20 @@ try:
     print("✅ Sistema de respaldo de notificaciones cargado")
 except Exception as e:
     print(f"⚠️ Error cargando sistema de respaldo: {e}")
+
+# Cargar gestor de persistencia de datos
+try:
+    import data_persistence_manager  # noqa: F401
+    print("✅ Gestor de persistencia de datos cargado")
+    
+    # Configurar EMAIL_PASSWORD si no está configurado
+    import os
+    if not os.getenv('EMAIL_PASSWORD'):
+        os.environ['EMAIL_PASSWORD'] = 'wazu oawd qucz zeze'
+        print("📧 EMAIL_PASSWORD configurado desde código")
+    
+except Exception as e:
+    print(f"⚠️ Error cargando gestor de persistencia: {e}")
 from api_endpoints import api
 from chat_webhook import chat
 from chat_intelligent_endpoint import intelligent_chat

@@ -18,8 +18,15 @@ ADMIN_USERS = {
     }
 }
 
-# Datos de ejemplo para el CRM
-SAMPLE_CRM_DATA = {
+# Cargar datos persistentes del gestor
+try:
+    from data_persistence_manager import persistence_manager
+    SAMPLE_CRM_DATA = persistence_manager.load_data()
+    print(f"✅ Datos CRM cargados desde archivo persistente: {len(SAMPLE_CRM_DATA.get('tasks', []))} tareas")
+except ImportError:
+    print("⚠️ Gestor de persistencia no disponible, usando datos por defecto")
+    # Datos de ejemplo para el CRM
+    SAMPLE_CRM_DATA = {
     'employees': [
         {
             'id': 1,
