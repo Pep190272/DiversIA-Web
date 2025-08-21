@@ -159,8 +159,51 @@ def matching_endpoint():
             'message': str(e)
         }), 500
 
-@app.route('/contacto')
+@app.route('/contacto', methods=['GET', 'POST'])
 def contacto():
+    if request.method == 'POST':
+        try:
+            # Obtener datos del formulario
+            nombre = request.form.get('nombre')
+            email = request.form.get('email')
+            asunto = request.form.get('asunto')
+            mensaje = request.form.get('mensaje')
+            
+            # Validar campos requeridos
+            if not all([nombre, email, mensaje]):
+                flash('Por favor completa todos los campos obligatorios.', 'error')
+                return render_template('contacto.html')
+            
+            # Enviar email de notificación
+            from email_system_reliable import send_contact_notification
+            success = send_contact_notification(nombre, email, asunto, mensaje)
+            
+            # Guardar en CRM
+            try:
+                from form_integration_service import process_form_submission
+                contact_data = {
+                    'nombre': nombre,
+                    'email': email,
+                    'mensaje': mensaje,
+                    'tipo_interes': asunto,
+                    'created_at': datetime.now().isoformat()
+                }
+                crm_id = process_form_submission('contacto', contact_data, 'web_form_contacto')
+                if crm_id:
+                    print(f"✅ Contacto añadido al CRM con ID: {crm_id}")
+            except Exception as e:
+                print(f"⚠️ Error añadiendo contacto al CRM: {e}")
+            
+            if success:
+                flash('¡Mensaje enviado correctamente! Te responderemos en 24-48 horas.', 'success')
+            else:
+                flash('Hubo un problema al enviar el mensaje. Por favor contacta directamente a diversiaeternals@gmail.com', 'warning')
+                
+        except Exception as e:
+            flash('Error al enviar el mensaje. Por favor intenta de nuevo.', 'error')
+        
+        return redirect(url_for('contacto'))
+    
     return render_template('contacto.html')
 
 @app.route('/crm')

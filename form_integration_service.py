@@ -13,6 +13,54 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def process_form_submission(form_type, data, source='web_form'):
+    """Función de compatibilidad para procesar formularios"""
+    try:
+        from data_persistence_manager import persistence_manager
+        
+        # Cargar datos existentes
+        crm_data = persistence_manager.load_data()
+        
+        # Generar ID único
+        if form_type == 'contacto':
+            contacts = crm_data.setdefault('contacts', [])
+            max_id = max([c.get('id', 0) for c in contacts], default=0)
+            contact_record = {
+                'id': max_id + 1,
+                'name': data.get('nombre'),
+                'email': data.get('email'),
+                'message': data.get('mensaje'),
+                'tipo_interes': data.get('tipo_interes'),
+                'source': source,
+                'created_at': data.get('created_at', '2025-08-21'),
+                'status': 'Nuevo'
+            }
+            contacts.append(contact_record)
+            
+        elif form_type == 'registro_persona':
+            users = crm_data.setdefault('users', [])
+            max_id = max([u.get('id', 0) for u in users], default=0)
+            user_record = {
+                'id': max_id + 1,
+                'name': f"{data.get('nombre', '')} {data.get('apellidos', '')}".strip(),
+                'email': data.get('email'),
+                'phone': data.get('telefono'),
+                'city': data.get('ciudad'),
+                'tipo_neurodivergencia': data.get('tipo_neurodivergencia'),
+                'source': source,
+                'created_at': data.get('created_at', '2025-08-21'),
+                'status': 'Activo'
+            }
+            users.append(user_record)
+        
+        # Guardar datos
+        persistence_manager.save_data(crm_data)
+        return max_id + 1
+        
+    except Exception as e:
+        print(f"Error en process_form_submission: {e}")
+        return None
+
 class FormIntegrationService:
     """Servicio para integrar formularios con base de datos y sistemas de respaldo"""
     

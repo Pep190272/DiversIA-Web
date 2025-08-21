@@ -21,16 +21,6 @@
       "formal_diagnosis": true,
       "created_at": "2024-02-20",
       "source": "manual"
-    },
-    {
-      "id": 3,
-      "name": "Test Corregido",
-      "email": "test@corregido.com",
-      "message": "Mensaje de prueba definitivo",
-      "tipo_interes": "Prueba Final",
-      "source": "web_form_contacto",
-      "created_at": "2025-08-21T10:57:11.595175",
-      "status": "Nuevo"
     }
   ],
   "companies": [
@@ -2043,8 +2033,8 @@
     }
   ],
   "metadata": {
-    "last_updated": "2025-08-21T10:57:11.726855",
+    "last_updated": "2025-08-21T09:07:11.596713",
     "version": "1.0",
-    "total_interactions": 143
+    "total_interactions": 142
   }
 }
