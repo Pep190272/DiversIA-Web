@@ -220,11 +220,16 @@ def enviar_contacto():
             flash('Por favor completa todos los campos requeridos.', 'error')
             return redirect(url_for('contacto'))
         
-        # Enviar notificación por email y añadir al CRM
+        # Enviar notificación por email usando sistema fiable
         try:
-            from sendgrid_helper import send_contact_notification
+            from email_system_reliable import send_contact_notification
             success = send_contact_notification(nombre, email, asunto, mensaje)
-        except ImportError:
+            if success:
+                print(f"✅ Email de contacto enviado exitosamente a diversiaeternals@gmail.com")
+            else:
+                print(f"⚠️ Email no enviado - revisar configuración EMAIL_PASSWORD")
+        except ImportError as e:
+            print(f"⚠️ Sistema de email no disponible: {e}")
             success = False
         
         # NUEVA FUNCIONALIDAD: Añadir formulario de contacto al CRM

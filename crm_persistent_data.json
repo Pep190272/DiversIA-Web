@@ -51,18 +51,6 @@
   ],
   "employees": [
     {
-      "id": 1,
-      "first_name": "Alex",
-      "last_name": "Martínez",
-      "email": "alex@diversia.com",
-      "position": "Desarrolladora",
-      "department": "Desarrollo",
-      "role": "empleado",
-      "hire_date": "2024-01-15",
-      "status": "active",
-      "created_at": "2024-01-15"
-    },
-    {
       "id": 2,
       "first_name": "Pep",
       "last_name": "Moreno",
@@ -89,6 +77,20 @@
       "is_active": true,
       "salary": 54000,
       "created_at": "2025-08-21T07:33:28.920981"
+    },
+    {
+      "id": 4,
+      "first_name": "Pep",
+      "last_name": "Moreno Carrillo",
+      "email": "jose190272@gmail.com",
+      "position": "Desarrollador",
+      "department": "Desarrollo",
+      "role": "empleado",
+      "hire_date": "2025-08-21",
+      "status": "active",
+      "is_active": true,
+      "salary": 54000,
+      "created_at": "2025-08-21T08:20:52.132073"
     }
   ],
   "job_offers": [
@@ -158,32 +160,138 @@
   "tasks": [
     {
       "id": 1,
-      "title": "Revisar candidatos TDAH",
-      "assigned_to": "Ana García",
+      "title": "Email Marketing - Configuración inicial",
+      "assigned_to": "Pep Moreno",
       "priority": "Alta",
-      "status": "En progreso",
-      "category": "Recruitment",
-      "estimated_time": "2h",
-      "actual_time": "1.5h",
-      "due_date": "2024-12-30",
-      "created_at": "2024-12-15"
+      "status": "Completada",
+      "category": "Marketing",
+      "estimated_time": "8h",
+      "actual_time": "8h",
+      "due_date": "2024-08-01",
+      "created_at": "2024-08-01",
+      "completed_at": "2024-08-01"
     },
     {
       "id": 2,
-      "title": "Contactar empresa TechInclusiva",
-      "assigned_to": "Carlos López",
+      "title": "LinkedIn - Optimización de perfil corporativo",
+      "assigned_to": "Pep Moreno",
+      "priority": "Alta",
+      "status": "Completada",
+      "category": "RRSS",
+      "estimated_time": "6h",
+      "actual_time": "6h",
+      "due_date": "2024-08-01",
+      "created_at": "2024-08-01",
+      "completed_at": "2024-08-01"
+    },
+    {
+      "id": 3,
+      "title": "Discord - Bot y configuración de comunidad",
+      "assigned_to": "Pep Moreno",
+      "priority": "Alta",
+      "status": "Completada",
+      "category": "Comunidad",
+      "estimated_time": "12h",
+      "actual_time": "12h",
+      "due_date": "2024-08-01",
+      "created_at": "2024-08-01",
+      "completed_at": "2024-08-01"
+    },
+    {
+      "id": 4,
+      "title": "Instagram - Estrategia de contenido visual",
+      "assigned_to": "Pep Moreno",
+      "priority": "Media",
+      "status": "Completada",
+      "category": "RRSS",
+      "estimated_time": "4h",
+      "actual_time": "4h",
+      "due_date": "2024-08-01",
+      "created_at": "2024-08-01",
+      "completed_at": "2024-08-01"
+    },
+    {
+      "id": 5,
+      "title": "Telegram - Canal de soporte oficial",
+      "assigned_to": "Pep Moreno",
+      "priority": "Media",
+      "status": "Completada",
+      "category": "Soporte",
+      "estimated_time": "3h",
+      "actual_time": "3h",
+      "due_date": "2024-08-01",
+      "created_at": "2024-08-01",
+      "completed_at": "2024-08-01"
+    },
+    {
+      "id": 6,
+      "title": "Web - Formularios con integración directa CRM",
+      "assigned_to": "Pep Moreno",
+      "priority": "Crítica",
+      "status": "Completada",
+      "category": "Desarrollo",
+      "estimated_time": "16h",
+      "actual_time": "16h",
+      "due_date": "2024-08-01",
+      "created_at": "2024-08-01",
+      "completed_at": "2024-08-01"
+    },
+    {
+      "id": 7,
+      "title": "Agente IA - Integración con Mistral API",
+      "assigned_to": "Pep Moreno",
+      "priority": "Alta",
+      "status": "En progreso",
+      "category": "IA",
+      "estimated_time": "20h",
+      "actual_time": "15h",
+      "due_date": "2024-08-15",
+      "created_at": "2024-08-01",
+      "notes": "Conectado con API gratuita Mistral. Funciona via N8N con 4 nodos, sin memoria ni BD. Necesita escalado."
+    },
+    {
+      "id": 8,
+      "title": "N8N - Automatización de respuestas IA",
+      "assigned_to": "Pep Moreno",
+      "priority": "Alta",
+      "status": "En progreso",
+      "category": "Automatización",
+      "estimated_time": "12h",
+      "actual_time": "8h",
+      "due_date": "2024-08-15",
+      "created_at": "2024-08-01",
+      "notes": "Sistema funcional en pruebas. Pendiente despliegue web completo."
+    },
+    {
+      "id": 9,
+      "title": "App móvil - Planificación arquitectura",
+      "assigned_to": "Pep Moreno",
       "priority": "Media",
       "status": "Pendiente",
-      "category": "Sales",
-      "estimated_time": "1h",
+      "category": "Desarrollo",
+      "estimated_time": "40h",
       "actual_time": "0h",
-      "due_date": "2024-12-25",
-      "created_at": "2024-12-20"
+      "due_date": "2024-09-30",
+      "created_at": "2024-08-15",
+      "notes": "Pendiente completar web antes de iniciar app."
+    },
+    {
+      "id": 10,
+      "title": "Campañas publicitarias RRSS",
+      "assigned_to": "Pep Moreno",
+      "priority": "Alta",
+      "status": "En progreso",
+      "category": "Marketing",
+      "estimated_time": "25h",
+      "actual_time": "10h",
+      "due_date": "2024-08-30",
+      "created_at": "2024-08-15",
+      "notes": "Campañas activas en LinkedIn e Instagram."
     }
   ],
   "metadata": {
-    "last_updated": "2025-08-21T07:33:28.920987",
+    "last_updated": "2025-08-21T08:20:52.132091",
     "version": "1.0",
-    "total_interactions": 3
+    "total_interactions": 4
   }
 }
