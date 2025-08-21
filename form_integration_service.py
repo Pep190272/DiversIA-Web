@@ -70,8 +70,8 @@ class FormIntegrationService:
     def save_company_form(self, form_data):
         """Guardar formulario de empresa con múltiples respaldos"""
         try:
-            # 1. Intentar PostgreSQL primero
-            success_postgres = self._save_to_postgres_company(form_data)
+            # 1. Intentar SQLite primero
+            success_sqlite = self._save_to_sqlite_company(form_data)
             
             if success_postgres:
                 logger.info(f"✅ Empresa guardada en PostgreSQL: {form_data.get('nombre')}")

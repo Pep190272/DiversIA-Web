@@ -1812,19 +1812,6 @@
       "description": null,
       "created_at": "2025-08-21T09:07:11.596246",
       "source": "web_form"
-    },
-    {
-      "id": 138,
-      "name": "Acelerai",
-      "email": "automatizatunegocio@acelerai.eu",
-      "phone": "687408629",
-      "sector": "tecnologia",
-      "size": "startup",
-      "city": "La torre de Claramunt",
-      "website": null,
-      "description": null,
-      "created_at": "2025-08-21T12:48:40.232169",
-      "source": "web_form"
     }
   ],
   "employees": [
@@ -2056,8 +2043,8 @@
     }
   ],
   "metadata": {
-    "last_updated": "2025-08-21T12:48:40.232735",
+    "last_updated": "2025-08-21T10:57:11.726855",
     "version": "1.0",
-    "total_interactions": 144
+    "total_interactions": 143
   }
 }

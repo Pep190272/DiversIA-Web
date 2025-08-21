@@ -8,6 +8,13 @@ from forms import (RegistroGeneralForm, RegistroTDAHForm, RegistroDislexiaForm, 
                   EmpresaForm, OfertaTrabajoForm)
 from sendgrid_helper import send_registration_notification, send_company_registration_notification
 
+# Importar CSV Manager
+try:
+    from csv_manager import create_csv_routes
+    create_csv_routes(app)
+except ImportError:
+    print("⚠️ CSV Manager no disponible")
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -45,9 +52,38 @@ def empresas():
             
             print(f"Datos procesados: {data}")
             
-            # Usar servicio de integración de formularios
-            from form_integration_service import form_service
-            success = form_service.save_company_form(data)
+            # Guardar directamente en SQLite
+            company = Company(
+                nombre_empresa=data['nombre'],
+                email_contacto=data['email'],
+                telefono=data['telefono'],
+                sector=data['sector'],
+                tamano_empresa=data['tamaño'],
+                ciudad=data['ciudad'],
+                sitio_web=data.get('web'),
+                descripcion_empresa=data.get('descripcion')
+            )
+            db.session.add(company)
+            db.session.commit()
+            
+            # Enviar email de notificación
+            from sendgrid_helper import send_email
+            subject = f"Nueva Empresa Registrada - {data['nombre']}"
+            html_content = f"""
+            <h2>🏢 Nueva Empresa Registrada</h2>
+            <p><strong>Empresa:</strong> {data['nombre']}</p>
+            <p><strong>Email:</strong> {data['email']}</p>
+            <p><strong>Teléfono:</strong> {data['telefono']}</p>
+            <p><strong>Sector:</strong> {data['sector']}</p>
+            <p><strong>Tamaño:</strong> {data['tamaño']}</p>
+            <p><strong>Ciudad:</strong> {data['ciudad']}</p>
+            <p><strong>Web:</strong> {data.get('web', 'No especificado')}</p>
+            <hr>
+            <p>Panel admin: <a href="http://localhost:5000/admin/login-new">CRM</a></p>
+            """
+            email_success = send_email('diversiaeternals@gmail.com', subject, html_content)
+            print(f"✅ Email empresa enviado: {email_success}")
+            success = True
             
             if success:
                 flash(f'Empresa {data["nombre"]} registrada exitosamente', 'success')
@@ -1013,65 +1049,65 @@ def empresa_registro():
 
 @app.route('/ofertas-empleo', methods=['POST'])
 def crear_oferta():
-    form = OfertaTrabajoForm()
-    if form.validate_on_submit():
-        # For simplicity, using company_id = 1. In production, this would come from authentication
-        offer = JobOffer(
-            company_id=1,
-            titulo_puesto=form.titulo_puesto.data,
-            descripcion=form.descripcion.data,
-            tipo_contrato=form.tipo_contrato.data,
-            modalidad_trabajo=form.modalidad_trabajo.data,
-            salario_min=form.salario_min.data,
-            salario_max=form.salario_max.data,
-            requisitos=form.requisitos.data,
-            adaptaciones_disponibles=form.adaptaciones_disponibles.data,
-            neurodivergencias_target=','.join(form.neurodivergencias_target.data or [])
-        )
-        # Enviar notificación por email
-        offer_data = {
-            'titulo_puesto': form.titulo_puesto.data,
-            'tipo_contrato': form.tipo_contrato.data,
-            'modalidad_trabajo': form.modalidad_trabajo.data,
-            'salario_min': form.salario_min.data,
-            'salario_max': form.salario_max.data,
-            'descripcion': form.descripcion.data,
-            'requisitos': form.requisitos.data,
-            'adaptaciones_disponibles': form.adaptaciones_disponibles.data,
-            'neurodivergencias_target': ','.join(form.neurodivergencias_target.data or [])
+    try:
+        # Obtener datos del formulario directamente
+        data = {
+            'titulo_puesto': request.form.get('titulo_puesto'),
+            'descripcion': request.form.get('descripcion'),
+            'tipo_contrato': request.form.get('tipo_contrato'),
+            'modalidad_trabajo': request.form.get('modalidad_trabajo'),
+            'salario_min': request.form.get('salario_min'),
+            'salario_max': request.form.get('salario_max'),
+            'requisitos': request.form.get('requisitos'),
+            'adaptaciones_disponibles': request.form.get('adaptaciones_disponibles'),
+            'neurodivergencias_target': request.form.getlist('neurodivergencias_target')
         }
         
-        try:
-            from sendgrid_helper import send_email
-            titulo = offer_data.get('titulo_puesto', 'Sin título')
-            subject = f"Nueva Oferta de Trabajo - {titulo}"
-            html_content = f"""
-            <h2>💼 Nueva Oferta de Trabajo</h2>
-            <p><strong>Puesto:</strong> {offer_data.get('titulo_puesto', 'No especificado')}</p>
-            <p><strong>Tipo:</strong> {offer_data.get('tipo_contrato', 'No especificado')}</p>
-            <p><strong>Modalidad:</strong> {offer_data.get('modalidad_trabajo', 'No especificado')}</p>
-            <p><strong>Salario:</strong> {offer_data.get('salario_min', 'N/A')} - {offer_data.get('salario_max', 'N/A')} €</p>
-            <p><strong>Descripción:</strong> {offer_data.get('descripcion', 'No especificada')}</p>
-            <hr>
-            <p>Panel: <a href="http://localhost:5000/admin/login-new">CRM</a></p>
-            """
-            send_email('diversiaeternals@gmail.com', subject, html_content)
-            print("✅ Email de notificación de oferta enviado")
-        except Exception as e:
-            print(f"⚠️ Error enviando email de notificación: {e}")
+        # Buscar la última empresa registrada como company_id por defecto
+        last_company = Company.query.order_by(Company.id.desc()).first()
+        company_id = last_company.id if last_company else 1
         
-        # Guardar en CRM
-        try:
-            from form_integration_service import process_form_submission
-            crm_id = process_form_submission('oferta_trabajo', offer_data, 'web_form_oferta')
-            if crm_id:
-                print(f"✅ Oferta añadida al CRM con ID: {crm_id}")
-        except Exception as e:
-            print(f"⚠️ Error integrando oferta con CRM: {e}")
+        # Crear oferta de trabajo
+        offer = JobOffer(
+            company_id=company_id,
+            titulo_puesto=data['titulo_puesto'],
+            descripcion=data['descripcion'],
+            tipo_contrato=data['tipo_contrato'],
+            modalidad_trabajo=data['modalidad_trabajo'],
+            salario_min=int(data['salario_min']) if data['salario_min'] else None,
+            salario_max=int(data['salario_max']) if data['salario_max'] else None,
+            requisitos=data['requisitos'],
+            adaptaciones_disponibles=data['adaptaciones_disponibles'],
+            neurodivergencias_target=','.join(data['neurodivergencias_target']) if data['neurodivergencias_target'] else ''
+        )
         
+        # Guardar en base de datos
         db.session.add(offer)
         db.session.commit()
-        flash('¡Oferta de empleo creada exitosamente! Se ha enviado una notificación por email.', 'success')
+        
+        # Enviar notificación por email
+        from sendgrid_helper import send_email
+        subject = f"Nueva Oferta de Trabajo - {data['titulo_puesto']}"
+        html_content = f"""
+        <h2>💼 Nueva Oferta de Trabajo</h2>
+        <p><strong>Puesto:</strong> {data['titulo_puesto']}</p>
+        <p><strong>Tipo:</strong> {data['tipo_contrato']}</p>
+        <p><strong>Modalidad:</strong> {data['modalidad_trabajo']}</p>
+        <p><strong>Salario:</strong> {data['salario_min']} - {data['salario_max']} €</p>
+        <p><strong>Descripción:</strong> {data['descripcion']}</p>
+        <p><strong>Empresa ID:</strong> {company_id}</p>
+        <hr>
+        <p>Panel: <a href="http://localhost:5000/admin/login-new">CRM</a></p>
+        """
+        email_success = send_email('diversiaeternals@gmail.com', subject, html_content)
+        print(f"✅ Email oferta enviado: {email_success}")
+        
+        flash('¡Oferta de trabajo publicada exitosamente!', 'success')
+        
+    except Exception as e:
+        print(f"❌ Error creando oferta: {e}")
+        flash('Error al crear la oferta. Por favor intenta de nuevo.', 'error')
+        
     return redirect(url_for('empresas'))
 
 @app.route('/api/ofertas')
