@@ -357,7 +357,7 @@ class DiversiaCRM {
             document.getElementById('totalAssociations').textContent = '0';
             
             // Intentar cargar desde API funcional
-            const response = await fetch(`${this.apiBase}/api/stats-working`);
+            const response = await fetch(this.apiBase + '/api/stats-working');
             if (response.ok) {
                 const stats = await response.json();
                 document.getElementById('totalUsers').textContent = stats.total_users || 0;
@@ -372,7 +372,7 @@ class DiversiaCRM {
 
     async loadEmployees() {
         try {
-            const response = await fetch(`${this.apiBase}/api/employees`);
+            const response = await fetch(this.apiBase + '/api/employees');
             const employees = await response.json();
             
             const tbody = document.getElementById('employeesTable');
@@ -381,25 +381,21 @@ class DiversiaCRM {
                 return;
             }
 
-            tbody.innerHTML = employees.map(employee => `
-                <tr>
-                    <td><strong>${employee.first_name} ${employee.last_name}</strong></td>
-                    <td>${employee.email}</td>
-                    <td>${employee.position}</td>
-                    <td><span class="badge bg-secondary">${employee.department}</span></td>
-                    <td><span class="badge bg-${employee.role === 'admin' ? 'danger' : employee.role === 'colaborador' ? 'warning' : 'info'}">${employee.role}</span></td>
-                    <td>${employee.hire_date}</td>
-                    <td><span class="badge bg-${employee.is_active ? 'success' : 'danger'}">${employee.is_active ? 'Activo' : 'Inactivo'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee(${employee.id})" title="Editar empleado">
-                            Editar
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(${employee.id})" title="Eliminar empleado">
-                            Eliminar
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = employees.map(employee => 
+                '<tr>' +
+                    '<td><strong>' + employee.first_name + ' ' + employee.last_name + '</strong></td>' +
+                    '<td>' + employee.email + '</td>' +
+                    '<td>' + employee.position + '</td>' +
+                    '<td><span class="badge bg-secondary">' + employee.department + '</span></td>' +
+                    '<td><span class="badge bg-' + (employee.role === 'admin' ? 'danger' : employee.role === 'colaborador' ? 'warning' : 'info') + '">' + employee.role + '</span></td>' +
+                    '<td>' + employee.hire_date + '</td>' +
+                    '<td><span class="badge bg-' + (employee.is_active ? 'success' : 'danger') + '">' + (employee.is_active ? 'Activo' : 'Inactivo') + '</span></td>' +
+                    '<td>' +
+                        '<button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee(' + employee.id + ')" title="Editar empleado">Editar</button>' +
+                        '<button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(' + employee.id + ')" title="Eliminar empleado">Eliminar</button>' +
+                    '</td>' +
+                '</tr>'
+            ).join('');
         } catch (error) {
             console.error('Error loading employees:', error);
         }
@@ -407,7 +403,7 @@ class DiversiaCRM {
 
     async loadTasks() {
         try {
-            const response = await fetch(`${this.apiBase}/api/tasks`);
+            const response = await fetch(this.apiBase + '/api/tasks');
             const tasks = await response.json();
             
             const tbody = document.getElementById('tasksTable');
@@ -416,37 +412,33 @@ class DiversiaCRM {
                 return;
             }
 
-            tbody.innerHTML = tasks.map(task => `
-                <tr>
-                    <td>
-                        <strong>${task.title}</strong>
-                        <br><small class="text-muted">${task.description || task.notes || 'Sin descripción'}</small>
-                    </td>
-                    <td>
-                        <span class="task-assignment" data-task-id="${task.id}">${task.assigned_to}</span>
-                    </td>
-                    <td><span class="badge bg-${this.getPriorityColor(task.priority)}">${task.priority}</span></td>
-                    <td>
-                        <select class="form-select form-select-sm" onchange="updateTaskStatus(${task.id}, this.value)">
-                            <option value="Pendiente" ${task.status === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                            <option value="En progreso" ${task.status === 'En progreso' ? 'selected' : ''}>En Progreso</option>
-                            <option value="Completada" ${task.status === 'Completada' ? 'selected' : ''}>Completada</option>
-                        </select>
-                    </td>
-                    <td><span class="badge bg-info">${task.category}</span></td>
-                    <td>${task.estimated_time || task.estimated_hours || '0h'}</td>
-                    <td>${task.actual_time || task.actual_hours || '0h'}</td>
-                    <td>${task.due_date || 'Sin fecha'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editTask(${task.id})" title="Editar tarea">
-                            Editar
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${task.id})" title="Eliminar tarea">
-                            Eliminar
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = tasks.map(task => 
+                '<tr>' +
+                    '<td>' +
+                        '<strong>' + task.title + '</strong>' +
+                        '<br><small class="text-muted">' + (task.description || task.notes || 'Sin descripción') + '</small>' +
+                    '</td>' +
+                    '<td>' +
+                        '<span class="task-assignment" data-task-id="' + task.id + '">' + task.assigned_to + '</span>' +
+                    '</td>' +
+                    '<td><span class="badge bg-' + this.getPriorityColor(task.priority) + '">' + task.priority + '</span></td>' +
+                    '<td>' +
+                        '<select class="form-select form-select-sm" onchange="updateTaskStatus(' + task.id + ', this.value)">' +
+                            '<option value="Pendiente"' + (task.status === 'Pendiente' ? ' selected' : '') + '>Pendiente</option>' +
+                            '<option value="En progreso"' + (task.status === 'En progreso' ? ' selected' : '') + '>En Progreso</option>' +
+                            '<option value="Completada"' + (task.status === 'Completada' ? ' selected' : '') + '>Completada</option>' +
+                        '</select>' +
+                    '</td>' +
+                    '<td><span class="badge bg-info">' + task.category + '</span></td>' +
+                    '<td>' + (task.estimated_time || task.estimated_hours || '0h') + '</td>' +
+                    '<td>' + (task.actual_time || task.actual_hours || '0h') + '</td>' +
+                    '<td>' + (task.due_date || 'Sin fecha') + '</td>' +
+                    '<td>' +
+                        '<button class="btn btn-sm btn-outline-primary me-1" onclick="editTask(' + task.id + ')" title="Editar tarea">Editar</button>' +
+                        '<button class="btn btn-sm btn-outline-danger" onclick="deleteTask(' + task.id + ')" title="Eliminar tarea">Eliminar</button>' +
+                    '</td>' +
+                '</tr>'
+            ).join('');
         } catch (error) {
             console.error('Error loading tasks:', error);
         }
@@ -498,7 +490,7 @@ class DiversiaCRM {
                         if (data.success) {
                             this.employees = data.employees;
                             this.updateAllDropdowns();
-                            console.log(`✅ ${this.employees.length} empleados cargados para asignación`);
+                            console.log('✅ ' + this.employees.length + ' empleados cargados para asignación');
                         }
                     } catch (error) {
                         console.error('Error cargando empleados para asignación:', error);
@@ -544,7 +536,7 @@ class DiversiaCRM {
                             id: employee.id,
                             name: employee.name
                         });
-                        option.textContent = `${employee.name} (${employee.position})`;
+                        option.textContent = employee.name + ' (' + employee.position + ')';
                         
                         if (employee.name === currentAssignment) {
                             option.selected = true;
@@ -563,7 +555,7 @@ class DiversiaCRM {
                     try {
                         const assignmentData = JSON.parse(selectedValue);
                         
-                        const response = await fetch(`/api/tasks/${taskId}/assign`, {
+                        const response = await fetch('/api/tasks/' + taskId + '/assign', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -575,11 +567,11 @@ class DiversiaCRM {
                         const result = await response.json();
                         
                         if (result.success) {
-                            this.showNotification(`✅ Tarea asignada a ${assignmentData.name}`, 'success');
+                            this.showNotification('✅ Tarea asignada a ' + assignmentData.name, 'success');
                             selectElement.style.backgroundColor = '#d4edda';
                             setTimeout(() => selectElement.style.backgroundColor = '', 2000);
                         } else {
-                            this.showNotification(`❌ Error: ${result.error}`, 'error');
+                            this.showNotification('❌ Error: ' + result.error, 'error');
                         }
                         
                     } catch (error) {
@@ -590,12 +582,9 @@ class DiversiaCRM {
                 
                 showNotification(message, type = 'info') {
                     const toast = document.createElement('div');
-                    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+                    toast.className = 'alert alert-' + (type === 'success' ? 'success' : 'danger') + ' alert-dismissible fade show position-fixed';
                     toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-                    toast.innerHTML = `
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    `;
+                    toast.innerHTML = '<div>' + message + '</div><button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
                     
                     document.body.appendChild(toast);
                     setTimeout(() => toast.remove(), 3000);
@@ -615,7 +604,7 @@ class DiversiaCRM {
 
     async loadContacts() {
         try {
-            const response = await fetch(`${this.apiBase}/api/contacts`);
+            const response = await fetch(this.apiBase + '/api/contacts');
             const contacts = await response.json();
             
             const tbody = document.getElementById('contactsTable');
@@ -653,7 +642,7 @@ class DiversiaCRM {
 
     async loadCompanies() {
         try {
-            const response = await fetch(`${this.apiBase}/api/companies`);
+            const response = await fetch(this.apiBase + '/api/companies');
             const companies = await response.json();
             
             const tbody = document.getElementById('companiesTable');
@@ -691,7 +680,7 @@ class DiversiaCRM {
 
     async loadOffers() {
         try {
-            const response = await fetch(`${this.apiBase}/api/job-offers`);
+            const response = await fetch(this.apiBase + '/api/job-offers');
             const offers = await response.json();
             
             const tbody = document.getElementById('offersTable');
@@ -733,7 +722,7 @@ class DiversiaCRM {
 
     async loadAssociations() {
         try {
-            const response = await fetch(`${this.apiBase}/api/associations`);
+            const response = await fetch(this.apiBase + '/api/associations');
             const associations = await response.json();
             
             const tbody = document.getElementById('associationsTable');

@@ -213,7 +213,7 @@ def crm_dashboard():
         if 'admin_user_id' not in session:
             flash('Debes iniciar sesión como administrador para acceder al CRM.', 'error')
             return redirect('/admin/login-new')
-        return render_template('crm-dashboard.html')
+        return render_template('crm-dashboard-simple.html')
     except Exception as e:
         print(f"Error en CRM dashboard: {e}")
         flash('Error interno del servidor. Inténtalo de nuevo.', 'error')
