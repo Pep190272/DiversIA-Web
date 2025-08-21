@@ -929,7 +929,7 @@ def registro_asociacion():
                 'neurodivergencias_atendidas': ','.join(form.neurodivergencias_atendidas.data or []),
                 'servicios': ','.join(form.servicios.data or []),
                 'descripcion': form.descripcion.data,
-                'años_funcionamiento': form.anos_funcionamiento.data,
+                'años_funcionamiento': form.años_funcionamiento.data,
                 'contacto_nombre': form.contacto_nombre.data,
                 'contacto_cargo': form.contacto_cargo.data
             }
