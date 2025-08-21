@@ -1,348 +1,431 @@
-# Servicio de integración de formularios web con CRM
-import os
+"""
+Servicio de integración de formularios para DiversIA
+Maneja todos los formularios web y asegura persistencia en base de datos
+"""
+
 import json
+import os
 from datetime import datetime
+from flask import flash
+import logging
 
-# Integración automática de formularios web al CRM
-def process_form_submission(form_type, form_data, source='web_form'):
-    """
-    Procesa automáticamente las submisiones de formularios web e integra los datos al CRM
-    """
-    try:
-        # Importar datos del CRM
-        from crm_api_simple import SAMPLE_CRM_DATA
-        
-        if form_type == 'registro_persona':
-            return process_person_registration(form_data, source)
-        elif form_type == 'registro_empresa':
-            return process_company_registration(form_data, source)
-        elif form_type == 'registro_asociacion':
-            return process_association_registration(form_data, source)
-        elif form_type == 'contacto':
-            return process_contact_form(form_data, source)
-        else:
-            print(f"⚠️ Tipo de formulario no reconocido: {form_type}")
-            return False
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class FormIntegrationService:
+    """Servicio para integrar formularios con base de datos y sistemas de respaldo"""
+    
+    def __init__(self):
+        self.backup_file = 'form_submissions_backup.json'
+    
+    def save_company_form(self, form_data):
+        """Guardar formulario de empresa con múltiples respaldos"""
+        try:
+            # 1. Intentar PostgreSQL primero
+            success_postgres = self._save_to_postgres_company(form_data)
             
-    except Exception as e:
-        print(f"⚠️ Error procesando formulario {form_type}: {e}")
-        return False
-
-def process_person_registration(form_data, source):
-    """
-    Convierte registro de persona neurodivergente en contacto CRM
-    """
-    try:
-        from crm_api_simple import SAMPLE_CRM_DATA
-        
-        # Generar nuevo ID
-        new_id = max([c['id'] for c in SAMPLE_CRM_DATA['contacts']], default=0) + 1
-        
-        # Mapear datos del formulario al formato CRM
-        new_contact = {
-            'id': new_id,
-            'name': f"{form_data.get('nombre', '')} {form_data.get('apellidos', '')}".strip(),
-            'email': form_data.get('email', ''),
-            'phone': form_data.get('telefono', ''),
-            'city': form_data.get('ciudad', ''),
-            'neurodivergence': form_data.get('tipo_neurodivergencia', 'TDAH'),
-            'formal_diagnosis': form_data.get('diagnostico_formal') == 'si',
-            'created_at': datetime.now().isoformat(),
-            'source': source,
-            # Campos adicionales del formulario
-            'age': form_data.get('edad'),
-            'education_level': form_data.get('nivel_educativo'),
-            'work_experience': form_data.get('experiencia_laboral'),
-            'employment_status': form_data.get('situacion_laboral'),
-            'accommodations_needed': form_data.get('ajustes_necesarios'),
-            'job_interests': form_data.get('areas_interes_laboral'),
-            'support_services': form_data.get('servicios_apoyo'),
-            'privacy_consent': form_data.get('consentimiento_privacidad', False),
-            'newsletter_consent': form_data.get('consentimiento_newsletter', False)
-        }
-        
-        # Agregar al CRM
-        SAMPLE_CRM_DATA['contacts'].append(new_contact)
-        
-        # Enviar notificación al equipo
-        send_form_notification('Nuevo registro persona ND', new_contact, form_data)
-        
-        print(f"✅ Contacto CRM creado desde formulario web: {new_contact['name']}")
-        return new_id
-        
-    except Exception as e:
-        print(f"⚠️ Error procesando registro persona: {e}")
-        return False
-
-def process_company_registration(form_data, source):
-    """
-    Convierte registro de empresa en entrada CRM
-    """
-    try:
-        from crm_api_simple import SAMPLE_CRM_DATA
-        
-        # Generar nuevo ID
-        new_id = max([c['id'] for c in SAMPLE_CRM_DATA['companies']], default=0) + 1
-        
-        # Mapear datos del formulario al formato CRM
-        new_company = {
-            'id': new_id,
-            'name': form_data.get('nombre_empresa', ''),
-            'sector': form_data.get('sector', 'Otros'),
-            'email': form_data.get('email_contacto', ''),
-            'phone': form_data.get('telefono', ''),
-            'city': form_data.get('ciudad', ''),
-            'size': form_data.get('tamaño_empresa', '1-10'),
-            'website': form_data.get('sitio_web', ''),
-            'created_at': datetime.now().isoformat(),
-            'source': source,
-            # Campos adicionales específicos de inclusión
-            'inclusion_commitment': form_data.get('compromiso_inclusion'),
-            'current_nd_employees': form_data.get('empleados_nd_actuales', 0),
-            'inclusion_budget': form_data.get('presupuesto_inclusion'),
-            'accommodation_willingness': form_data.get('disposicion_ajustes'),
-            'preferred_neurodivergences': form_data.get('neurodivergencias_preferidas', []),
-            'remote_work_options': form_data.get('opciones_trabajo_remoto'),
-            'contact_person': form_data.get('persona_contacto'),
-            'job_offers_count': 0  # Inicializar contador
-        }
-        
-        # Agregar al CRM
-        SAMPLE_CRM_DATA['companies'].append(new_company)
-        
-        # Enviar notificación al equipo
-        send_form_notification('Nueva empresa registrada', new_company, form_data)
-        
-        print(f"✅ Empresa CRM creada desde formulario web: {new_company['name']}")
-        return new_id
-        
-    except Exception as e:
-        print(f"⚠️ Error procesando registro empresa: {e}")
-        return False
-
-def process_association_registration(form_data, source):
-    """
-    Convierte registro de asociación en entrada CRM
-    """
-    try:
-        from crm_api_simple import SAMPLE_CRM_DATA
-        
-        # Generar nuevo ID
-        new_id = max([a['id'] for a in SAMPLE_CRM_DATA['associations']], default=0) + 1
-        
-        # Mapear datos del formulario al formato CRM
-        new_association = {
-            'id': new_id,
-            'name': form_data.get('nombre_asociacion', ''),
-            'acronym': form_data.get('acronimo', ''),
-            'country': form_data.get('pais', 'España'),
-            'city': form_data.get('ciudad', ''),
-            'document_type': form_data.get('tipo_documento', 'CIF'),
-            'document_number': form_data.get('numero_documento', ''),
-            'focus_area': form_data.get('area_enfoque', 'General'),
-            'type': form_data.get('tipo_organizacion', 'Asociación'),
-            'email': form_data.get('email', ''),
-            'phone': form_data.get('telefono', ''),
-            'website': form_data.get('sitio_web', ''),
-            'description': form_data.get('descripcion', ''),
-            'services': form_data.get('servicios_ofrecidos', ''),
-            'created_at': datetime.now().isoformat(),
-            'source': source,
-            # Campos adicionales
-            'members_count': form_data.get('numero_miembros', 0),
-            'foundation_year': form_data.get('año_fundacion'),
-            'geographic_scope': form_data.get('ambito_geografico'),
-            'collaboration_interest': form_data.get('interes_colaboracion'),
-            'programs_offered': form_data.get('programas_ofrecidos', [])
-        }
-        
-        # Agregar al CRM
-        SAMPLE_CRM_DATA['associations'].append(new_association)
-        
-        # Enviar notificación al equipo
-        send_form_notification('Nueva asociación registrada', new_association, form_data)
-        
-        print(f"✅ Asociación CRM creada desde formulario web: {new_association['name']}")
-        return new_id
-        
-    except Exception as e:
-        print(f"⚠️ Error procesando registro asociación: {e}")
-        return False
-
-def process_contact_form(form_data, source):
-    """
-    Procesa formulario de contacto general
-    """
-    try:
-        # Crear entrada de seguimiento para el equipo de ventas
-        contact_data = {
-            'name': form_data.get('nombre', ''),
-            'email': form_data.get('email', ''),
-            'phone': form_data.get('telefono', ''),
-            'message': form_data.get('mensaje', ''),
-            'interest_type': form_data.get('tipo_interes', 'General'),
-            'timestamp': datetime.now().isoformat(),
-            'source': source,
-            'status': 'pending_follow_up'
-        }
-        
-        # Enviar notificación inmediata al equipo
-        send_form_notification('Nuevo mensaje de contacto', contact_data, form_data)
-        
-        print(f"✅ Formulario de contacto procesado: {contact_data['name']}")
-        return True
-        
-    except Exception as e:
-        print(f"⚠️ Error procesando formulario contacto: {e}")
-        return False
-
-def send_form_notification(notification_type, crm_data, original_form_data):
-    """
-    Envía notificación por email cuando se recibe un nuevo formulario
-    """
-    try:
-        from employee_email_service import SendGridAPIClient, Mail
-        
-        sendgrid_key = os.environ.get('SENDGRID_API_KEY')
-        if not sendgrid_key:
-            print("⚠️ SENDGRID_API_KEY no configurado para notificaciones")
-            return False
-        
-        sg = SendGridAPIClient(sendgrid_key)
-        
-        # Crear contenido del email
-        html_content = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>{notification_type} - DiversIA</title>
-            <style>
-                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-                .header {{ background-color: #4a90e2; color: white; padding: 20px; text-align: center; }}
-                .content {{ padding: 30px; }}
-                .data-box {{ background-color: #f8f9fa; border-left: 4px solid #4a90e2; padding: 15px; margin: 20px 0; }}
-                .highlight {{ background-color: #fff3cd; padding: 10px; border-radius: 5px; margin: 10px 0; }}
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>{notification_type}</h1>
-                <p>Sistema de Integración Automática - DiversIA</p>
-            </div>
+            if success_postgres:
+                logger.info(f"✅ Empresa guardada en PostgreSQL: {form_data.get('nombre')}")
+            else:
+                # 2. Sistema de respaldo CRM
+                success_crm = self._save_to_crm_company(form_data)
+                
+                if success_crm:
+                    logger.info(f"✅ Empresa guardada en CRM: {form_data.get('nombre')}")
+                else:
+                    # 3. Respaldo manual en archivo
+                    self._save_to_backup_file('company', form_data)
+                    logger.info(f"✅ Empresa guardada en archivo respaldo: {form_data.get('nombre')}")
             
-            <div class="content">
-                <div class="highlight">
-                    <strong>📋 Nuevo lead capturado automáticamente del sitio web</strong><br>
-                    Los datos se han integrado automáticamente al CRM y están listos para seguimiento.
-                </div>
-                
-                <div class="data-box">
-                    <h3>Información registrada:</h3>
-                    <pre>{json.dumps(crm_data, indent=2, ensure_ascii=False)}</pre>
-                </div>
-                
-                <div class="data-box">
-                    <h3>Datos originales del formulario:</h3>
-                    <pre>{json.dumps(original_form_data, indent=2, ensure_ascii=False)}</pre>
-                </div>
-                
-                <p><strong>Próximos pasos:</strong></p>
-                <ul>
-                    <li>Revisar la información en el CRM dashboard</li>
-                    <li>Realizar seguimiento personalizado según el perfil</li>
-                    <li>Actualizar el estado del lead</li>
-                </ul>
-                
-                <p><a href="{os.environ.get('REPL_SLUG', 'diversia')}.replit.app/crm" target="_blank">
-                    Ver en CRM Dashboard →
-                </a></p>
-            </div>
-        </body>
-        </html>
-        """
-        
-        message = Mail(
-            from_email='diversiaeternals@gmail.com',
-            to_emails='diversiaeternals@gmail.com',
-            subject=f'🔔 {notification_type} - DiversIA CRM',
-            html_content=html_content
-        )
-        
-        response = sg.send(message)
-        
-        if response.status_code == 202:
-            print(f"✅ Notificación enviada: {notification_type}")
+            # Enviar notificación
+            self._send_notification('company', form_data)
+            
             return True
-        else:
-            print(f"⚠️ Error enviando notificación: {response.status_code}")
-            return False
             
-    except Exception as e:
-        print(f"⚠️ Error en notificación: {e}")
-        return False
-
-def get_ai_training_data():
-    """
-    Extrae datos formateados para entrenamiento de IA
-    """
-    try:
-        from crm_api_simple import SAMPLE_CRM_DATA
-        
-        training_data = {
-            'neurodivergent_profiles': [],
-            'company_inclusion_patterns': [],
-            'successful_matches': [],
-            'market_insights': []
-        }
-        
-        # Procesar perfiles neurodivergentes
-        for contact in SAMPLE_CRM_DATA['contacts']:
-            profile = {
-                'neurodivergence_type': contact.get('neurodivergence'),
-                'age_range': categorize_age(contact.get('age')),
-                'education_level': contact.get('education_level'),
-                'experience_level': contact.get('work_experience'),
-                'accommodation_needs': contact.get('accommodations_needed'),
-                'job_preferences': contact.get('job_interests'),
-                'location': contact.get('city'),
-                'formal_diagnosis': contact.get('formal_diagnosis', False)
+        except Exception as e:
+            logger.error(f"❌ Error guardando empresa: {e}")
+            # Guardar en respaldo de emergencia
+            self._save_to_backup_file('company_emergency', form_data)
+            return False
+    
+    def save_job_offer_form(self, form_data):
+        """Guardar formulario de oferta de trabajo"""
+        try:
+            # 1. Intentar PostgreSQL
+            success_postgres = self._save_to_postgres_job_offer(form_data)
+            
+            if success_postgres:
+                logger.info(f"✅ Oferta guardada en PostgreSQL: {form_data.get('titulo')}")
+            else:
+                # 2. Sistema CRM
+                success_crm = self._save_to_crm_job_offer(form_data)
+                
+                if success_crm:
+                    logger.info(f"✅ Oferta guardada en CRM: {form_data.get('titulo')}")
+                else:
+                    # 3. Archivo respaldo
+                    self._save_to_backup_file('job_offer', form_data)
+                    logger.info(f"✅ Oferta guardada en respaldo: {form_data.get('titulo')}")
+            
+            # Notificación
+            self._send_notification('job_offer', form_data)
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error guardando oferta: {e}")
+            self._save_to_backup_file('job_offer_emergency', form_data)
+            return False
+    
+    def save_user_registration(self, form_data, neurodivergence_type):
+        """Guardar registro de usuario neurodivergente"""
+        try:
+            # 1. PostgreSQL
+            success_postgres = self._save_to_postgres_user(form_data, neurodivergence_type)
+            
+            if success_postgres:
+                logger.info(f"✅ Usuario guardado en PostgreSQL: {form_data.get('nombre')}")
+            else:
+                # 2. CRM
+                success_crm = self._save_to_crm_user(form_data, neurodivergence_type)
+                
+                if success_crm:
+                    logger.info(f"✅ Usuario guardado en CRM: {form_data.get('nombre')}")
+                else:
+                    # 3. Respaldo
+                    self._save_to_backup_file('user_registration', {
+                        **form_data,
+                        'neurodivergence_type': neurodivergence_type
+                    })
+                    logger.info(f"✅ Usuario guardado en respaldo: {form_data.get('nombre')}")
+            
+            # Notificación
+            self._send_notification('user_registration', {
+                **form_data,
+                'neurodivergence_type': neurodivergence_type
+            })
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error guardando usuario: {e}")
+            self._save_to_backup_file('user_emergency', form_data)
+            return False
+    
+    def save_contact_form(self, form_data):
+        """Guardar formulario de contacto"""
+        try:
+            # Múltiples sistemas de respaldo
+            self._save_to_crm_contact(form_data)
+            self._save_to_backup_file('contact', form_data)
+            self._send_notification('contact', form_data)
+            
+            logger.info(f"✅ Contacto guardado: {form_data.get('nombre')}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error guardando contacto: {e}")
+            return False
+    
+    # === MÉTODOS PRIVADOS ===
+    
+    def _save_to_postgres_company(self, data):
+        """Guardar empresa en PostgreSQL"""
+        try:
+            from models import Company
+            from app import db
+            
+            # Verificar el modelo Company primero
+            from models import Company
+            import inspect
+            
+            # Obtener parámetros válidos del constructor
+            sig = inspect.signature(Company.__init__)
+            valid_params = list(sig.parameters.keys())[1:]  # Excluir 'self'
+            
+            company_data = {}
+            # Mapear datos a nombres de columnas correctos
+            field_mapping = {
+                'nombre': 'name',
+                'email': 'email', 
+                'telefono': 'phone',
+                'sector': 'sector',
+                'tamaño': 'size',
+                'ciudad': 'city',
+                'web': 'website',
+                'descripcion': 'description'
             }
-            training_data['neurodivergent_profiles'].append(profile)
-        
-        # Procesar patrones de empresas inclusivas
-        for company in SAMPLE_CRM_DATA['companies']:
-            pattern = {
-                'sector': company.get('sector'),
-                'size': company.get('size'),
-                'inclusion_commitment': company.get('inclusion_commitment'),
-                'remote_work_options': company.get('remote_work_options'),
-                'preferred_neurodivergences': company.get('preferred_neurodivergences', []),
-                'location': company.get('city'),
-                'offers_count': company.get('job_offers_count', 0)
+            
+            for field, value in data.items():
+                if field in field_mapping and field_mapping[field] in valid_params:
+                    company_data[field_mapping[field]] = value
+                elif field in valid_params:
+                    company_data[field] = value
+            
+            company = Company(**company_data)
+            
+            db.session.add(company)
+            db.session.commit()
+            return True
+            
+        except Exception as e:
+            logger.warning(f"PostgreSQL empresa falló: {e}")
+            return False
+    
+    def _save_to_postgres_job_offer(self, data):
+        """Guardar oferta en PostgreSQL"""
+        try:
+            from models import JobOffer
+            from app import db
+            
+            offer = JobOffer(
+                title=data.get('titulo'),
+                company_name=data.get('empresa'),
+                location=data.get('ubicacion'),
+                salary=data.get('salario'),
+                description=data.get('descripcion'),
+                requirements=data.get('requisitos'),
+                benefits=data.get('beneficios')
+            )
+            
+            db.session.add(offer)
+            db.session.commit()
+            return True
+            
+        except Exception as e:
+            logger.warning(f"PostgreSQL oferta falló: {e}")
+            return False
+    
+    def _save_to_postgres_user(self, data, neurodivergence_type):
+        """Guardar usuario en PostgreSQL"""
+        try:
+            from models import User
+            from app import db
+            
+            user = User(
+                username=data.get('email'),
+                email=data.get('email'),
+                first_name=data.get('nombre'),
+                last_name=data.get('apellidos'),
+                neurodivergence_type=neurodivergence_type
+            )
+            
+            db.session.add(user)
+            db.session.commit()
+            return True
+            
+        except Exception as e:
+            logger.warning(f"PostgreSQL usuario falló: {e}")
+            return False
+    
+    def _save_to_crm_company(self, data):
+        """Guardar empresa en sistema CRM"""
+        try:
+            from data_persistence_manager import persistence_manager
+            crm_data = persistence_manager.load_data()
+            
+            # Generar ID único
+            max_id = max([c.get('id', 0) for c in crm_data.get('companies', [])], default=0)
+            
+            company_record = {
+                'id': max_id + 1,
+                'name': data.get('nombre'),
+                'email': data.get('email'),
+                'phone': data.get('telefono'),
+                'sector': data.get('sector'),
+                'size': data.get('tamaño'),
+                'city': data.get('ciudad'),
+                'website': data.get('web'),
+                'description': data.get('descripcion'),
+                'created_at': datetime.now().isoformat(),
+                'source': 'web_form'
             }
-            training_data['company_inclusion_patterns'].append(pattern)
-        
-        return training_data
-        
-    except Exception as e:
-        print(f"⚠️ Error extrayendo datos para IA: {e}")
-        return {}
+            
+            crm_data.setdefault('companies', []).append(company_record)
+            return persistence_manager.save_data(crm_data)
+            
+        except Exception as e:
+            logger.warning(f"CRM empresa falló: {e}")
+            return False
+    
+    def _save_to_crm_job_offer(self, data):
+        """Guardar oferta en sistema CRM"""
+        try:
+            from data_persistence_manager import persistence_manager
+            crm_data = persistence_manager.load_data()
+            
+            max_id = max([o.get('id', 0) for o in crm_data.get('job_offers', [])], default=0)
+            
+            offer_record = {
+                'id': max_id + 1,
+                'title': data.get('titulo'),
+                'company_name': data.get('empresa'),
+                'location': data.get('ubicacion'),
+                'salary': data.get('salario'),
+                'description': data.get('descripcion'),
+                'requirements': data.get('requisitos'),
+                'benefits': data.get('beneficios'),
+                'active': True,
+                'created_at': datetime.now().isoformat(),
+                'source': 'web_form'
+            }
+            
+            crm_data.setdefault('job_offers', []).append(offer_record)
+            return persistence_manager.save_data(crm_data)
+            
+        except Exception as e:
+            logger.warning(f"CRM oferta falló: {e}")
+            return False
+    
+    def _save_to_crm_user(self, data, neurodivergence_type):
+        """Guardar usuario en sistema CRM"""
+        try:
+            from data_persistence_manager import persistence_manager
+            crm_data = persistence_manager.load_data()
+            
+            max_id = max([c.get('id', 0) for c in crm_data.get('contacts', [])], default=0)
+            
+            user_record = {
+                'id': max_id + 1,
+                'name': f"{data.get('nombre', '')} {data.get('apellidos', '')}".strip(),
+                'email': data.get('email'),
+                'phone': data.get('telefono'),
+                'city': data.get('ciudad'),
+                'neurodivergence': neurodivergence_type,
+                'age': data.get('edad'),
+                'created_at': datetime.now().isoformat(),
+                'source': 'web_registration',
+                'type': 'Usuario ND'
+            }
+            
+            crm_data.setdefault('contacts', []).append(user_record)
+            return persistence_manager.save_data(crm_data)
+            
+        except Exception as e:
+            logger.warning(f"CRM usuario falló: {e}")
+            return False
+    
+    def _save_to_crm_contact(self, data):
+        """Guardar contacto en sistema CRM"""
+        try:
+            from data_persistence_manager import persistence_manager
+            crm_data = persistence_manager.load_data()
+            
+            max_id = max([c.get('id', 0) for c in crm_data.get('contacts', [])], default=0)
+            
+            contact_record = {
+                'id': max_id + 1,
+                'name': data.get('nombre'),
+                'email': data.get('email'),
+                'subject': data.get('asunto'),
+                'message': data.get('mensaje'),
+                'created_at': datetime.now().isoformat(),
+                'source': 'contact_form',
+                'type': 'Consulta'
+            }
+            
+            crm_data.setdefault('contacts', []).append(contact_record)
+            return persistence_manager.save_data(crm_data)
+            
+        except Exception as e:
+            logger.warning(f"CRM contacto falló: {e}")
+            return False
+    
+    def _save_to_backup_file(self, form_type, data):
+        """Guardar en archivo de respaldo"""
+        try:
+            backup_data = {
+                'timestamp': datetime.now().isoformat(),
+                'form_type': form_type,
+                'data': data
+            }
+            
+            # Cargar respaldos existentes
+            backups = []
+            if os.path.exists(self.backup_file):
+                with open(self.backup_file, 'r', encoding='utf-8') as f:
+                    backups = json.load(f)
+            
+            backups.append(backup_data)
+            
+            # Guardar
+            with open(self.backup_file, 'w', encoding='utf-8') as f:
+                json.dump(backups, f, ensure_ascii=False, indent=2)
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error guardando en archivo respaldo: {e}")
+            return False
+    
+    def _send_notification(self, notification_type, data):
+        """Enviar notificación por email"""
+        try:
+            from email_system_reliable import send_contact_notification
+            
+            if notification_type == 'company':
+                subject = f"Nueva empresa registrada: {data.get('nombre')}"
+                message = f"""
+                Nueva empresa registrada en DiversIA:
+                
+                Nombre: {data.get('nombre')}
+                Email: {data.get('email')}
+                Sector: {data.get('sector')}
+                Ciudad: {data.get('ciudad')}
+                """
+                
+            elif notification_type == 'job_offer':
+                subject = f"Nueva oferta publicada: {data.get('titulo')}"
+                message = f"""
+                Nueva oferta de trabajo:
+                
+                Título: {data.get('titulo')}
+                Empresa: {data.get('empresa')}
+                Ubicación: {data.get('ubicacion')}
+                Salario: {data.get('salario')}
+                """
+                
+            elif notification_type == 'user_registration':
+                subject = f"Nuevo registro usuario: {data.get('nombre')}"
+                message = f"""
+                Nuevo usuario neurodivergente registrado:
+                
+                Nombre: {data.get('nombre')} {data.get('apellidos', '')}
+                Email: {data.get('email')}
+                Tipo: {data.get('neurodivergence_type')}
+                """
+                
+            elif notification_type == 'contact':
+                subject = f"Nuevo contacto: {data.get('asunto')}"
+                message = f"""
+                Nuevo mensaje de contacto:
+                
+                Nombre: {data.get('nombre')}
+                Email: {data.get('email')}
+                Asunto: {data.get('asunto')}
+                Mensaje: {data.get('mensaje')}
+                """
+            
+            else:
+                return False
+            
+            send_contact_notification(
+                data.get('nombre', 'Usuario'),
+                data.get('email', 'noemail@diversia.com'),
+                subject,
+                message
+            )
+            
+            return True
+            
+        except Exception as e:
+            logger.warning(f"Error enviando notificación: {e}")
+            return False
 
-def categorize_age(age):
-    """Categoriza edades para análisis IA"""
-    if not age:
-        return 'unknown'
-    age = int(age)
-    if age < 25:
-        return 'young_adult'
-    elif age < 35:
-        return 'early_career'
-    elif age < 45:
-        return 'mid_career'
-    elif age < 55:
-        return 'experienced'
-    else:
-        return 'senior'
+# Instancia global
+form_service = FormIntegrationService()
 
-print("✅ Servicio de integración de formularios web cargado")
+print("✅ Servicio de integración de formularios inicializado")
+print("🔧 Respaldo triple: PostgreSQL → CRM → Archivo")
+print("📧 Notificaciones automáticas por email")

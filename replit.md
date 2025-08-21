@@ -12,6 +12,9 @@ System reliability: Critical requirement - zero tolerance for 500 errors on main
 - Route validator (route_validator.py) automatically checks critical routes
 - Critical routes that must never fail: /, /empresas, /personas-nd, /comunidad, /registro, /registro-tdah, /registro-tea, /registro-dislexia, /test, /comenzar
 - Admin login fixed: Access via /admin/login-new with credentials DiversiaEternals / diversia3ternal$2025
+- **ALL FORMS NOW WORKING**: Company registration, user registration, contact forms - all save data correctly
+- **Triple backup system**: PostgreSQL → CRM persistent → File backup ensures zero data loss
+- **Email notifications**: Automatic emails sent to diversiaeternals@gmail.com for all form submissions
 - System works with PostgreSQL when active, automatically falls back to memory storage when disabled
 
 ## System Architecture

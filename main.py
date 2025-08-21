@@ -44,6 +44,13 @@ try:
     print("✅ Sistema de asignación de tareas cargado")
 except Exception as e:
     print(f"⚠️ Error cargando sistema de asignación: {e}")
+
+# Cargar servicio de integración de formularios
+try:
+    import form_integration_service  # noqa: F401
+    print("✅ Servicio de integración de formularios cargado")
+except Exception as e:
+    print(f"⚠️ Error cargando servicio de formularios: {e}")
 from api_endpoints import api
 from chat_webhook import chat
 from chat_intelligent_endpoint import intelligent_chat

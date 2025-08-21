@@ -1,4 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify
+from datetime import datetime
 from app import app, db
 from models import User, Company, JobOffer, TestResult
 from forms import (RegistroGeneralForm, RegistroTDAHForm, RegistroDislexiaForm, RegistroTEAForm, 
@@ -15,10 +16,50 @@ def index():
 def personas_nd():
     return render_template('personas-nd.html')
 
-@app.route('/empresas')
+@app.route('/empresas', methods=['GET', 'POST'])
 def empresas():
     form = EmpresaForm()
     oferta_form = OfertaTrabajoForm()
+    
+    if request.method == 'POST':
+        try:
+            # Debug: imprimir todos los datos del formulario
+            print("=== DATOS RECIBIDOS EN FORMULARIO ===")
+            for key, value in request.form.items():
+                print(f"{key}: {value}")
+            print("=====================================")
+            
+            # Obtener datos del formulario usando los nombres correctos del template
+            data = {
+                'nombre': request.form.get('nombre_empresa'),  # Campo del template
+                'email': request.form.get('email_contacto'),   # Campo del template  
+                'telefono': request.form.get('telefono'),
+                'sector': request.form.get('sector'),
+                'tamaño': request.form.get('tamano_empresa'),  # Campo del template
+                'ciudad': request.form.get('ciudad'),
+                'web': request.form.get('sitio_web'),          # Campo del template
+                'descripcion': request.form.get('descripcion_empresa'),  # Campo del template
+                'inclusivo': request.form.get('aceptar_privacidad'),  # Checkbox privacidad
+                'created_at': datetime.now().isoformat()
+            }
+            
+            print(f"Datos procesados: {data}")
+            
+            # Usar servicio de integración de formularios
+            from form_integration_service import form_service
+            success = form_service.save_company_form(data)
+            
+            if success:
+                flash(f'Empresa {data["nombre"]} registrada exitosamente', 'success')
+                return redirect(url_for('empresas'))
+            else:
+                flash('Error al registrar la empresa. Los datos han sido guardados en respaldo.', 'warning')
+                return redirect(url_for('empresas'))
+            
+        except Exception as e:
+            print(f"❌ Error procesando formulario empresa: {e}")
+            flash('Error al registrar la empresa. Inténtalo de nuevo.', 'error')
+    
     return render_template('empresas.html', form=form, oferta_form=oferta_form)
 
 @app.route('/comunidad')
