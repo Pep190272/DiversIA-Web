@@ -64,6 +64,60 @@ def comenzar():
     """Ruta para "Comenzar ahora" - redirige a personas neurodivergentes"""
     return redirect(url_for('personas_nd'))
 
+# API del Chat Inteligente
+@app.route('/api/chat', methods=['POST'])
+def chat_endpoint():
+    """Endpoint para el chat inteligente"""
+    try:
+        from chat_simple import get_chat_response
+        
+        data = request.get_json()
+        message = data.get('message', '')
+        context = data.get('context', {})
+        
+        if not message:
+            return jsonify({'error': 'Mensaje requerido'}), 400
+        
+        response = get_chat_response(message, context)
+        return jsonify(response)
+        
+    except Exception as e:
+        return jsonify({
+            'error': 'Error en el chat',
+            'response': 'Lo siento, hay un problema técnico. Intenta de nuevo.',
+            'source': 'error'
+        }), 500
+
+# API del Motor de Emparejamiento
+@app.route('/api/matching', methods=['POST'])
+def matching_endpoint():
+    """Endpoint para encontrar coincidencias de trabajo"""
+    try:
+        from matching_engine_simple import find_job_matches
+        
+        data = request.get_json()
+        user_profile = data.get('user_profile', {})
+        job_offers = data.get('job_offers', [])
+        top_n = data.get('top_n', 5)
+        
+        if not user_profile:
+            return jsonify({'error': 'Perfil de usuario requerido'}), 400
+        
+        matches = find_job_matches(user_profile, job_offers, top_n)
+        
+        return jsonify({
+            'success': True,
+            'matches': matches,
+            'total_jobs_analyzed': len(job_offers),
+            'top_matches_returned': len(matches)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': 'Error en el motor de emparejamiento',
+            'message': str(e)
+        }), 500
+
 @app.route('/contacto')
 def contacto():
     return render_template('contacto.html')

@@ -11,10 +11,17 @@ from typing import Dict, List, Optional, Any
 import logging
 
 # IA y Machine Learning
-import openai  # Compatible con Mistral via API
-import numpy as np
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    NUMPY_AVAILABLE = False
+
+try:
+    import requests
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
 
 # Base de datos y APIs
 import requests
@@ -38,16 +45,21 @@ class DiversIAAgent:
         
     def setup_ai_models(self):
         """Configurar modelos de IA"""
-        # Modelo de embeddings para análisis semántico
-        self.embedding_model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+        self.mistral_api_key = os.getenv('MISTRAL_API_KEY')
         
-        # Configuración para Mistral (compatible con OpenAI API)
-        self.mistral_client = openai.OpenAI(
-            api_key=os.getenv('MISTRAL_API_KEY', 'demo-key'),
-            base_url="https://api.mistral.ai/v1"
-        )
+        if self.mistral_api_key and REQUESTS_AVAILABLE:
+            self.mistral_enabled = True
+            logger.info("✅ Mistral AI enabled")
+        else:
+            self.mistral_enabled = False
+            logger.warning("⚠️ Mistral AI disabled - missing API key or requests")
         
-        logger.info("✅ AI models initialized")
+        if NUMPY_AVAILABLE:
+            self.numpy_enabled = True
+            logger.info("✅ NumPy available for matching")
+        else:
+            self.numpy_enabled = False
+            logger.warning("⚠️ NumPy unavailable - basic matching only")
     
     def setup_database(self):
         """Configurar conexión a base de datos"""

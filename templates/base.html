@@ -20,6 +20,7 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat-widget.css') }}">
     
 
     
@@ -261,6 +262,30 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Chat Widget -->
+    <div id="chat-widget" class="chat-widget">
+        <div id="chat-toggle" class="chat-toggle" onclick="toggleChat()">
+            <i data-lucide="message-circle" style="width: 24px; height: 24px;"></i>
+        </div>
+        <div id="chat-container" class="chat-container" style="display: none;">
+            <div class="chat-header">
+                <h6 class="mb-0">Asistente DiversIA</h6>
+                <button onclick="toggleChat()" class="btn-close btn-close-white"></button>
+            </div>
+            <div id="chat-messages" class="chat-messages">
+                <div class="chat-message bot-message">
+                    ¡Hola! Soy el asistente de DiversIA. ¿En qué puedo ayudarte?
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Escribe tu mensaje..." onkeypress="handleChatKeyPress(event)">
+                <button onclick="sendChatMessage()" class="chat-send-btn">
+                    <i data-lucide="send" style="width: 16px; height: 16px;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer mt-5" role="contentinfo">
         <div class="container">
@@ -344,8 +369,80 @@
     <!-- Client Translation System -->
     <script src="{{ url_for('static', filename='js/client-translator.js') }}"></script>
     
-    <!-- Chat Widget -->
-    <script src="{{ url_for('static', filename='js/chat-widget.js') }}"></script>
+    <!-- Chat Widget Scripts -->
+    <script>
+        function toggleChat() {
+            const container = document.getElementById('chat-container');
+            const toggle = document.getElementById('chat-toggle');
+            
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                toggle.style.display = 'none';
+                document.getElementById('chat-input').focus();
+            } else {
+                container.style.display = 'none';
+                toggle.style.display = 'flex';
+            }
+        }
+        
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+        
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Agregar mensaje del usuario
+            addChatMessage(message, 'user');
+            input.value = '';
+            
+            // Mostrar indicador de escritura
+            const typingDiv = addChatMessage('Escribiendo...', 'bot', 'typing-indicator');
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        context: {}
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Remover indicador de escritura
+                if (typingDiv) typingDiv.remove();
+                
+                // Agregar respuesta del bot
+                addChatMessage(data.response || 'Lo siento, no pude procesar tu mensaje.', 'bot');
+                
+            } catch (error) {
+                console.error('Error en chat:', error);
+                if (typingDiv) typingDiv.remove();
+                addChatMessage('Lo siento, hay un problema de conexión. Intenta de nuevo.', 'bot');
+            }
+        }
+        
+        function addChatMessage(message, sender, extraClass = '') {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}-message ${extraClass}`;
+            messageDiv.textContent = message;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            return messageDiv;
+        }
+    </script>
     
     <!-- Metricool se carga solo con consentimiento de cookies de análisis -->
     
