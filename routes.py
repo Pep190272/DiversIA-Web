@@ -911,24 +911,27 @@ def podcast_diversia():
 @app.route('/registro-asociacion', methods=['GET', 'POST'])
 def registro_asociacion():
     """Formulario para registro de nuevas asociaciones"""
-    if request.method == 'POST':
+    from forms import AsociacionForm
+    form = AsociacionForm()
+    
+    if request.method == 'POST' and form.validate_on_submit():
         try:
             # Recoger datos del formulario
             data = {
-                'nombre_asociacion': request.form.get('nombre_asociacion'),
-                'acronimo': request.form.get('acronimo'),
-                'pais': request.form.get('pais'),
-                'ciudad': request.form.get('ciudad'),
-                'email': request.form.get('email'),
-                'telefono': request.form.get('telefono'),
-                'tipo_documento': request.form.get('tipo_documento'),
-                'numero_documento': request.form.get('numero_documento'),
-                'neurodivergencias_atendidas': ','.join(request.form.getlist('neurodivergencias_atendidas')),
-                'servicios': ','.join(request.form.getlist('servicios')),
-                'descripcion': request.form.get('descripcion'),
-                'años_funcionamiento': request.form.get('anos_funcionamiento'),
-                'contacto_nombre': request.form.get('contacto_nombre'),
-                'contacto_cargo': request.form.get('contacto_cargo')
+                'nombre_asociacion': form.nombre_asociacion.data,
+                'acronimo': form.acronimo.data,
+                'pais': form.pais.data,
+                'ciudad': form.ciudad.data,
+                'email': form.email.data,
+                'telefono': form.telefono.data,
+                'tipo_documento': form.tipo_documento.data,
+                'numero_documento': form.numero_documento.data,
+                'neurodivergencias_atendidas': ','.join(form.neurodivergencias_atendidas.data or []),
+                'servicios': ','.join(form.servicios.data or []),
+                'descripcion': form.descripcion.data,
+                'años_funcionamiento': form.anos_funcionamiento.data,
+                'contacto_nombre': form.contacto_nombre.data,
+                'contacto_cargo': form.contacto_cargo.data
             }
             
             # Crear asociación en SQLite
@@ -989,4 +992,4 @@ def registro_asociacion():
             print(f"❌ Error registrando asociación: {e}")
             flash('Error al registrar la asociación. Por favor intenta de nuevo.', 'error')
     
-    return render_template('registro-asociacion.html')
+    return render_template('registro-asociacion.html', form=form)
