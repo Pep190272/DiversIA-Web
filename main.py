@@ -16,6 +16,13 @@ try:
     print("✅ CRM API cargado correctamente")
 except Exception as e:
     print(f"⚠️ Error cargando CRM: {e}")
+
+# Cargar sistema de respaldo de notificaciones
+try:
+    import email_fallback_system  # noqa: F401
+    print("✅ Sistema de respaldo de notificaciones cargado")
+except Exception as e:
+    print(f"⚠️ Error cargando sistema de respaldo: {e}")
 from api_endpoints import api
 from chat_webhook import chat
 from chat_intelligent_endpoint import intelligent_chat
