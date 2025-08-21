@@ -986,10 +986,15 @@ def registro_asociacion():
                 print(f"⚠️ Error integrando asociación con CRM: {e}")
             
             flash('¡Asociación registrada exitosamente! Te contactaremos pronto.', 'success')
-            return redirect(url_for('registro_asociacion'))
+            return redirect(url_for('verificacion_documentos'))
             
         except Exception as e:
             print(f"❌ Error registrando asociación: {e}")
             flash('Error al registrar la asociación. Por favor intenta de nuevo.', 'error')
     
     return render_template('registro-asociacion.html', form=form)
+
+@app.route('/verificacion-documentos')
+def verificacion_documentos():
+    """Página de confirmación y subida de documentos para asociaciones"""
+    return render_template('verificacion-documentos.html')

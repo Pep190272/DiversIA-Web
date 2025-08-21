@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Verificación de Documentos - DiversIA{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white text-center">
+                    <h3><i class="fas fa-check-circle me-2"></i>Solicitud Enviada Exitosamente</h3>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="alert alert-success">
+                            <i class="fas fa-envelope-circle-check fa-3x mb-3"></i>
+                            <h4>¡Gracias por tu solicitud!</h4>
+                            <p class="mb-0">Hemos recibido tu solicitud de registro como asociación.</p>
+                        </div>
+                    </div>
+                    
+                    <h5><i class="fas fa-file-upload me-2"></i>Próximos Pasos</h5>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <span class="timeline-number bg-success text-white">1</span>
+                            <div class="timeline-content">
+                                <h6>Subir Documentación Legal</h6>
+                                <p>Deberás subir los documentos legales que acrediten la legitimidad de tu asociación:</p>
+                                <ul>
+                                    <li>Registro oficial de la asociación</li>
+                                    <li>Estatutos</li>
+                                    <li>Certificado de utilidad pública (si aplica)</li>
+                                    <li>NIF/CIF o documento fiscal correspondiente</li>
+                                </ul>
+                                <div class="mt-3">
+                                    <button class="btn btn-primary" onclick="subirDocumentos()">
+                                        <i class="fas fa-upload me-2"></i>Subir Documentos
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <span class="timeline-number bg-warning text-dark">2</span>
+                            <div class="timeline-content">
+                                <h6>Revisión por Administración</h6>
+                                <p>Nuestro equipo revisará tu documentación en un plazo de 3-5 días laborables.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <span class="timeline-number bg-info text-white">3</span>
+                            <div class="timeline-content">
+                                <h6>Notificación de Resultado</h6>
+                                <p>Te notificaremos por email el resultado de la verificación.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6><i class="fas fa-info-circle me-2"></i>Información Importante</h6>
+                        <ul class="mb-0">
+                            <li>Tu asociación aparecerá en estado "Verificando Documentación" hasta completar el proceso</li>
+                            <li>Recibirás emails de seguimiento en cada etapa</li>
+                            <li>Una vez aprobada, tendrás acceso completo a la plataforma</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('asociaciones') }}" class="btn btn-outline-primary me-3">
+                            <i class="fas fa-heart-handshake me-2"></i>Ver Asociaciones
+                        </a>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-home me-2"></i>Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para subir documentos -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-upload me-2"></i>Subir Documentación Legal
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Registro Oficial de la Asociación</label>
+                        <input type="file" class="form-control" name="registro_oficial" accept=".pdf,.jpg,.png" required>
+                        <small class="form-text text-muted">PDF, JPG o PNG - Máximo 5MB</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Estatutos</label>
+                        <input type="file" class="form-control" name="estatutos" accept=".pdf,.jpg,.png">
+                        <small class="form-text text-muted">PDF, JPG o PNG - Máximo 5MB</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Documento Fiscal (NIF/CIF)</label>
+                        <input type="file" class="form-control" name="documento_fiscal" accept=".pdf,.jpg,.png">
+                        <small class="form-text text-muted">PDF, JPG o PNG - Máximo 5MB</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Otros Documentos (Opcional)</label>
+                        <input type="file" class="form-control" name="otros_documentos" accept=".pdf,.jpg,.png" multiple>
+                        <small class="form-text text-muted">Certificados, avales, etc.</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" name="observaciones" rows="3" placeholder="Información adicional sobre los documentos..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="enviarDocumentos()">
+                    <i class="fas fa-upload me-2"></i>Subir Documentos
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    margin: 20px 0;
+}
+
+.timeline-item {
+    display: flex;
+    margin-bottom: 20px;
+    align-items: flex-start;
+}
+
+.timeline-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.timeline-content {
+    flex: 1;
+    padding-top: 5px;
+}
+</style>
+
+<script>
+function subirDocumentos() {
+    const uploadModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+    uploadModal.show();
+}
+
+function enviarDocumentos() {
+    const form = document.getElementById('uploadForm');
+    const formData = new FormData(form);
+    
+    // Simular subida de documentos
+    const submitBtn = event.target;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Subiendo...';
+    submitBtn.disabled = true;
+    
+    setTimeout(() => {
+        alert('¡Documentos subidos exitosamente! Recibirás una confirmación por email.');
+        bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
+        submitBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Subir Documentos';
+        submitBtn.disabled = false;
+    }, 2000);
+}
+</script>
+{% endblock %}

@@ -68,8 +68,19 @@ class RegistroTDAHForm(RegistroGeneralForm):
         ('alto', 'Alto - Necesito moverme constantemente')
     ], validators=[Optional()])
     
-    medicacion = BooleanField('¿Tomas medicación para el TDAH?')
-    medicacion_actual = BooleanField('¿Actualmente tomas medicación?')
+    medicacion = SelectField('¿Tomas medicación para el TDAH?', choices=[
+        ('', 'Selecciona una opción'),
+        ('si', 'Sí, tomo medicación'),
+        ('no', 'No tomo medicación'),
+        ('antes', 'Tomé antes, pero ya no')
+    ], validators=[Optional()])
+    
+    medicacion_actual = SelectField('Estado actual de medicación', choices=[
+        ('', 'Selecciona una opción'),
+        ('si_actual', 'Sí, actualmente tomo'),
+        ('no_actual', 'No tomo actualmente'),
+        ('evaluando', 'Estoy evaluando opciones')
+    ], validators=[Optional()])
     
     estrategias_organizacion = TextAreaField('Estrategias de organización', validators=[Optional()], 
         description='Describe las estrategias que te ayudan a mantenerte organizado')
@@ -571,11 +582,11 @@ class AsociacionForm(FlaskForm):
     
     años_funcionamiento = SelectField('Años de funcionamiento', choices=[
         ('', 'Selecciona una opción'),
-        ('menos_1', 'Menos de 1 año'),
-        ('1_3', '1-3 años'),
-        ('4_10', '4-10 años'),
-        ('11_20', '11-20 años'),
-        ('mas_20', 'Más de 20 años')
+        ('0', 'Menos de 1 año'),
+        ('2', '1-3 años'),
+        ('7', '4-10 años'),
+        ('15', '11-20 años'),
+        ('25', 'Más de 20 años')
     ], validators=[DataRequired(message='Debes especificar los años de funcionamiento')])
     
     numero_socios = SelectField('Número aproximado de socios/miembros', choices=[
