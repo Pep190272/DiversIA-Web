@@ -3,12 +3,12 @@ from app import app
 # Importar rutas después de crear la app
 import routes  # noqa: F401
 
-# Importar módulos de autenticación
+# Sistema de autenticación simplificado (sin base de datos)
 try:
-    import admin_auth  # noqa: F401
-    print("✅ Sistema de autenticación admin cargado")
+    import admin_auth_simple  # noqa: F401
+    print("✅ Sistema de autenticación admin simplificado cargado")
 except Exception as e:
-    print(f"⚠️ Error cargando admin_auth: {e}")
+    print(f"⚠️ Error cargando admin_auth_simple: {e}")
 
 # Cargar CRM simple y su API
 try:

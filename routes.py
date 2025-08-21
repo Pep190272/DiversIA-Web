@@ -126,7 +126,7 @@ def contacto():
 def crm_dashboard():
     try:
         from flask import session, redirect, flash
-        if 'admin_id' not in session:
+        if 'admin_logged_in' not in session or not session['admin_logged_in']:
             flash('Debes iniciar sesión como administrador para acceder al CRM.', 'error')
             return redirect('/admin/login')
         return render_template('crm-dashboard.html')
@@ -138,7 +138,7 @@ def crm_dashboard():
 @app.route('/crm/funnel')
 def crm_funnel_dashboard():
     from flask import session, redirect, flash
-    if 'admin_id' not in session:
+    if 'admin_logged_in' not in session or not session['admin_logged_in']:
         flash('Debes iniciar sesión como administrador.', 'error')
         return redirect('/admin/login')
     return render_template('crm-dashboard-funnel.html')
