@@ -1013,7 +1013,7 @@ def empresa_registro():
 
 @app.route('/ofertas-empleo', methods=['POST'])
 def crear_oferta():
-    form = OfertaEmpleoForm()
+    form = OfertaTrabajoForm()
     if form.validate_on_submit():
         # For simplicity, using company_id = 1. In production, this would come from authentication
         offer = JobOffer(
