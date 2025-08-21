@@ -15,6 +15,13 @@ try:
 except ImportError:
     print("⚠️ CSV Manager no disponible")
 
+# Importar CRM Neurodivergentes
+try:
+    from crm_neurodivergentes import create_neurodivergentes_api
+    create_neurodivergentes_api(app)
+except ImportError:
+    print("⚠️ CRM Neurodivergentes no disponible")
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -254,6 +261,20 @@ def crm_dashboard():
         print(f"Error en CRM dashboard: {e}")
         flash('Error interno del servidor. Inténtalo de nuevo.', 'error')
         return redirect('/')
+
+@app.route('/crm/neurodivergentes')
+def crm_neurodivergentes():
+    """Panel CRM especializado para personas neurodivergentes"""
+    try:
+        from flask import session, redirect, flash
+        if 'admin_user_id' not in session:
+            flash('Debes iniciar sesión como administrador para acceder al CRM.', 'error')
+            return redirect('/admin/login-new')
+        return render_template('crm-neurodivergentes.html')
+    except Exception as e:
+        print(f"Error en CRM neurodivergentes: {e}")
+        flash('Error interno del servidor. Inténtalo de nuevo.', 'error')
+        return redirect('/crm')
 
 @app.route('/crm/funnel')
 def crm_funnel_dashboard():
@@ -1101,6 +1122,25 @@ def crear_oferta():
         """
         email_success = send_email('diversiaeternals@gmail.com', subject, html_content)
         print(f"✅ Email oferta enviado: {email_success}")
+        
+        # Integrar con CRM
+        try:
+            from form_integration_service import process_form_submission
+            crm_data = {
+                'titulo_puesto': data['titulo_puesto'],
+                'descripcion': data['descripcion'],
+                'tipo_contrato': data['tipo_contrato'],
+                'modalidad_trabajo': data['modalidad_trabajo'],
+                'salario_min': data['salario_min'],
+                'salario_max': data['salario_max'],
+                'company_id': company_id,
+                'created_at': datetime.now().isoformat()
+            }
+            crm_id = process_form_submission('oferta_trabajo', crm_data, 'web_form_oferta')
+            if crm_id:
+                print(f"✅ Oferta añadida al CRM con ID: {crm_id}")
+        except Exception as e:
+            print(f"⚠️ Error integrando oferta con CRM: {e}")
         
         flash('¡Oferta de trabajo publicada exitosamente!', 'success')
         

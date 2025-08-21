@@ -248,3 +248,52 @@ class Employee(db.Model):
     
     def __repr__(self):
         return f'<Employee {self.name}>'
+
+class Asociacion(db.Model):
+    __tablename__ = 'asociaciones'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # Información básica
+    nombre_asociacion = db.Column(db.String(200), nullable=False)
+    acronimo = db.Column(db.String(20), nullable=True)
+    pais = db.Column(db.String(10), nullable=False)
+    otro_pais = db.Column(db.String(100), nullable=True)
+    
+    # Información legal
+    tipo_documento = db.Column(db.String(100), nullable=False)
+    numero_documento = db.Column(db.String(50), nullable=False)
+    descripcion_otro_documento = db.Column(db.Text, nullable=True)
+    
+    # Servicios y neurodivergencias (JSON strings)
+    neurodivergencias_atendidas = db.Column(db.Text, nullable=True)
+    servicios = db.Column(db.Text, nullable=True)
+    certificaciones = db.Column(db.Text, nullable=True)
+    
+    # Información de contacto
+    ciudad = db.Column(db.String(100), nullable=False)
+    direccion = db.Column(db.Text, nullable=True)
+    telefono = db.Column(db.String(20), nullable=True)
+    email = db.Column(db.String(120), nullable=False)
+    sitio_web = db.Column(db.String(200), nullable=True)
+    descripcion = db.Column(db.Text, nullable=True)
+    
+    # Información operativa
+    años_funcionamiento = db.Column(db.Integer, nullable=True)
+    numero_socios = db.Column(db.Integer, nullable=True)
+    
+    # Contacto responsable
+    contacto_nombre = db.Column(db.String(150), nullable=True)
+    contacto_cargo = db.Column(db.String(100), nullable=True)
+    
+    # Información de auditoría
+    ip_solicitud = db.Column(db.String(45), nullable=True)
+    user_agent = db.Column(db.String(500), nullable=True)
+    estado = db.Column(db.String(20), default='pendiente')
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Asociacion {self.nombre_asociacion}>'

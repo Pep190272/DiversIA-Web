@@ -117,6 +117,75 @@ class CSVManager:
         conn.close()
         return imported_count
     
+    def export_users_csv(self):
+        """Exportar usuarios neurodivergentes a CSV"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+        SELECT id, nombre, apellidos, email, telefono, ciudad, 
+               fecha_nacimiento, tipo_neurodivergencia, diagnostico_formal,
+               experiencia_laboral, formacion_academica, habilidades,
+               intereses_laborales, adaptaciones_necesarias, created_at
+        FROM users ORDER BY created_at DESC
+        ''')
+        
+        users = cursor.fetchall()
+        conn.close()
+        
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        # Headers
+        writer.writerow([
+            'ID', 'Nombre', 'Apellidos', 'Email', 'Teléfono', 'Ciudad',
+            'Fecha Nacimiento', 'Neurodivergencia', 'Diagnóstico Formal', 
+            'Experiencia Laboral', 'Formación', 'Habilidades',
+            'Intereses Laborales', 'Adaptaciones', 'Fecha Registro'
+        ])
+        
+        # Data
+        for user in users:
+            writer.writerow(user)
+        
+        output.seek(0)
+        return output.getvalue()
+    
+    def export_associations_csv(self):
+        """Exportar asociaciones a CSV"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Verificar si tabla existe
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='asociaciones'")
+        if not cursor.fetchone():
+            return "ID,Nombre,Email,Ciudad,Estado\n# No hay asociaciones registradas"
+        
+        cursor.execute('''
+        SELECT id, nombre_asociacion, email, ciudad, pais, 
+               neurodivergencias_atendidas, servicios, estado, created_at
+        FROM asociaciones ORDER BY created_at DESC
+        ''')
+        
+        associations = cursor.fetchall()
+        conn.close()
+        
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        # Headers
+        writer.writerow([
+            'ID', 'Nombre Asociación', 'Email', 'Ciudad', 'País',
+            'Neurodivergencias', 'Servicios', 'Estado', 'Fecha Registro'
+        ])
+        
+        # Data
+        for assoc in associations:
+            writer.writerow(assoc)
+        
+        output.seek(0)
+        return output.getvalue()
+    
     def export_stats_json(self):
         """Exportar estadísticas en JSON"""
         conn = sqlite3.connect(self.db_path)
@@ -196,7 +265,43 @@ def create_csv_routes(app):
         )
         return response
     
-    print("✅ Rutas CSV creadas: /admin/export/companies.csv, /admin/export/offers.csv, /admin/export/stats.json")
+    @app.route('/admin/export/users.csv')
+    def export_users():
+        csv_data = csv_manager.export_users_csv()
+        response = Response(
+            csv_data,
+            mimetype='text/csv',
+            headers={'Content-Disposition': 'attachment; filename=users_neurodivergentes.csv'}
+        )
+        return response
+    
+    @app.route('/admin/export/associations.csv')
+    def export_associations():
+        csv_data = csv_manager.export_associations_csv()
+        response = Response(
+            csv_data,
+            mimetype='text/csv',
+            headers={'Content-Disposition': 'attachment; filename=asociaciones.csv'}
+        )
+        return response
+    
+    @app.route('/admin/import/companies', methods=['POST'])
+    def import_companies():
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        if file and file.filename.endswith('.csv'):
+            csv_content = file.read().decode('utf-8')
+            imported_count = csv_manager.import_companies_csv(csv_content)
+            return jsonify({'message': f'{imported_count} companies imported successfully'})
+        
+        return jsonify({'error': 'Invalid file format. Please upload CSV'}), 400
+    
+    print("✅ Rutas CSV completas: exportar e importar datos")
 
 if __name__ == "__main__":
     # Test

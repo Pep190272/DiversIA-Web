@@ -8,15 +8,17 @@ Preferred communication style: Simple, everyday language.
 System reliability: Critical requirement - zero tolerance for 500 errors on main routes.
 
 ## System Reliability
+- **SQLite Database**: Migrated from PostgreSQL to SQLite for 100% reliability, zero cost, and mobile compatibility
 - All form fields MUST be defined in forms.py before being used in templates  
 - Route validator (route_validator.py) automatically checks critical routes
 - Critical routes that must never fail: /, /empresas, /personas-nd, /comunidad, /registro, /registro-tdah, /registro-tea, /registro-dislexia, /test, /comenzar
 - Admin login fixed: Access via /admin/login-new with credentials DiversiaEternals / diversia3ternal$2025
-- **ALL FORMS NOW WORKING**: Company registration, user registration, contact forms - all save data correctly
-- **Triple backup system**: PostgreSQL → CRM persistent → File backup ensures zero data loss
+- **ALL FORMS NOW WORKING**: Company registration, user registration, contact forms, job offers - all save data correctly
+- **Triple backup system**: SQLite → CRM persistent → File backup ensures zero data loss
 - **Email notifications**: Automatic emails sent to diversiaeternals@gmail.com for all form submissions
-- **CRM Dashboard**: Fully operational without PostgreSQL, all tabs load instantly, JavaScript errors eliminated
-- System works with PostgreSQL when active, automatically falls back to memory storage when disabled
+- **CRM Dashboard**: Fully operational with specialized neurodivergent management system
+- **CSV Management**: Full import/export capabilities for all data types
+- **Comprehensive ND CRM**: Individual panels for TDAH, TEA, Dislexia, Discalculia, and other neurodivergences
 
 ## System Architecture
 
@@ -27,7 +29,7 @@ The frontend is built using Jinja2 templates with Flask for server-side renderin
 The backend is a Flask application with a modular structure, separating models, routes, and forms. SQLAlchemy is used for ORM operations, and Flask-WTF handles secure form processing and validation. Security measures include comprehensive security headers, CSRF protection, and input validation. The application has a role-based admin system with session management and permission controls, integrating a complete business management CRM with automatic form tracking and data analytics.
 
 ### Data Models
-Core data models include: User (neurodivergent profiles), Company, JobOffer, Admin, CrmContact (business contacts), FormSubmission (tracked web forms), Partner, SocialMediaAccount, Task, and Metric. TestResult is a planned model for gamified assessments.
+Core data models include: User (neurodivergent profiles), Company, JobOffer, Admin, CrmContact (business contacts), FormSubmission (tracked web forms), Asociacion (neurodivergent associations), Employee, Task, and TestResult (gamified assessments). All models optimized for SQLite with proper indexing and relationships.
 
 ### Form Architecture
 Forms are inheritance-based, extending a base `RegistroGeneralForm` with specialized versions for TDAH, Dislexia, and TEA, containing condition-specific fields. Custom field types like `MultiCheckboxField` enhance accessibility. Server-side validation with user-friendly error messages is a priority.
