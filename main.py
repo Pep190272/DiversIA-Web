@@ -51,6 +51,13 @@ try:
     print("✅ Servicio de integración de formularios cargado")
 except Exception as e:
     print(f"⚠️ Error cargando servicio de formularios: {e}")
+
+# Cargar APIs de respaldo para CRM
+try:
+    import api_crm_backup  # noqa: F401
+    print("✅ APIs de respaldo CRM cargadas")
+except Exception as e:
+    print(f"⚠️ Error cargando APIs CRM: {e}")
 from api_endpoints import api
 from chat_webhook import chat
 from chat_intelligent_endpoint import intelligent_chat
