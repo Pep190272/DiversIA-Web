@@ -162,12 +162,10 @@ def delete_all_email_marketing():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/email-marketing/edit/<int:contact_id>', methods=['POST'])
-def edit_email_marketing_contact():
+def edit_email_marketing_contact(contact_id):
     """Editar un contacto específico inline"""
     if 'admin_ok' not in session or not session.get('admin_ok'):
         return jsonify({'error': 'No autorizado'}), 403
-    
-    contact_id = request.view_args['contact_id']
     data = request.get_json()
     
     try:
