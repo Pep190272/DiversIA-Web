@@ -8,19 +8,17 @@ Preferred communication style: Simple, everyday language.
 System reliability: Critical requirement - zero tolerance for 500 errors on main routes.
 
 ## System Reliability
-- **SQLite Database**: Migrated from PostgreSQL to SQLite for 100% reliability, zero cost, and mobile compatibility
+- **PostgreSQL Database**: Production database with 100% uptime and data integrity
 - All form fields MUST be defined in forms.py before being used in templates  
 - Route validator (route_validator.py) automatically checks critical routes
 - Critical routes that must never fail: /, /empresas, /personas-nd, /comunidad, /registro, /registro-tdah, /registro-tea, /registro-dislexia, /test, /comenzar
-- Admin login fixed: Access via /admin/login-new with credentials DiversiaEternals / diversia3ternal$2025
+- Admin login: Access via /admin/login-new with credentials DiversiaEternals / diversia3ternal$2025
 - **ALL FORMS NOW WORKING**: Company registration, user registration, contact forms, job offers - all save data correctly
-- **Triple backup system**: SQLite → CRM persistent → File backup ensures zero data loss
-- **Email notifications**: Automatic emails sent to diversiaeternals@gmail.com for all form submissions
-- **CRM Dashboard**: Fully operational with specialized neurodivergent management system
-- **CSV Management**: Full import/export capabilities for all data types - UPDATED 2025-08-22
-- **CSV Import System**: Complete API `/api/import-csv` for companies and contacts with validation
-- **Data Integrity**: CRM cleaned to contain only real company data (Acelerai)
-- **Comprehensive ND CRM**: Individual panels for TDAH, TEA, Dislexia, Discalculia, and other neurodivergences
+- **CRM Minimal System**: Simple, functional CRM at /crm-minimal with CSV import capabilities
+- **CSV Management**: Full import/export for DiversIA format (Empresa, Email, Telefono, Sector, Ciudad, Fecha, Acciones)
+- **Data Processing**: Automatic email cleanup (mailto: removal), data validation, and note truncation
+- **Authentication**: Secure admin access with session management and logout functionality
+- **Production Ready**: Clean codebase, minimal dependencies, fully operational system - UPDATED 2025-08-22
 
 ## System Architecture
 

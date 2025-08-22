@@ -195,4 +195,47 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'error': f'Error procesando CSV: {str(e)}'}), 500
     
+    # Ruta adicional para exportar datos
+    @app.route('/api/minimal/export-csv')
+    def export_csv_minimal():
+        """Exportar datos a CSV"""
+        try:
+            from flask import make_response
+            
+            data = load_data()
+            companies = data.get('companies', [])
+            
+            if not companies:
+                return jsonify({'success': False, 'error': 'No hay datos para exportar'})
+            
+            # Crear CSV
+            output = io.StringIO()
+            writer = csv.writer(output)
+            
+            # Escribir encabezados
+            writer.writerow(['Empresa', 'Email', 'Telefono', 'Sector', 'Ciudad', 'Fecha', 'Acciones'])
+            
+            # Escribir datos
+            for company in companies:
+                writer.writerow([
+                    company.get('nombre', ''),
+                    company.get('email', ''),
+                    company.get('telefono', ''),
+                    company.get('sector', ''),
+                    company.get('ciudad', ''),
+                    company.get('fecha_contacto', ''),
+                    company.get('notas', '')
+                ])
+            
+            # Preparar respuesta
+            output.seek(0)
+            response = make_response(output.getvalue())
+            response.headers['Content-Type'] = 'text/csv'
+            response.headers['Content-Disposition'] = f'attachment; filename=diversia_empresas_{datetime.now().strftime("%Y%m%d")}.csv'
+            
+            return response
+            
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
     print("CRM Minimal inicializado correctamente")

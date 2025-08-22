@@ -33,9 +33,10 @@
         <div class="row mb-4">
             <div class="col-12">
                 <button class="btn btn-primary me-2" onclick="showAddForm()">Añadir Empresa</button>
-                <button class="btn btn-danger me-2" onclick="clearAllCompanies()">Eliminar Todas</button>
                 <button class="btn btn-success me-2" onclick="showImportForm()">Importar CSV</button>
-                <button class="btn btn-info" onclick="loadCompanies()">Actualizar</button>
+                <button class="btn btn-warning me-2" onclick="exportCSV()">Exportar CSV</button>
+                <button class="btn btn-info me-2" onclick="loadCompanies()">Actualizar</button>
+                <button class="btn btn-danger" onclick="clearAllCompanies()">Eliminar Todas</button>
             </div>
         </div>
         
@@ -323,6 +324,10 @@
             if (confirm('¿Cerrar sesión?')) {
                 window.location.href = '/admin/logout-new';
             }
+        }
+        
+        function exportCSV() {
+            window.location.href = '/api/minimal/export-csv';
         }
     </script>
 </body>
