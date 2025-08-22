@@ -3,11 +3,10 @@
 CRM Minimal - Sistema simple que funciona sin complicaciones
 """
 
-from flask import jsonify, request, render_template, session, redirect, url_for, flash
+from flask import jsonify, request, render_template
 import json
 import os
 from datetime import datetime
-from werkzeug.utils import secure_filename
 import csv
 import io
 
@@ -165,4 +164,4 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
     
-    print("✅ CRM Minimal inicializado correctamente")
+    print("CRM Minimal inicializado correctamente")

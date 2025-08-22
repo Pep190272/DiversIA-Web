@@ -6,7 +6,7 @@ from forms import (RegistroGeneralForm, RegistroTDAHForm, RegistroDislexiaForm, 
                   RegistroDiscalculiaForm, RegistroTouretteForm, RegistroDispraxiaForm, 
                   RegistroAnsiedadForm, RegistroBipolarForm, RegistroAltasCapacidadesForm,
                   EmpresaForm, OfertaTrabajoForm)
-from sendgrid_helper import send_registration_notification, send_company_registration_notification
+from sendgrid_simple import send_registration_notification, send_company_registration_notification
 
 # Importar CSV Manager
 try:
