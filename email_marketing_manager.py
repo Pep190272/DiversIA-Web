@@ -161,6 +161,52 @@ def delete_all_email_marketing():
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/email-marketing/edit/<int:contact_id>', methods=['POST'])
+def edit_email_marketing_contact():
+    """Editar un contacto específico inline"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    contact_id = request.view_args['contact_id']
+    data = request.get_json()
+    
+    try:
+        contact = EmailMarketing.query.get_or_404(contact_id)
+        
+        # Actualizar campos editables
+        field = data.get('field')
+        value = data.get('value', '').strip()
+        
+        if field == 'comunidad_autonoma':
+            contact.comunidad_autonoma = value
+        elif field == 'asociacion':
+            contact.asociacion = value
+        elif field == 'email':
+            contact.email = value
+        elif field == 'telefono':
+            contact.telefono = value
+        elif field == 'direccion':
+            contact.direccion = value
+        elif field == 'servicios':
+            contact.servicios = value
+        elif field == 'fecha_enviado':
+            contact.fecha_enviado = value
+        elif field == 'respuesta':
+            contact.respuesta = value
+        elif field == 'notas_especiales':
+            contact.notas_especiales = value
+        else:
+            return jsonify({'error': 'Campo no válido'}), 400
+        
+        contact.updated_at = datetime.now()
+        db.session.commit()
+        
+        return jsonify({'success': True, 'value': value})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/email-marketing/export')
 def export_email_marketing_csv():
     """Exportar datos de email marketing"""
@@ -206,6 +252,41 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
     <style>
         .table-responsive { max-height: 70vh; overflow-y: auto; }
         .btn-sm { font-size: 0.8rem; }
+        .editable-field {
+            cursor: pointer;
+            padding: 3px 6px;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+            display: inline-block;
+            min-width: 60px;
+            min-height: 20px;
+        }
+        .editable-field:hover {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+        }
+        .editing {
+            background-color: #fff3cd !important;
+            border: 2px solid #ffc107 !important;
+        }
+        .edit-input {
+            border: 2px solid #007bff;
+            font-size: 0.9rem;
+            padding: 2px 6px;
+            width: 100%;
+            min-width: 80px;
+        }
+        .edit-textarea {
+            border: 2px solid #007bff;
+            font-size: 0.9rem;
+            padding: 5px;
+            width: 100%;
+            min-height: 60px;
+            resize: vertical;
+        }
+        .save-cancel-buttons {
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -243,13 +324,13 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                 <thead class="table-dark">
                                     <tr>
                                         <th>ID</th>
-                                        <th>Comunidad</th>
-                                        <th>Asociación</th>
-                                        <th>Email</th>
-                                        <th>Teléfono</th>
-                                        <th>Servicios</th>
-                                        <th>Enviado</th>
-                                        <th>Respuesta</th>
+                                        <th>Comunidad <small>(click para editar)</small></th>
+                                        <th>Asociación <small>(click para editar)</small></th>
+                                        <th>Email <small>(click para editar)</small></th>
+                                        <th>Teléfono <small>(click para editar)</small></th>
+                                        <th>Servicios <small>(click para editar)</small></th>
+                                        <th>Enviado <small>(click para editar)</small></th>
+                                        <th>Respuesta <small>(click para editar)</small></th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -257,24 +338,47 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                     {% for asociacion in asociaciones %}
                                     <tr>
                                         <td>{{ asociacion.id }}</td>
-                                        <td><span class="badge bg-secondary">{{ asociacion.comunidad_autonoma }}</span></td>
-                                        <td><strong>{{ asociacion.asociacion }}</strong></td>
-                                        <td><a href="mailto:{{ asociacion.email }}">{{ asociacion.email }}</a></td>
-                                        <td>{{ asociacion.telefono or '-' }}</td>
-                                        <td>{{ (asociacion.servicios or '')[:50] }}{% if asociacion.servicios and asociacion.servicios|length > 50 %}...{% endif %}</td>
                                         <td>
-                                            {% if asociacion.fecha_enviado %}
-                                                <span class="badge bg-success">{{ asociacion.fecha_enviado }}</span>
-                                            {% else %}
-                                                <span class="badge bg-warning">Pendiente</span>
-                                            {% endif %}
+                                            <span class="editable-field" 
+                                                  data-field="comunidad_autonoma" 
+                                                  data-id="{{ asociacion.id }}"
+                                                  title="Click para editar">{{ asociacion.comunidad_autonoma }}</span>
                                         </td>
                                         <td>
-                                            {% if asociacion.respuesta %}
-                                                <span class="badge bg-warning text-dark" title="{{ asociacion.respuesta }}">{{ asociacion.respuesta[:30] }}{% if asociacion.respuesta|length > 30 %}...{% endif %}</span>
-                                            {% else %}
-                                                <span class="badge bg-secondary">Sin respuesta</span>
-                                            {% endif %}
+                                            <strong class="editable-field" 
+                                                    data-field="asociacion" 
+                                                    data-id="{{ asociacion.id }}"
+                                                    title="Click para editar">{{ asociacion.asociacion }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="editable-field" 
+                                                  data-field="email" 
+                                                  data-id="{{ asociacion.id }}"
+                                                  title="Click para editar">{{ asociacion.email }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="editable-field" 
+                                                  data-field="telefono" 
+                                                  data-id="{{ asociacion.id }}"
+                                                  title="Click para editar">{{ asociacion.telefono or '-' }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="editable-field" 
+                                                  data-field="servicios" 
+                                                  data-id="{{ asociacion.id }}"
+                                                  title="Click para editar">{{ (asociacion.servicios or '')[:50] }}{% if asociacion.servicios and asociacion.servicios|length > 50 %}...{% endif %}</span>
+                                        </td>
+                                        <td>
+                                            <span class="editable-field" 
+                                                  data-field="fecha_enviado" 
+                                                  data-id="{{ asociacion.id }}"
+                                                  title="Click para editar">{{ asociacion.fecha_enviado or 'Pendiente' }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="editable-field" 
+                                                  data-field="respuesta" 
+                                                  data-id="{{ asociacion.id }}"
+                                                  title="Click para editar">{{ asociacion.respuesta or 'Sin respuesta' }}</span>
                                         </td>
                                         <td>
                                             <button class="btn btn-sm btn-danger" onclick="deleteAssociation({{ asociacion.id }})">Eliminar</button>
@@ -331,6 +435,131 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                 }
             }
         }
+
+        // Sistema de edición inline
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentlyEditing = null;
+
+            // Hacer todos los campos editables
+            document.querySelectorAll('.editable-field').forEach(field => {
+                field.addEventListener('click', function() {
+                    if (currentlyEditing && currentlyEditing !== this) {
+                        cancelEdit(currentlyEditing);
+                    }
+                    startEdit(this);
+                });
+            });
+
+            function startEdit(element) {
+                if (currentlyEditing === element) return;
+
+                currentlyEditing = element;
+                const originalValue = element.textContent.trim();
+                const field = element.getAttribute('data-field');
+                const contactId = element.getAttribute('data-id');
+                
+                element.classList.add('editing');
+                
+                // Crear input apropiado según el campo
+                let inputElement;
+                if (field === 'servicios' || field === 'respuesta') {
+                    inputElement = document.createElement('textarea');
+                    inputElement.className = 'edit-textarea';
+                    inputElement.rows = 3;
+                } else {
+                    inputElement = document.createElement('input');
+                    inputElement.className = 'edit-input';
+                    inputElement.type = field === 'email' ? 'email' : 'text';
+                }
+                
+                inputElement.value = originalValue === '-' || originalValue === 'Sin respuesta' || originalValue === 'Pendiente' ? '' : originalValue;
+                
+                // Crear botones de acción
+                const buttonContainer = document.createElement('div');
+                buttonContainer.className = 'save-cancel-buttons';
+                
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'btn btn-sm btn-success me-1';
+                saveBtn.textContent = '✓';
+                saveBtn.onclick = () => saveEdit(element, inputElement, contactId, field, originalValue);
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'btn btn-sm btn-secondary';
+                cancelBtn.textContent = '✗';
+                cancelBtn.onclick = () => cancelEdit(element, originalValue);
+                
+                buttonContainer.appendChild(saveBtn);
+                buttonContainer.appendChild(cancelBtn);
+                
+                // Reemplazar contenido
+                element.innerHTML = '';
+                element.appendChild(inputElement);
+                element.appendChild(buttonContainer);
+                
+                inputElement.focus();
+                inputElement.select();
+                
+                // Guardar con Enter, cancelar con Escape
+                inputElement.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        saveEdit(element, inputElement, contactId, field, originalValue);
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        cancelEdit(element, originalValue);
+                    }
+                });
+            }
+
+            function saveEdit(element, inputElement, contactId, field, originalValue) {
+                const newValue = inputElement.value.trim();
+                
+                // Mostrar loading
+                element.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
+                
+                fetch(`/email-marketing/edit/${contactId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        field: field,
+                        value: newValue
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mostrar valor actualizado
+                        const displayValue = newValue || (field === 'telefono' ? '-' : field === 'respuesta' ? 'Sin respuesta' : field === 'fecha_enviado' ? 'Pendiente' : '');
+                        element.textContent = displayValue;
+                        element.classList.remove('editing');
+                        currentlyEditing = null;
+                        
+                        // Efecto visual de éxito
+                        element.style.backgroundColor = '#d4edda';
+                        setTimeout(() => {
+                            element.style.backgroundColor = '';
+                        }, 1000);
+                    } else {
+                        alert('Error al guardar: ' + data.error);
+                        cancelEdit(element, originalValue);
+                    }
+                })
+                .catch(error => {
+                    alert('Error de conexión: ' + error);
+                    cancelEdit(element, originalValue);
+                });
+            }
+
+            function cancelEdit(element, originalValue = null) {
+                if (originalValue !== null) {
+                    element.textContent = originalValue;
+                }
+                element.classList.remove('editing');
+                currentlyEditing = null;
+            }
+        });
     </script>
 </body>
 </html>
