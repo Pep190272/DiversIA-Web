@@ -213,6 +213,42 @@ def delete_all_tasks():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+@app.route('/tasks/add', methods=['POST'])
+def add_task_manual():
+    """Añadir tarea manualmente"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    data = request.get_json()
+    try:
+        new_task = Task(
+            tarea=data.get('tarea', '').strip(),
+            colaborador=data.get('colaborador', '').strip(),
+            fecha_inicio=data.get('fecha_inicio', '').strip(),
+            fecha_final=data.get('fecha_final', '').strip(),
+            estado=data.get('estado', 'Pendiente').strip(),
+            notas=data.get('notas', '').strip()
+        )
+        db.session.add(new_task)
+        db.session.commit()
+        
+        # Si se asigna a un colaborador, enviar notificación
+        if new_task.colaborador:
+            employee = Employee.query.filter_by(name=new_task.colaborador, active=True).first()
+            if employee:
+                task_data = {
+                    'tarea': new_task.tarea,
+                    'estado': new_task.estado,
+                    'fecha_inicio': new_task.fecha_inicio,
+                    'fecha_final': new_task.fecha_final
+                }
+                send_task_assignment_notification(task_data, employee.email)
+        
+        return jsonify({'success': True, 'message': 'Tarea añadida correctamente'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/tasks/export')
 def export_tasks_csv():
     """Exportar datos de tareas"""
@@ -391,6 +427,7 @@ TASKS_TABLE_TEMPLATE = '''
                         </div>
                     </div>
                     <div class="col-md-4 text-end">
+                        <button class="btn btn-success me-2" onclick="showAddTaskForm()">➕ Añadir Tarea</button>
                         <button class="btn btn-primary me-2" onclick="showAddEmployeeForm()">👤 Añadir Colaborador</button>
                         <a href="/tasks/export" class="btn btn-warning me-2">Exportar CSV</a>
                         <button onclick="deleteAllTasks()" class="btn btn-danger">🗑️ Eliminar Todo</button>
@@ -403,6 +440,70 @@ TASKS_TABLE_TEMPLATE = '''
                         <small class="text-muted">
                             Mostrando <span id="visibleCount">{{ total_tasks }}</span> de {{ total_tasks }} tareas
                         </small>
+                    </div>
+                </div>
+                
+                <!-- Formulario añadir tarea -->
+                <div id="addTaskForm" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5>Añadir Nueva Tarea</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="taskForm">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Descripción de la Tarea *</label>
+                                        <textarea class="form-control" id="taskTarea" rows="2" required 
+                                                placeholder="Describe la tarea a realizar..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Asignar a Colaborador</label>
+                                        <select class="form-control" id="taskColaborador">
+                                            <option value="">Sin asignar</option>
+                                            {% for emp in employees %}
+                                            <option value="{{ emp.name }}">{{ emp.name }} ({{ emp.rol }})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Estado</label>
+                                        <select class="form-control" id="taskEstado">
+                                            <option value="Pendiente">Pendiente</option>
+                                            <option value="En curso">En curso</option>
+                                            <option value="Completado">Completado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Fecha de Inicio</label>
+                                        <input type="date" class="form-control" id="taskFechaInicio">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Fecha Límite</label>
+                                        <input type="date" class="form-control" id="taskFechaFinal">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Notas Adicionales</label>
+                                        <textarea class="form-control" id="taskNotas" rows="2" 
+                                                placeholder="Notas opcionales sobre la tarea..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success">Crear Tarea</button>
+                                <button type="button" class="btn btn-secondary" onclick="hideAddTaskForm()">Cancelar</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 
@@ -539,6 +640,16 @@ TASKS_TABLE_TEMPLATE = '''
             }
         }
         
+        function showAddTaskForm() {
+            document.getElementById('addTaskForm').style.display = 'block';
+            document.getElementById('taskTarea').focus();
+        }
+        
+        function hideAddTaskForm() {
+            document.getElementById('addTaskForm').style.display = 'none';
+            document.getElementById('taskForm').reset();
+        }
+        
         function showAddEmployeeForm() {
             document.getElementById('addEmployeeForm').style.display = 'block';
             document.getElementById('empName').focus();
@@ -578,6 +689,46 @@ TASKS_TABLE_TEMPLATE = '''
                     alert('✅ Colaborador añadido correctamente');
                     hideAddEmployeeForm();
                     loadEmployeeOptions(); // Actualizar opciones
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Error de conexión: ' + error);
+            });
+        });
+        
+        // Gestión de tareas manuales
+        document.getElementById('taskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                tarea: document.getElementById('taskTarea').value.trim(),
+                colaborador: document.getElementById('taskColaborador').value.trim(),
+                estado: document.getElementById('taskEstado').value.trim(),
+                fecha_inicio: document.getElementById('taskFechaInicio').value.trim(),
+                fecha_final: document.getElementById('taskFechaFinal').value.trim(),
+                notas: document.getElementById('taskNotas').value.trim()
+            };
+            
+            if (!formData.tarea) {
+                alert('Por favor, describe la tarea');
+                return;
+            }
+            
+            fetch('/tasks/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Tarea añadida correctamente');
+                    hideAddTaskForm();
+                    location.reload(); // Actualizar la tabla
                 } else {
                     alert('❌ Error: ' + data.error);
                 }
