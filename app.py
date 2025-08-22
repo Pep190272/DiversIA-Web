@@ -38,10 +38,9 @@ def after_request(response):
 db.init_app(app)
 
 with app.app_context():
-    # Import models and routes
+    # Import models only (routes imported in main.py)
     try:
         import models
-        import routes
         db.create_all()
         print("✅ Database initialized successfully")
     except Exception as e:

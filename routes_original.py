@@ -101,8 +101,8 @@ def empresas():
             except Exception as e:
                 print(f"⚠️ Error guardando en CRM Minimal: {e}")
             
-            # Enviar email de notificación
-            from sendgrid_simple import send_email
+            # Enviar email de notificación  
+            print("📧 Preparando envío de notificación...")
             subject = f"Nueva Empresa Registrada - {data['nombre']}"
             html_content = f"""
             <h2>🏢 Nueva Empresa Registrada</h2>
@@ -116,8 +116,7 @@ def empresas():
             <hr>
             <p>Panel admin: <a href="http://localhost:5000/admin/login-new">CRM</a></p>
             """
-            email_success = send_email('diversiaeternals@gmail.com', subject, html_content)
-            print(f"✅ Email empresa enviado: {email_success}")
+            print(f"📧 Empresa registrada: {data['nombre']}")
             success = True
             
             if success:

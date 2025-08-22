@@ -1,7 +1,7 @@
 from app import app
 
-# Importar rutas principales
-import routes  # noqa: F401
+# Importar rutas simplificadas
+import routes_simple  # noqa: F401
 
 # CRM Minimal - Sistema principal
 try:
