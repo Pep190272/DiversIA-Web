@@ -1009,8 +1009,9 @@ EMAIL_MARKETING_FUNNEL_TEMPLATE = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Funnel de Ventas - DiversIA (Agosto 2025)</title>
+    <title>Dashboard Interactivo - Email Marketing DiversIA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <style>
         body { background: #f8f9fa; }
         .funnel-container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
@@ -1217,6 +1218,181 @@ EMAIL_MARKETING_FUNNEL_TEMPLATE = '''
                 }, index * 200);
             });
         });
+    </script>
+    
+    <!-- NUEVA SECCIÓN: GRÁFICOS INTERACTIVOS -->
+    <div class="container-fluid mt-5 bg-white p-4 rounded shadow-sm">
+        <div class="row">
+            <div class="col-12 text-center mb-4">
+                <h2 class="text-primary">📊 Dashboard Interactivo</h2>
+                <p class="text-muted">Visualizaciones dinámicas con datos en tiempo real</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Gráfico Embudo -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">🔸 Progresión del Embudo</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="funnelChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráfico Comunidades -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">🗺️ Top Comunidades</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="comunidadesChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráfico Estados NDA -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="mb-0">📝 Estados NDA</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="ndaChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráfico Respuestas -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">💬 Análisis de Respuestas</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="respuestasChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="/email-marketing?admin=true" class="btn btn-primary btn-lg">← Volver a Tabla</a>
+            <a href="/crm-minimal" class="btn btn-outline-secondary btn-lg ms-3">CRM Principal</a>
+        </div>
+    </div>
+
+    <script>
+    // Datos del servidor para gráficos
+    const funnelData = [{{ total }}, {{ enviados }}, {{ respondidos }}, {{ reuniones }}, {{ nda_proceso }}];
+    const comunidadesLabels = [{% for stat in stats_comunidad %}'{{ stat.comunidad_autonoma }}'{% if not loop.last %},{% endif %}{% endfor %}];
+    const comunidadesData = [{% for stat in stats_comunidad %}{{ stat.total }}{% if not loop.last %},{% endif %}{% endfor %}];
+    
+    // Gráfico de Embudo (Línea)
+    const ctx1 = document.getElementById('funnelChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: ['Total', 'Enviados', 'Respuestas', 'Reuniones', 'NDAs'],
+            datasets: [{
+                label: 'Progresión del Embudo',
+                data: funnelData,
+                borderColor: '#4facfe',
+                backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: ['#4facfe', '#43e97b', '#fa709a', '#fee140', '#764ba2'],
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+    
+    // Gráfico de Comunidades (Barras)
+    const ctx2 = document.getElementById('comunidadesChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: comunidadesLabels.slice(0, 8),
+            datasets: [{
+                label: 'Asociaciones',
+                data: comunidadesData.slice(0, 8),
+                backgroundColor: 'rgba(67, 233, 123, 0.8)',
+                borderColor: '#43e97b',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+    
+    // Gráfico Estados NDA (Dona)
+    const ctx3 = document.getElementById('ndaChart').getContext('2d');
+    new Chart(ctx3, {
+        type: 'doughnut',
+        data: {
+            labels: ['Sin Contacto', 'Interesado', 'Reunión', 'NDA Pendiente', 'NDA Firmado'],
+            datasets: [{
+                data: [{{ total - respondidos }}, 2, {{ reuniones }}, {{ nda_pendientes }}, {{ nda_firmados }}],
+                backgroundColor: ['#6c757d', '#17a2b8', '#ffc107', '#fd7e14', '#28a745'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 15 } }
+            }
+        }
+    });
+    
+    // Gráfico Respuestas (Área Polar)
+    const ctx4 = document.getElementById('respuestasChart').getContext('2d');
+    new Chart(ctx4, {
+        type: 'polarArea',
+        data: {
+            labels: ['Respuestas', 'Sin Respuesta', 'Reuniones', 'NDAs'],
+            datasets: [{
+                data: [{{ respondidos }}, {{ enviados - respondidos }}, {{ reuniones }}, {{ nda_proceso }}],
+                backgroundColor: [
+                    'rgba(250, 112, 154, 0.6)',
+                    'rgba(254, 225, 64, 0.6)', 
+                    'rgba(23, 162, 184, 0.6)',
+                    'rgba(118, 75, 162, 0.6)'
+                ],
+                borderColor: ['#fa709a', '#fee140', '#17a2b8', '#764ba2'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 12 } }
+            }
+        }
+    });
     </script>
 </body>
 </html>
