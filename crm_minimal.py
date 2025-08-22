@@ -50,8 +50,8 @@ def create_minimal_crm_routes(app):
     def crm_minimal_dashboard():
         """Dashboard del CRM minimal - requiere autenticación"""
         # Verificar si está autenticado como admin
-        if 'admin_user_id' not in session:
-            return redirect('/admin/login-new')
+        if 'admin_ok' not in session or not session.get('admin_ok'):
+            return redirect('/diversia-admin')
         return render_template('crm-minimal.html')
     
     @app.route('/api/minimal/companies')

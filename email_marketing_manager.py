@@ -6,14 +6,15 @@ Gestión completa de campañas de email a asociaciones
 import csv
 import io
 from datetime import datetime
-from flask import request, jsonify, render_template_string, flash, redirect
+from flask import request, jsonify, render_template_string, flash, redirect, session
 from app import app, db
 from models import EmailMarketing
 
 @app.route('/email-marketing')
 def email_marketing_dashboard():
     """Dashboard principal de email marketing - Tabla simple"""
-    if not request.args.get('admin') == 'true':
+    # Verificar autenticación admin
+    if 'admin_ok' not in session or not session.get('admin_ok'):
         return redirect('/diversia-admin')
     
     # Obtener todas las asociaciones
@@ -27,7 +28,8 @@ def email_marketing_dashboard():
 @app.route('/email-marketing-funnel')
 def email_marketing_funnel():
     """Dashboard en formato embudo"""
-    if not request.args.get('admin') == 'true':
+    # Verificar autenticación admin
+    if 'admin_ok' not in session or not session.get('admin_ok'):
         return redirect('/diversia-admin')
     
     # Estadísticas para embudo
