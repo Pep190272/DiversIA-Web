@@ -139,97 +139,32 @@
                 </div>
             </div>
 
-            <!-- Job Offer Form -->
+            <!-- Info App -->
             <div class="col-lg-6 mb-5">
-                <div class="card">
-                    <div class="card-header">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
                         <h3 class="card-title h5 mb-0">
-                            <i data-lucide="briefcase" aria-hidden="true"></i>
-                            Publicar Oferta de Empleo
+                            <i data-lucide="smartphone" aria-hidden="true"></i>
+                            Publicación de Ofertas
                         </h3>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ url_for('empresas') }}" novalidate>
-                            {{ oferta_form.hidden_tag() }}
-                            
-                            <div class="mb-3">
-                                {{ oferta_form.titulo_puesto.label(class="form-label") }}
-                                {{ oferta_form.titulo_puesto(class="form-control" + (" is-invalid" if oferta_form.titulo_puesto.errors else "")) }}
-                                {% if oferta_form.titulo_puesto.errors %}
-                                    <div class="invalid-feedback">
-                                        {% for error in oferta_form.titulo_puesto.errors %}{{ error }}{% endfor %}
-                                    </div>
-                                {% endif %}
+                        <div class="text-center py-4">
+                            <i data-lucide="mobile" class="text-info mb-3" style="width: 64px; height: 64px;"></i>
+                            <h4 class="mb-3">¡Próximamente en nuestra APP!</h4>
+                            <p class="text-muted mb-4">
+                                La publicación de ofertas de empleo estará disponible en nuestra aplicación móvil.
+                                Podrás gestionar todas tus ofertas de forma cómoda y eficiente.
+                            </p>
+                            <div class="alert alert-info">
+                                <i data-lucide="info" class="me-2"></i>
+                                <strong>¿Ya tienes ofertas?</strong> Contáctanos y te ayudamos a migrarlas a la APP cuando esté lista.
                             </div>
-                            
-                            <div class="mb-3">
-                                {{ oferta_form.descripcion.label(class="form-label") }}
-                                {{ oferta_form.descripcion(class="form-control", rows="4") }}
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    {{ oferta_form.tipo_contrato.label(class="form-label") }}
-                                    {{ oferta_form.tipo_contrato(class="form-control") }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ oferta_form.modalidad_trabajo.label(class="form-label") }}
-                                    {{ oferta_form.modalidad_trabajo(class="form-control") }}
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    {{ oferta_form.salario_min.label(class="form-label") }}
-                                    {{ oferta_form.salario_min(class="form-control") }}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    {{ oferta_form.salario_max.label(class="form-label") }}
-                                    {{ oferta_form.salario_max(class="form-control") }}
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                {{ oferta_form.requisitos.label(class="form-label") }}
-                                {{ oferta_form.requisitos(class="form-control", rows="3") }}
-                            </div>
-                            
-                            <div class="mb-3">
-                                {{ oferta_form.adaptaciones_disponibles.label(class="form-label") }}
-                                {{ oferta_form.adaptaciones_disponibles(class="form-control", rows="3") }}
-                                <div class="form-text">Describe las adaptaciones que ofreces (ej: horarios flexibles, ambiente tranquilo, etc.)</div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Neurodivergencias objetivo</label>
-                                {% for subfield in oferta_form.neurodivergencias_target %}
-                                    <div class="form-check">
-                                        {{ subfield(class="form-check-input") }}
-                                        {{ subfield.label(class="form-check-label") }}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                            
-                            <!-- Política de Privacidad -->
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    {{ oferta_form.aceptar_privacidad(class="form-check-input" + (" is-invalid" if oferta_form.aceptar_privacidad.errors else "")) }}
-                                    <label class="form-check-label" for="{{ oferta_form.aceptar_privacidad.id }}">
-                                        He leído y acepto la <a href="{{ url_for('privacidad') }}" target="_blank" class="text-decoration-none">Política de Privacidad</a>
-                                    </label>
-                                    {% if oferta_form.aceptar_privacidad.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {% for error in oferta_form.aceptar_privacidad.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">
-                                <i data-lucide="send" aria-hidden="true"></i>
-                                Publicar Oferta
-                            </button>
-                        </form>
+                            <a href="{{ url_for('contacto') }}" class="btn btn-info">
+                                <i data-lucide="mail" aria-hidden="true"></i>
+                                Contactar para más información
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

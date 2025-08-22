@@ -9,7 +9,7 @@ from models import User, Company, Admin, JobOffer, Asociacion
 from forms import (RegistroGeneralForm, RegistroTDAHForm, RegistroDislexiaForm, RegistroTEAForm, 
                   RegistroDiscalculiaForm, RegistroTouretteForm, RegistroDispraxiaForm, 
                   RegistroAnsiedadForm, RegistroBipolarForm, RegistroAltasCapacidadesForm,
-                  EmpresaForm, OfertaTrabajoForm)
+                  EmpresaForm)
 from datetime import datetime
 
 # Importar CSV Manager
@@ -34,8 +34,6 @@ def empresas():
         print("🔍 DEBUG: Iniciando función empresas")
         form = EmpresaForm()
         print("🔍 DEBUG: EmpresaForm creado")
-        oferta_form = OfertaTrabajoForm()
-        print("🔍 DEBUG: OfertaTrabajoForm creado")
         
         if request.method == 'POST':
             try:
@@ -107,7 +105,7 @@ def empresas():
                 flash('Error al registrar la empresa. Inténtalo de nuevo.', 'error')
         
         print("🔍 DEBUG: Enviando template empresas.html")
-        return render_template('empresas.html', form=form, oferta_form=oferta_form)
+        return render_template('empresas.html', form=form)
     except Exception as e:
         print(f"❌ ERROR EN EMPRESAS: {e}")
         import traceback
