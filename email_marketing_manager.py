@@ -308,8 +308,8 @@ def email_marketing_funnel_ventas():
             if texto_completo and any(keyword in texto_completo for keyword in reuniones_keywords):
                 reuniones.append(a)
         
-        # Análisis de NDA y contratos (palabras clave avanzadas y más específicas)
-        nda_keywords = ['nda', 'confidencialidad', 'acuerdo', 'contrato', 'firma', 'legal', 'términos', 'clausula', 'firmado', 'firmar', 'pendiente', 'documento', 'protocolo']
+        # Análisis específico de NDAs y contratos de confidencialidad
+        nda_keywords = ['contrato de confidencialidad', 'confidencialidad', 'nda', 'contrato', 'firmado', 'pendiente']
         nda_proceso = []
         for a in asociaciones:
             texto_completo = ""
@@ -320,7 +320,9 @@ def email_marketing_funnel_ventas():
             if a.notas_especiales:
                 texto_completo += a.notas_especiales.lower() + " "
             
-            if texto_completo and any(keyword in texto_completo for keyword in nda_keywords):
+            # Buscar específicamente contratos de confidencialidad
+            if ('contrato de confidencialidad' in texto_completo or 
+                ('confidencialidad' in texto_completo and ('pendiente' in texto_completo or 'firmado' in texto_completo))):
                 nda_proceso.append(a)
         
         # Análisis de interés positivo (más amplio)
@@ -1558,15 +1560,21 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                     {% for nda in nda_detalle %}
                     <div class="mb-3 border-bottom pb-2">
                         <strong>{{ nda.asociacion }}</strong> 
-                        <span class="badge bg-danger">{{ nda.comunidad_autonoma }}</span><br>
+                        <span class="badge bg-danger">{{ nda.comunidad_autonoma }}</span>
+                        {% if 'firmado' in (nda.notas_personalizadas or '').lower() %}
+                        <span class="badge bg-success ms-2">✅ FIRMADO</span>
+                        {% elif 'pendiente' in (nda.notas_personalizadas or '').lower() or 'pendiente' in (nda.respuesta or '').lower() %}
+                        <span class="badge bg-warning ms-2">⏳ PENDIENTE</span>
+                        {% endif %}
+                        <br>
                         {% if nda.respuesta %}
-                        <small class="text-primary"><strong>Respuesta:</strong> {{ nda.respuesta[:150] }}{% if nda.respuesta|length > 150 %}...{% endif %}</small><br>
+                        <small class="text-primary"><strong>Respuesta:</strong> {{ nda.respuesta[:200] }}{% if nda.respuesta|length > 200 %}...{% endif %}</small><br>
                         {% endif %}
                         {% if nda.notas_personalizadas %}
-                        <small class="text-warning"><strong>Notas:</strong> {{ nda.notas_personalizadas[:100] }}{% if nda.notas_personalizadas|length > 100 %}...{% endif %}</small><br>
+                        <small class="text-success"><strong>Estado del Contrato:</strong> {{ nda.notas_personalizadas[:300] }}{% if nda.notas_personalizadas|length > 300 %}...{% endif %}</small><br>
                         {% endif %}
                         {% if nda.notas_especiales %}
-                        <small class="text-info"><strong>Especiales:</strong> {{ nda.notas_especiales[:100] }}{% if nda.notas_especiales|length > 100 %}...{% endif %}</small>
+                        <small class="text-info"><strong>Especiales:</strong> {{ nda.notas_especiales[:150] }}{% if nda.notas_especiales|length > 150 %}...{% endif %}</small>
                         {% endif %}
                     </div>
                     {% endfor %}
