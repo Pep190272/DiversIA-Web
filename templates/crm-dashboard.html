@@ -165,9 +165,14 @@
                         <div class="tab-pane fade" id="companies" role="tabpanel">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="mb-0">Empresas Registradas</h5>
-                                <button class="btn btn-primary btn-sm" onclick="addCompany()">
-                                    <i data-lucide="plus" class="me-1"></i>Nueva Empresa
-                                </button>
+                                <div>
+                                    <button class="btn btn-danger btn-sm me-2" onclick="clearAllCompanies()">
+                                        <i data-lucide="trash-2" class="me-1"></i>Eliminar Todas
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="addCompany()">
+                                        <i data-lucide="plus" class="me-1"></i>Nueva Empresa
+                                    </button>
+                                </div>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-hover">
@@ -675,7 +680,7 @@ class DiversiaCRM {
                             <button class="btn btn-sm btn-outline-primary me-1" onclick="editCompany(${company.id})" title="Editar empresa">
                                 Editar
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCompany(${company.id})" title="Eliminar empresa">
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCompanyConfirm(${company.id}, '${company.nombre_empresa}')" title="Eliminar empresa">
                                 Eliminar
                             </button>
                         </td>
@@ -1103,6 +1108,51 @@ document.addEventListener('DOMContentLoaded', function() {
         csvForm.addEventListener('submit', handleCSVImport);
     }
 });
+
+// Funciones de eliminación
+async function deleteCompanyConfirm(companyId, companyName) {
+    if (confirm(`¿Seguro que quieres eliminar la empresa "${companyName}"?`)) {
+        try {
+            const response = await fetch(`/api/companies-fixed/${companyId}`, {
+                method: 'DELETE'
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert(`✅ ${result.message}`);
+                location.reload(); // Recargar página
+            } else {
+                alert(`❌ Error: ${result.error}`);
+            }
+        } catch (error) {
+            alert(`❌ Error de conexión: ${error.message}`);
+        }
+    }
+}
+
+async function clearAllCompanies() {
+    if (confirm('⚠️ ¿SEGURO que quieres eliminar TODAS las empresas? Esta acción no se puede deshacer.')) {
+        if (confirm('⚠️ CONFIRMACIÓN FINAL: Se eliminarán todas las empresas del sistema.')) {
+            try {
+                const response = await fetch('/api/companies-fixed/clear', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ ${result.message}`);
+                    location.reload(); // Recargar página
+                } else {
+                    alert(`❌ Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`❌ Error de conexión: ${error.message}`);
+            }
+        }
+    }
+}
 </script>
 
                         <!-- Importar CSV -->

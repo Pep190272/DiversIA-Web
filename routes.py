@@ -1335,3 +1335,39 @@ def api_employees_fixed():
 @app.route('/api/tasks-fixed')
 def api_tasks_fixed():
     return jsonify([])
+
+@app.route('/api/companies-fixed/<int:company_id>', methods=['DELETE'])
+def delete_company_fixed(company_id):
+    try:
+        company = Company.query.get(company_id)
+        if not company:
+            return jsonify({'error': 'Empresa no encontrada'}), 404
+        
+        # Guardar nombre para confirmación
+        company_name = company.nombre_empresa
+        
+        # Eliminar de base de datos
+        db.session.delete(company)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Empresa {company_name} eliminada correctamente'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/companies-fixed/clear', methods=['POST'])
+def clear_all_companies():
+    try:
+        # Eliminar todas las empresas
+        count = Company.query.count()
+        Company.query.delete()
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'{count} empresas eliminadas correctamente'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
