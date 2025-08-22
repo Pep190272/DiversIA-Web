@@ -1026,6 +1026,67 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
             }
         });
     </script>
+
+    <!-- Bootstrap JS - Carga crítica para modals -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Verificar y corregir Bootstrap
+        document.addEventListener('DOMContentLoaded', function() {
+            // Esperar un momento para que Bootstrap se cargue completamente
+            setTimeout(function() {
+                if (typeof bootstrap === 'undefined') {
+                    console.error('⚠️ Bootstrap no disponible - usando solución alternativa');
+                    // Redefinir openEditModal para trabajar sin Bootstrap
+                    window.openEditModal = function(id) {
+                        // Usar modal nativo HTML/CSS
+                        const modal = document.getElementById('editModal');
+                        if (modal) {
+                            modal.style.display = 'block';
+                            modal.classList.add('show');
+                            modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                            document.body.style.overflow = 'hidden';
+                            
+                            // Cargar datos del registro
+                            fetch(`/email-marketing/get/${id}?admin=true`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const asociacion = data.data;
+                                    document.getElementById('editId').value = asociacion.id;
+                                    document.getElementById('editComunidad').value = asociacion.comunidad_autonoma || '';
+                                    document.getElementById('editAsociacion').value = asociacion.asociacion || '';
+                                    document.getElementById('editEmail').value = asociacion.email || '';
+                                    document.getElementById('editTelefono').value = asociacion.telefono || '';
+                                    document.getElementById('editDireccion').value = asociacion.direccion || '';
+                                    document.getElementById('editServicios').value = asociacion.servicios || '';
+                                    document.getElementById('editFechaEnviado').value = asociacion.fecha_enviado || '';
+                                    document.getElementById('editRespuesta').value = asociacion.respuesta || '';
+                                    document.getElementById('editNotasPersonalizadas').value = asociacion.notas_personalizadas || '';
+                                } else {
+                                    alert('Error cargando datos: ' + data.error);
+                                }
+                            })
+                            .catch(error => {
+                                alert('Error de conexión: ' + error);
+                            });
+                        }
+                    };
+                    
+                    // Agregar cierre del modal
+                    document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(btn => {
+                        btn.onclick = function() {
+                            const modal = document.getElementById('editModal');
+                            modal.style.display = 'none';
+                            modal.classList.remove('show');
+                            document.body.style.overflow = 'auto';
+                        };
+                    });
+                } else {
+                    console.log('✅ Bootstrap cargado correctamente');
+                }
+            }, 100);
+        });
+    </script>
 </body>
 </html>
 '''
