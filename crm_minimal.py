@@ -121,7 +121,7 @@ def create_minimal_crm_routes(app):
     
     @app.route('/api/minimal/import-csv', methods=['POST'])
     def import_csv_minimal():
-        """Importar CSV"""
+        """Importar CSV con formato específico de DiversIA"""
         try:
             if 'csv_file' not in request.files:
                 return jsonify({'success': False, 'error': 'No se proporcionó archivo'})
@@ -130,25 +130,48 @@ def create_minimal_crm_routes(app):
             if file.filename == '':
                 return jsonify({'success': False, 'error': 'No se seleccionó archivo'})
             
-            # Leer CSV
-            stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+            # Leer CSV con formato específico
+            content = file.stream.read().decode("UTF8")
+            stream = io.StringIO(content, newline=None)
             reader = csv.DictReader(stream)
             
             data = load_data()
             companies = data.get('companies', [])
             
             created = 0
+            skipped = 0
+            
             for row in reader:
-                # Generar ID
+                # Mapear columnas específicas del CSV de DiversIA
+                empresa = row.get('Empresa', '').strip()
+                email = row.get('Email', '').strip()
+                telefono = row.get('Telefono', '').strip()
+                sector = row.get('Sector', '').strip()
+                ciudad = row.get('Ciudad', '').strip()
+                fecha = row.get('Fecha', '').strip()
+                acciones = row.get('Acciones', '').strip()
+                
+                # Validar que tenga al menos empresa
+                if not empresa:
+                    skipped += 1
+                    continue
+                
+                # Limpiar email si tiene formato mailto:
+                if email.startswith('mailto:'):
+                    email = email.replace('mailto:', '')
+                
+                # Generar ID único
                 new_id = max([c.get('id', 0) for c in companies], default=0) + 1
                 
                 new_company = {
                     'id': new_id,
-                    'nombre': row.get('nombre_empresa', row.get('nombre', '')),
-                    'email': row.get('email_contacto', row.get('email', '')),
-                    'telefono': row.get('telefono', ''),
-                    'sector': row.get('sector', ''),
-                    'ciudad': row.get('ciudad', ''),
+                    'nombre': empresa,
+                    'email': email,
+                    'telefono': telefono,
+                    'sector': sector,
+                    'ciudad': ciudad,
+                    'fecha_contacto': fecha,
+                    'notas': acciones,
                     'created_at': datetime.now().isoformat()
                 }
                 
@@ -158,13 +181,18 @@ def create_minimal_crm_routes(app):
             data['companies'] = companies
             save_data(data)
             
+            message = f'Importación completada: {created} empresas creadas'
+            if skipped > 0:
+                message += f', {skipped} filas omitidas'
+            
             return jsonify({
                 'success': True,
-                'message': f'Importación completada: {created} empresas creadas',
-                'created': created
+                'message': message,
+                'created': created,
+                'skipped': skipped
             })
             
         except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return jsonify({'success': False, 'error': f'Error procesando CSV: {str(e)}'}), 500
     
     print("CRM Minimal inicializado correctamente")

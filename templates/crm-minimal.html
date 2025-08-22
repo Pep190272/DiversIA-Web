@@ -95,7 +95,7 @@
                         <label class="form-label">Archivo CSV</label>
                         <input type="file" class="form-control" id="csvFile" accept=".csv" required>
                         <div class="form-text">
-                            Formato esperado: nombre_empresa, email_contacto, telefono, sector, ciudad
+                            <strong>Formato DiversIA:</strong> Empresa, Email, Telefono, Sector, Ciudad, Fecha, Acciones
                         </div>
                     </div>
                     <button type="submit" class="btn btn-success">Importar</button>
@@ -115,12 +115,13 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Nombre</th>
+                                <th>Empresa</th>
                                 <th>Email</th>
                                 <th>Teléfono</th>
                                 <th>Sector</th>
                                 <th>Ciudad</th>
                                 <th>Fecha</th>
+                                <th>Notas</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -170,7 +171,7 @@
                 countSpan.textContent = companies.length;
                 
                 if (companies.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No hay empresas registradas</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No hay empresas registradas</td></tr>';
                     return;
                 }
                 
@@ -178,11 +179,12 @@
                     <tr>
                         <td>${company.id}</td>
                         <td><strong>${company.nombre}</strong></td>
-                        <td>${company.email}</td>
+                        <td><a href="mailto:${company.email}">${company.email}</a></td>
                         <td>${company.telefono || '-'}</td>
                         <td>${company.sector || '-'}</td>
                         <td>${company.ciudad || '-'}</td>
-                        <td>${new Date(company.created_at).toLocaleDateString()}</td>
+                        <td>${company.fecha_contacto || new Date(company.created_at).toLocaleDateString()}</td>
+                        <td title="${company.notas || ''}">${company.notas ? company.notas.substring(0, 50) + '...' : '-'}</td>
                         <td>
                             <button class="btn btn-sm btn-danger" onclick="deleteCompany(${company.id})">
                                 Eliminar
