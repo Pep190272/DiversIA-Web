@@ -293,32 +293,48 @@ def email_marketing_funnel_ventas():
         contactos_iniciales = len(asociaciones)
         respuestas_totales = len([a for a in asociaciones if a.respuesta])
         
-        # Análisis de reuniones (buscar palabras clave en respuestas)
-        reuniones_keywords = ['reunión', 'reunion', 'meeting', 'llamada', 'videollamada', 'zoom', 'teams', 'cita', 'entrevista']
+        # Análisis de reuniones (buscar palabras clave en respuestas y notas)
+        reuniones_keywords = ['reunión', 'reunion', 'meeting', 'llamada', 'videollamada', 'zoom', 'teams', 'cita', 'entrevista', 'contacto', 'hablar', 'conversar']
         reuniones = []
         for a in asociaciones:
+            texto_completo = ""
             if a.respuesta:
-                respuesta_lower = a.respuesta.lower()
-                if any(keyword in respuesta_lower for keyword in reuniones_keywords):
-                    reuniones.append(a)
+                texto_completo += a.respuesta.lower() + " "
+            if a.notas_personalizadas:
+                texto_completo += a.notas_personalizadas.lower() + " "
+            if a.notas_especiales:
+                texto_completo += a.notas_especiales.lower() + " "
+            
+            if texto_completo and any(keyword in texto_completo for keyword in reuniones_keywords):
+                reuniones.append(a)
         
-        # Análisis de NDA y contratos (palabras clave avanzadas)
-        nda_keywords = ['nda', 'confidencialidad', 'acuerdo', 'contrato', 'firma', 'legal', 'términos', 'clausula']
+        # Análisis de NDA y contratos (palabras clave avanzadas y más específicas)
+        nda_keywords = ['nda', 'confidencialidad', 'acuerdo', 'contrato', 'firma', 'legal', 'términos', 'clausula', 'firmado', 'firmar', 'pendiente', 'documento', 'protocolo']
         nda_proceso = []
         for a in asociaciones:
+            texto_completo = ""
             if a.respuesta:
-                respuesta_lower = a.respuesta.lower()
-                if any(keyword in respuesta_lower for keyword in nda_keywords):
-                    nda_proceso.append(a)
+                texto_completo += a.respuesta.lower() + " "
+            if a.notas_personalizadas:
+                texto_completo += a.notas_personalizadas.lower() + " "
+            if a.notas_especiales:
+                texto_completo += a.notas_especiales.lower() + " "
+            
+            if texto_completo and any(keyword in texto_completo for keyword in nda_keywords):
+                nda_proceso.append(a)
         
-        # Análisis de interés positivo
-        interes_keywords = ['interesa', 'interesante', 'colaborar', 'colaboración', 'partnership', 'alianza', 'trabajar juntos', 'sí', 'si', 'perfecto', 'genial']
+        # Análisis de interés positivo (más amplio)
+        interes_keywords = ['interesa', 'interesante', 'colaborar', 'colaboración', 'partnership', 'alianza', 'trabajar juntos', 'sí', 'si', 'perfecto', 'genial', 'positivo', 'bien', 'adelante', 'encantados', 'dispuesto']
         interesados = []
         for a in asociaciones:
+            texto_completo = ""
             if a.respuesta:
-                respuesta_lower = a.respuesta.lower()
-                if any(keyword in respuesta_lower for keyword in interes_keywords):
-                    interesados.append(a)
+                texto_completo += a.respuesta.lower() + " "
+            if a.notas_personalizadas:
+                texto_completo += a.notas_personalizadas.lower() + " "
+            
+            if texto_completo and any(keyword in texto_completo for keyword in interes_keywords):
+                interesados.append(a)
         
         # Calcular porcentajes
         tasa_respuesta = (respuestas_totales / contactos_iniciales * 100) if contactos_iniciales > 0 else 0
@@ -358,8 +374,8 @@ def email_marketing_funnel_ventas():
             'tasa_reuniones': round(tasa_reuniones, 1),
             'tasa_nda': round(tasa_nda, 1),
             'mejores_comunidades': mejores_comunidades,
-            'reuniones_detalle': reuniones[:10],  # Top 10 reuniones
-            'nda_detalle': nda_proceso[:10],       # Top 10 NDAs
+            'reuniones_detalle': reuniones,        # Todas las reuniones
+            'nda_detalle': nda_proceso,            # Todos los NDAs
             'stats_comunidad': stats_comunidad
         }
         
@@ -1520,9 +1536,15 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                 <h6>🤝 Reuniones Programadas/Realizadas</h6>
                 <div class="detail-list">
                     {% for reunion in reuniones_detalle %}
-                    <div class="mb-2">
-                        <strong>{{ reunion.asociacion }}</strong> ({{ reunion.comunidad_autonoma }})<br>
-                        <small class="text-muted">{{ reunion.respuesta[:100] }}...</small>
+                    <div class="mb-3 border-bottom pb-2">
+                        <strong>{{ reunion.asociacion }}</strong> 
+                        <span class="badge bg-info">{{ reunion.comunidad_autonoma }}</span><br>
+                        {% if reunion.respuesta %}
+                        <small class="text-primary"><strong>Respuesta:</strong> {{ reunion.respuesta[:150] }}{% if reunion.respuesta|length > 150 %}...{% endif %}</small><br>
+                        {% endif %}
+                        {% if reunion.notas_personalizadas %}
+                        <small class="text-success"><strong>Notas:</strong> {{ reunion.notas_personalizadas[:100] }}{% if reunion.notas_personalizadas|length > 100 %}...{% endif %}</small>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
@@ -1534,9 +1556,18 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                 <h6>📋 NDAs y Contratos en Proceso</h6>
                 <div class="detail-list">
                     {% for nda in nda_detalle %}
-                    <div class="mb-2">
-                        <strong>{{ nda.asociacion }}</strong> ({{ nda.comunidad_autonoma }})<br>
-                        <small class="text-muted">{{ nda.respuesta[:100] }}...</small>
+                    <div class="mb-3 border-bottom pb-2">
+                        <strong>{{ nda.asociacion }}</strong> 
+                        <span class="badge bg-danger">{{ nda.comunidad_autonoma }}</span><br>
+                        {% if nda.respuesta %}
+                        <small class="text-primary"><strong>Respuesta:</strong> {{ nda.respuesta[:150] }}{% if nda.respuesta|length > 150 %}...{% endif %}</small><br>
+                        {% endif %}
+                        {% if nda.notas_personalizadas %}
+                        <small class="text-warning"><strong>Notas:</strong> {{ nda.notas_personalizadas[:100] }}{% if nda.notas_personalizadas|length > 100 %}...{% endif %}</small><br>
+                        {% endif %}
+                        {% if nda.notas_especiales %}
+                        <small class="text-info"><strong>Especiales:</strong> {{ nda.notas_especiales[:100] }}{% if nda.notas_especiales|length > 100 %}...{% endif %}</small>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
