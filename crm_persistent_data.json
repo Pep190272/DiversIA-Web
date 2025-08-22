@@ -35,43 +35,6 @@
   ],
   "companies": [
     {
-      "id": 1,
-      "name": "TechInclusiva S.L.",
-      "sector": "Tecnología",
-      "email": "rrhh@techinclusiva.com",
-      "phone": "+34 900 555 123",
-      "city": "Madrid",
-      "size": "50-100",
-      "website": "https://techinclusiva.com",
-      "created_at": "2024-01-10",
-      "source": "manual"
-    },
-    {
-      "id": 2,
-      "name": "ConsultoríaND",
-      "sector": "Consultoría",
-      "email": "contacto@consultoriaND.es",
-      "phone": "+34 910 444 789",
-      "city": "Valencia",
-      "size": "10-50",
-      "website": "https://consultoriand.es",
-      "created_at": "2024-03-05",
-      "source": "manual"
-    },
-    {
-      "id": 35,
-      "name": "TechCorp Solutions",
-      "email": "info@techcorp.com",
-      "phone": "912345678",
-      "sector": "Tecnología",
-      "size": null,
-      "city": "Madrid",
-      "website": "https://techcorp.com",
-      "description": "Empresa tecnológica innovadora",
-      "created_at": "2025-08-21T09:02:49.722894",
-      "source": "web_form"
-    },
-    {
       "id": 138,
       "name": "Acelerai",
       "email": "automatizatunegocio@acelerai.eu",
