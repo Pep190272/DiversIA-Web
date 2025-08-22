@@ -64,6 +64,13 @@ def create_minimal_crm_routes(app):
         companies = data.get('companies', [])
         return render_template('empresas-cards.html', companies=companies)
     
+    @app.route('/asociaciones-crm')
+    def asociaciones_crm():
+        """Dashboard de asociaciones del CRM - requiere autenticación"""
+        if 'admin_ok' not in session or not session.get('admin_ok'):
+            return redirect('/diversia-admin')
+        return render_template('asociaciones-crm.html')
+    
     @app.route('/api/minimal/companies')
     def get_companies_minimal():
         """Obtener todas las empresas"""
@@ -292,6 +299,240 @@ def create_minimal_crm_routes(app):
             response = make_response(output.getvalue())
             response.headers['Content-Type'] = 'text/csv'
             response.headers['Content-Disposition'] = f'attachment; filename=diversia_empresas_{datetime.now().strftime("%Y%m%d")}.csv'
+            
+            return response
+            
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    # ==================== RUTAS PARA ASOCIACIONES ====================
+    
+    @app.route('/api/asociaciones')
+    def get_asociaciones():
+        """Obtener todas las asociaciones de la base de datos"""
+        try:
+            from models import Asociacion
+            from app import db
+            
+            asociaciones = Asociacion.query.all()
+            
+            asociaciones_data = []
+            for asoc in asociaciones:
+                # Procesar neurodivergencias y servicios desde JSON
+                import json
+                try:
+                    neurodivergencias = json.loads(asoc.neurodivergencias_atendidas) if asoc.neurodivergencias_atendidas else []
+                except:
+                    neurodivergencias = []
+                
+                try:
+                    servicios = json.loads(asoc.servicios) if asoc.servicios else []
+                except:
+                    servicios = []
+                
+                asociaciones_data.append({
+                    'id': asoc.id,
+                    'nombre_asociacion': asoc.nombre_asociacion,
+                    'acronimo': asoc.acronimo,
+                    'pais': asoc.pais,
+                    'ciudad': asoc.ciudad,
+                    'telefono': asoc.telefono,
+                    'email': asoc.email,
+                    'sitio_web': asoc.sitio_web,
+                    'contacto_nombre': asoc.contacto_nombre,
+                    'contacto_cargo': asoc.contacto_cargo,
+                    'estado': asoc.estado,
+                    'años_funcionamiento': asoc.años_funcionamiento,
+                    'numero_socios': asoc.numero_socios,
+                    'neurodivergencias_atendidas': ', '.join(neurodivergencias) if neurodivergencias else '',
+                    'servicios': ', '.join(servicios) if servicios else '',
+                    'descripcion': asoc.descripcion,
+                    'created_at': asoc.created_at.isoformat() if asoc.created_at else None
+                })
+            
+            return jsonify(asociaciones_data)
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/asociaciones/<int:asociacion_id>')
+    def get_asociacion(asociacion_id):
+        """Obtener una asociación específica"""
+        try:
+            from models import Asociacion
+            
+            asociacion = Asociacion.query.get_or_404(asociacion_id)
+            
+            # Procesar campos JSON
+            import json
+            try:
+                neurodivergencias = json.loads(asociacion.neurodivergencias_atendidas) if asociacion.neurodivergencias_atendidas else []
+            except:
+                neurodivergencias = []
+            
+            try:
+                servicios = json.loads(asociacion.servicios) if asociacion.servicios else []
+            except:
+                servicios = []
+                
+            data = {
+                'id': asociacion.id,
+                'nombre_asociacion': asociacion.nombre_asociacion,
+                'acronimo': asociacion.acronimo,
+                'pais': asociacion.pais,
+                'ciudad': asociacion.ciudad,
+                'direccion': asociacion.direccion,
+                'telefono': asociacion.telefono,
+                'email': asociacion.email,
+                'sitio_web': asociacion.sitio_web,
+                'contacto_nombre': asociacion.contacto_nombre,
+                'contacto_cargo': asociacion.contacto_cargo,
+                'estado': asociacion.estado,
+                'años_funcionamiento': asociacion.años_funcionamiento,
+                'numero_socios': asociacion.numero_socios,
+                'neurodivergencias_atendidas': neurodivergencias,
+                'servicios': servicios,
+                'descripcion': asociacion.descripcion,
+                'tipo_documento': asociacion.tipo_documento,
+                'numero_documento': asociacion.numero_documento
+            }
+            
+            return jsonify({'success': True, 'asociacion': data})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/asociaciones/<int:asociacion_id>', methods=['PUT'])
+    def update_asociacion(asociacion_id):
+        """Actualizar asociación específica"""
+        try:
+            from models import Asociacion
+            from app import db
+            
+            asociacion = Asociacion.query.get_or_404(asociacion_id)
+            update_data = request.get_json()
+            
+            # Actualizar campos básicos
+            if 'nombre_asociacion' in update_data:
+                asociacion.nombre_asociacion = update_data['nombre_asociacion']
+            if 'acronimo' in update_data:
+                asociacion.acronimo = update_data['acronimo']
+            if 'pais' in update_data:
+                asociacion.pais = update_data['pais']
+            if 'ciudad' in update_data:
+                asociacion.ciudad = update_data['ciudad']
+            if 'direccion' in update_data:
+                asociacion.direccion = update_data['direccion']
+            if 'telefono' in update_data:
+                asociacion.telefono = update_data['telefono']
+            if 'email' in update_data:
+                asociacion.email = update_data['email']
+            if 'sitio_web' in update_data:
+                asociacion.sitio_web = update_data['sitio_web']
+            if 'contacto_nombre' in update_data:
+                asociacion.contacto_nombre = update_data['contacto_nombre']
+            if 'contacto_cargo' in update_data:
+                asociacion.contacto_cargo = update_data['contacto_cargo']
+            if 'estado' in update_data:
+                asociacion.estado = update_data['estado']
+            if 'años_funcionamiento' in update_data:
+                try:
+                    asociacion.años_funcionamiento = int(update_data['años_funcionamiento']) if update_data['años_funcionamiento'] else None
+                except:
+                    pass
+            if 'numero_socios' in update_data:
+                try:
+                    asociacion.numero_socios = int(update_data['numero_socios']) if update_data['numero_socios'] else None
+                except:
+                    pass
+            if 'descripcion' in update_data:
+                asociacion.descripcion = update_data['descripcion']
+            
+            # Actualizar timestamp
+            from datetime import datetime
+            asociacion.updated_at = datetime.now()
+            
+            db.session.commit()
+            
+            return jsonify({'success': True, 'message': 'Asociación actualizada correctamente'})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/asociaciones/<int:asociacion_id>', methods=['DELETE'])
+    def delete_asociacion(asociacion_id):
+        """Eliminar asociación"""
+        try:
+            from models import Asociacion
+            from app import db
+            
+            asociacion = Asociacion.query.get_or_404(asociacion_id)
+            db.session.delete(asociacion)
+            db.session.commit()
+            
+            return jsonify({'success': True, 'message': 'Asociación eliminada correctamente'})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/asociaciones/export-csv')
+    def export_asociaciones_csv():
+        """Exportar asociaciones a CSV"""
+        try:
+            from models import Asociacion
+            from flask import make_response
+            import json
+            
+            asociaciones = Asociacion.query.all()
+            
+            if not asociaciones:
+                return jsonify({'success': False, 'error': 'No hay asociaciones para exportar'})
+            
+            # Crear CSV
+            output = io.StringIO()
+            writer = csv.writer(output)
+            
+            # Escribir encabezados
+            writer.writerow([
+                'ID', 'Nombre Asociación', 'Acrónimo', 'País', 'Ciudad', 'Teléfono', 
+                'Email', 'Sitio Web', 'Contacto', 'Cargo', 'Estado', 'Años Funcionamiento',
+                'Número Socios', 'Neurodivergencias', 'Servicios', 'Descripción'
+            ])
+            
+            # Escribir datos
+            for asoc in asociaciones:
+                try:
+                    neurodivergencias = json.loads(asoc.neurodivergencias_atendidas) if asoc.neurodivergencias_atendidas else []
+                except:
+                    neurodivergencias = []
+                
+                try:
+                    servicios = json.loads(asoc.servicios) if asoc.servicios else []
+                except:
+                    servicios = []
+                
+                writer.writerow([
+                    asoc.id,
+                    asoc.nombre_asociacion,
+                    asoc.acronimo or '',
+                    asoc.pais,
+                    asoc.ciudad,
+                    asoc.telefono or '',
+                    asoc.email,
+                    asoc.sitio_web or '',
+                    asoc.contacto_nombre or '',
+                    asoc.contacto_cargo or '',
+                    asoc.estado,
+                    asoc.años_funcionamiento or '',
+                    asoc.numero_socios or '',
+                    ', '.join(neurodivergencias),
+                    ', '.join(servicios),
+                    asoc.descripcion or ''
+                ])
+            
+            # Preparar respuesta
+            output.seek(0)
+            response = make_response(output.getvalue())
+            response.headers['Content-Type'] = 'text/csv'
+            response.headers['Content-Disposition'] = f'attachment; filename=diversia_asociaciones_{datetime.now().strftime("%Y%m%d")}.csv'
             
             return response
             

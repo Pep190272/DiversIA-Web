@@ -5,22 +5,24 @@
       "nombre": "Auria",
       "email": "albertpinyol@auria.org",
       "telefono": "",
-      "sector": "Recruiter",
+      "sector": "Otros",
       "ciudad": "Barcelona",
-      "fecha_contacto": "",
+      "fecha_contacto": "2025-07-30",
       "notas": "",
-      "created_at": "2025-08-22T10:11:21.820583"
+      "created_at": "2025-08-22T10:11:21.820583",
+      "updated_at": "2025-08-22T18:31:13.384603"
     },
     {
       "id": 3,
       "nombre": "Atípicos",
       "email": "veronicamapo@gmail.com",
       "telefono": "",
-      "sector": "Diseño neurodivergente",
+      "sector": "Otros",
       "ciudad": "Barcelona",
-      "fecha_contacto": "",
+      "fecha_contacto": "2025-07-29",
       "notas": "",
-      "created_at": "2025-08-22T10:11:21.820591"
+      "created_at": "2025-08-22T10:11:21.820591",
+      "updated_at": "2025-08-22T18:31:48.842988"
     },
     {
       "id": 4,
@@ -47,6 +49,6 @@
   "stats": {
     "total_companies": 4,
     "total_contacts": 0,
-    "last_updated": "2025-08-22T12:39:03.758599"
+    "last_updated": "2025-08-22T18:31:48.842994"
   }
 }
