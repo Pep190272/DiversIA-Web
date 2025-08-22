@@ -59,6 +59,9 @@ def update_email_marketing_complete(record_id):
         record.fecha_enviado = data.get('fecha_enviado', '').strip()
         record.respuesta = data.get('respuesta', '').strip()
         record.notas_personalizadas = data.get('notas_personalizadas', '').strip()
+        # Campos NDA
+        record.estado_nda = data.get('estado_nda', 'Sin contacto').strip()
+        record.fecha_nda = data.get('fecha_nda', '').strip()
         record.updated_at = datetime.now()
         
         db.session.commit()
@@ -166,11 +169,17 @@ def email_marketing_funnel():
     if reuniones == 0:
         reuniones = int(respondidos * 0.33) if respondidos > 0 else 0
     
-    # Paso 4: NDA firmados y en proceso (datos reales de DiversIA)
-    # Teamworkz: NDA firmado ✓
-    # Colombia: NDA pendiente de firma 
-    nda_firmados = 1  # Teamworkz confirmado
-    nda_pendientes = 1  # Colombia pendiente
+    # Paso 4: NDA basados en estados reales de la base de datos
+    nda_firmados = EmailMarketing.query.filter(EmailMarketing.estado_nda == 'NDA firmado').count()
+    nda_pendientes = EmailMarketing.query.filter(EmailMarketing.estado_nda == 'NDA pendiente').count()
+    reuniones_programadas = EmailMarketing.query.filter(EmailMarketing.estado_nda == 'Reunión programada').count()
+    interesados = EmailMarketing.query.filter(EmailMarketing.estado_nda == 'Interesado').count()
+    
+    # Si no hay datos en BD, usar valores conocidos
+    if nda_firmados == 0 and nda_pendientes == 0:
+        nda_firmados = 1  # Teamworkz confirmado
+        nda_pendientes = 1  # Colombia pendiente
+    
     nda_proceso = nda_firmados + nda_pendientes
     
     # Stats por comunidad autónoma
@@ -324,6 +333,10 @@ def edit_email_marketing_contact(contact_id):
             contact.notas_especiales = value
         elif field == 'notas_personalizadas':
             contact.notas_personalizadas = value
+        elif field == 'estado_nda':
+            contact.estado_nda = value
+        elif field == 'fecha_nda':
+            contact.fecha_nda = value
         else:
             return jsonify({'error': 'Campo no válido'}), 400
         
@@ -560,6 +573,7 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                         <th>Asociación</th>
                                         <th>Email</th>
                                         <th>Fecha Envío</th>
+                                        <th>Estado NDA</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -578,6 +592,11 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                             {% endif %}
                                         </td>
                                         <td>
+                                            <span class="badge {% if asociacion.estado_nda == 'NDA firmado' %}bg-success{% elif asociacion.estado_nda == 'NDA pendiente' %}bg-warning text-dark{% elif asociacion.estado_nda == 'Reunión programada' %}bg-info{% elif asociacion.estado_nda == 'Interesado' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                                {{ asociacion.estado_nda or 'Sin contacto' }}
+                                            </span>
+                                        </td>
+                                        <td>
                                             <button class="btn btn-sm btn-primary me-1" onclick="toggleEditCard({{ asociacion.id }})">
                                                 <i class="bi bi-pencil"></i> Editar
                                             </button>
@@ -589,7 +608,7 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                     
                                     <!-- Ficha de edición expandible -->
                                     <tr id="editCard-{{ asociacion.id }}" class="edit-card-row d-none">
-                                        <td colspan="6">
+                                        <td colspan="7">
                                             <div class="card {% if asociacion.notas_personalizadas %}border-warning{% elif asociacion.respuesta %}border-success{% else %}border-primary{% endif %}">
                                                 <div class="card-header {% if asociacion.notas_personalizadas %}bg-warning{% elif asociacion.respuesta %}bg-success{% else %}bg-primary{% endif %} text-white d-flex justify-content-between align-items-center">
                                                     <div>
@@ -660,6 +679,25 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                                                 <div class="mb-3">
                                                                     <label class="form-label">Notas Personalizadas</label>
                                                                     <textarea class="form-control" name="notas_personalizadas" rows="2" placeholder="Añadir notas de seguimiento...">{{ asociacion.notas_personalizadas or '' }}</textarea>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Campos para seguimiento NDA -->
+                                                            <div class="col-md-6">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Estado NDA</label>
+                                                                    <select class="form-select" name="estado_nda">
+                                                                        <option value="Sin contacto" {% if not asociacion.estado_nda or asociacion.estado_nda == 'Sin contacto' %}selected{% endif %}>Sin contacto</option>
+                                                                        <option value="Interesado" {% if asociacion.estado_nda == 'Interesado' %}selected{% endif %}>Interesado</option>
+                                                                        <option value="Reunión programada" {% if asociacion.estado_nda == 'Reunión programada' %}selected{% endif %}>Reunión programada</option>
+                                                                        <option value="NDA pendiente" {% if asociacion.estado_nda == 'NDA pendiente' %}selected{% endif %}>NDA pendiente</option>
+                                                                        <option value="NDA firmado" {% if asociacion.estado_nda == 'NDA firmado' %}selected{% endif %}>NDA firmado</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Fecha NDA/Reunión</label>
+                                                                    <input type="text" class="form-control" name="fecha_nda" placeholder="dd/mm/yyyy" value="{{ asociacion.fecha_nda or '' }}">
                                                                 </div>
                                                             </div>
                                                         </div>

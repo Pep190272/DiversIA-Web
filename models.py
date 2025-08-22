@@ -200,6 +200,10 @@ class EmailMarketing(db.Model):
     tipo_respuesta = db.Column(db.String(100))  # interesado, no_interesado, info_solicitada
     seguimiento_programado = db.Column(db.DateTime)
     
+    # Campos para seguimiento de acuerdos NDA
+    estado_nda = db.Column(db.String(50), default='Sin contacto')  # Sin contacto, Interesado, Reunión programada, NDA firmado, NDA pendiente
+    fecha_nda = db.Column(db.String(50))  # Fecha del NDA o reunión
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
