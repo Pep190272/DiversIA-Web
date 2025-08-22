@@ -405,6 +405,7 @@ TASKS_TABLE_TEMPLATE = '''
                     <h2>📋 Gestión de Tareas - DiversIA ({{ total_tasks }})</h2>
                     <div>
                         <a href="/tasks/analytics" class="btn btn-info me-2">📊 Analytics</a>
+                        <a href="/colaboradores" class="btn btn-primary me-2">👥 Colaboradores</a>
                         <a href="/crm-minimal" class="btn btn-outline-secondary me-2">← CRM</a>
                         <a href="/diversia-admin-logout" class="btn btn-outline-danger">Salir</a>
                     </div>

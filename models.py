@@ -254,12 +254,22 @@ class Employee(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     rol = db.Column(db.String(100), nullable=False)  # Developer, Designer, Marketing, Manager, etc.
     department = db.Column(db.String(100), nullable=True)
+    
+    # Campos adicionales para ficha completa
+    telefono = db.Column(db.String(20), nullable=True)
+    fecha_ingreso = db.Column(db.String(20), nullable=True)  # Formato: YYYY-MM-DD
+    especialidades = db.Column(db.Text, nullable=True)  # Habilidades específicas
+    notas = db.Column(db.Text, nullable=True)  # Notas adicionales
+    
+    # Estado y timestamps
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     
-    def __repr__(self):
-        return f'<Employee {self.name}>'
+    # Relación con tareas
+    tasks = db.relationship('Task', backref='employee_ref', lazy=True, 
+                           primaryjoin='Employee.name == Task.colaborador',
+                           foreign_keys='Task.colaborador')
     
     def __repr__(self):
         return f'<Employee {self.name}>'
