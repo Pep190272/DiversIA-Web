@@ -1036,20 +1036,25 @@ def verificacion_documentos():
 @app.route('/api/associations')
 def api_associations():
     """API para obtener todas las asociaciones"""
-    asociaciones = Asociacion.query.all()
-    data = []
-    
-    for asoc in asociaciones:
-        data.append({
-            'id': asoc.id,
-            'name': asoc.nombre_asociacion,
-            'acronym': asoc.acronimo,
-            'country': asoc.pais,
-            'city': asoc.ciudad,
-            'email': asoc.email,
-            'neurodivergences': asoc.neurodivergencias_atendidas,
-            'status': asoc.estado,
-            'created_at': asoc.created_at.isoformat() if asoc.created_at else None
-        })
-    
-    return jsonify(data)
+    from models import Asociacion
+    try:
+        asociaciones = Asociacion.query.all()
+        data = []
+        
+        for asoc in asociaciones:
+            data.append({
+                'id': asoc.id,
+                'name': asoc.nombre_asociacion,
+                'acronym': asoc.acronimo,
+                'country': asoc.pais,
+                'city': asoc.ciudad,
+                'email': asoc.email,
+                'neurodivergences': asoc.neurodivergencias_atendidas,
+                'status': asoc.estado,
+                'created_at': asoc.created_at.isoformat() if asoc.created_at else None
+            })
+        
+        return jsonify(data)
+    except Exception as e:
+        print(f"Error en API associations: {e}")
+        return jsonify([])  # Devolver lista vacía si hay error
