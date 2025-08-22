@@ -1399,3 +1399,713 @@ EMAIL_MARKETING_FUNNEL_TEMPLATE = '''
 '''
 
 print("✅ Email Marketing Manager cargado")
+
+# ======= NUEVOS LISTADOS EDITABLES =======
+
+@app.route('/colaboradores-listado')
+def colaboradores_listado():
+    """Listado editable de colaboradores con fichas"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return redirect('/diversia-admin')
+    
+    from models import Employee
+    colaboradores = Employee.query.all()
+    
+    return render_template_string(COLABORADORES_LISTADO_TEMPLATE, 
+                                colaboradores=colaboradores,
+                                total_colaboradores=len(colaboradores))
+
+@app.route('/personas-nd-listado')
+def personas_nd_listado():
+    """Listado editable de personas neurodivergentes con fichas completas"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return redirect('/diversia-admin')
+    
+    from models import User
+    personas = User.query.all()
+    
+    return render_template_string(PERSONAS_ND_LISTADO_TEMPLATE, 
+                                personas=personas,
+                                total_personas=len(personas))
+
+@app.route('/asociaciones-listado')
+def asociaciones_listado():
+    """Listado editable de asociaciones neurodivergentes"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return redirect('/diversia-admin')
+    
+    from models import Asociacion
+    asociaciones = Asociacion.query.all()
+    
+    return render_template_string(ASOCIACIONES_LISTADO_TEMPLATE, 
+                                asociaciones=asociaciones,
+                                total_asociaciones=len(asociaciones))
+
+# Rutas de actualización para los nuevos listados
+@app.route('/colaboradores/update/<int:id>', methods=['POST'])
+def update_colaborador(id):
+    """Actualizar colaborador desde ficha editable"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    try:
+        from models import Employee
+        colaborador = Employee.query.get_or_404(id)
+        data = request.get_json()
+        
+        colaborador.nombre = data.get('nombre', colaborador.nombre)
+        colaborador.email = data.get('email', colaborador.email)
+        colaborador.rol = data.get('rol', colaborador.rol)
+        colaborador.departamento = data.get('departamento', colaborador.departamento)
+        colaborador.telefono = data.get('telefono', colaborador.telefono)
+        colaborador.salario = data.get('salario', colaborador.salario)
+        colaborador.fecha_contratacion = data.get('fecha_contratacion', colaborador.fecha_contratacion)
+        colaborador.notas = data.get('notas', colaborador.notas)
+        colaborador.updated_at = datetime.now()
+        
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Colaborador actualizado'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/personas-nd/update/<int:id>', methods=['POST'])
+def update_persona_nd(id):
+    """Actualizar persona neurodivergente desde ficha editable"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    try:
+        from models import User
+        persona = User.query.get_or_404(id)
+        data = request.get_json()
+        
+        # Campos básicos
+        persona.nombre = data.get('nombre', persona.nombre)
+        persona.apellidos = data.get('apellidos', persona.apellidos)
+        persona.email = data.get('email', persona.email)
+        persona.telefono = data.get('telefono', persona.telefono)
+        persona.ciudad = data.get('ciudad', persona.ciudad)
+        persona.fecha_nacimiento = data.get('fecha_nacimiento', persona.fecha_nacimiento)
+        
+        # Campos específicos neurodivergencia
+        persona.tipo_neurodivergencia = data.get('tipo_neurodivergencia', persona.tipo_neurodivergencia)
+        persona.diagnostico_formal = data.get('diagnostico_formal', persona.diagnostico_formal) == 'true'
+        persona.experiencia_laboral = data.get('experiencia_laboral', persona.experiencia_laboral)
+        persona.formacion_academica = data.get('formacion_academica', persona.formacion_academica)
+        persona.habilidades = data.get('habilidades', persona.habilidades)
+        persona.intereses_laborales = data.get('intereses_laborales', persona.intereses_laborales)
+        persona.adaptaciones_necesarias = data.get('adaptaciones_necesarias', persona.adaptaciones_necesarias)
+        
+        # Campos específicos TDAH
+        persona.medicacion_actual = data.get('medicacion_actual', persona.medicacion_actual)
+        persona.necesidades_organizacion = data.get('necesidades_organizacion', persona.necesidades_organizacion)
+        persona.entorno_preferido = data.get('entorno_preferido', persona.entorno_preferido)
+        
+        # Campos específicos Dislexia
+        persona.dificultades_lectura = data.get('dificultades_lectura', persona.dificultades_lectura)
+        persona.herramientas_asistivas = data.get('herramientas_asistivas', persona.herramientas_asistivas)
+        persona.estrategias_aprendizaje = data.get('estrategias_aprendizaje', persona.estrategias_aprendizaje)
+        
+        # Campos específicos TEA
+        persona.nivel_comunicacion = data.get('nivel_comunicacion', persona.nivel_comunicacion)
+        persona.sensibilidades = data.get('sensibilidades', persona.sensibilidades)
+        persona.intereses_especiales = data.get('intereses_especiales', persona.intereses_especiales)
+        
+        persona.updated_at = datetime.now()
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Persona actualizada'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/asociaciones/update/<int:id>', methods=['POST'])
+def update_asociacion(id):
+    """Actualizar asociación desde ficha editable"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    try:
+        from models import Asociacion
+        asociacion = Asociacion.query.get_or_404(id)
+        data = request.get_json()
+        
+        asociacion.nombre = data.get('nombre', asociacion.nombre)
+        asociacion.email = data.get('email', asociacion.email)
+        asociacion.telefono = data.get('telefono', asociacion.telefono)
+        asociacion.direccion = data.get('direccion', asociacion.direccion)
+        asociacion.ciudad = data.get('ciudad', asociacion.ciudad)
+        asociacion.provincia = data.get('provincia', asociacion.provincia)
+        asociacion.comunidad_autonoma = data.get('comunidad_autonoma', asociacion.comunidad_autonoma)
+        asociacion.tipo_neurodivergencia = data.get('tipo_neurodivergencia', asociacion.tipo_neurodivergencia)
+        asociacion.servicios = data.get('servicios', asociacion.servicios)
+        asociacion.estado_colaboracion = data.get('estado_colaboracion', asociacion.estado_colaboracion)
+        asociacion.notas = data.get('notas', asociacion.notas)
+        asociacion.updated_at = datetime.now()
+        
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Asociación actualizada'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+# ======= TEMPLATES PARA LISTADOS EDITABLES =======
+
+# Template para listado de colaboradores
+COLABORADORES_LISTADO_TEMPLATE = '''
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colaboradores - DiversIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .ficha-colaborador { background: #f8f9fa; border-left: 4px solid #007bff; margin-bottom: 15px; }
+        .salario-field { color: #28a745; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>👥 Colaboradores DiversIA ({{ total_colaboradores }})</h2>
+                    <div>
+                        <a href="/tasks" class="btn btn-primary me-2">← Gestión Tareas</a>
+                        <a href="/sistema-gestion" class="btn btn-outline-secondary me-2">Sistema</a>
+                        <a href="/diversia-admin-logout" class="btn btn-outline-danger">Salir</a>
+                    </div>
+                </div>
+                
+                <!-- Lista de colaboradores -->
+                <div id="colaboradoresList">
+                    {% for colaborador in colaboradores %}
+                    <div class="card ficha-colaborador">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6 class="text-primary mb-1">{{ colaborador.nombre }}</h6>
+                                    <small class="text-muted">{{ colaborador.email }}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge bg-primary">{{ colaborador.departamento or 'Sin asignar' }}</span><br>
+                                    <small>{{ colaborador.rol or 'Sin rol' }}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="salario-field">{{ colaborador.salario or 'No definido' }}</span><br>
+                                    <small class="text-muted">Salario</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">Contratado:</small> {{ colaborador.fecha_contratacion or 'No definido' }}<br>
+                                    <small class="text-muted">Tel:</small> {{ colaborador.telefono or 'No definido' }}
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="toggleEditCard({{ colaborador.id }})">
+                                        ✏️ Editar
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Ficha de edición expandible -->
+                            <div id="editCard-{{ colaborador.id }}" class="edit-card-row d-none">
+                                <hr>
+                                <form id="editForm-{{ colaborador.id }}">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Nombre</label>
+                                            <input type="text" class="form-control" name="nombre" value="{{ colaborador.nombre }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" name="email" value="{{ colaborador.email }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Departamento</label>
+                                            <input type="text" class="form-control" name="departamento" value="{{ colaborador.departamento }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Rol</label>
+                                            <input type="text" class="form-control" name="rol" value="{{ colaborador.rol }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Salario</label>
+                                            <input type="text" class="form-control" name="salario" value="{{ colaborador.salario }}">
+                                        </div>
+                                    </div>
+                                    <div class="text-end mt-3">
+                                        <button type="button" class="btn btn-secondary me-2" onclick="cancelEdit({{ colaborador.id }})">Cancelar</button>
+                                        <button type="button" class="btn btn-primary" onclick="saveColaborador({{ colaborador.id }})">Guardar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if total_colaboradores == 0 %}
+                <div class="text-center mt-5">
+                    <div class="alert alert-info">
+                        <h4>👥 No hay colaboradores registrados</h4>
+                        <p>Los colaboradores aparecerán aquí cuando se registren en el sistema.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+<script>
+function toggleEditCard(id) {
+    const editCard = document.getElementById(`editCard-${id}`);
+    document.querySelectorAll('.edit-card-row').forEach(row => row.classList.add('d-none'));
+    if (editCard.classList.contains('d-none')) {
+        editCard.classList.remove('d-none');
+    }
+}
+
+function cancelEdit(id) {
+    document.getElementById(`editCard-${id}`).classList.add('d-none');
+}
+
+function saveColaborador(id) {
+    const form = document.getElementById(`editForm-${id}`);
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    fetch(`/colaboradores/update/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ Colaborador actualizado');
+            location.reload();
+        } else {
+            alert('❌ Error: ' + data.error);
+        }
+    });
+}
+</script>
+</body>
+</html>
+'''
+
+# Template para listado de personas neurodivergentes
+PERSONAS_ND_LISTADO_TEMPLATE = '''
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personas Neurodivergentes - DiversIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .ficha-persona { background: #f8f9fa; border-left: 4px solid #28a745; margin-bottom: 15px; }
+        .tipo-nd-badge { font-size: 0.9em; }
+        .campo-expandido { background: #e3f2fd; padding: 10px; border-radius: 8px; margin: 5px 0; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>🧠 Personas Neurodivergentes ({{ total_personas }})</h2>
+                    <div>
+                        <a href="/personas-nd" class="btn btn-success me-2">← Formularios Web</a>
+                        <a href="/sistema-gestion" class="btn btn-outline-secondary me-2">Sistema</a>
+                        <a href="/diversia-admin-logout" class="btn btn-outline-danger">Salir</a>
+                    </div>
+                </div>
+                
+                <!-- Filtros -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre o email...">
+                    </div>
+                    <div class="col-md-3">
+                        <select id="filterTipo" class="form-control">
+                            <option value="">Todos los tipos</option>
+                            <option value="TDAH">TDAH</option>
+                            <option value="TEA">TEA</option>
+                            <option value="Dislexia">Dislexia</option>
+                            <option value="Discalculia">Discalculia</option>
+                            <option value="Tourette">Tourette</option>
+                            <option value="Dispraxia">Dispraxia</option>
+                            <option value="Ansiedad">Ansiedad</option>
+                            <option value="Bipolar">Bipolar</option>
+                            <option value="Altas Capacidades">Altas Capacidades</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select id="filterDiagnostico" class="form-control">
+                            <option value="">Todos</option>
+                            <option value="true">Con diagnóstico</option>
+                            <option value="false">Sin diagnóstico</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Lista de personas -->
+                <div id="personasList">
+                    {% for persona in personas %}
+                    <div class="card ficha-persona persona-item" data-nombre="{{ persona.nombre }}" data-email="{{ persona.email }}" 
+                         data-tipo="{{ persona.tipo_neurodivergencia }}" data-diagnostico="{{ persona.diagnostico_formal }}">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6 class="text-primary mb-1">{{ persona.nombre }} {{ persona.apellidos }}</h6>
+                                    <small class="text-muted">{{ persona.email }}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge bg-success tipo-nd-badge">{{ persona.tipo_neurodivergencia }}</span><br>
+                                    <small class="text-muted">{{ '✅ Con diagnóstico' if persona.diagnostico_formal else '⚠️ Sin diagnóstico' }}</small>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted">Ciudad:</small><br>
+                                    <span>{{ persona.ciudad or 'No especificada' }}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted">Teléfono:</small><br>
+                                    <span>{{ persona.telefono or 'No especificado' }}</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <small class="text-muted">Fecha Nac.:</small><br>
+                                    <span>{{ persona.fecha_nacimiento or 'No especificada' }}</span>
+                                </div>
+                                <div class="col-md-1">
+                                    <button class="btn btn-sm btn-outline-success" onclick="toggleEditCard({{ persona.id }})">
+                                        ✏️ Ver/Editar
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Ficha de edición expandible COMPLETA -->
+                            <div id="editCard-{{ persona.id }}" class="edit-card-row d-none">
+                                <hr>
+                                <form id="editForm-{{ persona.id }}">
+                                    <div class="row">
+                                        <!-- Información básica -->
+                                        <div class="col-12">
+                                            <h6 class="text-primary mb-3">📋 Información Personal</h6>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Nombre</label>
+                                            <input type="text" class="form-control" name="nombre" value="{{ persona.nombre }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Apellidos</label>
+                                            <input type="text" class="form-control" name="apellidos" value="{{ persona.apellidos }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" name="email" value="{{ persona.email }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Teléfono</label>
+                                            <input type="text" class="form-control" name="telefono" value="{{ persona.telefono }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Ciudad</label>
+                                            <input type="text" class="form-control" name="ciudad" value="{{ persona.ciudad }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Fecha de Nacimiento</label>
+                                            <input type="date" class="form-control" name="fecha_nacimiento" value="{{ persona.fecha_nacimiento }}">
+                                        </div>
+                                        
+                                        <!-- Información de neurodivergencia -->
+                                        <div class="col-12 mt-4">
+                                            <h6 class="text-success mb-3">🧠 Información de Neurodivergencia</h6>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Tipo de Neurodivergencia</label>
+                                            <select class="form-control" name="tipo_neurodivergencia">
+                                                <option value="TDAH" {{ 'selected' if persona.tipo_neurodivergencia == 'TDAH' }}>TDAH</option>
+                                                <option value="TEA" {{ 'selected' if persona.tipo_neurodivergencia == 'TEA' }}>TEA</option>
+                                                <option value="Dislexia" {{ 'selected' if persona.tipo_neurodivergencia == 'Dislexia' }}>Dislexia</option>
+                                                <option value="Discalculia" {{ 'selected' if persona.tipo_neurodivergencia == 'Discalculia' }}>Discalculia</option>
+                                                <option value="Tourette" {{ 'selected' if persona.tipo_neurodivergencia == 'Tourette' }}>Tourette</option>
+                                                <option value="Dispraxia" {{ 'selected' if persona.tipo_neurodivergencia == 'Dispraxia' }}>Dispraxia</option>
+                                                <option value="Ansiedad" {{ 'selected' if persona.tipo_neurodivergencia == 'Ansiedad' }}>Ansiedad</option>
+                                                <option value="Bipolar" {{ 'selected' if persona.tipo_neurodivergencia == 'Bipolar' }}>Bipolar</option>
+                                                <option value="Altas Capacidades" {{ 'selected' if persona.tipo_neurodivergencia == 'Altas Capacidades' }}>Altas Capacidades</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Diagnóstico Formal</label>
+                                            <select class="form-control" name="diagnostico_formal">
+                                                <option value="true" {{ 'selected' if persona.diagnostico_formal }}>Sí</option>
+                                                <option value="false" {{ 'selected' if not persona.diagnostico_formal }}>No</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Información laboral -->
+                                        <div class="col-12 mt-4">
+                                            <h6 class="text-info mb-3">💼 Información Laboral</h6>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Habilidades</label>
+                                            <textarea class="form-control" name="habilidades" rows="2">{{ persona.habilidades }}</textarea>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <label class="form-label">Experiencia Laboral</label>
+                                            <textarea class="form-control" name="experiencia_laboral" rows="2">{{ persona.experiencia_laboral }}</textarea>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <label class="form-label">Formación Académica</label>
+                                            <textarea class="form-control" name="formacion_academica" rows="2">{{ persona.formacion_academica }}</textarea>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <label class="form-label">Intereses Laborales</label>
+                                            <textarea class="form-control" name="intereses_laborales" rows="2">{{ persona.intereses_laborales }}</textarea>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <label class="form-label">Adaptaciones Necesarias</label>
+                                            <textarea class="form-control" name="adaptaciones_necesarias" rows="2">{{ persona.adaptaciones_necesarias }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="text-end mt-3">
+                                        <button type="button" class="btn btn-secondary me-2" onclick="cancelEdit({{ persona.id }})">Cancelar</button>
+                                        <button type="button" class="btn btn-success" onclick="savePersona({{ persona.id }})">💾 Guardar Cambios</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if total_personas == 0 %}
+                <div class="text-center mt-5">
+                    <div class="alert alert-success">
+                        <h4>🧠 No hay personas neurodivergentes registradas</h4>
+                        <p>Las personas aparecerán aquí cuando se registren desde los formularios web.</p>
+                        <a href="/personas-nd" class="btn btn-success">Ir a Formularios</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+<script>
+function toggleEditCard(id) {
+    const editCard = document.getElementById(`editCard-${id}`);
+    document.querySelectorAll('.edit-card-row').forEach(row => row.classList.add('d-none'));
+    if (editCard.classList.contains('d-none')) {
+        editCard.classList.remove('d-none');
+    }
+}
+
+function cancelEdit(id) {
+    document.getElementById(`editCard-${id}`).classList.add('d-none');
+}
+
+function savePersona(id) {
+    const form = document.getElementById(`editForm-${id}`);
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    fetch(`/personas-nd/update/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ Persona actualizada correctamente');
+            location.reload();
+        } else {
+            alert('❌ Error: ' + data.error);
+        }
+    });
+}
+
+// Filtros
+document.getElementById('searchInput').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const items = document.querySelectorAll('.persona-item');
+    
+    items.forEach(item => {
+        const nombre = item.dataset.nombre.toLowerCase();
+        const email = item.dataset.email.toLowerCase();
+        
+        if (nombre.includes(searchTerm) || email.includes(searchTerm)) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+document.getElementById('filterTipo').addEventListener('change', function() {
+    const filterValue = this.value;
+    const items = document.querySelectorAll('.persona-item');
+    
+    items.forEach(item => {
+        const tipo = item.dataset.tipo;
+        
+        if (!filterValue || tipo === filterValue) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+</script>
+</body>
+</html>
+'''
+
+# Template para listado de asociaciones
+ASOCIACIONES_LISTADO_TEMPLATE = '''
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asociaciones - DiversIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .ficha-asociacion { background: #f8f9fa; border-left: 4px solid #ffc107; margin-bottom: 15px; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>🏢 Asociaciones Neurodivergentes ({{ total_asociaciones }})</h2>
+                    <div>
+                        <a href="/email-marketing?admin=true" class="btn btn-warning me-2">← Email Marketing</a>
+                        <a href="/sistema-gestion" class="btn btn-outline-secondary me-2">Sistema</a>
+                        <a href="/diversia-admin-logout" class="btn btn-outline-danger">Salir</a>
+                    </div>
+                </div>
+                
+                <div id="asociacionesList">
+                    {% for asociacion in asociaciones %}
+                    <div class="card ficha-asociacion">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h6 class="text-warning mb-1">{{ asociacion.nombre }}</h6>
+                                    <small class="text-muted">{{ asociacion.email }}</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <span class="badge bg-warning text-dark">{{ asociacion.comunidad_autonoma }}</span><br>
+                                    <small>{{ asociacion.ciudad }}</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">Tipo:</small> {{ asociacion.tipo_neurodivergencia or 'General' }}<br>
+                                    <small class="text-muted">Tel:</small> {{ asociacion.telefono or 'No especificado' }}
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-sm btn-outline-warning" onclick="toggleEditCard({{ asociacion.id }})">
+                                        ✏️ Editar
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="editCard-{{ asociacion.id }}" class="edit-card-row d-none">
+                                <hr>
+                                <form id="editForm-{{ asociacion.id }}">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Nombre de la Asociación</label>
+                                            <input type="text" class="form-control" name="nombre" value="{{ asociacion.nombre }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Email de Contacto</label>
+                                            <input type="email" class="form-control" name="email" value="{{ asociacion.email }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Teléfono</label>
+                                            <input type="text" class="form-control" name="telefono" value="{{ asociacion.telefono }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Ciudad</label>
+                                            <input type="text" class="form-control" name="ciudad" value="{{ asociacion.ciudad }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Comunidad Autónoma</label>
+                                            <input type="text" class="form-control" name="comunidad_autonoma" value="{{ asociacion.comunidad_autonoma }}">
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <label class="form-label">Tipo de Neurodivergencia</label>
+                                            <input type="text" class="form-control" name="tipo_neurodivergencia" value="{{ asociacion.tipo_neurodivergencia }}">
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <label class="form-label">Servicios</label>
+                                            <textarea class="form-control" name="servicios" rows="2">{{ asociacion.servicios }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="text-end mt-3">
+                                        <button type="button" class="btn btn-secondary me-2" onclick="cancelEdit({{ asociacion.id }})">Cancelar</button>
+                                        <button type="button" class="btn btn-warning" onclick="saveAsociacion({{ asociacion.id }})">Guardar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if total_asociaciones == 0 %}
+                <div class="text-center mt-5">
+                    <div class="alert alert-warning">
+                        <h4>🏢 No hay asociaciones registradas</h4>
+                        <p>Las asociaciones aparecerán cuando se carguen desde email marketing.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+<script>
+function toggleEditCard(id) {
+    const editCard = document.getElementById(`editCard-${id}`);
+    document.querySelectorAll('.edit-card-row').forEach(row => row.classList.add('d-none'));
+    if (editCard.classList.contains('d-none')) {
+        editCard.classList.remove('d-none');
+    }
+}
+
+function cancelEdit(id) {
+    document.getElementById(`editCard-${id}`).classList.add('d-none');
+}
+
+function saveAsociacion(id) {
+    const form = document.getElementById(`editForm-${id}`);
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    fetch(`/asociaciones/update/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ Asociación actualizada');
+            location.reload();
+        } else {
+            alert('❌ Error: ' + data.error);
+        }
+    });
+}
+</script>
+</body>
+</html>
+'''
