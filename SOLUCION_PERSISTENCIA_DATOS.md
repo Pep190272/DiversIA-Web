@@ -51,7 +51,7 @@ EMAIL_USER=diversiaeternals@gmail.com  # Por defecto
 - **Sistema de Email**: ✅ Funcionando
 
 ### Funcionalidades Activas:
-- ✅ Login admin: /admin/login-new (DiversiaEternals / diversia3ternal$2025)
+- ✅ Login admin: /admin-login (DiversiaEternals / diversia3ternal$2025)
 - ✅ CRM Dashboard: /crm
 - ✅ Formularios web integrados
 - ✅ Chat IA con Mistral

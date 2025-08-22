@@ -10,8 +10,8 @@ import hashlib
 ADMIN_USER = "DiversiaEternals"
 ADMIN_PASS = "diversia3ternal$2025"
 
-@app.route('/admin/login-new', methods=['GET', 'POST'])
-def admin_login_simple():
+@app.route('/admin-login', methods=['GET', 'POST'])
+def admin_login_working():
     """Login admin ultra-simple que FUNCIONA"""
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
@@ -27,8 +27,8 @@ def admin_login_simple():
     
     return render_template('admin/login_simple.html')
 
-@app.route('/admin/logout')
-def admin_logout_simple():
+@app.route('/admin-logout')
+def admin_logout_working():
     """Logout simple"""
     session.clear()
     flash('Sesión cerrada', 'info')

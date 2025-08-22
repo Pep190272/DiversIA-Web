@@ -16,7 +16,7 @@
 - ✅ Notificaciones automáticas funcionando
 
 ### **3. CRM Dashboard**
-- ✅ Login admin: `/admin/login-new` (DiversiaEternals / diversia3ternal$2025)
+- ✅ Login admin: `/admin-login` (DiversiaEternals / diversia3ternal$2025)
 - ✅ Dashboard funcional: `/crm`
 - ✅ Asignación de tareas con desplegables dinámicos
 - ✅ Todos los datos visibles en tiempo real

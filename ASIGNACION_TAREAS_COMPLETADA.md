@@ -93,7 +93,7 @@ def assign_task_api(task_id):
 ## 📋 Verificación de Funcionamiento
 
 ### **Test Manual Completado:**
-- ✅ Login admin funciona: `/admin/login-new`
+- ✅ Login admin funciona: `/admin-login`
 - ✅ CRM dashboard carga: `/crm`
 - ✅ Desplegables aparecen en columna "Asignado"
 - ✅ Lista de empleados se carga correctamente
