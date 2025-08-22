@@ -16,9 +16,19 @@
     </style>
 </head>
 <body>
+    <!-- Barra superior con logout -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand">CRM Minimal - DiversIA</span>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="#" onclick="logout()">
+                    <i class="bi bi-power"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
     <div class="container-fluid py-4">
-        <h1 class="mb-4">CRM Minimal - Sistema Simple</h1>
-        
         <!-- Botones de acción -->
         <div class="row mb-4">
             <div class="col-12">
@@ -304,6 +314,12 @@
                 }
             } catch (error) {
                 showNotification('Error de conexión: ' + error.message, 'danger');
+            }
+        }
+        
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                window.location.href = '/admin/logout-new';
             }
         }
     </script>
