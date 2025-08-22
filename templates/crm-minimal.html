@@ -179,13 +179,15 @@
                 tbody.innerHTML = companies.map(company => `
                     <tr>
                         <td>${company.id}</td>
-                        <td><strong>${company.nombre}</strong></td>
+                        <td><strong>${company.nombre}</strong>
+                            ${company.origen ? `<br><small class="text-muted">${company.origen === 'web_registro' ? '🌐 Web' : '📄 CSV'}</small>` : ''}
+                        </td>
                         <td><a href="mailto:${company.email}">${company.email}</a></td>
                         <td>${company.telefono || '-'}</td>
                         <td>${company.sector || '-'}</td>
                         <td>${company.ciudad || '-'}</td>
                         <td>${company.fecha_contacto || new Date(company.created_at).toLocaleDateString()}</td>
-                        <td title="${company.notas || ''}">${company.notas ? company.notas.substring(0, 50) + '...' : '-'}</td>
+                        <td title="${company.notas || company.descripcion || ''}">${(company.notas || company.descripcion) ? (company.notas || company.descripcion).substring(0, 50) + '...' : '-'}</td>
                         <td>
                             <button class="btn btn-sm btn-danger" onclick="deleteCompany(${company.id})">
                                 Eliminar

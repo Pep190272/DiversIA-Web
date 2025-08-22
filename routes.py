@@ -54,7 +54,7 @@ def empresas():
             
             print(f"Datos procesados: {data}")
             
-            # Guardar directamente en SQLite
+            # Guardar directamente en PostgreSQL
             company = Company(
                 nombre_empresa=data['nombre'],
                 email_contacto=data['email'],
@@ -68,8 +68,41 @@ def empresas():
             db.session.add(company)
             db.session.commit()
             
+            # TAMBIÉN guardar en CRM Minimal para compatibilidad total
+            try:
+                from crm_minimal import load_data, save_data
+                
+                crm_data = load_data()
+                companies = crm_data.get('companies', [])
+                
+                # Generar ID único para CRM
+                new_id = max([c.get('id', 0) for c in companies], default=0) + 1
+                
+                crm_company = {
+                    'id': new_id,
+                    'nombre': data['nombre'],
+                    'email': data['email'],
+                    'telefono': data['telefono'],
+                    'sector': data['sector'],
+                    'ciudad': data['ciudad'],
+                    'tamano': data['tamaño'],
+                    'web': data.get('web', ''),
+                    'descripcion': data.get('descripcion', ''),
+                    'origen': 'web_registro',
+                    'created_at': datetime.now().isoformat()
+                }
+                
+                companies.append(crm_company)
+                crm_data['companies'] = companies
+                save_data(crm_data)
+                
+                print(f"✅ Empresa también guardada en CRM Minimal con ID: {new_id}")
+                
+            except Exception as e:
+                print(f"⚠️ Error guardando en CRM Minimal: {e}")
+            
             # Enviar email de notificación
-            from sendgrid_helper import send_email
+            from sendgrid_simple import send_email
             subject = f"Nueva Empresa Registrada - {data['nombre']}"
             html_content = f"""
             <h2>🏢 Nueva Empresa Registrada</h2>

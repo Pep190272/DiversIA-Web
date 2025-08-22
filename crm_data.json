@@ -52,12 +52,25 @@
       "sector": "Inteligencia artificial",
       "ciudad": "La torre de Claramunt",
       "created_at": "2025-08-22T10:12:00.144277"
+    },
+    {
+      "id": 1,
+      "nombre": "Empresa Test Web",
+      "email": "test@empresa.com",
+      "telefono": "123456789",
+      "sector": "Tecnología",
+      "ciudad": "Madrid",
+      "tamano": "Mediana",
+      "web": "https://test.com",
+      "descripcion": "Empresa de prueba registrada desde web",
+      "origen": "web_registro",
+      "created_at": "2025-08-22T10:14:47.532900"
     }
   ],
   "contacts": [],
   "stats": {
-    "total_companies": 5,
+    "total_companies": 6,
     "total_contacts": 0,
-    "last_updated": "2025-08-22T10:12:00.144287"
+    "last_updated": "2025-08-22T10:14:47.533356"
   }
 }
