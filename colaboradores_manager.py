@@ -173,6 +173,26 @@ COLABORADORES_TABLE_TEMPLATE = '''
             width: 100%;
             min-width: 80px;
         }
+        .edit-select {
+            border: 2px solid #007bff;
+            font-size: 0.9rem;
+            padding: 2px 6px;
+            width: 100%;
+        }
+        .edit-textarea {
+            border: 2px solid #007bff;
+            font-size: 0.9rem;
+            padding: 5px;
+            width: 100%;
+            min-height: 60px;
+            resize: vertical;
+        }
+        .edit-date {
+            border: 2px solid #007bff;
+            font-size: 0.9rem;
+            padding: 2px 6px;
+            width: 100%;
+        }
         .role-badge {
             font-size: 0.8rem;
         }
@@ -317,6 +337,14 @@ COLABORADORES_TABLE_TEMPLATE = '''
                                 </div>
                                 
                                 <div class="mb-2">
+                                    <small class="text-muted">💼 Rol:</small><br>
+                                    <span class="editable-field editable-select" 
+                                          data-field="rol" 
+                                          data-id="{{ col.id }}"
+                                          title="Click para editar">{{ col.rol }}</span>
+                                </div>
+                                
+                                <div class="mb-2">
                                     <small class="text-muted">🏢 Departamento:</small><br>
                                     <span class="editable-field" 
                                           data-field="department" 
@@ -324,49 +352,47 @@ COLABORADORES_TABLE_TEMPLATE = '''
                                           title="Click para editar">{{ col.department or '-' }}</span>
                                 </div>
                                 
-                                {% if col.telefono %}
                                 <div class="mb-2">
                                     <small class="text-muted">📞 Teléfono:</small><br>
                                     <span class="editable-field" 
                                           data-field="telefono" 
                                           data-id="{{ col.id }}"
-                                          title="Click para editar">{{ col.telefono }}</span>
+                                          title="Click para editar">{{ col.telefono or '-' }}</span>
                                 </div>
-                                {% endif %}
                                 
-                                {% if col.fecha_ingreso %}
                                 <div class="mb-2">
                                     <small class="text-muted">📅 Ingreso:</small><br>
-                                    <span class="editable-field" 
+                                    <span class="editable-field editable-date" 
                                           data-field="fecha_ingreso" 
                                           data-id="{{ col.id }}"
-                                          title="Click para editar">{{ col.fecha_ingreso }}</span>
+                                          title="Click para editar">{{ col.fecha_ingreso or '-' }}</span>
                                 </div>
-                                {% endif %}
                                 
-                                {% if col.especialidades %}
                                 <div class="mb-2">
                                     <small class="text-muted">💡 Especialidades:</small><br>
-                                    <span class="editable-field" 
+                                    <span class="editable-field editable-textarea" 
                                           data-field="especialidades" 
                                           data-id="{{ col.id }}"
-                                          title="Click para editar">{{ col.especialidades }}</span>
+                                          title="Click para editar">{{ col.especialidades or '-' }}</span>
                                 </div>
-                                {% endif %}
                                 
-                                {% if col.notas %}
                                 <div class="mb-2">
                                     <small class="text-muted">📝 Notas:</small><br>
-                                    <span class="editable-field" 
+                                    <span class="editable-field editable-textarea" 
                                           data-field="notas" 
                                           data-id="{{ col.id }}"
-                                          title="Click para editar">{{ col.notas }}</span>
+                                          title="Click para editar">{{ col.notas or '-' }}</span>
                                 </div>
-                                {% endif %}
                             </div>
-                            <div class="card-footer d-flex justify-content-between">
-                                <small class="text-muted">ID: {{ col.id }}</small>
-                                <button class="btn btn-sm btn-danger" onclick="deleteColaborador({{ col.id }})">🗑️ Eliminar</button>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    ID: {{ col.id }}<br>
+                                    <em>Creado: {{ col.created_at.strftime('%d/%m/%Y') if col.created_at else '-' }}</em>
+                                </small>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editColaborador({{ col.id }})">✏️ Editar</button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteColaborador({{ col.id }})">🗑️ Eliminar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -411,6 +437,34 @@ COLABORADORES_TABLE_TEMPLATE = '''
         function hideAddColaboradorForm() {
             document.getElementById('addColaboradorForm').style.display = 'none';
             document.getElementById('colaboradorForm').reset();
+        }
+        
+        function editColaborador(id) {
+            // Resaltar la tarjeta que se está editando
+            const card = document.querySelector(`[data-id="${id}"]`).closest('.colaborador-card');
+            card.style.border = '3px solid #007bff';
+            card.style.boxShadow = '0 0 15px rgba(0,123,255,0.3)';
+            
+            // Mostrar mensaje informativo
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-info alert-dismissible fade show position-fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.innerHTML = `
+                <strong>Modo Edición Activado</strong><br>
+                Haz clic en cualquier campo para editarlo.
+                <button type="button" class="btn-close" onclick="this.parentElement.remove(); document.querySelector('.colaborador-card[style*=border]').style.cssText = ''"></button>
+            `;
+            document.body.appendChild(notification);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                    card.style.cssText = '';
+                }
+            }, 5000);
         }
         
         function deleteAllColaboradores() {
@@ -522,24 +576,51 @@ COLABORADORES_TABLE_TEMPLATE = '''
                     const currentValue = this.textContent.trim();
                     
                     // Crear input de edición
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.className = 'edit-input';
-                    input.value = currentValue === '-' ? '' : currentValue;
+                    let inputElement;
+                    
+                    // Crear el tipo de input apropiado según el campo
+                    if (this.classList.contains('editable-select') && fieldName === 'rol') {
+                        inputElement = document.createElement('select');
+                        inputElement.className = 'edit-select';
+                        const roles = ['Developer', 'Designer', 'Marketing', 'Manager', 'Analyst', 'Support', 'HR', 'Sales'];
+                        roles.forEach(role => {
+                            const option = document.createElement('option');
+                            option.value = role;
+                            option.textContent = role;
+                            if (role === currentValue) option.selected = true;
+                            inputElement.appendChild(option);
+                        });
+                    } else if (this.classList.contains('editable-textarea')) {
+                        inputElement = document.createElement('textarea');
+                        inputElement.className = 'edit-textarea';
+                        inputElement.value = currentValue === '-' ? '' : currentValue;
+                    } else if (this.classList.contains('editable-date')) {
+                        inputElement = document.createElement('input');
+                        inputElement.type = 'date';
+                        inputElement.className = 'edit-date';
+                        inputElement.value = currentValue === '-' ? '' : currentValue;
+                    } else {
+                        inputElement = document.createElement('input');
+                        inputElement.type = fieldName === 'email' ? 'email' : 'text';
+                        inputElement.className = 'edit-input';
+                        inputElement.value = currentValue === '-' ? '' : currentValue;
+                    }
                     
                     // Reemplazar contenido
                     this.classList.add('editing');
                     const originalContent = this.innerHTML;
                     this.innerHTML = '';
-                    this.appendChild(input);
+                    this.appendChild(inputElement);
                     
                     // Focus y seleccionar
-                    input.focus();
-                    input.select();
+                    inputElement.focus();
+                    if (inputElement.select) {
+                        inputElement.select();
+                    }
                     
                     // Función para guardar
                     const saveEdit = () => {
-                        const newValue = input.value.trim();
+                        const newValue = inputElement.value.trim();
                         
                         fetch(`/colaboradores/update/${collaboratorId}`, {
                             method: 'POST',
@@ -576,9 +657,9 @@ COLABORADORES_TABLE_TEMPLATE = '''
                     };
                     
                     // Event listeners
-                    input.addEventListener('blur', saveEdit);
-                    input.addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter') {
+                    inputElement.addEventListener('blur', saveEdit);
+                    inputElement.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
                             saveEdit();
                         } else if (e.key === 'Escape') {
