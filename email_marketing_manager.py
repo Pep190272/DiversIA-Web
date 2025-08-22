@@ -10,6 +10,80 @@ from flask import request, jsonify, render_template_string, flash, redirect, ses
 from app import app, db
 from models import EmailMarketing
 
+@app.route('/email-marketing/add', methods=['POST'])
+def add_email_marketing_manual():
+    """Añadir registro de email marketing manualmente"""
+    if not request.args.get('admin') == 'true':
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    data = request.get_json()
+    try:
+        new_record = EmailMarketing(
+            comunidad_autonoma=data.get('comunidad_autonoma', '').strip(),
+            asociacion=data.get('asociacion', '').strip(),
+            email=data.get('email', '').strip(),
+            telefono=data.get('telefono', '').strip(),
+            direccion=data.get('direccion', '').strip(),
+            servicios=data.get('servicios', '').strip(),
+            fecha_enviado=data.get('fecha_enviado', '').strip(),
+            respuesta=data.get('respuesta', '').strip(),
+            notas_especiales=data.get('notas_especiales', '').strip(),
+            notas_personalizadas=data.get('notas_personalizadas', '').strip()
+        )
+        db.session.add(new_record)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Registro añadido correctamente'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/email-marketing/edit/<int:record_id>', methods=['POST'])
+def edit_email_marketing_inline(record_id):
+    """Editar registro de email marketing inline"""
+    if not request.args.get('admin') == 'true':
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    data = request.get_json()
+    
+    try:
+        record = EmailMarketing.query.get_or_404(record_id)
+        
+        field = data.get('field')
+        value = data.get('value', '').strip()
+        
+        if field == 'comunidad_autonoma':
+            record.comunidad_autonoma = value
+        elif field == 'asociacion':
+            record.asociacion = value
+        elif field == 'email':
+            record.email = value
+        elif field == 'telefono':
+            record.telefono = value
+        elif field == 'direccion':
+            record.direccion = value
+        elif field == 'servicios':
+            record.servicios = value
+        elif field == 'fecha_enviado':
+            record.fecha_enviado = value
+        elif field == 'respuesta':
+            record.respuesta = value
+        elif field == 'notas_especiales':
+            record.notas_especiales = value
+        elif field == 'notas_personalizadas':
+            record.notas_personalizadas = value
+        else:
+            return jsonify({'error': 'Campo no válido'}), 400
+        
+        record.updated_at = datetime.now()
+        db.session.commit()
+        
+        return jsonify({'success': True, 'value': value})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/email-marketing')
 def email_marketing_dashboard():
     """Dashboard principal de email marketing - Tabla simple"""
@@ -193,6 +267,8 @@ def edit_email_marketing_contact(contact_id):
             contact.respuesta = value
         elif field == 'notas_especiales':
             contact.notas_especiales = value
+        elif field == 'notas_personalizadas':
+            contact.notas_personalizadas = value
         else:
             return jsonify({'error': 'Campo no válido'}), 400
         
@@ -317,6 +393,7 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                         </div>
                     </div>
                     <div class="col-md-4 text-end">
+                        <button class="btn btn-success me-2" onclick="showAddEmailMarketingForm()">➕ Añadir Registro</button>
                         <a href="/email-marketing/export" class="btn btn-warning me-2">Exportar CSV</a>
                         <button onclick="deleteAllAssociations()" class="btn btn-danger">🗑️ Eliminar Todo</button>
                     </div>
@@ -328,6 +405,85 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                         <small class="text-muted">
                             Mostrando <span id="visibleCount">{{ total_asociaciones }}</span> de {{ total_asociaciones }} asociaciones
                         </small>
+                    </div>
+                </div>
+                
+                <!-- Formulario añadir registro -->
+                <div id="addEmailMarketingForm" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5>Añadir Nuevo Registro de Email Marketing</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="emailMarketingForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Comunidad Autónoma *</label>
+                                        <input type="text" class="form-control" id="emComunidad" required 
+                                               placeholder="Ej: Andalucía, Madrid, Cataluña...">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nombre de la Asociación *</label>
+                                        <input type="text" class="form-control" id="emAsociacion" required 
+                                               placeholder="Nombre completo de la asociación">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Email *</label>
+                                        <input type="email" class="form-control" id="emEmail" required 
+                                               placeholder="contacto@asociacion.org">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Teléfono</label>
+                                        <input type="text" class="form-control" id="emTelefono" 
+                                               placeholder="600 123 456">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Dirección</label>
+                                        <input type="text" class="form-control" id="emDireccion" 
+                                               placeholder="Dirección completa">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Servicios</label>
+                                        <textarea class="form-control" id="emServicios" rows="2" 
+                                                placeholder="Descripción de servicios ofrecidos"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Fecha Enviado</label>
+                                        <input type="date" class="form-control" id="emFechaEnviado">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Respuesta</label>
+                                        <textarea class="form-control" id="emRespuesta" rows="2" 
+                                                placeholder="Respuesta recibida"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Notas Personalizadas</label>
+                                        <textarea class="form-control" id="emNotasPersonalizadas" rows="2" 
+                                                placeholder="Notas adicionales y seguimiento"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success">Crear Registro</button>
+                                <button type="button" class="btn btn-secondary" onclick="hideAddEmailMarketingForm()">Cancelar</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 
@@ -346,6 +502,7 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                         <th>Servicios <small>(click para editar)</small></th>
                                         <th>Enviado <small>(click para editar)</small></th>
                                         <th>Respuesta <small>(click para editar)</small></th>
+                                        <th>Notas <small>(click para editar)</small></th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -396,6 +553,12 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                                   title="Click para editar">{{ asociacion.respuesta or 'Sin respuesta' }}</span>
                                         </td>
                                         <td>
+                                            <span class="editable-field" 
+                                                  data-field="notas_personalizadas" 
+                                                  data-id="{{ asociacion.id }}"
+                                                  title="Click para añadir notas">{{ asociacion.notas_personalizadas or '-' }}</span>
+                                        </td>
+                                        <td>
                                             <button class="btn btn-sm btn-danger" onclick="deleteAssociation({{ asociacion.id }})">Eliminar</button>
                                         </td>
                                     </tr>
@@ -428,6 +591,59 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                 });
             }
         }
+        
+        function showAddEmailMarketingForm() {
+            document.getElementById('addEmailMarketingForm').style.display = 'block';
+            document.getElementById('emComunidad').focus();
+        }
+        
+        function hideAddEmailMarketingForm() {
+            document.getElementById('addEmailMarketingForm').style.display = 'none';
+            document.getElementById('emailMarketingForm').reset();
+        }
+        
+        // Gestión de registros manuales
+        document.getElementById('emailMarketingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                comunidad_autonoma: document.getElementById('emComunidad').value.trim(),
+                asociacion: document.getElementById('emAsociacion').value.trim(),
+                email: document.getElementById('emEmail').value.trim(),
+                telefono: document.getElementById('emTelefono').value.trim(),
+                direccion: document.getElementById('emDireccion').value.trim(),
+                servicios: document.getElementById('emServicios').value.trim(),
+                fecha_enviado: document.getElementById('emFechaEnviado').value.trim(),
+                respuesta: document.getElementById('emRespuesta').value.trim(),
+                notas_personalizadas: document.getElementById('emNotasPersonalizadas').value.trim()
+            };
+            
+            if (!formData.comunidad_autonoma || !formData.asociacion || !formData.email) {
+                alert('Por favor, completa los campos obligatorios (Comunidad, Asociación, Email)');
+                return;
+            }
+            
+            fetch('/email-marketing/add?admin=true', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Registro añadido correctamente');
+                    hideAddEmailMarketingForm();
+                    location.reload(); // Actualizar la tabla
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Error de conexión: ' + error);
+            });
+        });
         
         function deleteAllAssociations() {
             if (confirm('⚠️ ATENCIÓN: ¿Estás COMPLETAMENTE SEGURO de eliminar TODAS las asociaciones?')) {

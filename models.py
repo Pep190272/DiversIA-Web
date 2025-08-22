@@ -192,6 +192,7 @@ class EmailMarketing(db.Model):
     fecha_enviado = db.Column(db.String(20))  # Formato: 30/07/2025
     respuesta = db.Column(db.Text)  # Columna para respuestas del CSV
     notas_especiales = db.Column(db.Text)  # Para notas como "VACACIONES HASTA..."
+    notas_personalizadas = db.Column(db.Text)  # Nueva columna para notas manuales
     
     # Campos de seguimiento
     estado_email = db.Column(db.String(50), default='enviado')  # enviado, abierto, respondido, rebotado

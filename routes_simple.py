@@ -20,9 +20,7 @@ try:
 except Exception as e:
     print(f"⚠️ Error cargando CSV manager: {e}")
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+# Ruta principal movida a main.py
 
 @app.route('/personas-nd')
 def personas_nd():
