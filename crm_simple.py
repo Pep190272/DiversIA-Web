@@ -295,13 +295,13 @@ def api_contacts_simple():
 def api_companies_simple():
     if 'admin_id' not in session:
         return jsonify({'error': 'No autorizado'}), 401
-    return jsonify(SAMPLE_CRM_DATA['companies'])
+    return jsonify(SAMPLE_CRM_DATA.get('companies', []))
 
 @app.route('/api/job-offers')
 def api_job_offers_simple():
     if 'admin_id' not in session:
         return jsonify({'error': 'No autorizado'}), 401
-    return jsonify(SAMPLE_CRM_DATA['job_offers'])
+    return jsonify(SAMPLE_CRM_DATA.get('job_offers', []))
 
 @app.route('/api/associations')
 def api_associations_simple():
@@ -343,7 +343,7 @@ def api_stats_simple():
 def api_employees_simple():
     if 'admin_id' not in session:
         return jsonify({'error': 'No autorizado'}), 401
-    return jsonify(SAMPLE_CRM_DATA['employees'])
+    return jsonify(SAMPLE_CRM_DATA.get('employees', []))
 
 @app.route('/api/employees/<int:employee_id>', methods=['DELETE'])
 def delete_employee_simple(employee_id):
@@ -359,7 +359,7 @@ def delete_employee_simple(employee_id):
 def api_tasks_simple():
     if 'admin_id' not in session:
         return jsonify({'error': 'No autorizado'}), 401
-    return jsonify(SAMPLE_CRM_DATA['tasks'])
+    return jsonify(SAMPLE_CRM_DATA.get('tasks', []))
 
 @app.route('/api/tasks', methods=['POST'])
 def create_task_simple():
