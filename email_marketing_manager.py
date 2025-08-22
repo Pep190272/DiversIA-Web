@@ -42,11 +42,11 @@ def email_marketing_funnel():
     reuniones = EmailMarketing.query.filter(EmailMarketing.respuesta.contains('reunion')).count()
     contacto_nuevo = EmailMarketing.query.filter(EmailMarketing.respuesta.contains('CORREO NUEVO')).count()
     
-    # Stats por comunidad autónoma
+    # Stats por comunidad autónoma (sintaxis SQLAlchemy corregida)
     stats_comunidad = db.session.query(
         EmailMarketing.comunidad_autonoma,
         db.func.count(EmailMarketing.id).label('total'),
-        db.func.sum(db.case([(EmailMarketing.respuesta != '', 1)], else_=0)).label('con_respuesta')
+        db.func.sum(db.case((EmailMarketing.respuesta != '', 1), else_=0)).label('con_respuesta')
     ).group_by(EmailMarketing.comunidad_autonoma).order_by(db.func.count(EmailMarketing.id).desc()).limit(10).all()
     
     # Top 5 respuestas más comunes
