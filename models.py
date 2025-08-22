@@ -254,19 +254,20 @@ class Employee(db.Model):
     __tablename__ = 'employees'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
+    nombre = db.Column(db.String(150), nullable=False)  # Cambiar de name a nombre
     email = db.Column(db.String(120), unique=True, nullable=False)
     rol = db.Column(db.String(100), nullable=False)  # Developer, Designer, Marketing, Manager, etc.
-    department = db.Column(db.String(100), nullable=True)
+    departamento = db.Column(db.String(100), nullable=True)  # Cambiar de department a departamento
+    telefono = db.Column(db.String(20), nullable=True)
+    salario = db.Column(db.String(50), nullable=True)
+    fecha_contratacion = db.Column(db.String(20), nullable=True)
+    notas = db.Column(db.Text, nullable=True)
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     
     def __repr__(self):
-        return f'<Employee {self.name}>'
-    
-    def __repr__(self):
-        return f'<Employee {self.name}>'
+        return f'<Employee {self.nombre}>'
 
 class Asociacion(db.Model):
     __tablename__ = 'asociaciones'

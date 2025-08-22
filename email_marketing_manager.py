@@ -1445,8 +1445,9 @@ def asociaciones_listado():
 @app.route('/colaboradores/update/<int:id>', methods=['POST'])
 def update_colaborador(id):
     """Actualizar colaborador desde ficha editable"""
-    if 'admin_ok' not in session or not session.get('admin_ok'):
-        return jsonify({'error': 'No autorizado'}), 401
+    # Verificar autenticación de múltiples maneras
+    if not session.get('admin_ok') and not session.get('authenticated') and not session.get('admin_logged_in'):
+        return jsonify({'error': 'No autorizado - debe iniciar sesión primero'}), 401
     
     try:
         from models import Employee
@@ -1473,8 +1474,9 @@ def update_colaborador(id):
 @app.route('/personas-nd/update/<int:id>', methods=['POST'])
 def update_persona_nd(id):
     """Actualizar persona neurodivergente desde ficha editable"""
-    if 'admin_ok' not in session or not session.get('admin_ok'):
-        return jsonify({'error': 'No autorizado'}), 401
+    # Verificar autenticación de múltiples maneras
+    if not session.get('admin_ok') and not session.get('authenticated') and not session.get('admin_logged_in'):
+        return jsonify({'error': 'No autorizado - debe iniciar sesión primero'}), 401
     
     try:
         from models import User
@@ -1524,8 +1526,9 @@ def update_persona_nd(id):
 @app.route('/asociaciones/update/<int:id>', methods=['POST'])
 def update_asociacion(id):
     """Actualizar asociación desde ficha editable"""
-    if 'admin_ok' not in session or not session.get('admin_ok'):
-        return jsonify({'error': 'No autorizado'}), 401
+    # Verificar autenticación de múltiples maneras
+    if not session.get('admin_ok') and not session.get('authenticated') and not session.get('admin_logged_in'):
+        return jsonify({'error': 'No autorizado - debe iniciar sesión primero'}), 401
     
     try:
         from models import Asociacion
