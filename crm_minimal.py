@@ -54,6 +54,16 @@ def create_minimal_crm_routes(app):
             return redirect('/diversia-admin')
         return render_template('crm-minimal.html')
     
+    @app.route('/empresas')
+    def empresas_cards():
+        """Vista de tarjetas de empresas para edición individual"""
+        if 'admin_ok' not in session or not session.get('admin_ok'):
+            return redirect('/diversia-admin')
+        
+        data = load_data()
+        companies = data.get('companies', [])
+        return render_template('empresas-cards.html', companies=companies)
+    
     @app.route('/api/minimal/companies')
     def get_companies_minimal():
         """Obtener todas las empresas"""
@@ -90,6 +100,56 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
     
+    @app.route('/api/minimal/companies/<int:company_id>')
+    def get_company_minimal(company_id):
+        """Obtener una empresa específica"""
+        try:
+            data = load_data()
+            companies = data.get('companies', [])
+            
+            company = next((c for c in companies if c.get('id') == company_id), None)
+            if not company:
+                return jsonify({'success': False, 'error': 'Empresa no encontrada'}), 404
+            
+            return jsonify({'success': True, 'company': company})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/minimal/companies/<int:company_id>', methods=['PUT'])
+    def update_company_minimal(company_id):
+        """Actualizar empresa específica"""
+        try:
+            update_data = request.get_json()
+            
+            data = load_data()
+            companies = data.get('companies', [])
+            
+            # Encontrar empresa
+            company_index = next((i for i, c in enumerate(companies) if c.get('id') == company_id), None)
+            if company_index is None:
+                return jsonify({'success': False, 'error': 'Empresa no encontrada'}), 404
+            
+            # Actualizar campos
+            company = companies[company_index]
+            company.update({
+                'nombre': update_data.get('nombre', company.get('nombre', '')),
+                'email': update_data.get('email', company.get('email', '')),
+                'telefono': update_data.get('telefono', company.get('telefono', '')),
+                'sector': update_data.get('sector', company.get('sector', '')),
+                'ciudad': update_data.get('ciudad', company.get('ciudad', '')),
+                'fecha_contacto': update_data.get('fecha_contacto', company.get('fecha_contacto', '')),
+                'notas': update_data.get('notas', company.get('notas', '')),
+                'updated_at': datetime.now().isoformat()
+            })
+            
+            companies[company_index] = company
+            data['companies'] = companies
+            save_data(data)
+            
+            return jsonify({'success': True, 'company': company})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+
     @app.route('/api/minimal/companies/<int:company_id>', methods=['DELETE'])
     def delete_company_minimal(company_id):
         """Eliminar empresa"""
