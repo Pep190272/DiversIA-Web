@@ -430,11 +430,17 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                     </div>
                 </div>
                 
-                <!-- Contador de resultados -->
+                <!-- Contador de resultados y leyenda -->
                 <div class="row mb-2">
-                    <div class="col-12">
+                    <div class="col-md-8">
                         <small class="text-muted">
                             Mostrando <span id="visibleCount">{{ total_asociaciones }}</span> de {{ total_asociaciones }} asociaciones
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <small class="text-muted">
+                            <span class="badge bg-success">Verde: Con respuesta</span>
+                            <span class="badge bg-warning text-dark">Amarillo: Con notas</span>
                         </small>
                     </div>
                 </div>
@@ -529,20 +535,20 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                         <th>Comunidad</th>
                                         <th>Asociación</th>
                                         <th>Email</th>
-                                        <th>Estado</th>
+                                        <th>Fecha Envío</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for asociacion in asociaciones %}
-                                    <tr class="association-row" data-id="{{ asociacion.id }}">
+                                    <tr class="association-row {% if asociacion.respuesta %}table-success{% elif asociacion.notas_personalizadas %}table-warning{% endif %}" data-id="{{ asociacion.id }}">
                                         <td>{{ asociacion.id }}</td>
                                         <td>{{ asociacion.comunidad_autonoma }}</td>
                                         <td><strong>{{ asociacion.asociacion }}</strong></td>
                                         <td>{{ asociacion.email }}</td>
                                         <td>
                                             {% if asociacion.fecha_enviado %}
-                                                <span class="badge bg-success">Enviado</span>
+                                                <span class="badge bg-success">{{ asociacion.fecha_enviado }}</span>
                                             {% else %}
                                                 <span class="badge bg-secondary">Pendiente</span>
                                             {% endif %}
@@ -560,9 +566,22 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                     <!-- Ficha de edición expandible -->
                                     <tr id="editCard-{{ asociacion.id }}" class="edit-card-row d-none">
                                         <td colspan="6">
-                                            <div class="card border-primary">
-                                                <div class="card-header bg-primary text-white">
-                                                    <strong>Editar Asociación #{{ asociacion.id }}</strong>
+                                            <div class="card {% if asociacion.respuesta %}border-success{% elif asociacion.notas_personalizadas %}border-warning{% else %}border-primary{% endif %}">
+                                                <div class="card-header {% if asociacion.respuesta %}bg-success{% elif asociacion.notas_personalizadas %}bg-warning{% else %}bg-primary{% endif %} text-white d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <strong>Editar Asociación #{{ asociacion.id }}</strong>
+                                                        {% if asociacion.fecha_enviado %}
+                                                            <small class="ms-2">📅 Enviado: {{ asociacion.fecha_enviado }}</small>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        {% if asociacion.respuesta %}
+                                                            <span class="badge bg-light text-dark">✅ Con Respuesta</span>
+                                                        {% endif %}
+                                                        {% if asociacion.notas_personalizadas %}
+                                                            <span class="badge bg-light text-dark">📝 Con Notas</span>
+                                                        {% endif %}
+                                                    </div>
                                                 </div>
                                                 <div class="card-body">
                                                     <form id="editForm-{{ asociacion.id }}">
