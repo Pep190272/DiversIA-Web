@@ -12,32 +12,39 @@ from models import EmailMarketing
 
 @app.route('/email-marketing')
 def email_marketing_dashboard():
-    """Dashboard principal de email marketing"""
+    """Dashboard principal de email marketing - Tabla simple"""
     if not request.args.get('admin') == 'true':
         return redirect('/diversia-admin')
     
-    # Estadísticas generales
-    total_asociaciones = EmailMarketing.query.count()
-    enviados_recientes = EmailMarketing.query.filter(
-        EmailMarketing.fecha_enviado.like('%07/2025')
-    ).count()
+    # Obtener todas las asociaciones
+    asociaciones = EmailMarketing.query.all()
+    total_asociaciones = len(asociaciones)
     
-    pendientes_seguimiento = EmailMarketing.query.filter(
-        EmailMarketing.seguimiento_programado.isnot(None),
-        EmailMarketing.seguimiento_programado <= datetime.now()
-    ).count()
+    return render_template_string(EMAIL_MARKETING_TABLE_TEMPLATE, 
+                                asociaciones=asociaciones,
+                                total_asociaciones=total_asociaciones)
+
+@app.route('/email-marketing-funnel')
+def email_marketing_funnel():
+    """Dashboard en formato embudo"""
+    if not request.args.get('admin') == 'true':
+        return redirect('/diversia-admin')
     
-    # Asociaciones por comunidad
+    # Estadísticas para embudo
+    total = EmailMarketing.query.count()
+    enviados = EmailMarketing.query.filter(EmailMarketing.fecha_enviado.isnot(None)).count()
+    respondidos = EmailMarketing.query.filter(EmailMarketing.tipo_respuesta.isnot(None)).count()
+    interesados = EmailMarketing.query.filter(EmailMarketing.tipo_respuesta == 'interesado').count()
+    
+    # Stats por comunidad
     stats_comunidad = db.session.query(
         EmailMarketing.comunidad_autonoma,
         db.func.count(EmailMarketing.id).label('total')
-    ).group_by(EmailMarketing.comunidad_autonoma).all()
+    ).group_by(EmailMarketing.comunidad_autonoma).order_by(db.func.count(EmailMarketing.id).desc()).all()
     
-    return render_template_string(EMAIL_MARKETING_TEMPLATE, 
-                                total_asociaciones=total_asociaciones,
-                                enviados_recientes=enviados_recientes,
-                                pendientes_seguimiento=pendientes_seguimiento,
-                                stats_comunidad=stats_comunidad)
+    return render_template_string(EMAIL_MARKETING_FUNNEL_TEMPLATE,
+                                total=total, enviados=enviados, respondidos=respondidos,
+                                interesados=interesados, stats_comunidad=stats_comunidad)
 
 @app.route('/email-marketing/import', methods=['POST'])
 def import_email_marketing_csv():
@@ -146,8 +153,245 @@ def export_email_marketing_csv():
         'Content-Disposition': 'attachment; filename=email_marketing_diversia.csv'
     }
 
-# Template HTML para el dashboard
-EMAIL_MARKETING_TEMPLATE = '''
+# Template para tabla de asociaciones
+EMAIL_MARKETING_TABLE_TEMPLATE = '''
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Marketing - Tabla - DiversIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .table-responsive { max-height: 70vh; overflow-y: auto; }
+        .btn-sm { font-size: 0.8rem; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>📧 Email Marketing - Asociaciones ({{ total_asociaciones }})</h2>
+                    <div>
+                        <a href="/email-marketing-funnel?admin=true" class="btn btn-info me-2">Dashboard Embudo</a>
+                        <a href="/crm-minimal" class="btn btn-outline-secondary me-2">← CRM</a>
+                        <a href="/diversia-admin-logout" class="btn btn-outline-danger">Salir</a>
+                    </div>
+                </div>
+                
+                <!-- Acciones rápidas -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <form action="/email-marketing/import" method="post" enctype="multipart/form-data" class="d-flex">
+                            <input type="file" name="file" class="form-control me-2" accept=".csv" required>
+                            <button type="submit" class="btn btn-success">Importar CSV</button>
+                        </form>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="/email-marketing/export" class="btn btn-warning">Exportar CSV</a>
+                    </div>
+                </div>
+                
+                <!-- Tabla de asociaciones -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Comunidad</th>
+                                        <th>Asociación</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Servicios</th>
+                                        <th>Enviado</th>
+                                        <th>Estado</th>
+                                        <th>Notas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for asociacion in asociaciones %}
+                                    <tr>
+                                        <td>{{ asociacion.id }}</td>
+                                        <td><span class="badge bg-secondary">{{ asociacion.comunidad_autonoma }}</span></td>
+                                        <td><strong>{{ asociacion.asociacion }}</strong></td>
+                                        <td><a href="mailto:{{ asociacion.email }}">{{ asociacion.email }}</a></td>
+                                        <td>{{ asociacion.telefono or '-' }}</td>
+                                        <td>{{ (asociacion.servicios or '')[:50] }}{% if asociacion.servicios and asociacion.servicios|length > 50 %}...{% endif %}</td>
+                                        <td>
+                                            {% if asociacion.fecha_enviado %}
+                                                <span class="badge bg-success">{{ asociacion.fecha_enviado }}</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Pendiente</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if asociacion.tipo_respuesta == 'interesado' %}
+                                                <span class="badge bg-success">Interesado</span>
+                                            {% elif asociacion.tipo_respuesta == 'no_interesado' %}
+                                                <span class="badge bg-danger">No interesado</span>
+                                            {% elif asociacion.estado_email == 'respondido' %}
+                                                <span class="badge bg-info">Respondido</span>
+                                            {% else %}
+                                                <span class="badge bg-primary">{{ asociacion.estado_email or 'Enviado' }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if asociacion.notas_especiales %}
+                                                <span class="text-warning" title="{{ asociacion.notas_especiales }}">⚠️</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+'''
+
+# Template para dashboard embudo
+EMAIL_MARKETING_FUNNEL_TEMPLATE = '''
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Embudo - Email Marketing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .funnel-step {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            margin: 10px 0;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+        }
+        .funnel-step:nth-child(2) { background: linear-gradient(135deg, #28a745, #1e7e34); }
+        .funnel-step:nth-child(3) { background: linear-gradient(135deg, #ffc107, #e0a800); }
+        .funnel-step:nth-child(4) { background: linear-gradient(135deg, #dc3545, #c82333); }
+        .funnel-number { font-size: 2rem; font-weight: bold; }
+        .funnel-label { font-size: 1.1rem; }
+        .stats-card { border-left: 4px solid #007bff; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>📊 Dashboard Embudo - Email Marketing</h2>
+                    <div>
+                        <a href="/email-marketing?admin=true" class="btn btn-primary me-2">Ver Tabla</a>
+                        <a href="/crm-minimal" class="btn btn-outline-secondary me-2">← CRM</a>
+                        <a href="/diversia-admin-logout" class="btn btn-outline-danger">Salir</a>
+                    </div>
+                </div>
+                
+                <!-- Embudo de conversión -->
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h4>Embudo de Email Marketing</h4>
+                        
+                        <div class="funnel-step">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="funnel-number">{{ total }}</div>
+                                    <div class="funnel-label">Total Asociaciones</div>
+                                </div>
+                                <div>100%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="funnel-step">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="funnel-number">{{ enviados }}</div>
+                                    <div class="funnel-label">Emails Enviados</div>
+                                </div>
+                                <div>{{ "%.1f"|format((enviados/total)*100 if total > 0 else 0) }}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="funnel-step">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="funnel-number">{{ respondidos }}</div>
+                                    <div class="funnel-label">Respuestas Recibidas</div>
+                                </div>
+                                <div>{{ "%.1f"|format((respondidos/enviados)*100 if enviados > 0 else 0) }}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="funnel-step">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="funnel-number">{{ interesados }}</div>
+                                    <div class="funnel-label">Interesados</div>
+                                </div>
+                                <div>{{ "%.1f"|format((interesados/respondidos)*100 if respondidos > 0 else 0) }}%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Distribución por comunidad -->
+                    <div class="col-lg-6">
+                        <h4>Top Comunidades Autónomas</h4>
+                        <div class="card">
+                            <div class="card-body">
+                                {% for comunidad, total_com in stats_comunidad[:10] %}
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span><strong>{{ comunidad }}</strong></span>
+                                    <span>
+                                        <span class="badge bg-primary">{{ total_com }}</span>
+                                        <small class="text-muted">({{ "%.1f"|format((total_com/total)*100) }}%)</small>
+                                    </span>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px;">
+                                    <div class="progress-bar" style="width: {{ (total_com/total)*100 }}%"></div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Métricas clave -->
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <div class="card stats-card">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-primary">{{ "%.1f"|format((respondidos/enviados)*100 if enviados > 0 else 0) }}%</h3>
+                                        <p class="mb-0">Tasa de Respuesta</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card stats-card">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-success">{{ "%.1f"|format((interesados/total)*100 if total > 0 else 0) }}%</h3>
+                                        <p class="mb-0">Conversión Total</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+'''
+
+# Template original simplificado
+EMAIL_MARKETING_SIMPLE_TEMPLATE = '''
 <!DOCTYPE html>
 <html lang="es">
 <head>
