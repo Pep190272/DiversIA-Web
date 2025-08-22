@@ -166,9 +166,12 @@ def email_marketing_funnel():
     if reuniones == 0:
         reuniones = int(respondidos * 0.33) if respondidos > 0 else 0
     
-    # Paso 4: NDA en proceso (20% de las reuniones)  
-    if nda_proceso == 0:
-        nda_proceso = int(reuniones * 0.20) if reuniones > 0 else 0
+    # Paso 4: NDA firmados y en proceso (datos reales de DiversIA)
+    # Teamworkz: NDA firmado ✓
+    # Colombia: NDA pendiente de firma 
+    nda_firmados = 1  # Teamworkz confirmado
+    nda_pendientes = 1  # Colombia pendiente
+    nda_proceso = nda_firmados + nda_pendientes
     
     # Stats por comunidad autónoma
     stats_comunidad = db.session.query(
@@ -182,6 +185,8 @@ def email_marketing_funnel():
                                 respondidos=respondidos,
                                 reuniones=reuniones,
                                 nda_proceso=nda_proceso,
+                                nda_firmados=nda_firmados,
+                                nda_pendientes=nda_pendientes,
                                 stats_comunidad=stats_comunidad)
 
 @app.route('/email-marketing/import', methods=['POST'])
@@ -1074,10 +1079,10 @@ EMAIL_MARKETING_FUNNEL_TEMPLATE = '''
             <div class="percentage">{{ "%.1f"|format((reuniones/enviados)*100 if enviados > 0 else 0) }}%</div>
         </div>
         
-        <!-- Paso 4: NDA en Proceso -->
+        <!-- Paso 4: Acuerdos de Confidencialidad -->
         <div class="funnel-step">
             <div class="number">{{ nda_proceso }}</div>
-            <div class="label">NDA en proceso<br><small>{{ "%.0f"|format((nda_proceso/reuniones)*100 if reuniones > 0 else 0) }}% de reuniones</small></div>
+            <div class="label">Acuerdos NDA<br><small>{{ nda_firmados }} firmado + {{ nda_pendientes }} pendiente</small></div>
             <div class="percentage">{{ "%.1f"|format((nda_proceso/enviados)*100 if enviados > 0 else 0) }}%</div>
         </div>
         
@@ -1100,23 +1105,46 @@ EMAIL_MARKETING_FUNNEL_TEMPLATE = '''
                 </div>
                 <div class="col-md-3">
                     <div class="metric-card">
-                        <div class="metric-number">{{ "%.1f"|format((nda_proceso/reuniones)*100 if reuniones > 0 else 0) }}%</div>
-                        <div class="metric-label">Conversión a NDA</div>
+                        <div class="metric-number">{{ nda_firmados }}</div>
+                        <div class="metric-label">NDAs Firmados</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="metric-card">
-                        <div class="metric-number">{{ "%.2f"|format((nda_proceso/enviados)*100 if enviados > 0 else 0) }}%</div>
-                        <div class="metric-label">Conversión Total</div>
+                        <div class="metric-number">{{ nda_pendientes }}</div>
+                        <div class="metric-label">NDAs Pendientes</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Acuerdos Activos -->
+            <div class="mt-5">
+                <h5>🤝 Acuerdos de Confidencialidad</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <h6 class="card-title">✅ Teamworkz</h6>
+                                <p class="card-text text-success"><small>NDA Firmado - Activo</small></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-warning">
+                            <div class="card-body">
+                                <h6 class="card-title">⏳ Empresa Colombia</h6>
+                                <p class="card-text text-warning"><small>NDA Pendiente de Firma</small></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <!-- Top Comunidades -->
-            <div class="mt-5">
+            <div class="mt-4">
                 <h5>🗺️ Top Comunidades Autónomas</h5>
                 <div class="row">
-                    {% for comunidad, total_com in stats_comunidad[:8] %}
+                    {% for comunidad, total_com in stats_comunidad[:6] %}
                     <div class="col-md-6 mb-2">
                         <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
                             <span><strong>{{ comunidad }}</strong></span>
