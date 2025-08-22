@@ -190,7 +190,7 @@ class EmailMarketing(db.Model):
     direccion = db.Column(db.String(300))
     servicios = db.Column(db.Text)
     fecha_enviado = db.Column(db.String(20))  # Formato: 30/07/2025
-    # respuesta = db.Column(db.Text)  # Comentado temporalmente
+    respuesta = db.Column(db.Text)  # Columna para respuestas del CSV
     notas_especiales = db.Column(db.Text)  # Para notas como "VACACIONES HASTA..."
     
     # Campos de seguimiento
