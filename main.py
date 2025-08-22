@@ -23,6 +23,7 @@ except Exception as e:
 
 # Email Marketing System
 import email_marketing_manager  # noqa: F401
+import email_notifications  # noqa: F401
 import task_manager  # noqa: F401
 
 if __name__ == "__main__":

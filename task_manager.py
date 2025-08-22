@@ -9,6 +9,7 @@ from datetime import datetime
 from flask import request, jsonify, render_template_string, flash, redirect, session
 from app import app, db
 from models import Task, Employee
+from email_notifications import send_employee_notification, send_task_assignment_notification
 
 @app.route('/tasks')
 def tasks_dashboard():
@@ -144,7 +145,20 @@ def edit_task(task_id):
         if field == 'tarea':
             task.tarea = value
         elif field == 'colaborador':
+            old_collaborator = task.colaborador
             task.colaborador = value
+            
+            # Si se asigna un nuevo colaborador, enviar notificación
+            if value and value != old_collaborator:
+                employee = Employee.query.filter_by(name=value, active=True).first()
+                if employee:
+                    task_data = {
+                        'tarea': task.tarea,
+                        'estado': task.estado,
+                        'fecha_inicio': task.fecha_inicio,
+                        'fecha_final': task.fecha_final
+                    }
+                    send_task_assignment_notification(task_data, employee.email)
         elif field == 'fecha_inicio':
             task.fecha_inicio = value
         elif field == 'fecha_final':
@@ -245,7 +259,21 @@ def manage_employees():
             )
             db.session.add(new_employee)
             db.session.commit()
-            return jsonify({'success': True, 'message': 'Empleado añadido correctamente'})
+            
+            # Enviar notificaciones por email
+            employee_data = {
+                'name': new_employee.name,
+                'email': new_employee.email,
+                'rol': new_employee.rol,
+                'department': new_employee.department
+            }
+            
+            email_sent = send_employee_notification(employee_data)
+            
+            if email_sent:
+                return jsonify({'success': True, 'message': 'Empleado añadido y notificaciones enviadas'})
+            else:
+                return jsonify({'success': True, 'message': 'Empleado añadido (error en notificaciones por email)'})
         except Exception as e:
             db.session.rollback()
             return jsonify({'success': False, 'error': str(e)}), 500
