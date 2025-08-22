@@ -128,6 +128,18 @@ def delete_email_marketing_contact(contact_id):
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/email-marketing/delete-all', methods=['DELETE'])
+def delete_all_email_marketing():
+    """Eliminar TODOS los contactos de email marketing"""
+    try:
+        count = EmailMarketing.query.count()
+        EmailMarketing.query.delete()
+        db.session.commit()
+        return jsonify({'success': True, 'message': f'{count} contactos eliminados correctamente'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/email-marketing/export')
 def export_email_marketing_csv():
     """Exportar datos de email marketing"""
@@ -201,7 +213,8 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                         </form>
                     </div>
                     <div class="col-md-4 text-end">
-                        <a href="/email-marketing/export" class="btn btn-warning">Exportar CSV</a>
+                        <a href="/email-marketing/export" class="btn btn-warning me-2">Exportar CSV</a>
+                        <button onclick="deleteAllAssociations()" class="btn btn-danger">🗑️ Eliminar Todo</button>
                     </div>
                 </div>
                 
@@ -287,6 +300,28 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                 .catch(error => {
                     alert('Error de conexión: ' + error);
                 });
+            }
+        }
+        
+        function deleteAllAssociations() {
+            if (confirm('⚠️ ATENCIÓN: ¿Estás COMPLETAMENTE SEGURO de eliminar TODAS las asociaciones?')) {
+                if (confirm('🛑 ÚLTIMA CONFIRMACIÓN: Esto eliminará TODOS los contactos de Email Marketing. ¿Confirmas?')) {
+                    fetch('/email-marketing/delete-all', {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('✅ ' + data.message);
+                            location.reload();
+                        } else {
+                            alert('❌ Error al eliminar todo: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        alert('❌ Error de conexión: ' + error);
+                    });
+                }
             }
         }
     </script>
