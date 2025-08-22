@@ -381,4 +381,6 @@ def enviar_contacto():
     
     return redirect(url_for('contacto'))
 
+# Las rutas de admin están en admin_final.py - no redefinir aquí
+
 print("✅ Routes simplificado cargado correctamente")
