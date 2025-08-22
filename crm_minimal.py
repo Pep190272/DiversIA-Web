@@ -3,7 +3,7 @@
 CRM Minimal - Sistema simple que funciona sin complicaciones
 """
 
-from flask import jsonify, request, render_template
+from flask import jsonify, request, render_template, session, redirect
 import json
 import os
 from datetime import datetime
@@ -48,7 +48,10 @@ def create_minimal_crm_routes(app):
     
     @app.route('/crm-minimal')
     def crm_minimal_dashboard():
-        """Dashboard del CRM minimal"""
+        """Dashboard del CRM minimal - requiere autenticación"""
+        # Verificar si está autenticado como admin
+        if 'admin_user_id' not in session:
+            return redirect('/admin/login-new')
         return render_template('crm-minimal.html')
     
     @app.route('/api/minimal/companies')

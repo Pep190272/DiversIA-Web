@@ -99,7 +99,7 @@ def admin_login_new():
                 db.session.commit()
                 
                 flash(f'¡Bienvenido, {username}!', 'success')
-                return redirect(url_for('admin_dashboard_new'))
+                return redirect('/crm-minimal')
             else:
                 flash('Credenciales incorrectas.', 'error')
                 
@@ -115,7 +115,7 @@ def admin_login_new():
                 session['admin_email'] = 'diversiaeternals@gmail.com'
                 
                 flash(f'¡Bienvenido, {username}! (Modo respaldo)', 'success')
-                return redirect(url_for('admin_dashboard_new'))
+                return redirect('/crm-minimal')
             else:
                 flash('Credenciales incorrectas.', 'error')
     
