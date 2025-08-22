@@ -178,6 +178,32 @@ class CrmContact(db.Model):
     def __repr__(self):
         return f'<CrmContact {self.name}>'
 
+# Modelo para Email Marketing de Asociaciones
+class EmailMarketing(db.Model):
+    __tablename__ = 'email_marketing'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    comunidad_autonoma = db.Column(db.String(100), nullable=False)
+    asociacion = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    telefono = db.Column(db.String(20))
+    direccion = db.Column(db.String(300))
+    servicios = db.Column(db.Text)
+    fecha_enviado = db.Column(db.String(20))  # Formato: 30/07/2025
+    notas_especiales = db.Column(db.Text)  # Para notas como "VACACIONES HASTA..."
+    
+    # Campos de seguimiento
+    estado_email = db.Column(db.String(50), default='enviado')  # enviado, abierto, respondido, rebotado
+    fecha_respuesta = db.Column(db.DateTime)
+    tipo_respuesta = db.Column(db.String(100))  # interesado, no_interesado, info_solicitada
+    seguimiento_programado = db.Column(db.DateTime)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<EmailMarketing {self.asociacion}>'
+
 class Task(db.Model):
     __tablename__ = 'tasks'
     
