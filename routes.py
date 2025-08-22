@@ -1111,6 +1111,8 @@ def api_import_csv():
                         existing_company.telefono = row.get('telefono', existing_company.telefono)
                         existing_company.sector = row.get('sector', existing_company.sector)
                         existing_company.ciudad = row.get('ciudad', existing_company.ciudad)
+                        if not existing_company.tamano_empresa:
+                            existing_company.tamano_empresa = 'No especificado'
                         updated += 1
                     else:
                         # Crear nueva empresa
@@ -1118,7 +1120,8 @@ def api_import_csv():
                             nombre_empresa=row['nombre_empresa'],
                             email_contacto=row['email_contacto'],
                             telefono=row.get('telefono', ''),
-                            sector=row.get('sector', ''),
+                            sector=row.get('sector', 'General'),
+                            tamano_empresa='No especificado',
                             ciudad=row.get('ciudad', '')
                         )
                         db.session.add(new_company)
@@ -1231,6 +1234,32 @@ def api_import_csv():
                     
         except Exception as e:
             print(f"Error actualizando CRM persistente: {e}")
+        
+        # Enviar email de confirmación
+        try:
+            from sendgrid_helper import send_email
+            
+            email_content = f'''
+            <h2>📁 IMPORTACIÓN CSV COMPLETADA</h2>
+            
+            <h3>📊 Resultados:</h3>
+            <ul>
+            <li>✅ Registros procesados: {processed}</li>
+            <li>✅ Registros creados: {created}</li>
+            <li>✅ Registros actualizados: {updated}</li>
+            <li>⚠️ Errores: {errors}</li>
+            </ul>
+            
+            <h3>🗂️ Tipo de importación:</h3>
+            <p><strong>{import_type}</strong></p>
+            
+            <h3>⏰ Fecha:</h3>
+            <p>{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+            '''
+            
+            send_email('diversiaeternals@gmail.com', f'📁 CSV IMPORTADO - {import_type}', email_content)
+        except Exception as e:
+            print(f"Error enviando email: {e}")
         
         return jsonify({
             'success': True,
