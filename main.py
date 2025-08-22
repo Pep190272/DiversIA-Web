@@ -12,7 +12,7 @@ except Exception as e:
 
 # Cargar solo CRM API (sin conflictos de rutas)
 try:
-    import crm_api_simple  # noqa: F401
+    # import crm_api_simple  # Comentado para evitar conflictos
     print("✅ CRM API cargado correctamente")
 except Exception as e:
     print(f"⚠️ Error cargando CRM: {e}")
@@ -54,7 +54,7 @@ except Exception as e:
 
 # Cargar APIs de respaldo para CRM
 try:
-    import api_crm_backup  # noqa: F401
+    # import api_crm_backup  # Comentado para evitar conflictos
     print("✅ APIs de respaldo CRM cargadas")
 except Exception as e:
     print(f"⚠️ Error cargando APIs CRM: {e}")

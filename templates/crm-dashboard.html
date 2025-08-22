@@ -414,7 +414,7 @@ class DiversiaCRM {
 
     async loadTasks() {
         try {
-            const response = await fetch(this.apiBase + '/api/tasks');
+            const response = await fetch('/api/tasks-fixed');
             const tasks = await response.json();
             
             const tbody = document.getElementById('tasksTable');
@@ -495,7 +495,7 @@ class DiversiaCRM {
                 
                 async loadEmployees() {
                     try {
-                        const response = await fetch('/api/employees');
+                        const response = await fetch('/api/employees-fixed');
                         const data = await response.json();
                         
                         if (data.success) {
@@ -618,7 +618,7 @@ class DiversiaCRM {
 
     async loadContacts() {
         try {
-            const response = await fetch(this.apiBase + '/api/contacts');
+            const response = await fetch('/api/contacts-fixed');
             const contacts = await response.json();
             
             const tbody = document.getElementById('contactsTable');
@@ -656,7 +656,7 @@ class DiversiaCRM {
 
     async loadCompanies() {
         try {
-            const response = await fetch(this.apiBase + '/api/companies');
+            const response = await fetch('/api/companies-fixed');
             const companies = await response.json();
             
             const tbody = document.getElementById('companiesTable');
@@ -694,7 +694,7 @@ class DiversiaCRM {
 
     async loadOffers() {
         try {
-            const response = await fetch(this.apiBase + '/api/job-offers');
+            const response = await fetch('/api/offers-fixed');
             const offers = await response.json();
             
             const tbody = document.getElementById('offersTable');

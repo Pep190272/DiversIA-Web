@@ -15,12 +15,7 @@ try:
 except ImportError:
     print("⚠️ CSV Manager no disponible")
 
-# Importar CRM Neurodivergentes
-try:
-    from crm_neurodivergentes import create_neurodivergentes_api
-    create_neurodivergentes_api(app)
-except ImportError:
-    print("⚠️ CRM Neurodivergentes no disponible")
+# CRM Neurodivergentes eliminado para evitar conflictos
 
 @app.route('/')
 def index():
@@ -1273,3 +1268,70 @@ def api_import_csv():
     except Exception as e:
         print(f"Error en importación CSV: {e}")
         return jsonify({'success': False, 'message': f'Error al procesar CSV: {str(e)}'})
+
+
+# ============== API CRM SIMPLE SIN CONFLICTOS ==============
+@app.route('/api/companies-fixed')
+def api_companies_fixed():
+    try:
+        companies = Company.query.all()
+        companies_list = []
+        for company in companies:
+            companies_list.append({
+                'id': company.id,
+                'nombre_empresa': company.nombre_empresa,
+                'email_contacto': company.email_contacto,
+                'telefono': company.telefono,
+                'sector': company.sector,
+                'ciudad': company.ciudad,
+                'created_at': company.created_at.isoformat() if company.created_at else None
+            })
+        return jsonify(companies_list)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/contacts-fixed')
+def api_contacts_fixed():
+    try:
+        users = User.query.all()
+        users_list = []
+        for user in users:
+            users_list.append({
+                'id': user.id,
+                'nombre': user.nombre,
+                'apellidos': user.apellidos,
+                'email': user.email,
+                'telefono': user.telefono,
+                'tipo_neurodivergencia': user.tipo_neurodivergencia,
+                'ciudad': user.ciudad,
+                'created_at': user.created_at.isoformat() if user.created_at else None
+            })
+        return jsonify(users_list)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/offers-fixed')
+def api_offers_fixed():
+    try:
+        offers = JobOffer.query.all()
+        offers_list = []
+        for offer in offers:
+            offers_list.append({
+                'id': offer.id,
+                'titulo': offer.titulo,
+                'descripcion': offer.descripcion,
+                'salario': offer.salario,
+                'ubicacion': offer.ubicacion,
+                'created_at': offer.created_at.isoformat() if offer.created_at else None
+            })
+        return jsonify(offers_list)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/employees-fixed')
+def api_employees_fixed():
+    return jsonify([])
+
+@app.route('/api/tasks-fixed')
+def api_tasks_fixed():
+    return jsonify([])
