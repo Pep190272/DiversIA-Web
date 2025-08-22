@@ -209,28 +209,17 @@ class Task(db.Model):
     __tablename__ = 'tasks'
     
     id = db.Column(db.Integer, primary_key=True)
-    
-    title = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    
-    # Estado y prioridad
-    status = db.Column(db.String(20), default='pending')  # 'pending', 'in_progress', 'completed'
-    priority = db.Column(db.String(10), default='medium')  # 'low', 'medium', 'high'
-    
-    # Asignación
-    assigned_to = db.Column(db.String(100), nullable=True)
-    assigned_to_id = db.Column(db.Integer, nullable=True)
-    
-    # Fechas
-    due_date = db.Column(db.DateTime, nullable=True)
-    completed_at = db.Column(db.DateTime, nullable=True)
-    
-    # Timestamps
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    tarea = db.Column(db.String(300), nullable=False)
+    colaborador = db.Column(db.String(100))
+    fecha_inicio = db.Column(db.String(50))
+    fecha_final = db.Column(db.String(50))
+    estado = db.Column(db.String(50), default='Pendiente')  # Pendiente, En curso, Completado
+    notas = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     
     def __repr__(self):
-        return f'<Task {self.title}>'
+        return f'<Task {self.tarea[:50]}>'
 
 # Modelos para formularios web
 class FormSubmission(db.Model):
