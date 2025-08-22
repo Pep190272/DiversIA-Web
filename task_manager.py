@@ -8,7 +8,7 @@ import io
 from datetime import datetime
 from flask import request, jsonify, render_template_string, flash, redirect, session
 from app import app, db
-from models import Task
+from models import Task, Employee
 
 @app.route('/tasks')
 def tasks_dashboard():
@@ -17,13 +17,56 @@ def tasks_dashboard():
     if 'admin_ok' not in session or not session.get('admin_ok'):
         return redirect('/diversia-admin')
     
-    # Obtener todas las tareas
+    # Obtener todas las tareas y empleados
     tasks = Task.query.all()
+    employees = Employee.query.filter_by(active=True).all()
     total_tasks = len(tasks)
     
     return render_template_string(TASKS_TABLE_TEMPLATE, 
                                 tasks=tasks,
+                                employees=employees,
                                 total_tasks=total_tasks)
+
+@app.route('/tasks/analytics')
+def tasks_analytics():
+    """Dashboard de análisis con gráficos"""
+    # Verificar autenticación admin
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return redirect('/diversia-admin')
+    
+    # Estadísticas de tareas
+    total_tasks = Task.query.count()
+    pendientes = Task.query.filter_by(estado='Pendiente').count()
+    en_curso = Task.query.filter_by(estado='En curso').count()
+    completadas = Task.query.filter_by(estado='Completado').count()
+    
+    # Tareas por colaborador
+    tasks_by_collaborator = db.session.query(
+        Task.colaborador,
+        db.func.count(Task.id).label('total_tasks'),
+        db.func.sum(db.case((Task.estado == 'Completado', 1), else_=0)).label('completed'),
+        db.func.sum(db.case((Task.estado == 'En curso', 1), else_=0)).label('in_progress'),
+        db.func.sum(db.case((Task.estado == 'Pendiente', 1), else_=0)).label('pending')
+    ).group_by(Task.colaborador).all()
+    
+    # Productividad por estado
+    productivity_data = {
+        'pendientes': pendientes,
+        'en_curso': en_curso, 
+        'completadas': completadas
+    }
+    
+    # Empleados activos
+    employees = Employee.query.filter_by(active=True).all()
+    
+    return render_template_string(TASKS_ANALYTICS_TEMPLATE,
+                                total_tasks=total_tasks,
+                                pendientes=pendientes,
+                                en_curso=en_curso,
+                                completadas=completadas,
+                                tasks_by_collaborator=tasks_by_collaborator,
+                                productivity_data=productivity_data,
+                                employees=employees)
 
 @app.route('/tasks/import', methods=['POST'])
 def import_tasks_csv():
@@ -185,6 +228,53 @@ def export_tasks_csv():
         'Content-Disposition': 'attachment; filename=tareas_diversia.csv'
     }
 
+@app.route('/employees', methods=['GET', 'POST'])
+def manage_employees():
+    """Gestionar empleados"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return redirect('/diversia-admin')
+    
+    if request.method == 'POST':
+        data = request.get_json()
+        try:
+            new_employee = Employee(
+                name=data.get('name', '').strip(),
+                email=data.get('email', '').strip(),
+                rol=data.get('rol', '').strip(),
+                department=data.get('department', '').strip()
+            )
+            db.session.add(new_employee)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Empleado añadido correctamente'})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    # GET: mostrar empleados
+    employees = Employee.query.filter_by(active=True).all()
+    return jsonify([{
+        'id': emp.id,
+        'name': emp.name,
+        'email': emp.email,
+        'rol': emp.rol,
+        'department': emp.department
+    } for emp in employees])
+
+@app.route('/employees/<int:employee_id>', methods=['DELETE'])
+def delete_employee(employee_id):
+    """Eliminar empleado"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    try:
+        employee = Employee.query.get_or_404(employee_id)
+        employee.active = False  # Soft delete
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Empleado eliminado'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 # Template para tabla de tareas
 TASKS_TABLE_TEMPLATE = '''
 <!DOCTYPE html>
@@ -250,6 +340,7 @@ TASKS_TABLE_TEMPLATE = '''
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2>📋 Gestión de Tareas - DiversIA ({{ total_tasks }})</h2>
                     <div>
+                        <a href="/tasks/analytics" class="btn btn-info me-2">📊 Analytics</a>
                         <a href="/crm-minimal" class="btn btn-outline-secondary me-2">← CRM</a>
                         <a href="/diversia-admin-logout" class="btn btn-outline-danger">Salir</a>
                     </div>
@@ -272,6 +363,7 @@ TASKS_TABLE_TEMPLATE = '''
                         </div>
                     </div>
                     <div class="col-md-4 text-end">
+                        <button class="btn btn-primary me-2" onclick="showAddEmployeeForm()">👤 Añadir Colaborador</button>
                         <a href="/tasks/export" class="btn btn-warning me-2">Exportar CSV</a>
                         <button onclick="deleteAllTasks()" class="btn btn-danger">🗑️ Eliminar Todo</button>
                     </div>
@@ -283,6 +375,55 @@ TASKS_TABLE_TEMPLATE = '''
                         <small class="text-muted">
                             Mostrando <span id="visibleCount">{{ total_tasks }}</span> de {{ total_tasks }} tareas
                         </small>
+                    </div>
+                </div>
+                
+                <!-- Formulario añadir empleado -->
+                <div id="addEmployeeForm" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5>Añadir Nuevo Colaborador</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="employeeForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nombre Completo *</label>
+                                        <input type="text" class="form-control" id="empName" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Email *</label>
+                                        <input type="email" class="form-control" id="empEmail" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Rol *</label>
+                                        <select class="form-control" id="empRol" required>
+                                            <option value="">Seleccionar rol...</option>
+                                            <option value="Developer">Developer</option>
+                                            <option value="Designer">Designer</option>
+                                            <option value="Marketing">Marketing</option>
+                                            <option value="Manager">Manager</option>
+                                            <option value="Analyst">Analyst</option>
+                                            <option value="Support">Support</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Departamento</label>
+                                        <input type="text" class="form-control" id="empDepartment">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success">Añadir Colaborador</button>
+                                <button type="button" class="btn btn-secondary" onclick="hideAddEmployeeForm()">Cancelar</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 
@@ -313,7 +454,7 @@ TASKS_TABLE_TEMPLATE = '''
                                                   title="Click para editar">{{ task.tarea }}</span>
                                         </td>
                                         <td>
-                                            <span class="editable-field" 
+                                            <span class="editable-field editable-collaborator" 
                                                   data-field="colaborador" 
                                                   data-id="{{ task.id }}"
                                                   title="Click para editar">{{ task.colaborador or '-' }}</span>
@@ -368,6 +509,64 @@ TASKS_TABLE_TEMPLATE = '''
                     alert('Error de conexión: ' + error);
                 });
             }
+        }
+        
+        function showAddEmployeeForm() {
+            document.getElementById('addEmployeeForm').style.display = 'block';
+            document.getElementById('empName').focus();
+        }
+        
+        function hideAddEmployeeForm() {
+            document.getElementById('addEmployeeForm').style.display = 'none';
+            document.getElementById('employeeForm').reset();
+        }
+        
+        // Gestión de empleados
+        document.getElementById('employeeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('empName').value.trim(),
+                email: document.getElementById('empEmail').value.trim(),
+                rol: document.getElementById('empRol').value.trim(),
+                department: document.getElementById('empDepartment').value.trim()
+            };
+            
+            if (!formData.name || !formData.email || !formData.rol) {
+                alert('Por favor, completa todos los campos obligatorios');
+                return;
+            }
+            
+            fetch('/employees', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Colaborador añadido correctamente');
+                    hideAddEmployeeForm();
+                    loadEmployeeOptions(); // Actualizar opciones
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Error de conexión: ' + error);
+            });
+        });
+        
+        function loadEmployeeOptions() {
+            fetch('/employees')
+            .then(response => response.json())
+            .then(employees => {
+                // Actualizar opciones disponibles para asignación
+                window.availableEmployees = employees;
+            })
+            .catch(error => console.error('Error loading employees:', error));
         }
         
         function deleteAllTasks() {
@@ -445,8 +644,9 @@ TASKS_TABLE_TEMPLATE = '''
         document.addEventListener('DOMContentLoaded', function() {
             let currentlyEditing = null;
             
-            // Inicializar búsqueda
+            // Inicializar búsqueda y cargar empleados
             initializeSearch();
+            loadEmployeeOptions();
 
             // Hacer todos los campos editables
             document.querySelectorAll('.editable-field').forEach(field => {
@@ -470,7 +670,23 @@ TASKS_TABLE_TEMPLATE = '''
                 
                 // Crear input apropiado según el campo
                 let inputElement;
-                if (field === 'estado') {
+                if (field === 'colaborador') {
+                    inputElement = document.createElement('select');
+                    inputElement.className = 'edit-select';
+                    inputElement.innerHTML = '<option value="">Sin asignar</option>';
+                    
+                    // Añadir empleados disponibles
+                    if (window.availableEmployees) {
+                        window.availableEmployees.forEach(emp => {
+                            const option = document.createElement('option');
+                            option.value = emp.name;
+                            option.textContent = `${emp.name} (${emp.rol})`;
+                            inputElement.appendChild(option);
+                        });
+                    }
+                    
+                    inputElement.value = originalValue === '-' ? '' : originalValue;
+                } else if (field === 'estado') {
                     inputElement = document.createElement('select');
                     inputElement.className = 'edit-select';
                     inputElement.innerHTML = `
@@ -582,6 +798,286 @@ TASKS_TABLE_TEMPLATE = '''
                 }
                 element.classList.remove('editing');
                 currentlyEditing = null;
+            }
+        });
+    </script>
+</body>
+</html>
+'''
+
+# Template para analytics con gráficos
+TASKS_ANALYTICS_TEMPLATE = '''
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics de Tareas - DiversIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .metric-card { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+        }
+        .chart-container { 
+            height: 400px; 
+            position: relative;
+        }
+        .analytics-card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>📊 Analytics de Tareas - DiversIA</h1>
+            <div>
+                <a href="/tasks" class="btn btn-outline-primary me-2">← Ver Tareas</a>
+                <a href="/crm-minimal" class="btn btn-outline-secondary me-2">CRM</a>
+            </div>
+        </div>
+        
+        <!-- Métricas principales -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <h3>{{ total_tasks }}</h3>
+                        <p class="mb-0">Total Tareas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <h3>{{ completadas }}</h3>
+                        <p class="mb-0">Completadas</p>
+                        <small>{% if total_tasks > 0 %}{{ (completadas / total_tasks * 100)|round(1) }}%{% else %}0%{% endif %}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <h3>{{ en_curso }}</h3>
+                        <p class="mb-0">En Progreso</p>
+                        <small>{% if total_tasks > 0 %}{{ (en_curso / total_tasks * 100)|round(1) }}%{% else %}0%{% endif %}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <h3>{{ pendientes }}</h3>
+                        <p class="mb-0">Pendientes</p>
+                        <small>{% if total_tasks > 0 %}{{ (pendientes / total_tasks * 100)|round(1) }}%{% else %}0%{% endif %}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráficos -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5>📈 Estado General de Tareas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5>👥 Productividad por Colaborador</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="collaboratorChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabla de rendimiento -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5>📋 Rendimiento Detallado por Colaborador</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Colaborador</th>
+                                        <th>Total Tareas</th>
+                                        <th>Completadas</th>
+                                        <th>En Progreso</th>
+                                        <th>Pendientes</th>
+                                        <th>% Completado</th>
+                                        <th>Eficiencia</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for collab in tasks_by_collaborator %}
+                                    <tr>
+                                        <td><strong>{{ collab.colaborador or 'Sin asignar' }}</strong></td>
+                                        <td><span class="badge bg-primary">{{ collab.total_tasks }}</span></td>
+                                        <td><span class="badge bg-success">{{ collab.completed }}</span></td>
+                                        <td><span class="badge bg-warning">{{ collab.in_progress }}</span></td>
+                                        <td><span class="badge bg-danger">{{ collab.pending }}</span></td>
+                                        <td>
+                                            {% set completion_rate = (collab.completed / collab.total_tasks * 100) if collab.total_tasks > 0 else 0 %}
+                                            {{ completion_rate|round(1) }}%
+                                        </td>
+                                        <td>
+                                            {% if completion_rate >= 80 %}
+                                                <span class="badge bg-success">Excelente</span>
+                                            {% elif completion_rate >= 60 %}
+                                                <span class="badge bg-warning">Bueno</span>
+                                            {% elif completion_rate >= 40 %}
+                                                <span class="badge bg-secondary">Regular</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Necesita Mejora</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Insights de optimización -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5>💡 Insights de Optimización</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6>🎯 Recomendaciones</h6>
+                                <ul class="list-unstyled">
+                                    {% if pendientes > en_curso + completadas %}
+                                    <li><i class="text-warning">⚠️</i> Alto número de tareas pendientes</li>
+                                    <li><i class="text-info">💡</i> Considerar reasignar recursos</li>
+                                    {% endif %}
+                                    {% if en_curso > completadas * 2 %}
+                                    <li><i class="text-warning">⚠️</i> Muchas tareas en progreso</li>
+                                    <li><i class="text-info">💡</i> Revisar bloqueos o dependencias</li>
+                                    {% endif %}
+                                    {% if completadas > total_tasks * 0.7 %}
+                                    <li><i class="text-success">✅</i> Excelente productividad general</li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>📊 Métricas Clave</h6>
+                                <ul class="list-unstyled">
+                                    <li>Tasa de Finalización: <strong>{% if total_tasks > 0 %}{{ (completadas / total_tasks * 100)|round(1) }}%{% else %}0%{% endif %}</strong></li>
+                                    <li>Tareas Activas: <strong>{{ en_curso }}</strong></li>
+                                    <li>Backlog: <strong>{{ pendientes }}</strong></li>
+                                    <li>Colaboradores Activos: <strong>{{ tasks_by_collaborator|length }}</strong></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>🚀 Próximos Pasos</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="text-primary">📋</i> Revisar tareas sin asignar</li>
+                                    <li><i class="text-primary">⏰</i> Establecer fechas límite</li>
+                                    <li><i class="text-primary">👥</i> Equilibrar carga de trabajo</li>
+                                    <li><i class="text-primary">📈</i> Monitorear progreso semanal</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Gráfico de estado general
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completadas', 'En Progreso', 'Pendientes'],
+                datasets: [{
+                    data: [{{ completadas }}, {{ en_curso }}, {{ pendientes }}],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // Gráfico de productividad por colaborador
+        const collaboratorCtx = document.getElementById('collaboratorChart').getContext('2d');
+        const collaboratorData = {
+            labels: [{% for collab in tasks_by_collaborator %}'{{ collab.colaborador or "Sin asignar" }}'{% if not loop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Completadas',
+                data: [{% for collab in tasks_by_collaborator %}{{ collab.completed }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#28a745'
+            }, {
+                label: 'En Progreso',
+                data: [{% for collab in tasks_by_collaborator %}{{ collab.in_progress }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#ffc107'
+            }, {
+                label: 'Pendientes',
+                data: [{% for collab in tasks_by_collaborator %}{{ collab.pending }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#dc3545'
+            }]
+        };
+        
+        new Chart(collaboratorCtx, {
+            type: 'bar',
+            data: collaboratorData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
             }
         });
     </script>

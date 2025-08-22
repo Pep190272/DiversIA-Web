@@ -249,18 +249,16 @@ class Employee(db.Model):
     __tablename__ = 'employees'
     
     id = db.Column(db.Integer, primary_key=True)
-    
     name = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    position = db.Column(db.String(100), nullable=False)
+    rol = db.Column(db.String(100), nullable=False)  # Developer, Designer, Marketing, Manager, etc.
     department = db.Column(db.String(100), nullable=True)
-    
-    # Estado
     active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     
-    # Timestamps
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    def __repr__(self):
+        return f'<Employee {self.name}>'
     
     def __repr__(self):
         return f'<Employee {self.name}>'
