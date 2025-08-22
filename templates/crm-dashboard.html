@@ -670,17 +670,17 @@ class DiversiaCRM {
             companies.forEach(company => {
                 const row = `
                     <tr>
-                        <td><strong>${company.name}</strong></td>
-                        <td>${company.email}</td>
+                        <td><strong>${company.nombre_empresa || company.name || 'Sin nombre'}</strong></td>
+                        <td>${company.email_contacto || company.email || 'Sin email'}</td>
                         <td>${company.sector || '-'}</td>
-                        <td>${company.size || '-'}</td>
-                        <td>${company.city || '-'}</td>
-                        <td><span class="badge bg-info">${company.job_offers_count}</span></td>
+                        <td>${company.tamano_empresa || company.size || '-'}</td>
+                        <td>${company.ciudad || company.city || '-'}</td>
+                        <td><span class="badge bg-info">0</span></td>
                         <td>
                             <button class="btn btn-sm btn-outline-primary me-1" onclick="editCompany(${company.id})" title="Editar empresa">
                                 Editar
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCompanyConfirm(${company.id}, '${company.nombre_empresa}')" title="Eliminar empresa">
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCompanyConfirm(${company.id}, '${company.nombre_empresa || company.name}')" title="Eliminar empresa">
                                 Eliminar
                             </button>
                         </td>
@@ -1084,10 +1084,24 @@ async function handleCSVImport(event) {
                 ${result.errors ? `<li>⚠️ Errores: ${result.errors}</li>` : ''}
             `;
             
-            // Recargar datos del CRM
+            // Actualizar CRM inmediatamente y mostrar notificación
             setTimeout(() => {
-                location.reload();
-            }, 2000);
+                if (window.crmManager) {
+                    window.crmManager.loadCompanies();
+                    window.crmManager.loadContacts(); 
+                    window.crmManager.loadOffers();
+                    // Mostrar notificación visual
+                    const notification = document.createElement('div');
+                    notification.className = 'alert alert-success position-fixed';
+                    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+                    notification.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>CRM actualizado con nuevos datos';
+                    document.body.appendChild(notification);
+                    setTimeout(() => notification.remove(), 3000);
+                    console.log('✅ CRM actualizado después de importación CSV');
+                } else {
+                    location.reload(); // Fallback si no hay manager
+                }
+            }, 500);
             
         } else {
             resultsList.innerHTML = `<li>❌ Error: ${result.message}</li>`;

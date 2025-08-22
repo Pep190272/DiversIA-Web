@@ -2,12 +2,48 @@
   "companies": [
     {
       "id": 1,
-      "nombre_empresa": "Acelerai",
-      "email_contacto": "automatizatunegocio@acelerai.eu",
-      "telefono": "",
+      "nombre_empresa": "TechTest S.L.",
+      "email_contacto": "test@techtest.com",
+      "telefono": "123456789",
       "sector": "Tecnología",
       "ciudad": "Madrid",
-      "created_at": "2024-12-15T10:00:00"
+      "created_at": "2025-08-22T09:30:27.394707"
+    },
+    {
+      "id": 2,
+      "nombre_empresa": "InnovaTest",
+      "email_contacto": "info@innovatest.es",
+      "telefono": "987654321",
+      "sector": "Innovación",
+      "ciudad": "Barcelona",
+      "created_at": "2025-08-22T09:30:27.394710"
+    },
+    {
+      "id": 3,
+      "nombre_empresa": "Tech Innovators",
+      "email_contacto": "contacto@techinnovators.com",
+      "telefono": "612345678",
+      "sector": "Tecnología",
+      "ciudad": "Barcelona",
+      "created_at": "2025-08-22T09:30:50.542552"
+    },
+    {
+      "id": 4,
+      "nombre_empresa": "Green Solutions",
+      "email_contacto": "info@greensolutions.es",
+      "telefono": "987654321",
+      "sector": "Medio Ambiente",
+      "ciudad": "Valencia",
+      "created_at": "2025-08-22T09:30:50.542555"
+    },
+    {
+      "id": 5,
+      "nombre_empresa": "Digital Marketing Pro",
+      "email_contacto": "hello@digitalmarketing.com",
+      "telefono": "654987321",
+      "sector": "Marketing",
+      "ciudad": "Sevilla",
+      "created_at": "2025-08-22T09:30:50.542557"
     }
   ],
   "contacts": [],
