@@ -20,22 +20,7 @@ try:
 except Exception as e:
     print(f"⚠️ Error cargando CSV manager: {e}")
 
-@app.route('/')
-def index():
-    """Página principal de DiversIA - Web pública"""
-    return render_template('index.html')
-
-@app.route('/comunidad')  
-def comunidad():
-    return render_template('comunidad.html')
-
-@app.route('/test')
-def test():
-    return render_template('test.html')
-
-@app.route('/comenzar')
-def comenzar():
-    return render_template('comenzar.html')
+# Ruta principal movida a main.py
 
 @app.route('/personas-nd')
 def personas_nd():
@@ -125,7 +110,9 @@ def empresas():
         traceback.print_exc()
         return f"Error en /empresas: {e}", 500
 
-# Ruta comunidad movida a main.py para evitar conflictos
+@app.route('/comunidad')
+def comunidad():
+    return render_template('comunidad.html')
 
 @app.route('/contacto')
 def contacto():
@@ -343,7 +330,14 @@ def registro_dislexia():
     
     return render_template('registro-dislexia.html', form=form)
 
-# Rutas básicas adicionales - eliminadas duplicadas
+# Rutas básicas adicionales
+@app.route('/test')
+def test():
+    return render_template('test.html')
+
+@app.route('/comenzar')
+def comenzar():
+    return render_template('comenzar.html')
 
 @app.route('/sobre-nosotros')
 def sobre_nosotros():

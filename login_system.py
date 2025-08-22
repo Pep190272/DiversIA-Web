@@ -19,7 +19,7 @@ def diversia_admin_check():
     if username == 'DiversiaEternals' and password == 'diversia3ternal$2025':
         session['admin_ok'] = True
         session['admin_user'] = username
-        return redirect('/sistema-gestion')
+        return redirect('/crm-minimal')
     else:
         flash('Credenciales incorrectas', 'error')
         return redirect('/diversia-admin')

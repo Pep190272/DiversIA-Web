@@ -42,26 +42,6 @@ with app.app_context():
     try:
         import models
         db.create_all()
-        
-        # Migración para columnas NDA (SQLite compatible)
-        try:
-            from sqlalchemy import text
-            result = db.session.execute(text("PRAGMA table_info(email_marketing);")).fetchall()
-            columns = [row[1] for row in result]
-            
-            if 'estado_nda' not in columns:
-                db.session.execute(text("ALTER TABLE email_marketing ADD COLUMN estado_nda TEXT DEFAULT 'Sin contacto';"))
-                print("✅ Columna estado_nda agregada")
-                
-            if 'fecha_nda' not in columns:
-                db.session.execute(text("ALTER TABLE email_marketing ADD COLUMN fecha_nda TEXT;"))
-                print("✅ Columna fecha_nda agregada")
-                
-            db.session.commit()
-        except Exception as migration_error:
-            print(f"⚠️ Error en migración NDA: {migration_error}")
-            db.session.rollback()
-        
         print("✅ Database initialized successfully")
     except Exception as e:
         print(f"⚠️ Database error: {e}")

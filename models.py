@@ -200,10 +200,6 @@ class EmailMarketing(db.Model):
     tipo_respuesta = db.Column(db.String(100))  # interesado, no_interesado, info_solicitada
     seguimiento_programado = db.Column(db.DateTime)
     
-    # Campos para seguimiento de acuerdos NDA
-    estado_nda = db.Column(db.String(50), default='Sin contacto')  # Sin contacto, Interesado, Reunión programada, NDA firmado, NDA pendiente
-    fecha_nda = db.Column(db.String(50))  # Fecha del NDA o reunión
-    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -254,20 +250,19 @@ class Employee(db.Model):
     __tablename__ = 'employees'
     
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(150), nullable=False)  # Cambiar de name a nombre
+    name = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     rol = db.Column(db.String(100), nullable=False)  # Developer, Designer, Marketing, Manager, etc.
-    departamento = db.Column(db.String(100), nullable=True)  # Cambiar de department a departamento
-    telefono = db.Column(db.String(20), nullable=True)
-    salario = db.Column(db.String(50), nullable=True)
-    fecha_contratacion = db.Column(db.String(20), nullable=True)
-    notas = db.Column(db.Text, nullable=True)
+    department = db.Column(db.String(100), nullable=True)
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     
     def __repr__(self):
-        return f'<Employee {self.nombre}>'
+        return f'<Employee {self.name}>'
+    
+    def __repr__(self):
+        return f'<Employee {self.name}>'
 
 class Asociacion(db.Model):
     __tablename__ = 'asociaciones'
