@@ -89,7 +89,7 @@ def import_email_marketing_csv():
                 existing.direccion = row.get('Dirección', '')
                 existing.servicios = servicios
                 existing.fecha_enviado = row.get('ENVIADOS', '')
-                existing.respuesta = row.get('RESPUESTA', '')  # Nueva columna
+                # existing.respuesta = row.get('RESPUESTA', '')  # Comentado temporalmente
                 existing.notas_especiales = notas_especiales
                 existing.updated_at = datetime.now()
                 updated_count += 1
@@ -103,7 +103,7 @@ def import_email_marketing_csv():
                     direccion = row.get('Dirección', ''),
                     servicios = servicios,
                     fecha_enviado = row.get('ENVIADOS', ''),
-                    respuesta = row.get('RESPUESTA', ''),  # Nueva columna
+                    # respuesta = row.get('RESPUESTA', ''),  # Comentado temporalmente
                     notas_especiales = notas_especiales
                 )
                 db.session.add(new_contact)
@@ -166,7 +166,7 @@ def export_email_marketing_csv():
             contact.direccion or '',
             contact.servicios or '',
             contact.fecha_enviado or '',
-            contact.respuesta or ''
+            contact.notas_especiales or ''
         ])
     
     output.seek(0)
@@ -251,10 +251,10 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if asociacion.respuesta %}
-                                                <span class="badge bg-info" title="{{ asociacion.respuesta }}">{{ asociacion.respuesta[:30] }}{% if asociacion.respuesta|length > 30 %}...{% endif %}</span>
+                                            {% if asociacion.notas_especiales %}
+                                                <span class="badge bg-info" title="{{ asociacion.notas_especiales }}">{{ asociacion.notas_especiales[:30] }}{% if asociacion.notas_especiales|length > 30 %}...{% endif %}</span>
                                             {% else %}
-                                                <span class="badge bg-secondary">Sin respuesta</span>
+                                                <span class="badge bg-secondary">Sin notas</span>
                                             {% endif %}
                                         </td>
                                         <td>
