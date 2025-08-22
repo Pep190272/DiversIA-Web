@@ -38,19 +38,10 @@
       "id": 1,
       "nombre_empresa": "Acelerai",
       "email_contacto": "automatizatunegocio@acelerai.eu",
-      "telefono": "687408629",
-      "sector": "tecnologia",
-      "ciudad": "La torre de Claramunt",
-      "created_at": "2025-08-21T18:17:09.568862"
-    },
-    {
-      "id": 2,
-      "nombre_empresa": "TestImport S.L.",
-      "email_contacto": "test@testimport.com",
-      "telefono": "123456789",
-      "sector": "Tecnología",
-      "ciudad": "Madrid",
-      "created_at": "2025-08-22T08:25:52.819903"
+      "telefono": "",
+      "sector": "General",
+      "ciudad": "",
+      "created_at": null
     }
   ],
   "employees": [
