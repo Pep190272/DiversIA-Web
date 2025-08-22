@@ -802,11 +802,8 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
             }
         }
 
-        // Sistema de búsqueda
-        let allRows = [];
-        
+        // Sistema de búsqueda mejorado para fichas editables
         function initializeSearch() {
-            allRows = Array.from(document.querySelectorAll('tbody tr'));
             const searchInput = document.getElementById('searchInput');
             
             searchInput.addEventListener('input', function() {
@@ -822,61 +819,125 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
         
         function performSearch(searchTerm) {
             const term = searchTerm.toLowerCase().trim();
+            const rows = document.querySelectorAll('.association-row');
             let visibleCount = 0;
             
-            allRows.forEach(row => {
-                const comunidad = row.cells[1].textContent.toLowerCase();
-                const asociacion = row.cells[2].textContent.toLowerCase();
-                const email = row.cells[3].textContent.toLowerCase();
-                
-                const matches = comunidad.includes(term) || 
-                              asociacion.includes(term) || 
-                              email.includes(term);
-                
-                if (matches || term === '') {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
+            rows.forEach(row => {
+                try {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 4) {
+                        const comunidad = cells[1].textContent.toLowerCase();
+                        const asociacion = cells[2].textContent.toLowerCase();
+                        const email = cells[3].textContent.toLowerCase();
+                        
+                        const matches = comunidad.includes(term) || 
+                                      asociacion.includes(term) || 
+                                      email.includes(term) ||
+                                      term === '';
+                        
+                        if (matches) {
+                            row.style.display = '';
+                            // Mantener la ficha de edición disponible pero cerrada
+                            const editRow = document.getElementById(`editCard-${row.dataset.id}`);
+                            if (editRow) {
+                                editRow.style.display = '';
+                                if (!editRow.classList.contains('d-none')) {
+                                    // Si estaba abierta, mantenerla abierta
+                                } else {
+                                    editRow.classList.add('d-none');
+                                }
+                            }
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                            // Ocultar y cerrar la ficha de edición
+                            const editRow = document.getElementById(`editCard-${row.dataset.id}`);
+                            if (editRow) {
+                                editRow.style.display = 'none';
+                                editRow.classList.add('d-none');
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Error processing row during search:', error);
                 }
             });
             
-            document.getElementById('visibleCount').textContent = visibleCount;
-            document.getElementById('clearIcon').textContent = term ? '✗' : '🔍';
+            const visibleCountElement = document.getElementById('visibleCount');
+            if (visibleCountElement) {
+                visibleCountElement.textContent = visibleCount;
+            }
+            
+            const clearIcon = document.getElementById('clearIcon');
+            if (clearIcon) {
+                clearIcon.textContent = term ? '❌' : '🔍';
+            }
         }
         
         function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            performSearch('');
-            document.getElementById('searchInput').focus();
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = '';
+                performSearch('');
+                searchInput.focus();
+            }
         }
 
-        // Sistema de edición inline
-        document.addEventListener('DOMContentLoaded', function() {
-            let currentlyEditing = null;
+        // Sistema de fichas editables
+        function toggleEditCard(id) {
+            const editCard = document.getElementById(`editCard-${id}`);
+            if (editCard.classList.contains('d-none')) {
+                // Cerrar otras fichas abiertas
+                document.querySelectorAll('.edit-card-row').forEach(row => {
+                    row.classList.add('d-none');
+                });
+                // Abrir la ficha seleccionada
+                editCard.classList.remove('d-none');
+            } else {
+                editCard.classList.add('d-none');
+            }
+        }
+        
+        function cancelEdit(id) {
+            document.getElementById(`editCard-${id}`).classList.add('d-none');
+        }
+        
+        function saveAssociation(id) {
+            const form = document.getElementById(`editForm-${id}`);
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
             
+            fetch(`/email-marketing/update/${id}?admin=true`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Asociación actualizada correctamente');
+                    location.reload();
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Error de conexión: ' + error);
+            });
+        }
+
+        // Inicialización al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
             // Inicializar búsqueda
             initializeSearch();
-
-            // Hacer todos los campos editables
-            document.querySelectorAll('.editable-field').forEach(field => {
-                field.addEventListener('click', function() {
-                    if (currentlyEditing && currentlyEditing !== this) {
-                        cancelEdit(currentlyEditing);
-                    }
-                    startEdit(this);
-                });
-            });
-
-            function startEdit(element) {
-                if (currentlyEditing === element) return;
-
-                currentlyEditing = element;
-                const originalValue = element.textContent.trim();
-                const field = element.getAttribute('data-field');
-                const contactId = element.getAttribute('data-id');
-                
-                element.classList.add('editing');
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
                 
                 // Crear input apropiado según el campo
                 let inputElement;
