@@ -1,8 +1,8 @@
 from app import app
 
-# Routes principales
-@app.route('/')
-def index():
+# Sistema de gestión empresarial
+@app.route('/sistema-gestion')
+def sistema_gestion():
     return """
     <html>
     <head>
@@ -60,6 +60,8 @@ def index():
                             <small class="text-muted">
                                 Sistema completamente funcional • Presentación lista • Datos reales integrados
                             </small>
+                            <br><br>
+                            <a href="/" class="btn btn-outline-primary">← Volver a DiversIA Web</a>
                         </div>
                     </div>
                 </div>
@@ -68,6 +70,9 @@ def index():
     </body>
     </html>
     """
+
+# Importar Flask para renderizado
+from flask import render_template
 
 # Importar rutas simplificadas
 import routes_simple  # noqa: F401
