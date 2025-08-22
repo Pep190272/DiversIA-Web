@@ -3,8 +3,8 @@ from app import app
 # Importar rutas simplificadas
 import routes_simple  # noqa: F401
 
-# Importar admin simple que SÍ FUNCIONA
-import admin_simple  # noqa: F401
+# Sistema de login que FUNCIONA
+import login_system  # noqa: F401
 
 # CRM Minimal - Sistema principal
 try:
