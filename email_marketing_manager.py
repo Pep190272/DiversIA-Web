@@ -487,86 +487,107 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                     </div>
                 </div>
                 
-                <!-- Tabla de asociaciones -->
-                <div class="card">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover mb-0">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Comunidad <small>(click para editar)</small></th>
-                                        <th>Asociación <small>(click para editar)</small></th>
-                                        <th>Email <small>(click para editar)</small></th>
-                                        <th>Teléfono <small>(click para editar)</small></th>
-                                        <th>Servicios <small>(click para editar)</small></th>
-                                        <th>Enviado <small>(click para editar)</small></th>
-                                        <th>Respuesta <small>(click para editar)</small></th>
-                                        <th>Notas <small>(click para editar)</small></th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for asociacion in asociaciones %}
-                                    <tr>
-                                        <td>{{ asociacion.id }}</td>
-                                        <td>
-                                            <span class="editable-field" 
-                                                  data-field="comunidad_autonoma" 
-                                                  data-id="{{ asociacion.id }}"
-                                                  title="Click para editar">{{ asociacion.comunidad_autonoma }}</span>
-                                        </td>
-                                        <td>
-                                            <strong class="editable-field" 
-                                                    data-field="asociacion" 
-                                                    data-id="{{ asociacion.id }}"
-                                                    title="Click para editar">{{ asociacion.asociacion }}</strong>
-                                        </td>
-                                        <td>
-                                            <span class="editable-field" 
-                                                  data-field="email" 
-                                                  data-id="{{ asociacion.id }}"
-                                                  title="Click para editar">{{ asociacion.email }}</span>
-                                        </td>
-                                        <td>
-                                            <span class="editable-field" 
-                                                  data-field="telefono" 
-                                                  data-id="{{ asociacion.id }}"
-                                                  title="Click para editar">{{ asociacion.telefono or '-' }}</span>
-                                        </td>
-                                        <td>
-                                            <span class="editable-field" 
-                                                  data-field="servicios" 
-                                                  data-id="{{ asociacion.id }}"
-                                                  title="Click para editar">{{ (asociacion.servicios or '')[:50] }}{% if asociacion.servicios and asociacion.servicios|length > 50 %}...{% endif %}</span>
-                                        </td>
-                                        <td>
-                                            <span class="editable-field" 
-                                                  data-field="fecha_enviado" 
-                                                  data-id="{{ asociacion.id }}"
-                                                  title="Click para editar">{{ asociacion.fecha_enviado or 'Pendiente' }}</span>
-                                        </td>
-                                        <td>
-                                            <span class="editable-field" 
-                                                  data-field="respuesta" 
-                                                  data-id="{{ asociacion.id }}"
-                                                  title="Click para editar">{{ asociacion.respuesta or 'Sin respuesta' }}</span>
-                                        </td>
-                                        <td>
-                                            <span class="editable-field" 
-                                                  data-field="notas_personalizadas" 
-                                                  data-id="{{ asociacion.id }}"
-                                                  title="Click para añadir notas">{{ asociacion.notas_personalizadas or '-' }}</span>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-danger" onclick="deleteAssociation({{ asociacion.id }})">Eliminar</button>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                <!-- Sistema de Fichas de Asociaciones -->
+                <div class="row" id="associationsCards">
+                    {% for asociacion in asociaciones %}
+                    <div class="col-lg-6 col-xl-4 mb-4" data-id="{{ asociacion.id }}" data-comunidad="{{ asociacion.comunidad_autonoma|lower }}" data-asociacion="{{ asociacion.asociacion|lower }}">
+                        <div class="card h-100 border-start border-primary border-4">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <small class="text-muted">#{{ asociacion.id }} | {{ asociacion.comunidad_autonoma }}</small>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Acciones
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="editAssociation({{ asociacion.id }})">✏️ Editar</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="duplicateAssociation({{ asociacion.id }})">📋 Duplicar</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteAssociation({{ asociacion.id }})">🗑️ Eliminar</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">{{ asociacion.asociacion }}</h5>
+                                
+                                <div class="mb-3">
+                                    <strong>📧 Email:</strong><br>
+                                    <a href="mailto:{{ asociacion.email }}" class="text-decoration-none">{{ asociacion.email }}</a>
+                                </div>
+                                
+                                {% if asociacion.telefono %}
+                                <div class="mb-3">
+                                    <strong>📞 Teléfono:</strong><br>
+                                    <a href="tel:{{ asociacion.telefono }}" class="text-decoration-none">{{ asociacion.telefono }}</a>
+                                </div>
+                                {% endif %}
+                                
+                                {% if asociacion.direccion %}
+                                <div class="mb-3">
+                                    <strong>📍 Dirección:</strong><br>
+                                    <small class="text-muted">{{ asociacion.direccion }}</small>
+                                </div>
+                                {% endif %}
+                                
+                                {% if asociacion.servicios %}
+                                <div class="mb-3">
+                                    <strong>🎯 Servicios:</strong><br>
+                                    <small class="text-muted">{{ asociacion.servicios[:100] }}{% if asociacion.servicios|length > 100 %}...{% endif %}</small>
+                                </div>
+                                {% endif %}
+                                
+                                <hr>
+                                
+                                <!-- Estado de Email Marketing -->
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <strong>📤 Enviado</strong><br>
+                                            {% if asociacion.fecha_enviado %}
+                                                <span class="badge bg-success">{{ asociacion.fecha_enviado }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">No enviado</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <strong>💬 Respuesta</strong><br>
+                                            {% if asociacion.respuesta %}
+                                                <span class="badge bg-info">Respondido</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Sin respuesta</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {% if asociacion.respuesta %}
+                                <div class="mt-3">
+                                    <strong>💬 Respuesta recibida:</strong><br>
+                                    <div class="bg-light p-2 rounded">
+                                        <small>{{ asociacion.respuesta }}</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                {% if asociacion.notas_personalizadas %}
+                                <div class="mt-3">
+                                    <strong>📝 Notas:</strong><br>
+                                    <div class="bg-warning bg-opacity-10 p-2 rounded">
+                                        <small>{{ asociacion.notas_personalizadas }}</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editAssociation({{ asociacion.id }})">Editar</button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAssociation({{ asociacion.id }})">Eliminar</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
