@@ -5,7 +5,7 @@ Routes simplificado - Solo funcionalidades esenciales
 
 from flask import render_template, request, flash, redirect, url_for, jsonify
 from app import app, db
-from models import User, Company, Admin, JobOffer, Asociacion
+from models import User, Company, Admin, JobOffer
 from forms import (RegistroGeneralForm, RegistroTDAHForm, RegistroDislexiaForm, RegistroTEAForm, 
                   RegistroDiscalculiaForm, RegistroTouretteForm, RegistroDispraxiaForm, 
                   RegistroAnsiedadForm, RegistroBipolarForm, RegistroAltasCapacidadesForm,

@@ -116,6 +116,18 @@ def import_email_marketing_csv():
     
     return redirect('/email-marketing?admin=true')
 
+@app.route('/email-marketing/delete/<int:contact_id>', methods=['DELETE'])
+def delete_email_marketing_contact():
+    """Eliminar contacto de email marketing"""
+    try:
+        contact = EmailMarketing.query.get_or_404(contact_id)
+        db.session.delete(contact)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Contacto eliminado correctamente'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/email-marketing/export')
 def export_email_marketing_csv():
     """Exportar datos de email marketing"""
@@ -209,6 +221,7 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                         <th>Enviado</th>
                                         <th>Estado</th>
                                         <th>Notas</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -243,6 +256,9 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                                 <span class="text-warning" title="{{ asociacion.notas_especiales }}">⚠️</span>
                                             {% endif %}
                                         </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteAssociation({{ asociacion.id }})">Eliminar</button>
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -253,6 +269,27 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
             </div>
         </div>
     </div>
+    
+    <script>
+        function deleteAssociation(id) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta asociación?')) {
+                fetch(`/email-marketing/delete/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error al eliminar: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('Error de conexión: ' + error);
+                });
+            }
+        }
+    </script>
 </body>
 </html>
 '''
