@@ -17,7 +17,9 @@ System reliability: Critical requirement - zero tolerance for 500 errors on main
 - **Triple backup system**: SQLite → CRM persistent → File backup ensures zero data loss
 - **Email notifications**: Automatic emails sent to diversiaeternals@gmail.com for all form submissions
 - **CRM Dashboard**: Fully operational with specialized neurodivergent management system
-- **CSV Management**: Full import/export capabilities for all data types
+- **CSV Management**: Full import/export capabilities for all data types - UPDATED 2025-08-22
+- **CSV Import System**: Complete API `/api/import-csv` for companies and contacts with validation
+- **Data Integrity**: CRM cleaned to contain only real company data (Acelerai)
 - **Comprehensive ND CRM**: Individual panels for TDAH, TEA, Dislexia, Discalculia, and other neurodivergences
 
 ## System Architecture
