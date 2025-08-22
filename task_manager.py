@@ -288,20 +288,20 @@ def manage_employees():
         data = request.get_json()
         try:
             new_employee = Employee(
-                name=data.get('name', '').strip(),
+                nombre=data.get('name', '').strip(),
                 email=data.get('email', '').strip(),
                 rol=data.get('rol', '').strip(),
-                department=data.get('department', '').strip()
+                departamento=data.get('department', '').strip()
             )
             db.session.add(new_employee)
             db.session.commit()
             
             # Enviar notificaciones por email
             employee_data = {
-                'name': new_employee.name,
+                'name': new_employee.nombre,
                 'email': new_employee.email,
                 'rol': new_employee.rol,
-                'department': new_employee.department
+                'department': new_employee.departamento
             }
             
             email_sent = send_employee_notification(employee_data)
@@ -318,10 +318,10 @@ def manage_employees():
     employees = Employee.query.filter_by(active=True).all()
     return jsonify([{
         'id': emp.id,
-        'name': emp.name,
+        'name': emp.nombre,
         'email': emp.email,
         'rol': emp.rol,
-        'department': emp.department
+        'department': emp.departamento
     } for emp in employees])
 
 @app.route('/employees/<int:employee_id>', methods=['DELETE'])
@@ -428,7 +428,6 @@ TASKS_TABLE_TEMPLATE = '''
                     </div>
                     <div class="col-md-4 text-end">
                         <button class="btn btn-success me-2" onclick="showAddTaskForm()">➕ Añadir Tarea</button>
-                        <button class="btn btn-primary me-2" onclick="showAddEmployeeForm()">👤 Añadir Colaborador</button>
                         <a href="/tasks/export" class="btn btn-warning me-2">Exportar CSV</a>
                         <button onclick="deleteAllTasks()" class="btn btn-danger">🗑️ Eliminar Todo</button>
                     </div>
@@ -464,7 +463,7 @@ TASKS_TABLE_TEMPLATE = '''
                                         <select class="form-control" id="taskColaborador">
                                             <option value="">Sin asignar</option>
                                             {% for emp in employees %}
-                                            <option value="{{ emp.name }}">{{ emp.name }} ({{ emp.rol }})</option>
+                                            <option value="{{ emp.nombre }}">{{ emp.nombre }} ({{ emp.rol }})</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -507,54 +506,7 @@ TASKS_TABLE_TEMPLATE = '''
                     </div>
                 </div>
                 
-                <!-- Formulario añadir empleado -->
-                <div id="addEmployeeForm" class="card mb-4" style="display: none;">
-                    <div class="card-header">
-                        <h5>Añadir Nuevo Colaborador</h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="employeeForm">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Nombre Completo *</label>
-                                        <input type="text" class="form-control" id="empName" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Email *</label>
-                                        <input type="email" class="form-control" id="empEmail" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Rol *</label>
-                                        <select class="form-control" id="empRol" required>
-                                            <option value="">Seleccionar rol...</option>
-                                            <option value="Developer">Developer</option>
-                                            <option value="Designer">Designer</option>
-                                            <option value="Marketing">Marketing</option>
-                                            <option value="Manager">Manager</option>
-                                            <option value="Analyst">Analyst</option>
-                                            <option value="Support">Support</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Departamento</label>
-                                        <input type="text" class="form-control" id="empDepartment">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-success">Añadir Colaborador</button>
-                                <button type="button" class="btn btn-secondary" onclick="hideAddEmployeeForm()">Cancelar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+
                 
                 <!-- Tabla de tareas -->
                 <div class="card">
@@ -650,53 +602,9 @@ TASKS_TABLE_TEMPLATE = '''
             document.getElementById('taskForm').reset();
         }
         
-        function showAddEmployeeForm() {
-            document.getElementById('addEmployeeForm').style.display = 'block';
-            document.getElementById('empName').focus();
-        }
+
         
-        function hideAddEmployeeForm() {
-            document.getElementById('addEmployeeForm').style.display = 'none';
-            document.getElementById('employeeForm').reset();
-        }
-        
-        // Gestión de empleados
-        document.getElementById('employeeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                name: document.getElementById('empName').value.trim(),
-                email: document.getElementById('empEmail').value.trim(),
-                rol: document.getElementById('empRol').value.trim(),
-                department: document.getElementById('empDepartment').value.trim()
-            };
-            
-            if (!formData.name || !formData.email || !formData.rol) {
-                alert('Por favor, completa todos los campos obligatorios');
-                return;
-            }
-            
-            fetch('/employees', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('✅ Colaborador añadido correctamente');
-                    hideAddEmployeeForm();
-                    loadEmployeeOptions(); // Actualizar opciones
-                } else {
-                    alert('❌ Error: ' + data.error);
-                }
-            })
-            .catch(error => {
-                alert('❌ Error de conexión: ' + error);
-            });
-        });
+
         
         // Gestión de tareas manuales
         document.getElementById('taskForm').addEventListener('submit', function(e) {
