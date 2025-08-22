@@ -1365,9 +1365,23 @@ def clear_all_companies():
         Company.query.delete()
         db.session.commit()
         
+        # Limpiar también el archivo CRM persistente
+        import json
+        crm_data = {
+            'companies': [],
+            'contacts': [],
+            'job_offers': [],
+            'employees': [],
+            'tasks': [],
+            'associations': []
+        }
+        
+        with open('crm_persistent_data.json', 'w', encoding='utf-8') as f:
+            json.dump(crm_data, f, ensure_ascii=False, indent=2)
+        
         return jsonify({
             'success': True, 
-            'message': f'{count} empresas eliminadas correctamente'
+            'message': f'{count} empresas eliminadas completamente (BD + CRM)'
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
