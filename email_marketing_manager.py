@@ -117,7 +117,7 @@ def import_email_marketing_csv():
     return redirect('/email-marketing?admin=true')
 
 @app.route('/email-marketing/delete/<int:contact_id>', methods=['DELETE'])
-def delete_email_marketing_contact():
+def delete_email_marketing_contact(contact_id):
     """Eliminar contacto de email marketing"""
     try:
         contact = EmailMarketing.query.get_or_404(contact_id)
