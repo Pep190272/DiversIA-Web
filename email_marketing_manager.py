@@ -27,26 +27,38 @@ def email_marketing_dashboard():
 
 @app.route('/email-marketing-funnel')
 def email_marketing_funnel():
-    """Dashboard en formato embudo"""
+    """Dashboard en formato embudo con métricas reales"""
     # Verificar autenticación admin
     if 'admin_ok' not in session or not session.get('admin_ok'):
         return redirect('/diversia-admin')
     
-    # Estadísticas para embudo
+    # Estadísticas reales basadas en datos
     total = EmailMarketing.query.count()
-    enviados = EmailMarketing.query.filter(EmailMarketing.fecha_enviado.isnot(None)).count()
-    respondidos = EmailMarketing.query.filter(EmailMarketing.tipo_respuesta.isnot(None)).count()
-    interesados = EmailMarketing.query.filter(EmailMarketing.tipo_respuesta == 'interesado').count()
+    enviados = EmailMarketing.query.filter(EmailMarketing.fecha_enviado != '').filter(EmailMarketing.fecha_enviado.isnot(None)).count()
+    con_respuesta = EmailMarketing.query.filter(EmailMarketing.respuesta != '').filter(EmailMarketing.respuesta.isnot(None)).count()
     
-    # Stats por comunidad
+    # Calcular tipos de respuesta por palabras clave
+    vacaciones = EmailMarketing.query.filter(EmailMarketing.respuesta.contains('VACACIONES')).count()
+    reuniones = EmailMarketing.query.filter(EmailMarketing.respuesta.contains('reunion')).count()
+    contacto_nuevo = EmailMarketing.query.filter(EmailMarketing.respuesta.contains('CORREO NUEVO')).count()
+    
+    # Stats por comunidad autónoma
     stats_comunidad = db.session.query(
         EmailMarketing.comunidad_autonoma,
-        db.func.count(EmailMarketing.id).label('total')
-    ).group_by(EmailMarketing.comunidad_autonoma).order_by(db.func.count(EmailMarketing.id).desc()).all()
+        db.func.count(EmailMarketing.id).label('total'),
+        db.func.sum(db.case([(EmailMarketing.respuesta != '', 1)], else_=0)).label('con_respuesta')
+    ).group_by(EmailMarketing.comunidad_autonoma).order_by(db.func.count(EmailMarketing.id).desc()).limit(10).all()
     
-    return render_template_string(EMAIL_MARKETING_FUNNEL_TEMPLATE,
-                                total=total, enviados=enviados, respondidos=respondidos,
-                                interesados=interesados, stats_comunidad=stats_comunidad)
+    # Top 5 respuestas más comunes
+    respuestas_comunes = db.session.query(
+        EmailMarketing.respuesta,
+        db.func.count(EmailMarketing.id).label('count')
+    ).filter(EmailMarketing.respuesta != '').filter(EmailMarketing.respuesta.isnot(None)).group_by(EmailMarketing.respuesta).order_by(db.func.count(EmailMarketing.id).desc()).limit(5).all()
+    
+    return render_template_string(EMAIL_MARKETING_DASHBOARD_INTERACTIVE,
+                                total=total, enviados=enviados, con_respuesta=con_respuesta,
+                                vacaciones=vacaciones, reuniones=reuniones, contacto_nuevo=contacto_nuevo,
+                                stats_comunidad=stats_comunidad, respuestas_comunes=respuestas_comunes)
 
 @app.route('/email-marketing/import', methods=['POST'])
 def import_email_marketing_csv():
@@ -607,5 +619,222 @@ EMAIL_MARKETING_SIMPLE_TEMPLATE = '''
 </body>
 </html>
 '''
+
+# Template de Dashboard Interactivo
+EMAIL_MARKETING_DASHBOARD_INTERACTIVE = """
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Marketing - Dashboard Interactivo - DiversIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .metric-card { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+        }
+        .chart-container { height: 300px; }
+        .progress-custom { height: 25px; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>📊 Dashboard Email Marketing - DiversIA</h1>
+            <a href="/email-marketing" class="btn btn-outline-primary">← Ver Tabla</a>
+        </div>
+        
+        <!-- Métricas principales -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <h3>{{ total }}</h3>
+                        <p class="mb-0">Total Asociaciones</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <h3>{{ enviados }}</h3>
+                        <p class="mb-0">Emails Enviados</p>
+                        <small>{% if total > 0 %}{{ (enviados / total * 100)|round(1) }}%{% else %}0%{% endif %}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <h3>{{ con_respuesta }}</h3>
+                        <p class="mb-0">Con Respuesta</p>
+                        <small>{% if enviados > 0 %}{{ (con_respuesta / enviados * 100)|round(1) }}%{% else %}0%{% endif %}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <h3>{{ reuniones }}</h3>
+                        <p class="mb-0">Solicitan Reunión</p>
+                        <small>{% if con_respuesta > 0 %}{{ (reuniones / con_respuesta * 100)|round(1) }}%{% else %}0%{% endif %}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráficos -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>📈 Distribución por Comunidad Autónoma</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="comunidadChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>🎯 Estado de Respuestas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="respuestasChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabla de respuestas comunes -->
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>💬 Respuestas Más Comunes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Respuesta</th>
+                                        <th>Frecuencia</th>
+                                        <th>%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for respuesta, count in respuestas_comunes %}
+                                    <tr>
+                                        <td>{{ respuesta[:50] }}{% if respuesta|length > 50 %}...{% endif %}</td>
+                                        <td><span class="badge bg-primary">{{ count }}</span></td>
+                                        <td>{% if con_respuesta > 0 %}{{ (count / con_respuesta * 100)|round(1) }}%{% else %}0%{% endif %}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>📊 Resumen de Categorías</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>🏖️ De Vacaciones</span>
+                                <span class="badge bg-warning">{{ vacaciones }}</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>🤝 Solicitan Reunión</span>
+                                <span class="badge bg-success">{{ reuniones }}</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>✉️ Nuevo Contacto</span>
+                                <span class="badge bg-info">{{ contacto_nuevo }}</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>📧 Sin Respuesta</span>
+                                <span class="badge bg-secondary">{{ enviados - con_respuesta }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gráfico de Comunidades
+        const comunidadCtx = document.getElementById('comunidadChart').getContext('2d');
+        const comunidadChart = new Chart(comunidadCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [{% for comunidad, total, con_resp in stats_comunidad %}'{{ comunidad }}'{% if not loop.last %},{% endif %}{% endfor %}],
+                datasets: [{
+                    data: [{% for comunidad, total, con_resp in stats_comunidad %}{{ total }}{% if not loop.last %},{% endif %}{% endfor %}],
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                        '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Estado de Respuestas
+        const respuestasCtx = document.getElementById('respuestasChart').getContext('2d');
+        const respuestasChart = new Chart(respuestasCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Enviados', 'Con Respuesta', 'Vacaciones', 'Reuniones'],
+                datasets: [{
+                    label: 'Cantidad',
+                    data: [{{ enviados }}, {{ con_respuesta }}, {{ vacaciones }}, {{ reuniones }}],
+                    backgroundColor: ['#36A2EB', '#4BC0C0', '#FFCE56', '#FF6384']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+"""
 
 print("✅ Email Marketing Manager cargado")
