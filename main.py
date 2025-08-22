@@ -3,6 +3,9 @@ from app import app
 # Importar rutas simplificadas
 import routes_simple  # noqa: F401
 
+# Importar admin simple que SÍ FUNCIONA
+import admin_simple  # noqa: F401
+
 # CRM Minimal - Sistema principal
 try:
     from crm_minimal import create_minimal_crm_routes
