@@ -439,8 +439,8 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                     </div>
                     <div class="col-md-4 text-end">
                         <small class="text-muted">
+                            <span class="badge bg-warning text-dark">Amarillo: Con notas (prioridad)</span>
                             <span class="badge bg-success">Verde: Con respuesta</span>
-                            <span class="badge bg-warning text-dark">Amarillo: Con notas</span>
                         </small>
                     </div>
                 </div>
@@ -541,7 +541,7 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                 </thead>
                                 <tbody>
                                     {% for asociacion in asociaciones %}
-                                    <tr class="association-row {% if asociacion.respuesta %}table-success{% elif asociacion.notas_personalizadas %}table-warning{% endif %}" data-id="{{ asociacion.id }}">
+                                    <tr class="association-row {% if asociacion.notas_personalizadas %}table-warning{% elif asociacion.respuesta %}table-success{% endif %}" data-id="{{ asociacion.id }}">
                                         <td>{{ asociacion.id }}</td>
                                         <td>{{ asociacion.comunidad_autonoma }}</td>
                                         <td><strong>{{ asociacion.asociacion }}</strong></td>
@@ -566,8 +566,8 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                     <!-- Ficha de edición expandible -->
                                     <tr id="editCard-{{ asociacion.id }}" class="edit-card-row d-none">
                                         <td colspan="6">
-                                            <div class="card {% if asociacion.respuesta %}border-success{% elif asociacion.notas_personalizadas %}border-warning{% else %}border-primary{% endif %}">
-                                                <div class="card-header {% if asociacion.respuesta %}bg-success{% elif asociacion.notas_personalizadas %}bg-warning{% else %}bg-primary{% endif %} text-white d-flex justify-content-between align-items-center">
+                                            <div class="card {% if asociacion.notas_personalizadas %}border-warning{% elif asociacion.respuesta %}border-success{% else %}border-primary{% endif %}">
+                                                <div class="card-header {% if asociacion.notas_personalizadas %}bg-warning{% elif asociacion.respuesta %}bg-success{% else %}bg-primary{% endif %} text-white d-flex justify-content-between align-items-center">
                                                     <div>
                                                         <strong>Editar Asociación #{{ asociacion.id }}</strong>
                                                         {% if asociacion.fecha_enviado %}
