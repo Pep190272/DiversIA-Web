@@ -1058,3 +1058,192 @@ def api_associations():
     except Exception as e:
         print(f"Error en API associations: {e}")
         return jsonify([])  # Devolver lista vacía si hay error
+
+# API para importar CSV
+@app.route('/api/import-csv', methods=['POST'])
+def api_import_csv():
+    """API para importar datos desde CSV al CRM"""
+    try:
+        if 'csv_file' not in request.files:
+            return jsonify({'success': False, 'message': 'No se encontró archivo CSV'})
+        
+        file = request.files['csv_file']
+        import_type = request.form.get('import_type')
+        update_existing = request.form.get('update_existing') == 'true'
+        
+        if file.filename == '':
+            return jsonify({'success': False, 'message': 'No se seleccionó archivo'})
+        
+        if not file.filename.lower().endswith('.csv'):
+            return jsonify({'success': False, 'message': 'El archivo debe ser CSV'})
+        
+        # Leer CSV
+        import csv
+        import io
+        
+        # Leer contenido del archivo
+        file_content = file.read().decode('utf-8')
+        csv_reader = csv.DictReader(io.StringIO(file_content))
+        
+        processed = 0
+        created = 0
+        updated = 0
+        errors = 0
+        
+        # Procesar según tipo de importación
+        if import_type == 'companies':
+            for row in csv_reader:
+                try:
+                    # Verificar campos requeridos
+                    required_fields = ['nombre_empresa', 'email_contacto']
+                    if not all(field in row and row[field].strip() for field in required_fields):
+                        errors += 1
+                        continue
+                    
+                    # Buscar empresa existente si se debe actualizar
+                    existing_company = None
+                    if update_existing:
+                        existing_company = Company.query.filter_by(email_contacto=row['email_contacto']).first()
+                    
+                    if existing_company:
+                        # Actualizar empresa existente
+                        existing_company.nombre_empresa = row.get('nombre_empresa', existing_company.nombre_empresa)
+                        existing_company.telefono = row.get('telefono', existing_company.telefono)
+                        existing_company.sector = row.get('sector', existing_company.sector)
+                        existing_company.ciudad = row.get('ciudad', existing_company.ciudad)
+                        existing_company.pais = row.get('pais', existing_company.pais)
+                        updated += 1
+                    else:
+                        # Crear nueva empresa
+                        new_company = Company(
+                            nombre_empresa=row['nombre_empresa'],
+                            email_contacto=row['email_contacto'],
+                            telefono=row.get('telefono', ''),
+                            sector=row.get('sector', ''),
+                            ciudad=row.get('ciudad', ''),
+                            pais=row.get('pais', 'ES')
+                        )
+                        db.session.add(new_company)
+                        created += 1
+                    
+                    processed += 1
+                    
+                except Exception as e:
+                    print(f"Error procesando fila de empresa: {e}")
+                    errors += 1
+        
+        elif import_type == 'contacts':
+            for row in csv_reader:
+                try:
+                    # Verificar campos requeridos
+                    required_fields = ['nombre', 'email']
+                    if not all(field in row and row[field].strip() for field in required_fields):
+                        errors += 1
+                        continue
+                    
+                    # Buscar usuario existente si se debe actualizar
+                    existing_user = None
+                    if update_existing:
+                        existing_user = User.query.filter_by(email=row['email']).first()
+                    
+                    if existing_user:
+                        # Actualizar usuario existente
+                        existing_user.nombre = row.get('nombre', existing_user.nombre)
+                        existing_user.apellidos = row.get('apellidos', existing_user.apellidos)
+                        existing_user.telefono = row.get('telefono', existing_user.telefono)
+                        existing_user.ciudad = row.get('ciudad', existing_user.ciudad)
+                        existing_user.tipo_neurodivergencia = row.get('tipo_neurodivergencia', existing_user.tipo_neurodivergencia)
+                        updated += 1
+                    else:
+                        # Crear nuevo usuario
+                        new_user = User(
+                            nombre=row['nombre'],
+                            apellidos=row.get('apellidos', ''),
+                            email=row['email'],
+                            telefono=row.get('telefono', ''),
+                            ciudad=row.get('ciudad', ''),
+                            tipo_neurodivergencia=row.get('tipo_neurodivergencia', 'otro')
+                        )
+                        db.session.add(new_user)
+                        created += 1
+                    
+                    processed += 1
+                    
+                except Exception as e:
+                    print(f"Error procesando fila de contacto: {e}")
+                    errors += 1
+        
+        else:
+            return jsonify({'success': False, 'message': 'Tipo de importación no válido'})
+        
+        # Guardar cambios en base de datos
+        db.session.commit()
+        
+        # También actualizar CRM persistente
+        try:
+            import json
+            import os
+            
+            crm_file = 'crm_persistent_data.json'
+            if os.path.exists(crm_file):
+                with open(crm_file, 'r', encoding='utf-8') as f:
+                    crm_data = json.load(f)
+                
+                # Agregar datos al CRM según el tipo
+                if import_type == 'companies':
+                    if 'companies' not in crm_data:
+                        crm_data['companies'] = []
+                    
+                    # Obtener empresas de la base de datos
+                    companies = Company.query.all()
+                    crm_data['companies'] = []
+                    for company in companies:
+                        crm_data['companies'].append({
+                            'id': company.id,
+                            'nombre_empresa': company.nombre_empresa,
+                            'email_contacto': company.email_contacto,
+                            'telefono': company.telefono,
+                            'sector': company.sector,
+                            'ciudad': company.ciudad,
+                            'pais': company.pais,
+                            'created_at': company.created_at.isoformat() if company.created_at else None
+                        })
+                
+                elif import_type == 'contacts':
+                    if 'contacts' not in crm_data:
+                        crm_data['contacts'] = []
+                    
+                    # Obtener usuarios de la base de datos
+                    users = User.query.all()
+                    crm_data['contacts'] = []
+                    for user in users:
+                        crm_data['contacts'].append({
+                            'id': user.id,
+                            'nombre': user.nombre,
+                            'apellidos': user.apellidos,
+                            'email': user.email,
+                            'telefono': user.telefono,
+                            'ciudad': user.ciudad,
+                            'tipo_neurodivergencia': user.tipo_neurodivergencia,
+                            'created_at': user.created_at.isoformat() if user.created_at else None
+                        })
+                
+                # Guardar CRM actualizado
+                with open(crm_file, 'w', encoding='utf-8') as f:
+                    json.dump(crm_data, f, ensure_ascii=False, indent=2)
+                    
+        except Exception as e:
+            print(f"Error actualizando CRM persistente: {e}")
+        
+        return jsonify({
+            'success': True,
+            'processed': processed,
+            'created': created,
+            'updated': updated,
+            'errors': errors,
+            'message': f'Importación completada: {created} creados, {updated} actualizados'
+        })
+        
+    except Exception as e:
+        print(f"Error en importación CSV: {e}")
+        return jsonify({'success': False, 'message': f'Error al procesar CSV: {str(e)}'})
