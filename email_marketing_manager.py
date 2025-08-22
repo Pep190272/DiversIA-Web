@@ -69,44 +69,49 @@ def import_email_marketing_csv():
         updated_count = 0
         
         for row in csv_reader:
-            # Buscar si ya existe
-            existing = EmailMarketing.query.filter_by(
-                email=row.get('Email', '').strip()
-            ).first()
+            # Validar datos esenciales
+            asociacion = row.get('Asociación', '').strip()
+            email = row.get('Email', '').strip()
             
-            # Separar notas especiales si existen
-            notas_especiales = ''
-            servicios = row.get('Servicios', '')
-            if ',' in row:
-                # Buscar texto después de ENVIADOS (columna extra)
-                row_values = list(row.values())
-                if len(row_values) > 7:  # Si hay columna extra
-                    notas_especiales = row_values[-1].strip()
+            # Saltar filas vacías o sin datos válidos
+            if not asociacion or len(asociacion) < 3:
+                continue
+                
+            # Limpiar email
+            if email.startswith('mailto:'):
+                email = email[7:]
+            
+            # Validar email
+            if not email or '@' not in email:
+                continue
+            
+            # Buscar si ya existe
+            existing = EmailMarketing.query.filter_by(email=email).first()
             
             if existing:
                 # Actualizar
-                existing.comunidad_autonoma = row.get('Comunidad Autónoma', '')
-                existing.asociacion = row.get('Asociación', '')
-                existing.telefono = row.get('Teléfono', '')
-                existing.direccion = row.get('Dirección', '')
-                existing.servicios = servicios
-                existing.fecha_enviado = row.get('ENVIADOS', '')
-                existing.respuesta = row.get('RESPUESTA', '')  # Columna respuesta
-                existing.notas_especiales = notas_especiales
+                existing.comunidad_autonoma = row.get('Comunidad Autónoma', '').strip()
+                existing.asociacion = asociacion
+                existing.telefono = row.get('Teléfono', '').strip()
+                existing.direccion = row.get('Dirección', '').strip()
+                existing.servicios = row.get('Servicios', '').strip()
+                existing.fecha_enviado = row.get('ENVIADOS', '').strip()
+                existing.respuesta = row.get('RESPUESTA', '').strip()
+                existing.notas_especiales = ''
                 existing.updated_at = datetime.now()
                 updated_count += 1
             else:
                 # Crear nuevo
                 new_contact = EmailMarketing(
-                    comunidad_autonoma = row.get('Comunidad Autónoma', ''),
-                    asociacion = row.get('Asociación', ''),
-                    email = row.get('Email', '').strip(),
-                    telefono = row.get('Teléfono', ''),
-                    direccion = row.get('Dirección', ''),
-                    servicios = servicios,
-                    fecha_enviado = row.get('ENVIADOS', ''),
-                    respuesta = row.get('RESPUESTA', ''),  # Columna respuesta
-                    notas_especiales = notas_especiales
+                    comunidad_autonoma = row.get('Comunidad Autónoma', '').strip(),
+                    asociacion = asociacion,
+                    email = email,
+                    telefono = row.get('Teléfono', '').strip(),
+                    direccion = row.get('Dirección', '').strip(),
+                    servicios = row.get('Servicios', '').strip(),
+                    fecha_enviado = row.get('ENVIADOS', '').strip(),
+                    respuesta = row.get('RESPUESTA', '').strip(),
+                    notas_especiales = ''
                 )
                 db.session.add(new_contact)
                 imported_count += 1
