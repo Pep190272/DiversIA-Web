@@ -282,6 +282,92 @@ def delete_email_marketing_contact(contact_id):
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/email-marketing/funnel-ventas')
+def email_marketing_funnel_ventas():
+    """Dashboard de funnel de ventas estilo DiversIA"""
+    try:
+        # Obtener todos los registros
+        asociaciones = EmailMarketing.query.all()
+        
+        # Análisis inteligente de respuestas
+        contactos_iniciales = len(asociaciones)
+        respuestas_totales = len([a for a in asociaciones if a.respuesta])
+        
+        # Análisis de reuniones (buscar palabras clave en respuestas)
+        reuniones_keywords = ['reunión', 'reunion', 'meeting', 'llamada', 'videollamada', 'zoom', 'teams', 'cita', 'entrevista']
+        reuniones = []
+        for a in asociaciones:
+            if a.respuesta:
+                respuesta_lower = a.respuesta.lower()
+                if any(keyword in respuesta_lower for keyword in reuniones_keywords):
+                    reuniones.append(a)
+        
+        # Análisis de NDA y contratos (palabras clave avanzadas)
+        nda_keywords = ['nda', 'confidencialidad', 'acuerdo', 'contrato', 'firma', 'legal', 'términos', 'clausula']
+        nda_proceso = []
+        for a in asociaciones:
+            if a.respuesta:
+                respuesta_lower = a.respuesta.lower()
+                if any(keyword in respuesta_lower for keyword in nda_keywords):
+                    nda_proceso.append(a)
+        
+        # Análisis de interés positivo
+        interes_keywords = ['interesa', 'interesante', 'colaborar', 'colaboración', 'partnership', 'alianza', 'trabajar juntos', 'sí', 'si', 'perfecto', 'genial']
+        interesados = []
+        for a in asociaciones:
+            if a.respuesta:
+                respuesta_lower = a.respuesta.lower()
+                if any(keyword in respuesta_lower for keyword in interes_keywords):
+                    interesados.append(a)
+        
+        # Calcular porcentajes
+        tasa_respuesta = (respuestas_totales / contactos_iniciales * 100) if contactos_iniciales > 0 else 0
+        tasa_reuniones = (len(reuniones) / respuestas_totales * 100) if respuestas_totales > 0 else 0
+        tasa_nda = (len(nda_proceso) / len(reuniones) * 100) if len(reuniones) > 0 else 0
+        
+        # Estadísticas por comunidad para análisis geográfico
+        stats_comunidad = {}
+        for a in asociaciones:
+            comunidad = a.comunidad_autonoma
+            if comunidad not in stats_comunidad:
+                stats_comunidad[comunidad] = {
+                    'total': 0, 'respuestas': 0, 'reuniones': 0, 'nda': 0
+                }
+            stats_comunidad[comunidad]['total'] += 1
+            if a.respuesta:
+                stats_comunidad[comunidad]['respuestas'] += 1
+                if a in reuniones:
+                    stats_comunidad[comunidad]['reuniones'] += 1
+                if a in nda_proceso:
+                    stats_comunidad[comunidad]['nda'] += 1
+        
+        # Mejores comunidades por conversión
+        mejores_comunidades = sorted(
+            [(k, v) for k, v in stats_comunidad.items() if v['total'] >= 3],
+            key=lambda x: (x[1]['nda'] / x[1]['total']) if x[1]['total'] > 0 else 0,
+            reverse=True
+        )[:5]
+        
+        datos_funnel = {
+            'contactos_iniciales': contactos_iniciales,
+            'respuestas_totales': respuestas_totales,
+            'reuniones_count': len(reuniones),
+            'nda_count': len(nda_proceso),
+            'interesados_count': len(interesados),
+            'tasa_respuesta': round(tasa_respuesta, 1),
+            'tasa_reuniones': round(tasa_reuniones, 1),
+            'tasa_nda': round(tasa_nda, 1),
+            'mejores_comunidades': mejores_comunidades,
+            'reuniones_detalle': reuniones[:10],  # Top 10 reuniones
+            'nda_detalle': nda_proceso[:10],       # Top 10 NDAs
+            'stats_comunidad': stats_comunidad
+        }
+        
+        return render_template_string(EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE, **datos_funnel)
+        
+    except Exception as e:
+        return f"Error: {str(e)}", 500
+
 @app.route('/email-marketing/delete-all', methods=['DELETE'])
 def delete_all_email_marketing():
     """Eliminar TODOS los contactos de email marketing"""
@@ -430,6 +516,7 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                     <h2>📧 Email Marketing - Asociaciones ({{ total_asociaciones }})</h2>
                     <div>
                         <a href="/email-marketing-funnel?admin=true" class="btn btn-info me-2">Dashboard Embudo</a>
+                        <a href="/email-marketing/funnel-ventas" class="btn btn-warning me-2">💼 Funnel Ventas</a>
                         <a href="/crm-minimal" class="btn btn-outline-secondary me-2">← CRM</a>
                         <a href="/diversia-admin-logout" class="btn btn-outline-danger">Salir</a>
                     </div>
@@ -1220,6 +1307,262 @@ EMAIL_MARKETING_FUNNEL_TEMPLATE = '''
             </div>
         </div>
     </div>
+</body>
+</html>
+'''
+
+# Template de Funnel de Ventas estilo DiversIA
+EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funnel de Ventas - DiversIA (Agosto 2025)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .funnel-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .funnel-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        
+        .funnel-step {
+            margin: 20px auto;
+            max-width: 400px;
+            position: relative;
+        }
+        
+        .funnel-box {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(52, 152, 219, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .funnel-box:nth-child(2) .funnel-box { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .funnel-box:nth-child(3) .funnel-box { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .funnel-box:nth-child(4) .funnel-box { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        
+        .funnel-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .funnel-label {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .funnel-percentage {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .funnel-arrow {
+            text-align: center;
+            font-size: 30px;
+            color: #3498db;
+            margin: 10px 0;
+        }
+        
+        .stats-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 40px;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .metric-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .navigation-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .detail-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .step-respuestas { background: linear-gradient(135deg, #2ecc71, #27ae60) !important; }
+        .step-reuniones { background: linear-gradient(135deg, #f39c12, #e67e22) !important; }
+        .step-nda { background: linear-gradient(135deg, #e74c3c, #c0392b) !important; }
+    </style>
+</head>
+<body>
+    <div class="navigation-bar">
+        <a href="/email-marketing?admin=true" class="btn btn-primary me-2">📊 Ver Tabla</a>
+        <a href="/crm-minimal" class="btn btn-outline-secondary me-2">← CRM</a>
+        <a href="/diversia-admin-logout" class="btn btn-outline-danger">Salir</a>
+    </div>
+
+    <div class="funnel-container">
+        <div class="funnel-title">
+            Funnel de Ventas - DiversIA (Agosto 2025)
+        </div>
+        
+        <!-- Paso 1: Contactos iniciales -->
+        <div class="funnel-step">
+            <div class="funnel-box">
+                <div class="funnel-number">{{ contactos_iniciales }}</div>
+                <div class="funnel-label">Contactos iniciales</div>
+            </div>
+        </div>
+        
+        <div class="funnel-arrow">▼</div>
+        
+        <!-- Paso 2: Respuestas -->
+        <div class="funnel-step">
+            <div class="funnel-box step-respuestas">
+                <div class="funnel-number">{{ respuestas_totales }}</div>
+                <div class="funnel-label">Respuestas</div>
+                <div class="funnel-percentage">({{ tasa_respuesta }}%)</div>
+            </div>
+        </div>
+        
+        <div class="funnel-arrow">▼</div>
+        
+        <!-- Paso 3: Reuniones -->
+        <div class="funnel-step">
+            <div class="funnel-box step-reuniones">
+                <div class="funnel-number">{{ reuniones_count }}</div>
+                <div class="funnel-label">Reuniones</div>
+                <div class="funnel-percentage">({{ tasa_reuniones }}% de respuestas)</div>
+            </div>
+        </div>
+        
+        <div class="funnel-arrow">▼</div>
+        
+        <!-- Paso 4: NDA en proceso -->
+        <div class="funnel-step">
+            <div class="funnel-box step-nda">
+                <div class="funnel-number">{{ nda_count }}</div>
+                <div class="funnel-label">NDA en proceso</div>
+                <div class="funnel-percentage">({{ tasa_nda }}% de reuniones)</div>
+            </div>
+        </div>
+        
+        <!-- Panel de estadísticas adicionales -->
+        <div class="stats-panel">
+            <h5 class="text-center mb-4">📈 Métricas Detalladas</h5>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="metric-number">{{ tasa_respuesta }}%</div>
+                        <div class="metric-label">Tasa de Respuesta</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="metric-number">{{ interesados_count }}</div>
+                        <div class="metric-label">Interesados</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="metric-number">{{ mejores_comunidades|length }}</div>
+                        <div class="metric-label">Top Comunidades</div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if reuniones_detalle %}
+            <div class="mt-4">
+                <h6>🤝 Reuniones Programadas/Realizadas</h6>
+                <div class="detail-list">
+                    {% for reunion in reuniones_detalle %}
+                    <div class="mb-2">
+                        <strong>{{ reunion.asociacion }}</strong> ({{ reunion.comunidad_autonoma }})<br>
+                        <small class="text-muted">{{ reunion.respuesta[:100] }}...</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if nda_detalle %}
+            <div class="mt-4">
+                <h6>📋 NDAs y Contratos en Proceso</h6>
+                <div class="detail-list">
+                    {% for nda in nda_detalle %}
+                    <div class="mb-2">
+                        <strong>{{ nda.asociacion }}</strong> ({{ nda.comunidad_autonoma }})<br>
+                        <small class="text-muted">{{ nda.respuesta[:100] }}...</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if mejores_comunidades %}
+            <div class="mt-4">
+                <h6>🗺️ Top Comunidades por Conversión</h6>
+                <div class="detail-list">
+                    {% for comunidad, stats in mejores_comunidades %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><strong>{{ comunidad }}</strong></span>
+                        <span>
+                            <span class="badge bg-primary">{{ stats.nda }}/{{ stats.total }}</span>
+                            <small class="text-muted">({{ "%.1f"|format((stats.nda/stats.total)*100) }}%)</small>
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 '''
