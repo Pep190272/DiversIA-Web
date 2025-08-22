@@ -59,19 +59,6 @@
       "source": "manual"
     },
     {
-      "id": 3,
-      "name": "Test Company Solutions",
-      "email": "info@testcompany.com",
-      "phone": "912345678",
-      "sector": "Tecnología",
-      "size": null,
-      "city": "Madrid",
-      "website": null,
-      "description": "Empresa de prueba para verificar formularios",
-      "created_at": "2025-08-21T09:01:26.538734",
-      "source": "web_form"
-    },
-    {
       "id": 35,
       "name": "TechCorp Solutions",
       "email": "info@techcorp.com",
@@ -82,45 +69,6 @@
       "website": "https://techcorp.com",
       "description": "Empresa tecnológica innovadora",
       "created_at": "2025-08-21T09:02:49.722894",
-      "source": "web_form"
-    },
-    {
-      "id": 68,
-      "name": "DebugCorp",
-      "email": "debug@corp.com",
-      "phone": "999888777",
-      "sector": "Debug",
-      "size": null,
-      "city": "TestCity",
-      "website": null,
-      "description": null,
-      "created_at": "2025-08-21T09:04:06.743823",
-      "source": "web_form"
-    },
-    {
-      "id": 76,
-      "name": "CorrectedCorp",
-      "email": "corrected@corp.com",
-      "phone": "111222333",
-      "sector": "Corrected",
-      "size": null,
-      "city": "FixedCity",
-      "website": "https://corrected.com",
-      "description": "Empresa con formulario corregido",
-      "created_at": "2025-08-21T09:04:29.080575",
-      "source": "web_form"
-    },
-    {
-      "id": 110,
-      "name": "TestCorp",
-      "email": "test@corp.com",
-      "phone": "123456789",
-      "sector": "Tech",
-      "size": "50-100",
-      "city": "Madrid",
-      "website": "test.com",
-      "description": "Test company",
-      "created_at": "2025-08-21T09:06:01.451493",
       "source": "web_form"
     },
     {
