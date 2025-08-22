@@ -12,8 +12,9 @@ except Exception as e:
 
 # Cargar solo CRM API (sin conflictos de rutas)
 try:
-    # import crm_api_simple  # Comentado para evitar conflictos
-    print("✅ CRM API cargado correctamente")
+    from crm_minimal import create_minimal_crm_routes
+    create_minimal_crm_routes(app)
+    print("✅ CRM Minimal cargado correctamente")
 except Exception as e:
     print(f"⚠️ Error cargando CRM: {e}")
 
