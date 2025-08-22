@@ -1111,7 +1111,6 @@ def api_import_csv():
                         existing_company.telefono = row.get('telefono', existing_company.telefono)
                         existing_company.sector = row.get('sector', existing_company.sector)
                         existing_company.ciudad = row.get('ciudad', existing_company.ciudad)
-                        existing_company.pais = row.get('pais', existing_company.pais)
                         updated += 1
                     else:
                         # Crear nueva empresa
@@ -1120,8 +1119,7 @@ def api_import_csv():
                             email_contacto=row['email_contacto'],
                             telefono=row.get('telefono', ''),
                             sector=row.get('sector', ''),
-                            ciudad=row.get('ciudad', ''),
-                            pais=row.get('pais', 'ES')
+                            ciudad=row.get('ciudad', '')
                         )
                         db.session.add(new_company)
                         created += 1
@@ -1205,7 +1203,6 @@ def api_import_csv():
                             'telefono': company.telefono,
                             'sector': company.sector,
                             'ciudad': company.ciudad,
-                            'pais': company.pais,
                             'created_at': company.created_at.isoformat() if company.created_at else None
                         })
                 
