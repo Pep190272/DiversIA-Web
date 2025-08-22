@@ -6,7 +6,7 @@ DiversIA is a web-based employment platform designed to connect neurodivergent i
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 System reliability: Critical requirement - zero tolerance for 500 errors on main routes.
-Data protection: Never delete or modify real user data - only work with test/fictional data. Always preserve authentic user content and restore from backups when needed.
+Data protection: CRITICAL - Never delete or modify real user data. Only work with test/fictional data when explicitly requested. Always preserve authentic user content and restore from backups immediately when data loss occurs. User has real business data in: contacts, companies, employees, tasks - these must be preserved at all costs.
 
 ## System Reliability
 - **PostgreSQL Database**: Production database with 100% uptime and data integrity
