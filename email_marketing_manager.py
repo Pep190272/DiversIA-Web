@@ -89,6 +89,7 @@ def import_email_marketing_csv():
                 existing.direccion = row.get('Dirección', '')
                 existing.servicios = servicios
                 existing.fecha_enviado = row.get('ENVIADOS', '')
+                existing.respuesta = row.get('RESPUESTA', '')  # Nueva columna
                 existing.notas_especiales = notas_especiales
                 existing.updated_at = datetime.now()
                 updated_count += 1
@@ -102,6 +103,7 @@ def import_email_marketing_csv():
                     direccion = row.get('Dirección', ''),
                     servicios = servicios,
                     fecha_enviado = row.get('ENVIADOS', ''),
+                    respuesta = row.get('RESPUESTA', ''),  # Nueva columna
                     notas_especiales = notas_especiales
                 )
                 db.session.add(new_contact)
@@ -150,15 +152,13 @@ def export_email_marketing_csv():
     
     # Headers
     writer.writerow([
-        'ID', 'Comunidad Autónoma', 'Asociación', 'Email', 'Teléfono', 
-        'Dirección', 'Servicios', 'Fecha Enviado', 'Estado Email', 
-        'Tipo Respuesta', 'Notas Especiales'
+        'Comunidad Autónoma', 'Asociación', 'Email', 'Teléfono', 
+        'Dirección', 'Servicios', 'ENVIADOS', 'RESPUESTA'
     ])
     
     # Data
     for contact in contacts:
         writer.writerow([
-            contact.id,
             contact.comunidad_autonoma,
             contact.asociacion,
             contact.email,
@@ -166,9 +166,7 @@ def export_email_marketing_csv():
             contact.direccion or '',
             contact.servicios or '',
             contact.fecha_enviado or '',
-            contact.estado_email or '',
-            contact.tipo_respuesta or '',
-            contact.notas_especiales or ''
+            contact.respuesta or ''
         ])
     
     output.seek(0)
@@ -232,8 +230,7 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                         <th>Teléfono</th>
                                         <th>Servicios</th>
                                         <th>Enviado</th>
-                                        <th>Estado</th>
-                                        <th>Notas</th>
+                                        <th>Respuesta</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -254,19 +251,10 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if asociacion.tipo_respuesta == 'interesado' %}
-                                                <span class="badge bg-success">Interesado</span>
-                                            {% elif asociacion.tipo_respuesta == 'no_interesado' %}
-                                                <span class="badge bg-danger">No interesado</span>
-                                            {% elif asociacion.estado_email == 'respondido' %}
-                                                <span class="badge bg-info">Respondido</span>
+                                            {% if asociacion.respuesta %}
+                                                <span class="badge bg-info" title="{{ asociacion.respuesta }}">{{ asociacion.respuesta[:30] }}{% if asociacion.respuesta|length > 30 %}...{% endif %}</span>
                                             {% else %}
-                                                <span class="badge bg-primary">{{ asociacion.estado_email or 'Enviado' }}</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if asociacion.notas_especiales %}
-                                                <span class="text-warning" title="{{ asociacion.notas_especiales }}">⚠️</span>
+                                                <span class="badge bg-secondary">Sin respuesta</span>
                                             {% endif %}
                                         </td>
                                         <td>
