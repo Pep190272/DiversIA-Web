@@ -19,6 +19,7 @@ System reliability: Critical requirement - zero tolerance for 500 errors on main
 - **Data Processing**: Automatic email cleanup (mailto: removal), data validation, and note truncation
 - **Authentication**: Secure admin access with session management and logout functionality
 - **Production Ready**: Clean codebase, minimal dependencies, fully operational system - UPDATED 2025-08-22
+- **Route Separation Complete**: Public website (/) and admin dashboard (/admin-dashboard) properly separated - FIXED 2025-08-22
 - **CSV Processing Complete**: 111 valid associations correctly imported, 11 empty rows filtered
 - **Interactive Dashboard**: Real-time analytics with Chart.js graphs showing community distribution and response metrics
 - **Response Analytics**: Automated categorization of vacation responses, meeting requests, and contact updates

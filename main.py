@@ -1,8 +1,16 @@
 from app import app
+from flask import render_template
 
-# Routes principales
+# Routes principales - WEB PÚBLICA DE DIVERSIA
 @app.route('/')
 def index():
+    """Página principal pública de DiversIA"""
+    return render_template('index.html')
+
+# Panel de administración movido a ruta específica
+@app.route('/admin-dashboard')
+def admin_dashboard():
+    """Panel de administración del sistema"""
     return """
     <html>
     <head>
