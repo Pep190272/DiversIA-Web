@@ -49,8 +49,8 @@ def import_clean_csv():
                     telefono = row.get('Teléfono', '').strip(),
                     direccion = row.get('Dirección', '').strip(),
                     servicios = row.get('Servicios', '').strip(),
-                    fecha_enviado = row.get('ENVIADOS', '').strip(),
-                    respuesta = row.get('RESPUESTA', '').strip(),
+                    fecha_enviado = row.get('Envios', '').strip(),
+                    respuesta = row.get('Respuestas', '').strip(),
                     notas_especiales = ''
                 )
                 

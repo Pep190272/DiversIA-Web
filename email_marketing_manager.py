@@ -107,8 +107,8 @@ def import_email_marketing_csv():
                 existing.telefono = row.get('Teléfono', '').strip()
                 existing.direccion = row.get('Dirección', '').strip()
                 existing.servicios = row.get('Servicios', '').strip()
-                existing.fecha_enviado = row.get('ENVIADOS', '').strip()
-                existing.respuesta = row.get('RESPUESTA', '').strip()
+                existing.fecha_enviado = row.get('Envios', '').strip()
+                existing.respuesta = row.get('Respuestas', '').strip()
                 existing.notas_especiales = ''
                 existing.updated_at = datetime.now()
                 updated_count += 1
@@ -121,8 +121,8 @@ def import_email_marketing_csv():
                     telefono = row.get('Teléfono', '').strip(),
                     direccion = row.get('Dirección', '').strip(),
                     servicios = row.get('Servicios', '').strip(),
-                    fecha_enviado = row.get('ENVIADOS', '').strip(),
-                    respuesta = row.get('RESPUESTA', '').strip(),
+                    fecha_enviado = row.get('Envios', '').strip(),
+                    respuesta = row.get('Respuestas', '').strip(),
                     notas_especiales = ''
                 )
                 db.session.add(new_contact)
