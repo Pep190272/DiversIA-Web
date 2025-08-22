@@ -56,6 +56,40 @@ def sistema_gestion():
                                     </div>
                                 </div>
                             </div>
+                            <!-- Nuevos listados editables -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h5 class="text-center mb-3">📋 Listados Editables</h5>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card border-primary">
+                                        <div class="card-body text-center">
+                                            <h6>👥 Colaboradores</h6>
+                                            <p class="small">Gestión completa de equipos</p>
+                                            <a href="/colaboradores-listado" class="btn btn-primary btn-sm">Ver Listado</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card border-success">
+                                        <div class="card-body text-center">
+                                            <h6>🧠 Personas ND</h6>
+                                            <p class="small">Base de datos neurodivergentes</p>
+                                            <a href="/personas-nd-listado" class="btn btn-success btn-sm">Ver Listado</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card border-warning">
+                                        <div class="card-body text-center">
+                                            <h6>🏢 Asociaciones</h6>
+                                            <p class="small">Gestión de asociaciones</p>
+                                            <a href="/asociaciones-listado" class="btn btn-warning btn-sm text-dark">Ver Listado</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <hr>
                             <small class="text-muted">
                                 Sistema completamente funcional • Presentación lista • Datos reales integrados
@@ -99,6 +133,14 @@ except Exception as e:
 import email_marketing_manager  # noqa: F401
 import email_notifications  # noqa: F401
 import task_manager  # noqa: F401
+
+# Verificar que las rutas estén registradas
+with app.app_context():
+    print("📋 Rutas disponibles:")
+    for rule in app.url_map.iter_rules():
+        if any(x in str(rule) for x in ['colaboradores', 'personas-nd', 'asociaciones']):
+            print(f"  {rule.methods} {rule.rule}")
+    print("✅ Listados editables cargados")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
