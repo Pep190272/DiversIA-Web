@@ -302,15 +302,32 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                 
                 <!-- Acciones rápidas -->
                 <div class="row mb-3">
-                    <div class="col-md-8">
+                    <div class="col-md-4">
                         <form action="/email-marketing/import" method="post" enctype="multipart/form-data" class="d-flex">
                             <input type="file" name="file" class="form-control me-2" accept=".csv" required>
                             <button type="submit" class="btn btn-success">Importar CSV</button>
                         </form>
                     </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Buscar por asociación o comunidad...">
+                            <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                                <span id="clearIcon">🔍</span>
+                            </button>
+                        </div>
+                    </div>
                     <div class="col-md-4 text-end">
                         <a href="/email-marketing/export" class="btn btn-warning me-2">Exportar CSV</a>
                         <button onclick="deleteAllAssociations()" class="btn btn-danger">🗑️ Eliminar Todo</button>
+                    </div>
+                </div>
+                
+                <!-- Contador de resultados -->
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <small class="text-muted">
+                            Mostrando <span id="visibleCount">{{ total_asociaciones }}</span> de {{ total_asociaciones }} asociaciones
+                        </small>
                     </div>
                 </div>
                 
@@ -434,9 +451,61 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
             }
         }
 
+        // Sistema de búsqueda
+        let allRows = [];
+        
+        function initializeSearch() {
+            allRows = Array.from(document.querySelectorAll('tbody tr'));
+            const searchInput = document.getElementById('searchInput');
+            
+            searchInput.addEventListener('input', function() {
+                performSearch(this.value);
+            });
+            
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    clearSearch();
+                }
+            });
+        }
+        
+        function performSearch(searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+            let visibleCount = 0;
+            
+            allRows.forEach(row => {
+                const comunidad = row.cells[1].textContent.toLowerCase();
+                const asociacion = row.cells[2].textContent.toLowerCase();
+                const email = row.cells[3].textContent.toLowerCase();
+                
+                const matches = comunidad.includes(term) || 
+                              asociacion.includes(term) || 
+                              email.includes(term);
+                
+                if (matches || term === '') {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('visibleCount').textContent = visibleCount;
+            document.getElementById('clearIcon').textContent = term ? '✗' : '🔍';
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            performSearch('');
+            document.getElementById('searchInput').focus();
+        }
+
         // Sistema de edición inline
         document.addEventListener('DOMContentLoaded', function() {
             let currentlyEditing = null;
+            
+            // Inicializar búsqueda
+            initializeSearch();
 
             // Hacer todos los campos editables
             document.querySelectorAll('.editable-field').forEach(field => {
