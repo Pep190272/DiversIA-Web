@@ -38,6 +38,65 @@ def add_email_marketing_manual():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+@app.route('/email-marketing/get/<int:record_id>', methods=['GET'])
+def get_email_marketing_record(record_id):
+    """Obtener registro específico para edición"""
+    if not request.args.get('admin') == 'true':
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    try:
+        record = EmailMarketing.query.get_or_404(record_id)
+        return jsonify({
+            'success': True,
+            'data': {
+                'id': record.id,
+                'comunidad_autonoma': record.comunidad_autonoma,
+                'asociacion': record.asociacion,
+                'email': record.email,
+                'telefono': record.telefono,
+                'direccion': record.direccion,
+                'servicios': record.servicios,
+                'fecha_enviado': record.fecha_enviado,
+                'respuesta': record.respuesta,
+                'notas_especiales': record.notas_especiales,
+                'notas_personalizadas': record.notas_personalizadas
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/email-marketing/update/<int:record_id>', methods=['POST'])
+def update_email_marketing_record(record_id):
+    """Actualizar registro completo"""
+    if not request.args.get('admin') == 'true':
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    data = request.get_json()
+    
+    try:
+        record = EmailMarketing.query.get_or_404(record_id)
+        
+        # Actualizar todos los campos
+        record.comunidad_autonoma = data.get('comunidad_autonoma', '').strip()
+        record.asociacion = data.get('asociacion', '').strip()
+        record.email = data.get('email', '').strip()
+        record.telefono = data.get('telefono', '').strip()
+        record.direccion = data.get('direccion', '').strip()
+        record.servicios = data.get('servicios', '').strip()
+        record.fecha_enviado = data.get('fecha_enviado', '').strip()
+        record.respuesta = data.get('respuesta', '').strip()
+        record.notas_especiales = data.get('notas_especiales', '').strip()
+        record.notas_personalizadas = data.get('notas_personalizadas', '').strip()
+        
+        record.updated_at = datetime.now()
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Registro actualizado correctamente'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/email-marketing/edit/<int:record_id>', methods=['POST'])
 def edit_email_marketing_inline(record_id):
     """Editar registro de email marketing inline"""
@@ -487,107 +546,138 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                     </div>
                 </div>
                 
-                <!-- Sistema de Fichas de Asociaciones -->
-                <div class="row" id="associationsCards">
-                    {% for asociacion in asociaciones %}
-                    <div class="col-lg-6 col-xl-4 mb-4" data-id="{{ asociacion.id }}" data-comunidad="{{ asociacion.comunidad_autonoma|lower }}" data-asociacion="{{ asociacion.asociacion|lower }}">
-                        <div class="card h-100 border-start border-primary border-4">
-                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                <small class="text-muted">#{{ asociacion.id }} | {{ asociacion.comunidad_autonoma }}</small>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                        Acciones
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#" onclick="editAssociation({{ asociacion.id }})">✏️ Editar</a></li>
-                                        <li><a class="dropdown-item" href="#" onclick="duplicateAssociation({{ asociacion.id }})">📋 Duplicar</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteAssociation({{ asociacion.id }})">🗑️ Eliminar</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title text-primary">{{ asociacion.asociacion }}</h5>
-                                
-                                <div class="mb-3">
-                                    <strong>📧 Email:</strong><br>
-                                    <a href="mailto:{{ asociacion.email }}" class="text-decoration-none">{{ asociacion.email }}</a>
-                                </div>
-                                
-                                {% if asociacion.telefono %}
-                                <div class="mb-3">
-                                    <strong>📞 Teléfono:</strong><br>
-                                    <a href="tel:{{ asociacion.telefono }}" class="text-decoration-none">{{ asociacion.telefono }}</a>
-                                </div>
-                                {% endif %}
-                                
-                                {% if asociacion.direccion %}
-                                <div class="mb-3">
-                                    <strong>📍 Dirección:</strong><br>
-                                    <small class="text-muted">{{ asociacion.direccion }}</small>
-                                </div>
-                                {% endif %}
-                                
-                                {% if asociacion.servicios %}
-                                <div class="mb-3">
-                                    <strong>🎯 Servicios:</strong><br>
-                                    <small class="text-muted">{{ asociacion.servicios[:100] }}{% if asociacion.servicios|length > 100 %}...{% endif %}</small>
-                                </div>
-                                {% endif %}
-                                
-                                <hr>
-                                
-                                <!-- Estado de Email Marketing -->
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="text-center">
-                                            <strong>📤 Enviado</strong><br>
+                <!-- Tabla de Asociaciones con Fichas de Edición -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Comunidad</th>
+                                        <th>Asociación</th>
+                                        <th>Email</th>
+                                        <th>Estado Email</th>
+                                        <th>Respuesta</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for asociacion in asociaciones %}
+                                    <tr data-id="{{ asociacion.id }}">
+                                        <td><span class="badge bg-primary">#{{ asociacion.id }}</span></td>
+                                        <td><small class="text-muted">{{ asociacion.comunidad_autonoma }}</small></td>
+                                        <td><strong>{{ asociacion.asociacion }}</strong></td>
+                                        <td>
+                                            <a href="mailto:{{ asociacion.email }}" class="text-decoration-none">{{ asociacion.email }}</a>
+                                        </td>
+                                        <td>
                                             {% if asociacion.fecha_enviado %}
                                                 <span class="badge bg-success">{{ asociacion.fecha_enviado }}</span>
                                             {% else %}
                                                 <span class="badge bg-secondary">No enviado</span>
                                             {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="text-center">
-                                            <strong>💬 Respuesta</strong><br>
+                                        </td>
+                                        <td>
                                             {% if asociacion.respuesta %}
                                                 <span class="badge bg-info">Respondido</span>
                                             {% else %}
-                                                <span class="badge bg-warning">Sin respuesta</span>
+                                                <span class="badge bg-warning text-dark">Sin respuesta</span>
                                             {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="openEditModal({{ asociacion.id }})">
+                                                    ✏️ Editar
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAssociation({{ asociacion.id }})">
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de Edición -->
+                <div class="modal fade" id="editModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">✏️ Editar Asociación</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editForm">
+                                    <input type="hidden" id="editId">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Comunidad Autónoma *</label>
+                                                <input type="text" class="form-control" id="editComunidad" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Asociación *</label>
+                                                <input type="text" class="form-control" id="editAsociacion" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Email *</label>
+                                                <input type="email" class="form-control" id="editEmail" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Teléfono</label>
+                                                <input type="text" class="form-control" id="editTelefono">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">Dirección</label>
+                                                <input type="text" class="form-control" id="editDireccion">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Servicios</label>
+                                                <textarea class="form-control" id="editServicios" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Fecha Enviado</label>
+                                                <input type="date" class="form-control" id="editFechaEnviado">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Respuesta</label>
+                                                <textarea class="form-control" id="editRespuesta" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Notas Personalizadas</label>
+                                                <textarea class="form-control" id="editNotasPersonalizadas" rows="3"></textarea>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                {% if asociacion.respuesta %}
-                                <div class="mt-3">
-                                    <strong>💬 Respuesta recibida:</strong><br>
-                                    <div class="bg-light p-2 rounded">
-                                        <small>{{ asociacion.respuesta }}</small>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                
-                                {% if asociacion.notas_personalizadas %}
-                                <div class="mt-3">
-                                    <strong>📝 Notas:</strong><br>
-                                    <div class="bg-warning bg-opacity-10 p-2 rounded">
-                                        <small>{{ asociacion.notas_personalizadas }}</small>
-                                    </div>
-                                </div>
-                                {% endif %}
+                                </form>
                             </div>
-                            <div class="card-footer bg-transparent">
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editAssociation({{ asociacion.id }})">Editar</button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAssociation({{ asociacion.id }})">Eliminar</button>
-                                </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-primary" onclick="saveChanges()">💾 Guardar Cambios</button>
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -665,6 +755,77 @@ EMAIL_MARKETING_TABLE_TEMPLATE = '''
                 alert('❌ Error de conexión: ' + error);
             });
         });
+        
+        // Modal de edición
+        function openEditModal(id) {
+            fetch(`/email-marketing/get/${id}?admin=true`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const asociacion = data.data;
+                    document.getElementById('editId').value = asociacion.id;
+                    document.getElementById('editComunidad').value = asociacion.comunidad_autonoma || '';
+                    document.getElementById('editAsociacion').value = asociacion.asociacion || '';
+                    document.getElementById('editEmail').value = asociacion.email || '';
+                    document.getElementById('editTelefono').value = asociacion.telefono || '';
+                    document.getElementById('editDireccion').value = asociacion.direccion || '';
+                    document.getElementById('editServicios').value = asociacion.servicios || '';
+                    document.getElementById('editFechaEnviado').value = asociacion.fecha_enviado || '';
+                    document.getElementById('editRespuesta').value = asociacion.respuesta || '';
+                    document.getElementById('editNotasPersonalizadas').value = asociacion.notas_personalizadas || '';
+                    
+                    var editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                    editModal.show();
+                } else {
+                    alert('Error cargando datos: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error de conexión: ' + error);
+            });
+        }
+        
+        function saveChanges() {
+            const id = document.getElementById('editId').value;
+            const formData = {
+                comunidad_autonoma: document.getElementById('editComunidad').value.trim(),
+                asociacion: document.getElementById('editAsociacion').value.trim(),
+                email: document.getElementById('editEmail').value.trim(),
+                telefono: document.getElementById('editTelefono').value.trim(),
+                direccion: document.getElementById('editDireccion').value.trim(),
+                servicios: document.getElementById('editServicios').value.trim(),
+                fecha_enviado: document.getElementById('editFechaEnviado').value.trim(),
+                respuesta: document.getElementById('editRespuesta').value.trim(),
+                notas_personalizadas: document.getElementById('editNotasPersonalizadas').value.trim()
+            };
+            
+            if (!formData.comunidad_autonoma || !formData.asociacion || !formData.email) {
+                alert('Por favor, completa los campos obligatorios');
+                return;
+            }
+            
+            fetch(`/email-marketing/update/${id}?admin=true`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Cambios guardados correctamente');
+                    var editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                    editModal.hide();
+                    location.reload();
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Error de conexión: ' + error);
+            });
+        }
         
         function deleteAllAssociations() {
             if (confirm('⚠️ ATENCIÓN: ¿Estás COMPLETAMENTE SEGURO de eliminar TODAS las asociaciones?')) {
