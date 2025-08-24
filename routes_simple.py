@@ -97,6 +97,94 @@ def terminos():
     return render_template('terminos.html')
 
 # ===== REGISTROS =====
+@app.route('/registro')
+def registro():
+    """Página de registro general"""
+    return render_template('registro.html')
+
+# Rutas de registro específicas por neurodivergencia
+@app.route('/registro-tdah', methods=['GET', 'POST'])
+def registro_tdah():
+    from forms import RegistroGeneralForm
+    form = RegistroGeneralForm()
+    if form.validate_on_submit():
+        # Lógica de registro TDAH aquí
+        flash('¡Registro TDAH completado exitosamente!', 'success')
+        return redirect(url_for('personas_nd'))
+    return render_template('registro-tdah.html', form=form)
+
+@app.route('/registro-tea', methods=['GET', 'POST'])  
+def registro_tea():
+    from forms import RegistroGeneralForm
+    form = RegistroGeneralForm()
+    if form.validate_on_submit():
+        flash('¡Registro TEA completado exitosamente!', 'success')
+        return redirect(url_for('personas_nd'))
+    return render_template('registro-tea.html', form=form)
+
+@app.route('/registro-dislexia', methods=['GET', 'POST'])
+def registro_dislexia():
+    from forms import RegistroGeneralForm 
+    form = RegistroGeneralForm()
+    if form.validate_on_submit():
+        flash('¡Registro Dislexia completado exitosamente!', 'success')
+        return redirect(url_for('personas_nd'))
+    return render_template('registro-dislexia.html', form=form)
+
+@app.route('/registro-discalculia', methods=['GET', 'POST'])
+def registro_discalculia():
+    from forms import RegistroGeneralForm
+    form = RegistroGeneralForm()
+    if form.validate_on_submit():
+        flash('¡Registro completado exitosamente!', 'success')
+        return redirect(url_for('personas_nd'))
+    return render_template('registro-general.html', form=form, tipo='Discalculia')
+
+@app.route('/registro-tourette', methods=['GET', 'POST'])
+def registro_tourette():
+    from forms import RegistroGeneralForm
+    form = RegistroGeneralForm()
+    if form.validate_on_submit():
+        flash('¡Registro completado exitosamente!', 'success')
+        return redirect(url_for('personas_nd'))
+    return render_template('registro-general.html', form=form, tipo='Tourette')
+
+@app.route('/registro-dispraxia', methods=['GET', 'POST'])
+def registro_dispraxia():
+    from forms import RegistroGeneralForm
+    form = RegistroGeneralForm()
+    if form.validate_on_submit():
+        flash('¡Registro completado exitosamente!', 'success')
+        return redirect(url_for('personas_nd'))
+    return render_template('registro-general.html', form=form, tipo='Dispraxia')
+
+@app.route('/registro-ansiedad', methods=['GET', 'POST'])
+def registro_ansiedad():
+    from forms import RegistroGeneralForm
+    form = RegistroGeneralForm()
+    if form.validate_on_submit():
+        flash('¡Registro completado exitosamente!', 'success')
+        return redirect(url_for('personas_nd'))
+    return render_template('registro-general.html', form=form, tipo='Ansiedad')
+
+@app.route('/registro-bipolar', methods=['GET', 'POST'])
+def registro_bipolar():
+    from forms import RegistroGeneralForm
+    form = RegistroGeneralForm()
+    if form.validate_on_submit():
+        flash('¡Registro completado exitosamente!', 'success')
+        return redirect(url_for('personas_nd'))
+    return render_template('registro-general.html', form=form, tipo='Bipolar')
+
+@app.route('/registro-altas-capacidades', methods=['GET', 'POST'])
+def registro_altas_capacidades():
+    from forms import RegistroGeneralForm
+    form = RegistroGeneralForm()
+    if form.validate_on_submit():
+        flash('¡Registro completado exitosamente!', 'success')
+        return redirect(url_for('personas_nd'))
+    return render_template('registro-general.html', form=form, tipo='Altas Capacidades')
+
 @app.route('/registro-asociacion', methods=['GET', 'POST'])
 def registro_asociacion():
     """Registro de asociaciones neurodivergentes"""
