@@ -153,6 +153,12 @@ def registro_tdah():
     from forms import RegistroTDAHForm
     form = RegistroTDAHForm()
     
+    # Debug para TDAH
+    if request.method == 'POST':
+        print(f"🔍 TDAH - Datos recibidos: {list(request.form.keys())}")
+        if not form.validate():
+            print(f"❌ TDAH - Errores de validación: {form.errors}")
+    
     if form.validate_on_submit():
         try:
             from models import NeurodivergentProfile
@@ -168,8 +174,8 @@ def registro_tdah():
                 fecha_nacimiento=form.fecha_nacimiento.data,
                 
                 # Información de neurodivergencia
-                tipo_neurodivergencia='tdah',
-                diagnostico_formal=form.diagnostico_formal.data,
+                tipo_neurodivergencia='TDAH',
+                diagnostico_formal=form.diagnostico_formal.data == 'si',
                 
                 # Información laboral
                 habilidades=form.habilidades.data,
@@ -179,12 +185,7 @@ def registro_tdah():
                 adaptaciones_necesarias=form.adaptaciones_necesarias.data,
                 motivaciones=form.motivaciones.data,
                 
-                # Campos específicos TDAH
-                tipo_tdah=form.tipo_tdah.data,
-                nivel_atencion=form.nivel_atencion.data,
-                impulsividad=form.impulsividad.data,
-                hiperactividad=form.hiperactividad.data,
-                medicacion=form.medicacion.data
+                # TDAH: Campos específicos omitidos para compatibilidad con modelo base
             )
             
             db.session.add(nuevo_perfil)
