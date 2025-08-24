@@ -200,8 +200,13 @@ def registro_tdah():
             
         except Exception as e:
             print(f"❌ Error guardando perfil TDAH: {e}")
-            flash('Error al guardar tu perfil TDAH. Por favor intenta de nuevo.', 'error')
             db.session.rollback()
+            
+            # Verificar si es error de email duplicado
+            if 'UNIQUE constraint failed' in str(e) and 'email' in str(e):
+                flash(f'❌ Este email ya está registrado en nuestro sistema. Si necesitas actualizar tu información, contacta con nosotros.', 'warning')
+            else:
+                flash('❌ Error al guardar tu perfil TDAH. Por favor intenta de nuevo.', 'error')
     
     return render_template('registro-tdah.html', form=form)
 
@@ -236,8 +241,13 @@ def registro_tea():
             return redirect(url_for('personas_nd'))
         except Exception as e:
             print(f"❌ TEA - Error: {e}")
-            flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
             db.session.rollback()
+            
+            # Verificar si es error de email duplicado
+            if 'UNIQUE constraint failed' in str(e) and 'email' in str(e):
+                flash(f'❌ Este email ya está registrado en nuestro sistema. Si necesitas actualizar tu información, contacta con nosotros.', 'warning')
+            else:
+                flash('❌ Error al guardar tu perfil TEA. Por favor intenta de nuevo.', 'error')
     return render_template('registro-tea.html', form=form)
 
 @app.route('/registro-dislexia', methods=['GET', 'POST'])
