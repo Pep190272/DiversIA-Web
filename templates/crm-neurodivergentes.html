@@ -194,22 +194,36 @@
                 const response = await fetch('/api/usuarios');
                 const data = await response.json();
                 
+                console.log('Usuarios cargados:', data);
                 document.getElementById('total-users').textContent = data.length || 0;
                 
                 // Crear tarjetas de resumen
                 const overviewContainer = document.getElementById('overview-cards');
                 overviewContainer.innerHTML = '';
                 
-                const types = ['TDAH', 'TEA', 'Dislexia', 'Discalculia', 'Tourette', 'Dispraxia', 'Ansiedad', 'Bipolar', 'Altas Capacidades'];
+                // Contar usuarios por tipo
+                const usersByType = {};
+                const types = ['tdah', 'tea', 'dislexia', 'discalculia', 'tourette', 'dispraxia', 'ansiedad', 'bipolar', 'altas_capacidades'];
+                const typeLabels = ['TDAH', 'TEA', 'Dislexia', 'Discalculia', 'Tourette', 'Dispraxia', 'Ansiedad', 'Bipolar', 'Altas Capacidades'];
                 const colors = ['nd-tdah', 'nd-tea', 'nd-dislexia', 'nd-discalculia', 'nd-tourette', 'nd-dispraxia', 'nd-ansiedad', 'nd-bipolar', 'nd-altas'];
                 
+                // Inicializar contadores
+                types.forEach(type => usersByType[type] = 0);
+                
+                // Contar usuarios por tipo
+                data.forEach(user => {
+                    if (usersByType.hasOwnProperty(user.tipo_neurodivergencia)) {
+                        usersByType[user.tipo_neurodivergencia]++;
+                    }
+                });
+                
                 types.forEach((type, index) => {
-                    const count = data.by_type[type] || 0;
+                    const count = usersByType[type] || 0;
                     const card = `
                         <div class="col-md-4 col-lg-3 mb-3">
                             <div class="card nd-card ${colors[index]} position-relative" style="cursor: pointer;" onclick="switchToTab('${type.toLowerCase()}')">
                                 <div class="card-body">
-                                    <h5 class="card-title">${type}</h5>
+                                    <h5 class="card-title">${typeLabels[index]}</h5>
                                     <p class="card-text">${count} registrados</p>
                                     ${count > 0 ? `<div class="stats-badge">${count}</div>` : ''}
                                 </div>
@@ -236,15 +250,15 @@
                 
                 let html = `
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4>👥 ${type} - ${data.count} personas registradas</h4>
+                        <h4>👥 ${type} - ${data.length} personas registradas</h4>
                         <button class="btn btn-sm btn-outline-primary" onclick="exportTypeData('${type}')">
                             📁 Exportar ${type}
                         </button>
                     </div>
                 `;
                 
-                if (data.users && data.users.length > 0) {
-                    data.users.forEach(user => {
+                if (data && data.length > 0) {
+                    data.forEach(user => {
                         html += `
                             <div class="user-card" onclick="showUserDetails(${user.id})">
                                 <div class="row">
