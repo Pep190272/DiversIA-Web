@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Asociaciones - DiversIA Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .alert-security {
+            border-left: 4px solid #dc3545;
+            background: #f8d7da;
+            border-color: #f5c2c7;
+        }
+        .card-asociacion {
+            transition: transform 0.2s;
+        }
+        .card-asociacion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .badge-estado {
+            font-size: 0.8rem;
+        }
+        .btn-action {
+            margin: 2px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1 class="h3">🔐 Verificación de Asociaciones</h1>
+                <p class="text-muted">Panel de control para aprobar o rechazar solicitudes</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="/crm-minimal" class="btn btn-outline-primary">← Volver al CRM</a>
+                <a href="/" class="btn btn-outline-secondary" target="_blank">🌐 Ver Web</a>
+            </div>
+        </div>
+
+        <!-- Alerta de seguridad -->
+        <div class="alert alert-security mb-4">
+            <h5 class="alert-heading">⚠️ Importante - Verificación de Legitimidad</h5>
+            <p class="mb-2">Antes de aprobar cualquier asociación, asegúrate de:</p>
+            <ul class="mb-0">
+                <li>Verificar que la organización existe legalmente</li>
+                <li>Comprobar su historial y reputación</li>
+                <li>Confirmar que sus objetivos son legítimos</li>
+                <li>Solicitar documentación si es necesario</li>
+            </ul>
+        </div>
+
+        {% if asociaciones %}
+            <div class="row">
+                {% for asociacion in asociaciones %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card card-asociacion h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ asociacion.nombre_asociacion }}</h5>
+                            {% if asociacion.estado == 'verificando_documentacion' %}
+                                <span class="badge bg-warning badge-estado">Verificando</span>
+                            {% elif asociacion.estado == 'documentos_requeridos' %}
+                                <span class="badge bg-info badge-estado">Docs Pendientes</span>
+                            {% else %}
+                                <span class="badge bg-secondary badge-estado">{{ asociacion.estado|title }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                {% if asociacion.acronimo %}
+                                    <p class="mb-1"><strong>Acrónimo:</strong> {{ asociacion.acronimo }}</p>
+                                {% endif %}
+                                <p class="mb-1"><strong>País:</strong> {{ asociacion.pais }}</p>
+                                <p class="mb-1"><strong>Ciudad:</strong> {{ asociacion.ciudad }}</p>
+                                <p class="mb-1"><strong>Email:</strong> 
+                                    <a href="mailto:{{ asociacion.email }}">{{ asociacion.email }}</a>
+                                </p>
+                                {% if asociacion.telefono %}
+                                    <p class="mb-1"><strong>Teléfono:</strong> {{ asociacion.telefono }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <p class="mb-1"><strong>Contacto:</strong> {{ asociacion.contacto_nombre }}</p>
+                                {% if asociacion.contacto_cargo %}
+                                    <p class="mb-1"><strong>Cargo:</strong> {{ asociacion.contacto_cargo }}</p>
+                                {% endif %}
+                            </div>
+
+                            {% if asociacion.neurodivergencias_atendidas %}
+                                <div class="mb-3">
+                                    <p class="mb-1"><strong>Neurodivergencias:</strong></p>
+                                    <small class="text-primary">{{ asociacion.neurodivergencias_atendidas }}</small>
+                                </div>
+                            {% endif %}
+
+                            {% if asociacion.servicios %}
+                                <div class="mb-3">
+                                    <p class="mb-1"><strong>Servicios:</strong></p>
+                                    <small class="text-info">{{ asociacion.servicios }}</small>
+                                </div>
+                            {% endif %}
+
+                            {% if asociacion.descripcion %}
+                                <div class="mb-3">
+                                    <p class="mb-1"><strong>Descripción:</strong></p>
+                                    <small class="text-muted">{{ asociacion.descripcion[:100] }}{% if asociacion.descripcion|length > 100 %}...{% endif %}</small>
+                                </div>
+                            {% endif %}
+
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <strong>Registro:</strong> {{ asociacion.created_at.strftime('%d/%m/%Y %H:%M') }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <div class="d-grid gap-2">
+                                <!-- Botón Aprobar -->
+                                <form action="/admin/asociacion/{{ asociacion.id }}/aprobar" method="POST" 
+                                      onsubmit="return confirm('¿Estás seguro de aprobar esta asociación?')" class="d-inline">
+                                    <button type="submit" class="btn btn-success btn-sm w-100 btn-action">
+                                        ✅ Aprobar
+                                    </button>
+                                </form>
+
+                                <!-- Botón Solicitar Documentos -->
+                                {% if asociacion.estado != 'documentos_requeridos' %}
+                                <form action="/admin/asociacion/{{ asociacion.id }}/solicitar-documentos" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-warning btn-sm w-100 btn-action">
+                                        📄 Solicitar Documentos
+                                    </button>
+                                </form>
+                                {% else %}
+                                <button class="btn btn-outline-warning btn-sm w-100 btn-action" disabled>
+                                    📄 Documentos Solicitados
+                                </button>
+                                {% endif %}
+
+                                <!-- Botón Rechazar -->
+                                <button type="button" class="btn btn-danger btn-sm w-100 btn-action" 
+                                        onclick="rechazarAsociacion({{ asociacion.id }}, '{{ asociacion.nombre_asociacion }}')">
+                                    ❌ Rechazar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <div class="display-1 text-muted">🎉</div>
+                <h3 class="text-muted">No hay asociaciones pendientes</h3>
+                <p class="text-muted">Todas las solicitudes han sido procesadas.</p>
+                <a href="/crm-minimal" class="btn btn-primary">Volver al CRM</a>
+            </div>
+        {% endif %}
+
+        <!-- Modal para rechazar asociación -->
+        <div class="modal fade" id="rechazarModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Rechazar Asociación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="rechazarForm" method="POST">
+                        <div class="modal-body">
+                            <p>¿Estás seguro de rechazar la solicitud de <strong id="nombreAsociacion"></strong>?</p>
+                            <div class="mb-3">
+                                <label for="motivo" class="form-label">Motivo del rechazo:</label>
+                                <textarea class="form-control" id="motivo" name="motivo" rows="3" 
+                                         placeholder="Especifica el motivo del rechazo..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-danger">Rechazar Asociación</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function rechazarAsociacion(id, nombre) {
+            document.getElementById('nombreAsociacion').textContent = nombre;
+            document.getElementById('rechazarForm').action = `/admin/asociacion/${id}/rechazar`;
+            
+            const modal = new bootstrap.Modal(document.getElementById('rechazarModal'));
+            modal.show();
+        }
+    </script>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="position-fixed top-0 end-0 p-3" style="z-index: 1060;">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</body>
+</html>

@@ -477,8 +477,36 @@ def registro_asociacion():
             db.session.add(nueva_asociacion)
             db.session.commit()
             
+            # Enviar notificación inmediata a DiversIA para verificación
+            try:
+                from email_notifications import send_association_registration_notification
+                
+                association_data = {
+                    'nombre_asociacion': nueva_asociacion.nombre_asociacion,
+                    'acronimo': nueva_asociacion.acronimo,
+                    'pais': nueva_asociacion.pais,
+                    'ciudad': nueva_asociacion.ciudad,
+                    'email': nueva_asociacion.email,
+                    'telefono': nueva_asociacion.telefono,
+                    'tipo_documento': nueva_asociacion.tipo_documento,
+                    'numero_documento': nueva_asociacion.numero_documento,
+                    'neurodivergencias_atendidas': nueva_asociacion.neurodivergencias_atendidas,
+                    'servicios': nueva_asociacion.servicios,
+                    'contacto_nombre': nueva_asociacion.contacto_nombre,
+                    'contacto_cargo': nueva_asociacion.contacto_cargo
+                }
+                
+                email_sent = send_association_registration_notification(association_data)
+                if email_sent:
+                    print(f"✅ Notificación de verificación enviada a DiversIA")
+                else:
+                    print(f"⚠️ No se pudo enviar la notificación a DiversIA")
+                    
+            except Exception as e:
+                print(f"⚠️ Error enviando notificación: {e}")
+            
             print(f"✅ Asociación registrada: {nueva_asociacion.nombre_asociacion}")
-            flash('¡Asociación registrada exitosamente! Te contactaremos pronto.', 'success')
+            flash('¡Solicitud enviada! Te contactaremos cuando hayamos verificado tu asociación.', 'info')
             return redirect(url_for('asociaciones'))
             
         except Exception as e:
@@ -486,6 +514,166 @@ def registro_asociacion():
             flash('Error al registrar la asociación. Por favor intenta de nuevo.', 'error')
     
     return render_template('registro-asociacion.html', form=form)
+
+# Panel de administración para verificar asociaciones
+@app.route('/admin/verificar-asociaciones')
+def verificar_asociaciones():
+    """Panel para que DiversIA verifique y gestione asociaciones"""
+    from flask import session, redirect
+    
+    # Verificar que es administrador
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        flash('Acceso restringido. Inicia sesión como administrador.', 'error')
+        return redirect('/admin/login-new')
+    
+    from models import Asociacion
+    
+    # Obtener todas las asociaciones pendientes de verificación
+    asociaciones_pendientes = Asociacion.query.filter(
+        Asociacion.estado.in_(['verificando_documentacion', 'pendiente', 'documentos_requeridos'])
+    ).order_by(Asociacion.created_at.desc()).all()
+    
+    return render_template('admin/verificar-asociaciones.html', 
+                         asociaciones=asociaciones_pendientes)
+
+@app.route('/admin/asociacion/<int:asociacion_id>/aprobar', methods=['POST'])
+def aprobar_asociacion(asociacion_id):
+    """Aprobar una asociación"""
+    from flask import session, redirect, jsonify
+    
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return jsonify({'error': 'Acceso denegado'}), 403
+    
+    try:
+        from models import Asociacion
+        
+        asociacion = Asociacion.query.get_or_404(asociacion_id)
+        asociacion.estado = 'aprobada'
+        db.session.commit()
+        
+        # Enviar email de bienvenida
+        try:
+            from email_notifications import send_association_status_update
+            
+            association_data = {
+                'nombre_asociacion': asociacion.nombre_asociacion,
+                'email': asociacion.email,
+                'contacto_nombre': asociacion.contacto_nombre
+            }
+            
+            send_association_status_update(association_data, 'aprobada')
+            print(f"✅ Email de aprobación enviado a {asociacion.email}")
+        except Exception as e:
+            print(f"⚠️ Error enviando email de aprobación: {e}")
+        
+        flash(f'Asociación {asociacion.nombre_asociacion} aprobada exitosamente.', 'success')
+        return redirect('/admin/verificar-asociaciones')
+        
+    except Exception as e:
+        print(f"❌ Error aprobando asociación: {e}")
+        flash('Error al aprobar la asociación.', 'error')
+        return redirect('/admin/verificar-asociaciones')
+
+@app.route('/admin/asociacion/<int:asociacion_id>/rechazar', methods=['POST'])
+def rechazar_asociacion(asociacion_id):
+    """Rechazar una asociación"""
+    from flask import session, redirect, request
+    
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        flash('Acceso denegado', 'error')
+        return redirect('/admin/login-new')
+    
+    try:
+        from models import Asociacion
+        
+        asociacion = Asociacion.query.get_or_404(asociacion_id)
+        motivo = request.form.get('motivo', 'No especificado')
+        
+        asociacion.estado = 'rechazada'
+        asociacion.notas = f"Rechazada: {motivo}"
+        db.session.commit()
+        
+        # Enviar email de rechazo
+        try:
+            from email_notifications import send_association_status_update
+            
+            association_data = {
+                'nombre_asociacion': asociacion.nombre_asociacion,
+                'email': asociacion.email,
+                'contacto_nombre': asociacion.contacto_nombre
+            }
+            
+            send_association_status_update(association_data, 'rechazada')
+            print(f"✅ Email de rechazo enviado a {asociacion.email}")
+        except Exception as e:
+            print(f"⚠️ Error enviando email de rechazo: {e}")
+        
+        flash(f'Asociación {asociacion.nombre_asociacion} rechazada.', 'warning')
+        return redirect('/admin/verificar-asociaciones')
+        
+    except Exception as e:
+        print(f"❌ Error rechazando asociación: {e}")
+        flash('Error al rechazar la asociación.', 'error')
+        return redirect('/admin/verificar-asociaciones')
+
+@app.route('/admin/asociacion/<int:asociacion_id>/solicitar-documentos', methods=['POST'])
+def solicitar_documentos(asociacion_id):
+    """Solicitar documentos a una asociación"""
+    from flask import session, redirect
+    
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        flash('Acceso denegado', 'error')
+        return redirect('/admin/login-new')
+    
+    try:
+        from models import Asociacion
+        
+        asociacion = Asociacion.query.get_or_404(asociacion_id)
+        asociacion.estado = 'documentos_requeridos'
+        db.session.commit()
+        
+        # Crear enlace único para subir documentos (simplificado)
+        documents_link = f"https://{request.host}/subir-documentos/{asociacion.id}"
+        
+        # Enviar email solicitando documentos
+        try:
+            from email_notifications import send_association_status_update
+            
+            association_data = {
+                'nombre_asociacion': asociacion.nombre_asociacion,
+                'email': asociacion.email,
+                'contacto_nombre': asociacion.contacto_nombre
+            }
+            
+            send_association_status_update(association_data, 'documentos_requeridos', documents_link)
+            print(f"✅ Email de documentos enviado a {asociacion.email}")
+        except Exception as e:
+            print(f"⚠️ Error enviando email de documentos: {e}")
+        
+        flash(f'Documentos solicitados a {asociacion.nombre_asociacion}.', 'info')
+        return redirect('/admin/verificar-asociaciones')
+        
+    except Exception as e:
+        print(f"❌ Error solicitando documentos: {e}")
+        flash('Error al solicitar documentos.', 'error')
+        return redirect('/admin/verificar-asociaciones')
+
+# Ruta simplificada para subir documentos (las asociaciones pueden enviar por email)
+@app.route('/subir-documentos/<int:asociacion_id>')
+def subir_documentos(asociacion_id):
+    """Página para que las asociaciones suban documentos"""
+    from models import Asociacion
+    
+    try:
+        asociacion = Asociacion.query.get_or_404(asociacion_id)
+        
+        if asociacion.estado != 'documentos_requeridos':
+            return "Esta solicitud ya ha sido procesada o no requiere documentos.", 400
+        
+        return render_template('subir-documentos.html', asociacion=asociacion)
+        
+    except Exception as e:
+        return f"Error: {e}", 500
 
 # Las rutas de admin están en admin_final.py - no redefinir aquí
 
