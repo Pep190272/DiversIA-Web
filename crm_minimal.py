@@ -970,6 +970,12 @@ def create_minimal_crm_routes(app):
     def editar_usuario(user_id):
         """Editar un usuario específico (User o NeurodivergentProfile)"""
         try:
+            # Verificar autenticación PRIMERO y devolver JSON si falla
+            if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
+                return jsonify({'success': False, 'error': 'No autorizado. Debes iniciar sesión como administrador.'}), 401
+            
+            print(f"🔧 API edit request for user: {user_id}")
+            
             # Determinar si es User o NeurodivergentProfile
             is_profile = user_id.startswith('profile_')
             actual_id = user_id.replace('user_', '').replace('profile_', '')
@@ -1037,9 +1043,11 @@ def create_minimal_crm_routes(app):
                 flash('Acceso restringido. Inicia sesión como administrador.', 'error')
                 return redirect('/admin/login-new')
             
+            print(f"🔧 Abriendo editor para usuario: {user_id}")
             return render_template('crm-editar-usuario.html', user_id=user_id)
             
         except Exception as e:
+            print(f"❌ Error en editor: {e}")
             flash('Error cargando editor de usuario.', 'error')
             return redirect('/crm-minimal')
     
@@ -1047,9 +1055,9 @@ def create_minimal_crm_routes(app):
     def borrar_usuario(user_id):
         """Borrar un usuario específico (User o NeurodivergentProfile)"""
         try:
-            # Verificar que es administrador
+            # Verificar autenticación (ya verificado arriba en editar_usuario)
             if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
-                return jsonify({'success': False, 'error': 'Acceso no autorizado'}), 403
+                return jsonify({'success': False, 'error': 'Acceso no autorizado'}), 401
             
             # Determinar si es User o NeurodivergentProfile
             is_profile = user_id.startswith('profile_')
