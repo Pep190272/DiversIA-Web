@@ -37,9 +37,9 @@ class GeneralLead(db.Model):
     def __repr__(self):
         return f'<GeneralLead {self.nombre} {self.apellidos}>'
 
-# TABLA PARA PERFILES NEURODIVERGENTES ESPECÍFICOS (formularios detallados)
+# TABLA PARA PERFILES NEURODIVERGENTES ESPECÍFICOS NUEVOS (formularios detallados)
 class NeurodivergentProfile(db.Model):
-    __tablename__ = 'neurodivergent_profiles'
+    __tablename__ = 'neurodivergent_profiles_new'  # Nombre diferente para evitar conflictos
     __table_args__ = {'extend_existing': True}
     
     id = db.Column(db.Integer, primary_key=True)
@@ -79,8 +79,53 @@ class NeurodivergentProfile(db.Model):
     def __repr__(self):
         return f'<NeurodivergentProfile {self.nombre} {self.apellidos} ({self.tipo_neurodivergencia})>'
 
-# TABLA LEGACY COMENTADA - YA MIGRADA A GeneralLead
-# class User(db.Model): - TABLA ELIMINADA TRAS MIGRACIÓN EXITOSA
+# TABLA USER ORIGINAL - MANTENER INTACTA (datos importantes guardados aquí)
+class User(db.Model):
+    __tablename__ = 'users'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    apellidos = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    telefono = db.Column(db.String(20), nullable=True)
+    ciudad = db.Column(db.String(100), nullable=False)
+    fecha_nacimiento = db.Column(db.Date, nullable=False)
+    
+    # Información de neurodivergencia
+    tipo_neurodivergencia = db.Column(db.String(50), nullable=False)
+    diagnostico_formal = db.Column(db.Boolean, default=False)
+    
+    # Información laboral
+    habilidades = db.Column(db.Text, nullable=True)
+    experiencia_laboral = db.Column(db.Text, nullable=True)
+    formacion_academica = db.Column(db.Text, nullable=True)
+    intereses_laborales = db.Column(db.Text, nullable=True)
+    adaptaciones_necesarias = db.Column(db.Text, nullable=True)
+    motivaciones = db.Column(db.Text, nullable=True)
+    
+    # Campos específicos TDAH
+    tipo_tdah = db.Column(db.String(20), nullable=True)
+    nivel_atencion = db.Column(db.String(10), nullable=True)
+    impulsividad = db.Column(db.String(10), nullable=True)
+    hiperactividad = db.Column(db.String(10), nullable=True)
+    medicacion = db.Column(db.Boolean, default=False)
+    
+    # Campos específicos TEA
+    nivel_comunicacion = db.Column(db.String(10), nullable=True)
+    sensibilidades = db.Column(db.Text, nullable=True)
+    rutinas_importantes = db.Column(db.Text, nullable=True)
+    
+    # Campos específicos Dislexia
+    areas_dificultad = db.Column(db.String(100), nullable=True)
+    herramientas_apoyo = db.Column(db.Text, nullable=True)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<User {self.nombre} {self.apellidos}>'
 
 # SEGUNDA DEFINICIÓN ELIMINADA - SOLO MANTENEMOS LA PRIMERA
 

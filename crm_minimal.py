@@ -547,10 +547,10 @@ def create_minimal_crm_routes(app):
     def get_usuarios():
         """Obtener todos los usuarios neurodivergentes de la base de datos"""
         try:
-            from models import NeurodivergentProfile
+            from models import User  # Restaurar User original
             from app import db
             
-            usuarios = NeurodivergentProfile.query.all()
+            usuarios = User.query.all()
             
             usuarios_data = []
             for user in usuarios:
@@ -581,9 +581,9 @@ def create_minimal_crm_routes(app):
     def get_usuario(user_id):
         """Obtener un usuario específico"""
         try:
-            from models import NeurodivergentProfile
+            from models import User  # Restaurar User original
             
-            user = NeurodivergentProfile.query.get_or_404(user_id)
+            user = User.query.get_or_404(user_id)
             
             user_data = {
                 'id': user.id,
