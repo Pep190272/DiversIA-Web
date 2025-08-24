@@ -44,6 +44,12 @@ class RegistroGeneralForm(FlaskForm):
 
 # Formularios específicos por neurodivergencia
 class RegistroTDAHForm(RegistroGeneralForm):
+    # Sobrescribir tipo_neurodivergencia para que no sea requerido (ya sabemos que es TDAH)
+    tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', 
+        choices=[('TDAH', 'TDAH')], 
+        default='TDAH',
+        validators=[Optional()])
+    
     tipo_tdah = SelectField('Tipo de TDAH', choices=[
         ('', 'Selecciona una opción'),
         ('inatento', 'Predominantemente inatento'),

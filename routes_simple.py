@@ -163,7 +163,9 @@ def registro_tdah():
         try:
             from models import NeurodivergentProfile
             
-            # Crear nuevo perfil neurodivergente con TODOS los campos específicos TDAH
+            print(f"✅ TDAH - Formulario validado correctamente")
+            
+            # Crear nuevo perfil neurodivergente
             nuevo_perfil = NeurodivergentProfile(
                 # Información personal
                 nombre=form.nombre.data,
@@ -174,7 +176,7 @@ def registro_tdah():
                 fecha_nacimiento=form.fecha_nacimiento.data,
                 
                 # Información de neurodivergencia
-                tipo_neurodivergencia='TDAH',
+                tipo_neurodivergencia=form.tipo_neurodivergencia.data or 'TDAH',
                 diagnostico_formal=form.diagnostico_formal.data == 'si',
                 
                 # Información laboral
