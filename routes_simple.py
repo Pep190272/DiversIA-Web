@@ -379,6 +379,76 @@ def enviar_contacto():
     
     return redirect(url_for('contacto'))
 
+# Ruta para descargar la guía laboral
+@app.route('/descargar-guia-laboral')
+def descargar_guia_laboral():
+    """Ruta para descargar la guía de preparación laboral"""
+    try:
+        with open('static/resources/guia-preparacion-laboral.md', 'r', encoding='utf-8') as file:
+            content = file.read()
+        
+        # Crear respuesta con el contenido del archivo
+        response = app.response_class(
+            content,
+            mimetype='text/markdown',
+            headers={'Content-Disposition': 'attachment; filename=Guia_Preparacion_Laboral_DiversIA.md'}
+        )
+        return response
+    except FileNotFoundError:
+        flash('La guía no está disponible en este momento. Por favor, inténtalo más tarde.', 'error')
+        return redirect(url_for('personas_nd'))
+
+# Ruta para registro de asociaciones
+@app.route('/registro-asociacion', methods=['GET', 'POST'])
+def registro_asociacion():
+    """Formulario para registro de nuevas asociaciones"""
+    from forms import AsociacionForm
+    form = AsociacionForm()
+    
+    if request.method == 'POST' and form.validate_on_submit():
+        try:
+            # Verificar y convertir años_funcionamiento
+            años_funcionamiento_valor = form.años_funcionamiento.data
+            try:
+                años_funcionamiento_int = int(años_funcionamiento_valor) if años_funcionamiento_valor else None
+            except (ValueError, TypeError):
+                años_funcionamiento_int = None
+            
+            # Crear nueva asociación en base de datos
+            from models import Asociacion
+            nueva_asociacion = Asociacion(
+                nombre_asociacion=form.nombre_asociacion.data,
+                acronimo=form.acronimo.data,
+                pais=form.pais.data,
+                ciudad=form.ciudad.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                tipo_documento=form.tipo_documento.data,
+                numero_documento=form.numero_documento.data,
+                neurodivergencias_atendidas=','.join(form.neurodivergencias_atendidas.data or []),
+                servicios=','.join(form.servicios.data or []),
+                descripcion=form.descripcion.data,
+                años_funcionamiento=años_funcionamiento_int,
+                contacto_nombre=form.contacto_nombre.data,
+                contacto_cargo=form.contacto_cargo.data,
+                estado='verificando_documentacion',
+                ip_solicitud=request.remote_addr,
+                user_agent=request.user_agent.string[:500] if request.user_agent else None
+            )
+            
+            db.session.add(nueva_asociacion)
+            db.session.commit()
+            
+            print(f"✅ Asociación registrada: {nueva_asociacion.nombre_asociacion}")
+            flash('¡Asociación registrada exitosamente! Te contactaremos pronto.', 'success')
+            return redirect(url_for('asociaciones'))
+            
+        except Exception as e:
+            print(f"❌ Error registrando asociación: {e}")
+            flash('Error al registrar la asociación. Por favor intenta de nuevo.', 'error')
+    
+    return render_template('registro-asociacion.html', form=form)
+
 # Las rutas de admin están en admin_final.py - no redefinir aquí
 
 print("✅ Routes simplificado cargado correctamente")
