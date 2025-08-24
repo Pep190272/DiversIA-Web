@@ -969,10 +969,10 @@ def create_minimal_crm_routes(app):
     # ==================== FUNCIONALIDAD DE EDICIÓN ====================
     
     @app.route('/api/usuario/<user_id>/editar', methods=['GET', 'POST'])
-    def api_editar_usuario(user_id):
+    def editar_usuario(user_id):
         """Editar un usuario específico (User o NeurodivergentProfile)"""
         try:
-            # Verificar autenticación
+            # Verificar autenticación PRIMERO y devolver JSON si falla
             if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
                 return jsonify({'success': False, 'error': 'No autorizado. Debes iniciar sesión como administrador.'}), 401
             
@@ -1037,7 +1037,7 @@ def create_minimal_crm_routes(app):
             return jsonify({'success': False, 'error': str(e)}), 500
     
     @app.route('/crm-editar/<user_id>')
-    def crm_editar_usuario_form(user_id):
+    def crm_editar_usuario(user_id):
         """Página de edición de usuario"""
         try:
             # Verificar que es administrador
@@ -1054,10 +1054,135 @@ def create_minimal_crm_routes(app):
             return redirect('/crm-minimal')
     
     @app.route('/api/usuario/<user_id>/borrar', methods=['DELETE'])
-    def api_borrar_usuario(user_id):
+    def borrar_usuario(user_id):
         """Borrar un usuario específico (User o NeurodivergentProfile)"""
         try:
-            # Verificar autenticación
+            # Verificar autenticación (ya verificado arriba en editar_usuario)
+            if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
+                return jsonify({'success': False, 'error': 'Acceso no autorizado'}), 401
+            
+            # Determinar si es User o NeurodivergentProfile
+            is_profile = user_id.startswith('profile_')
+            actual_id = user_id.replace('user_', '').replace('profile_', '')
+            
+            if is_profile:
+                from models import NeurodivergentProfile
+                usuario = NeurodivergentProfile.query.get_or_404(actual_id)
+                table_name = 'NeurodivergentProfile'
+            else:
+                from models import User
+                usuario = User.query.get_or_404(actual_id)
+                table_name = 'User'
+            
+            nombre_completo = f"{usuario.nombre} {usuario.apellidos}"
+            
+            # Borrar usuario
+            db.session.delete(usuario)
+            db.session.commit()
+            
+            print(f"🗑️ {table_name} borrado exitosamente: {nombre_completo}")
+            
+            return jsonify({
+                'success': True,
+                'message': f'Usuario {nombre_completo} borrado correctamente'
+            })
+            
+        except Exception as e:
+            print(f"❌ Error borrando usuario {user_id}: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    # ==================== FUNCIONALIDAD DE EDICIÓN ====================
+    
+    @app.route('/api/usuario/<user_id>/editar', methods=['GET', 'POST'])
+    def editar_usuario(user_id):
+        """Editar un usuario específico (User o NeurodivergentProfile)"""
+        try:
+            # Verificar autenticación PRIMERO y devolver JSON si falla
+            if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
+                return jsonify({'success': False, 'error': 'No autorizado. Debes iniciar sesión como administrador.'}), 401
+            
+            print(f"🔧 API edit request for user: {user_id}")
+            
+            # Determinar si es User o NeurodivergentProfile
+            is_profile = user_id.startswith('profile_')
+            actual_id = user_id.replace('user_', '').replace('profile_', '')
+            
+            if is_profile:
+                from models import NeurodivergentProfile
+                usuario = NeurodivergentProfile.query.get_or_404(actual_id)
+                table_name = 'NeurodivergentProfile'
+            else:
+                from models import User
+                usuario = User.query.get_or_404(actual_id)
+                table_name = 'User'
+            
+            if request.method == 'POST':
+                # Actualizar campos del usuario
+                data = request.get_json()
+                
+                for field, value in data.items():
+                    if hasattr(usuario, field) and field != 'id':
+                        if field == 'diagnostico_formal' and isinstance(value, str):
+                            setattr(usuario, field, value.lower() == 'true' or value.lower() == 'si')
+                        else:
+                            setattr(usuario, field, value)
+                
+                db.session.commit()
+                print(f"✅ {table_name} editado: {usuario.nombre} {usuario.apellidos}")
+                
+                return jsonify({
+                    'success': True,
+                    'message': f'Usuario {usuario.nombre} actualizado correctamente'
+                })
+            
+            # GET: Devolver datos actuales del usuario
+            usuario_data = {
+                'id': user_id,
+                'fuente': table_name,
+                'nombre': usuario.nombre,
+                'apellidos': usuario.apellidos,
+                'email': usuario.email,
+                'telefono': usuario.telefono,
+                'ciudad': usuario.ciudad,
+                'fecha_nacimiento': usuario.fecha_nacimiento.isoformat() if usuario.fecha_nacimiento else None,
+                'tipo_neurodivergencia': usuario.tipo_neurodivergencia,
+                'diagnostico_formal': usuario.diagnostico_formal,
+                'habilidades': usuario.habilidades,
+                'experiencia_laboral': usuario.experiencia_laboral,
+                'formacion_academica': usuario.formacion_academica,
+                'intereses_laborales': usuario.intereses_laborales,
+                'adaptaciones_necesarias': usuario.adaptaciones_necesarias,
+                'motivaciones': usuario.motivaciones
+            }
+            
+            return jsonify(usuario_data)
+            
+        except Exception as e:
+            print(f"❌ Error editando usuario {user_id}: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/crm-editar/<user_id>')
+    def crm_editar_usuario(user_id):
+        """Página de edición de usuario"""
+        try:
+            # Verificar que es administrador
+            if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
+                flash('Acceso restringido. Inicia sesión como administrador.', 'error')
+                return redirect('/admin/login-new')
+            
+            print(f"🔧 Abriendo editor para usuario: {user_id}")
+            return render_template('crm-editar-usuario.html', user_id=user_id)
+            
+        except Exception as e:
+            print(f"❌ Error en editor: {e}")
+            flash('Error cargando editor de usuario.', 'error')
+            return redirect('/crm-minimal')
+    
+    @app.route('/api/usuario/<user_id>/borrar', methods=['DELETE'])
+    def borrar_usuario(user_id):
+        """Borrar un usuario específico (User o NeurodivergentProfile)"""
+        try:
+            # Verificar autenticación (ya verificado arriba en editar_usuario)
             if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
                 return jsonify({'success': False, 'error': 'Acceso no autorizado'}), 401
             
@@ -1092,4 +1217,3 @@ def create_minimal_crm_routes(app):
             return jsonify({'success': False, 'error': str(e)}), 500
     
     print("CRM Minimal inicializado correctamente")
-    
