@@ -3,6 +3,99 @@ from app import app, db
 from datetime import datetime
 import json
 
+# ===== RUTAS BÁSICAS DEL SITIO WEB QUE FALTAN =====
+# Nota: '/' ya está en main.py, solo añadimos las que faltan
+
+@app.route('/personas-nd')
+def personas_nd():
+    return render_template('personas-nd.html')
+
+@app.route('/empresas', methods=['GET', 'POST'])
+def empresas():
+    from forms import RegistroEmpresaForm
+    form = RegistroEmpresaForm()
+    
+    if form.validate_on_submit():
+        try:
+            from models import Company
+            nueva_empresa = Company(
+                nombre=form.nombre.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                sector=form.sector.data,
+                tamaño=form.tamaño.data,
+                ciudad=form.ciudad.data,
+                descripcion=form.descripcion.data,
+                contacto_nombre=form.contacto_nombre.data,
+                contacto_cargo=form.contacto_cargo.data
+            )
+            
+            db.session.add(nueva_empresa)
+            db.session.commit()
+            
+            flash('¡Empresa registrada exitosamente! Te contactaremos pronto.', 'success')
+            return redirect(url_for('empresas'))
+            
+        except Exception as e:
+            print(f"❌ Error registrando empresa: {e}")
+            flash('Error al registrar la empresa. Por favor intenta de nuevo.', 'error')
+    
+    return render_template('empresas.html', form=form)
+
+@app.route('/asociaciones')
+def asociaciones():
+    return render_template('asociaciones.html')
+
+@app.route('/comunidad')
+def comunidad():
+    return render_template('comunidad.html')
+
+@app.route('/contacto', methods=['GET', 'POST'])
+def contacto():
+    from forms import ContactForm
+    form = ContactForm()
+    
+    if form.validate_on_submit():
+        try:
+            from models import FormSubmission
+            nuevo_contacto = FormSubmission(
+                form_type='contacto',
+                nombre=form.nombre.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                asunto=form.asunto.data,
+                mensaje=form.mensaje.data,
+                ip_address=request.remote_addr
+            )
+            
+            db.session.add(nuevo_contacto)
+            db.session.commit()
+            
+            flash('¡Mensaje enviado exitosamente! Te responderemos pronto.', 'success')
+            return redirect(url_for('contacto'))
+            
+        except Exception as e:
+            print(f"❌ Error enviando contacto: {e}")
+            flash('Error al enviar el mensaje. Por favor intenta de nuevo.', 'error')
+    
+    return render_template('contacto.html', form=form)
+
+@app.route('/sobre-nosotros')
+def sobre_nosotros():
+    return render_template('sobre-nosotros.html')
+
+@app.route('/privacidad')
+def privacidad():
+    return render_template('privacidad.html')
+
+@app.route('/aviso-legal')
+def aviso_legal():
+    return render_template('aviso-legal.html')
+
+@app.route('/terminos')
+def terminos():
+    return render_template('terminos.html')
+
 # ===== REGISTROS =====
 @app.route('/registro-asociacion', methods=['GET', 'POST'])
 def registro_asociacion():
