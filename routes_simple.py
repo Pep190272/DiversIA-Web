@@ -106,11 +106,46 @@ def registro_dislexia():
         return redirect(url_for('personas_nd'))
     return render_template('registro-dislexia.html', form=form)
 
-# Ruta que faltaba para descargar guía
+# Rutas adicionales que requieren los templates
 @app.route('/descargar-guia-laboral')
 def descargar_guia_laboral():
     """Descargar guía laboral PDF"""
     return "Descarga de guía laboral (función temporal)", 200
+
+@app.route('/videos-informativos')
+def videos_informativos():
+    """Videos informativos"""
+    return "Videos informativos (función temporal)", 200
+
+@app.route('/recursos-formacion')
+def recursos_formacion():
+    """Recursos de formación"""
+    return "Recursos de formación (función temporal)", 200
+
+@app.route('/comunidad-neurodivergentes')
+def comunidad_neurodivergentes():
+    """Comunidad neurodivergentes"""
+    return "Comunidad neurodivergentes (función temporal)", 200
+
+@app.route('/bolsa-trabajo')
+def bolsa_trabajo():
+    """Bolsa de trabajo"""
+    return "Bolsa de trabajo (función temporal)", 200
+
+@app.route('/test')
+def test():
+    """Test/evaluaciones"""
+    return "Test y evaluaciones (función temporal)", 200
+
+@app.route('/comenzar')
+def comenzar():
+    """Comenzar proceso"""
+    return "Comenzar proceso (función temporal)", 200
+
+@app.route('/podcast-diversia')
+def podcast_diversia():
+    """Podcast DiversIA"""
+    return "Podcast DiversIA (función temporal)", 200
 
 @app.route('/registro-discalculia', methods=['GET', 'POST'])
 def registro_discalculia():
