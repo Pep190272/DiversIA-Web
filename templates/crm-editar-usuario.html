@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Usuario - CRM DiversIA{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Editar Usuario</h1>
+                <a href="/crm-minimal" class="btn btn-outline-secondary">
+                    <i data-lucide="arrow-left" aria-hidden="true"></i>
+                    Volver al CRM
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Formulario de Edición</h5>
+                </div>
+                <div class="card-body">
+                    <form id="editForm">
+                        <div class="row">
+                            <!-- Información Personal -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3">Información Personal</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="apellidos" class="form-label">Apellidos *</label>
+                                    <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="telefono" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control" id="telefono" name="telefono">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="ciudad" class="form-label">Ciudad</label>
+                                    <input type="text" class="form-control" id="ciudad" name="ciudad">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento">
+                                </div>
+                            </div>
+
+                            <!-- Información Específica -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3">Información Específica</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="tipo_neurodivergencia" class="form-label">Tipo de Neurodivergencia</label>
+                                    <input type="text" class="form-control" id="tipo_neurodivergencia" name="tipo_neurodivergencia">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="diagnostico_formal" class="form-label">Diagnóstico Formal</label>
+                                    <select class="form-select" id="diagnostico_formal" name="diagnostico_formal">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="true">Sí</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="habilidades" class="form-label">Habilidades</label>
+                                    <textarea class="form-control" id="habilidades" name="habilidades" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="experiencia_laboral" class="form-label">Experiencia Laboral</label>
+                                    <textarea class="form-control" id="experiencia_laboral" name="experiencia_laboral" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">Información Adicional</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="formacion_academica" class="form-label">Formación Académica</label>
+                                    <textarea class="form-control" id="formacion_academica" name="formacion_academica" rows="2"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="intereses_laborales" class="form-label">Intereses Laborales</label>
+                                    <textarea class="form-control" id="intereses_laborales" name="intereses_laborales" rows="2"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="adaptaciones_necesarias" class="form-label">Adaptaciones Necesarias</label>
+                                    <textarea class="form-control" id="adaptaciones_necesarias" name="adaptaciones_necesarias" rows="2"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="motivaciones" class="form-label">Motivaciones</label>
+                                    <textarea class="form-control" id="motivaciones" name="motivaciones" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/crm-minimal" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i data-lucide="save" aria-hidden="true"></i>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userId = '{{ user_id }}';
+    const form = document.getElementById('editForm');
+    
+    // Cargar datos del usuario
+    fetch(`/api/usuario/${userId}/editar`)
+        .then(response => response.json())
+        .then(data => {
+            // Llenar el formulario con los datos actuales
+            Object.keys(data).forEach(key => {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input && data[key] !== null) {
+                    if (key === 'fecha_nacimiento') {
+                        input.value = data[key] ? data[key].split('T')[0] : '';
+                    } else if (key === 'diagnostico_formal') {
+                        input.value = data[key] ? 'true' : 'false';
+                    } else {
+                        input.value = data[key];
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error cargando datos:', error);
+            alert('Error al cargar los datos del usuario');
+        });
+    
+    // Manejar envío del formulario
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        
+        fetch(`/api/usuario/${userId}/editar`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert('Usuario actualizado correctamente');
+                window.location.href = '/crm-minimal';
+            } else {
+                alert('Error: ' + result.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al guardar los cambios');
+        });
+    });
+});
+</script>
+{% endblock %}

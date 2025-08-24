@@ -877,5 +877,84 @@ def create_minimal_crm_routes(app):
             
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
+
+    # ==================== FUNCIONALIDAD DE EDICIÓN ====================
+    
+    @app.route('/api/usuario/<user_id>/editar', methods=['GET', 'POST'])
+    def editar_usuario(user_id):
+        """Editar un usuario específico (User o NeurodivergentProfile)"""
+        try:
+            # Determinar si es User o NeurodivergentProfile
+            is_profile = user_id.startswith('profile_')
+            actual_id = user_id.replace('user_', '').replace('profile_', '')
+            
+            if is_profile:
+                from models import NeurodivergentProfile
+                usuario = NeurodivergentProfile.query.get_or_404(actual_id)
+                table_name = 'NeurodivergentProfile'
+            else:
+                from models import User
+                usuario = User.query.get_or_404(actual_id)
+                table_name = 'User'
+            
+            if request.method == 'POST':
+                # Actualizar campos del usuario
+                data = request.get_json()
+                
+                for field, value in data.items():
+                    if hasattr(usuario, field) and field != 'id':
+                        if field == 'diagnostico_formal' and isinstance(value, str):
+                            setattr(usuario, field, value.lower() == 'true' or value.lower() == 'si')
+                        else:
+                            setattr(usuario, field, value)
+                
+                db.session.commit()
+                print(f"✅ {table_name} editado: {usuario.nombre} {usuario.apellidos}")
+                
+                return jsonify({
+                    'success': True,
+                    'message': f'Usuario {usuario.nombre} actualizado correctamente'
+                })
+            
+            # GET: Devolver datos actuales del usuario
+            usuario_data = {
+                'id': user_id,
+                'fuente': table_name,
+                'nombre': usuario.nombre,
+                'apellidos': usuario.apellidos,
+                'email': usuario.email,
+                'telefono': usuario.telefono,
+                'ciudad': usuario.ciudad,
+                'fecha_nacimiento': usuario.fecha_nacimiento.isoformat() if usuario.fecha_nacimiento else None,
+                'tipo_neurodivergencia': usuario.tipo_neurodivergencia,
+                'diagnostico_formal': usuario.diagnostico_formal,
+                'habilidades': usuario.habilidades,
+                'experiencia_laboral': usuario.experiencia_laboral,
+                'formacion_academica': usuario.formacion_academica,
+                'intereses_laborales': usuario.intereses_laborales,
+                'adaptaciones_necesarias': usuario.adaptaciones_necesarias,
+                'motivaciones': usuario.motivaciones
+            }
+            
+            return jsonify(usuario_data)
+            
+        except Exception as e:
+            print(f"❌ Error editando usuario {user_id}: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/crm-editar/<user_id>')
+    def crm_editar_usuario(user_id):
+        """Página de edición de usuario"""
+        try:
+            # Verificar que es administrador
+            if 'admin_ok' not in session or not session.get('admin_ok'):
+                flash('Acceso restringido. Inicia sesión como administrador.', 'error')
+                return redirect('/admin/login-new')
+            
+            return render_template('crm-editar-usuario.html', user_id=user_id)
+            
+        except Exception as e:
+            flash('Error cargando editor de usuario.', 'error')
+            return redirect('/crm-minimal')
     
     print("CRM Minimal inicializado correctamente")
