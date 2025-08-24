@@ -71,6 +71,13 @@ def create_minimal_crm_routes(app):
             return redirect('/diversia-admin')
         return render_template('asociaciones-crm.html')
     
+    @app.route('/usuarios-neurodivergentes')
+    def usuarios_neurodivergentes():
+        """Dashboard de usuarios neurodivergentes del CRM - requiere autenticación"""
+        if 'admin_ok' not in session or not session.get('admin_ok'):
+            return redirect('/diversia-admin')
+        return render_template('crm-neurodivergentes.html')
+    
     @app.route('/api/minimal/companies')
     def get_companies_minimal():
         """Obtener todas las empresas"""
@@ -305,6 +312,73 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
     
+    # ==================== RUTAS PARA USUARIOS NEURODIVERGENTES ====================
+    
+    @app.route('/api/usuarios')
+    def get_usuarios():
+        """Obtener todos los usuarios neurodivergentes de la base de datos"""
+        try:
+            from models import User
+            from app import db
+            
+            usuarios = User.query.all()
+            
+            usuarios_data = []
+            for user in usuarios:
+                usuarios_data.append({
+                    'id': user.id,
+                    'nombre': user.nombre,
+                    'apellidos': user.apellidos,
+                    'email': user.email,
+                    'telefono': user.telefono,
+                    'ciudad': user.ciudad,
+                    'fecha_nacimiento': user.fecha_nacimiento.isoformat() if user.fecha_nacimiento else None,
+                    'tipo_neurodivergencia': user.tipo_neurodivergencia,
+                    'diagnostico_formal': user.diagnostico_formal,
+                    'habilidades': user.habilidades,
+                    'experiencia_laboral': user.experiencia_laboral,
+                    'formacion_academica': user.formacion_academica,
+                    'intereses_laborales': user.intereses_laborales,
+                    'adaptaciones_necesarias': user.adaptaciones_necesarias,
+                    'motivaciones': user.motivaciones,
+                    'created_at': user.created_at.isoformat() if user.created_at else None
+                })
+            
+            return jsonify(usuarios_data)
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/usuarios/<int:user_id>')
+    def get_usuario(user_id):
+        """Obtener un usuario específico"""
+        try:
+            from models import User
+            
+            user = User.query.get_or_404(user_id)
+            
+            user_data = {
+                'id': user.id,
+                'nombre': user.nombre,
+                'apellidos': user.apellidos,
+                'email': user.email,
+                'telefono': user.telefono,
+                'ciudad': user.ciudad,
+                'fecha_nacimiento': user.fecha_nacimiento.isoformat() if user.fecha_nacimiento else None,
+                'tipo_neurodivergencia': user.tipo_neurodivergencia,
+                'diagnostico_formal': user.diagnostico_formal,
+                'habilidades': user.habilidades,
+                'experiencia_laboral': user.experiencia_laboral,
+                'formacion_academica': user.formacion_academica,
+                'intereses_laborales': user.intereses_laborales,
+                'adaptaciones_necesarias': user.adaptaciones_necesarias,
+                'motivaciones': user.motivaciones,
+                'created_at': user.created_at.isoformat() if user.created_at else None
+            }
+            
+            return jsonify(user_data)
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+
     # ==================== RUTAS PARA ASOCIACIONES ====================
     
     @app.route('/api/asociaciones')
