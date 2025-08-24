@@ -126,12 +126,57 @@ def registro():
 # Rutas de registro específicas por neurodivergencia
 @app.route('/registro-tdah', methods=['GET', 'POST'])
 def registro_tdah():
+    """Página de registro específica para TDAH - Guarda en NeurodivergentProfile"""
     from forms import RegistroTDAHForm
     form = RegistroTDAHForm()
+    
     if form.validate_on_submit():
-        # Lógica de registro TDAH aquí
-        flash('¡Registro TDAH completado exitosamente!', 'success')
-        return redirect(url_for('personas_nd'))
+        try:
+            from models import NeurodivergentProfile
+            
+            # Crear nuevo perfil neurodivergente con TODOS los campos específicos TDAH
+            nuevo_perfil = NeurodivergentProfile(
+                # Información personal
+                nombre=form.nombre.data,
+                apellidos=form.apellidos.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                ciudad=form.ciudad.data,
+                fecha_nacimiento=form.fecha_nacimiento.data,
+                
+                # Información de neurodivergencia
+                tipo_neurodivergencia='tdah',
+                diagnostico_formal=form.diagnostico_formal.data,
+                
+                # Información laboral
+                habilidades=form.habilidades.data,
+                experiencia_laboral=form.experiencia_laboral.data,
+                formacion_academica=form.formacion_academica.data,
+                intereses_laborales=form.intereses_laborales.data,
+                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
+                motivaciones=form.motivaciones.data,
+                
+                # Campos específicos TDAH
+                tipo_tdah=form.tipo_tdah.data,
+                nivel_atencion=form.nivel_atencion.data,
+                impulsividad=form.impulsividad.data,
+                hiperactividad=form.hiperactividad.data,
+                medicacion=form.medicacion.data
+            )
+            
+            db.session.add(nuevo_perfil)
+            db.session.commit()
+            
+            flash(f'¡Registro TDAH completado exitosamente, {form.nombre.data}! Tu perfil detallado ha sido guardado.', 'success')
+            print(f"✅ Perfil TDAH registrado: {form.nombre.data} {form.apellidos.data}")
+            
+            return redirect(url_for('personas_nd'))
+            
+        except Exception as e:
+            print(f"❌ Error guardando perfil TDAH: {e}")
+            flash('Error al guardar tu perfil TDAH. Por favor intenta de nuevo.', 'error')
+            db.session.rollback()
+    
     return render_template('registro-tdah.html', form=form)
 
 @app.route('/registro-tea', methods=['GET', 'POST'])  

@@ -314,6 +314,62 @@ def create_minimal_crm_routes(app):
     
     # ==================== RUTAS PARA USUARIOS NEURODIVERGENTES ====================
     
+    @app.route('/api/neurodivergent-profiles')
+    def get_neurodivergent_profiles():
+        """Obtener todos los perfiles neurodivergentes detallados de la base de datos"""
+        try:
+            from models import NeurodivergentProfile
+            from app import db
+            
+            profiles = NeurodivergentProfile.query.all()
+            
+            profiles_data = []
+            for profile in profiles:
+                profiles_data.append({
+                    'id': profile.id,
+                    'nombre': profile.nombre,
+                    'apellidos': profile.apellidos,
+                    'email': profile.email,
+                    'telefono': profile.telefono,
+                    'ciudad': profile.ciudad,
+                    'fecha_nacimiento': profile.fecha_nacimiento.isoformat() if profile.fecha_nacimiento else None,
+                    'tipo_neurodivergencia': profile.tipo_neurodivergencia,
+                    'diagnostico_formal': profile.diagnostico_formal,
+                    'habilidades': profile.habilidades,
+                    'experiencia_laboral': profile.experiencia_laboral,
+                    'formacion_academica': profile.formacion_academica,
+                    'intereses_laborales': profile.intereses_laborales,
+                    'adaptaciones_necesarias': profile.adaptaciones_necesarias,
+                    'motivaciones': profile.motivaciones,
+                    # Campos específicos TDAH
+                    'tipo_tdah': profile.tipo_tdah,
+                    'nivel_atencion': profile.nivel_atencion,
+                    'impulsividad': profile.impulsividad,
+                    'hiperactividad': profile.hiperactividad,
+                    'medicacion': profile.medicacion,
+                    'medicacion_actual': profile.medicacion_actual,
+                    'dosis_medicacion': profile.dosis_medicacion,
+                    'efectos_secundarios': profile.efectos_secundarios,
+                    'estrategias_organizacion': profile.estrategias_organizacion,
+                    # Campos específicos TEA
+                    'nivel_comunicacion': profile.nivel_comunicacion,
+                    'sensibilidades': profile.sensibilidades,
+                    'rutinas_importantes': profile.rutinas_importantes,
+                    'intereses_especiales': profile.intereses_especiales,
+                    'dificultades_sociales': profile.dificultades_sociales,
+                    # Campos específicos Dislexia
+                    'areas_dificultad': profile.areas_dificultad,
+                    'herramientas_apoyo': profile.herramientas_apoyo,
+                    'estrategias_lectura': profile.estrategias_lectura,
+                    'created_at': profile.created_at.isoformat() if profile.created_at else None
+                })
+            
+            return jsonify(profiles_data)
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    # ==================== RUTAS PARA USUARIOS GENERALES ===================="
+    
     @app.route('/api/usuarios')
     def get_usuarios():
         """Obtener todos los usuarios neurodivergentes de la base de datos"""

@@ -191,10 +191,10 @@
 
         async function loadOverviewData() {
             try {
-                const response = await fetch('/api/neurodivergentes/stats');
+                const response = await fetch('/api/usuarios');
                 const data = await response.json();
                 
-                document.getElementById('total-users').textContent = data.total || 0;
+                document.getElementById('total-users').textContent = data.length || 0;
                 
                 // Crear tarjetas de resumen
                 const overviewContainer = document.getElementById('overview-cards');
@@ -229,8 +229,10 @@
             container.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
             
             try {
-                const response = await fetch(`/api/neurodivergentes/${type}`);
-                const data = await response.json();
+                const response = await fetch('/api/usuarios');
+                const allData = await response.json();
+                // Filtrar por tipo de neurodivergencia
+                const data = allData.filter(user => user.tipo_neurodivergencia === type.toLowerCase());
                 
                 let html = `
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -277,7 +279,7 @@
 
         async function showUserDetails(userId) {
             try {
-                const response = await fetch(`/api/neurodivergentes/user/${userId}`);
+                const response = await fetch(`/api/usuarios/${userId}`);
                 const user = await response.json();
                 
                 const modalBody = document.getElementById('userModalBody');
@@ -324,7 +326,7 @@
 
         async function exportAllData() {
             try {
-                const response = await fetch('/api/neurodivergentes/export');
+                const response = await fetch('/api/usuarios');
                 const data = await response.json();
                 
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -344,40 +346,39 @@
             const container = document.getElementById('otros-content');
             container.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
             
-            Promise.all([
-                fetch('/api/neurodivergentes/Tourette').then(r => r.json()),
-                fetch('/api/neurodivergentes/Dispraxia').then(r => r.json()),
-                fetch('/api/neurodivergentes/Ansiedad').then(r => r.json()),
-                fetch('/api/neurodivergentes/Bipolar').then(r => r.json()),
-                fetch('/api/neurodivergentes/Altas%20Capacidades').then(r => r.json())
-            ]).then(results => {
-                let html = '<div class="row">';
-                const types = ['Tourette', 'Dispraxia', 'Ansiedad', 'Bipolar', 'Altas Capacidades'];
+            fetch('/api/usuarios')
+                .then(response => response.json())
+                .then(allUsers => {
+                    const types = ['tourette', 'dispraxia', 'ansiedad', 'bipolar', 'altas_capacidades'];
+                    const typeLabels = ['Tourette', 'Dispraxia', 'Ansiedad', 'Bipolar', 'Altas Capacidades'];
+                    const results = types.map(type => allUsers.filter(user => user.tipo_neurodivergencia === type));
+                
+                    let html = '<div class="row">';
                 
                 results.forEach((data, index) => {
                     html += `
                         <div class="col-md-6 mb-4">
                             <div class="card">
                                 <div class="card-header">
-                                    <h6>${types[index]} - ${data.count} registros</h6>
+                                    <h6>${typeLabels[index]} - ${data.length} registros</h6>
                                 </div>
                                 <div class="card-body">
-                                    ${data.users.slice(0, 3).map(user => `
+                                    ${data.slice(0, 3).map(user => `
                                         <div class="border-bottom pb-2 mb-2" onclick="showUserDetails(${user.id})">
-                                            <strong>${user.nombre_completo}</strong><br>
+                                            <strong>${user.nombre} ${user.apellidos}</strong><br>
                                             <small class="text-muted">${user.email} - ${user.ciudad}</small>
                                         </div>
                                     `).join('')}
-                                    ${data.count > 3 ? `<small class="text-muted">Y ${data.count - 3} más...</small>` : ''}
+                                    ${data.length > 3 ? `<small class="text-muted">Y ${data.length - 3} más...</small>` : ''}
                                 </div>
                             </div>
                         </div>
                     `;
                 });
                 
-                html += '</div>';
-                container.innerHTML = html;
-            }).catch(error => {
+                    html += '</div>';
+                    container.innerHTML = html;
+                }).catch(error => {
                 console.error('Error loading other types:', error);
                 container.innerHTML = '<div class="alert alert-danger">Error cargando datos</div>';
             });

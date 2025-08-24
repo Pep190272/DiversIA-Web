@@ -49,6 +49,61 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.nombre} {self.apellidos}>'
 
+# Nueva tabla para formularios específicos de neurodivergencia con campos detallados
+class NeurodivergentProfile(db.Model):
+    __tablename__ = 'neurodivergent_profiles'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    # Información personal básica
+    nombre = db.Column(db.String(100), nullable=False)
+    apellidos = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False, index=True)
+    telefono = db.Column(db.String(20), nullable=True)
+    ciudad = db.Column(db.String(100), nullable=False)
+    fecha_nacimiento = db.Column(db.Date, nullable=False)
+    
+    # Información de neurodivergencia
+    tipo_neurodivergencia = db.Column(db.String(50), nullable=False)
+    diagnostico_formal = db.Column(db.String(20), nullable=True)  # 'si', 'no', 'proceso'
+    
+    # Información laboral y personal
+    habilidades = db.Column(db.Text, nullable=True)
+    experiencia_laboral = db.Column(db.Text, nullable=True)
+    formacion_academica = db.Column(db.Text, nullable=True)
+    intereses_laborales = db.Column(db.Text, nullable=True)
+    adaptaciones_necesarias = db.Column(db.Text, nullable=True)
+    motivaciones = db.Column(db.Text, nullable=True)
+    
+    # Campos específicos TDAH
+    tipo_tdah = db.Column(db.String(20), nullable=True)
+    nivel_atencion = db.Column(db.String(10), nullable=True)
+    impulsividad = db.Column(db.String(10), nullable=True)
+    hiperactividad = db.Column(db.String(10), nullable=True)
+    medicacion = db.Column(db.String(10), nullable=True)  # 'si', 'no', 'antes'
+    medicacion_actual = db.Column(db.String(20), nullable=True)
+    dosis_medicacion = db.Column(db.String(50), nullable=True)
+    efectos_secundarios = db.Column(db.Text, nullable=True)
+    estrategias_organizacion = db.Column(db.Text, nullable=True)
+    
+    # Campos específicos TEA
+    nivel_comunicacion = db.Column(db.String(10), nullable=True)
+    sensibilidades = db.Column(db.Text, nullable=True)
+    rutinas_importantes = db.Column(db.Text, nullable=True)
+    intereses_especiales = db.Column(db.Text, nullable=True)
+    dificultades_sociales = db.Column(db.String(10), nullable=True)
+    
+    # Campos específicos Dislexia
+    areas_dificultad = db.Column(db.Text, nullable=True)  # Array de strings convertido a Text
+    herramientas_apoyo = db.Column(db.Text, nullable=True)
+    estrategias_lectura = db.Column(db.Text, nullable=True)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<NeurodivergentProfile {self.nombre} {self.apellidos} - {self.tipo_neurodivergencia}>'
+
 class Company(db.Model):
     __tablename__ = 'companies'
     
