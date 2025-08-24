@@ -322,3 +322,29 @@ class Asociacion(db.Model):
     
     def __repr__(self):
         return f'<Asociacion {self.nombre_asociacion}>'
+
+class NotificationBackup(db.Model):
+    """Sistema de respaldo para notificaciones cuando falla el email"""
+    __tablename__ = 'notifications_backup'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    tipo = db.Column(db.String(50), nullable=False)  # 'asociacion_registro', 'asociacion_estado', etc.
+    destinatario = db.Column(db.String(120), nullable=False)
+    asunto = db.Column(db.String(200), nullable=False)
+    contenido = db.Column(db.Text, nullable=False)  # Datos en texto plano
+    email_html = db.Column(db.Text, nullable=True)  # Contenido HTML del email
+    
+    estado = db.Column(db.String(20), default='pendiente')  # 'pendiente', 'enviado', 'leido'
+    prioridad = db.Column(db.String(10), default='media')  # 'alta', 'media', 'baja'
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    sent_at = db.Column(db.DateTime, nullable=True)
+    read_at = db.Column(db.DateTime, nullable=True)
+    
+    def mark_as_read(self):
+        self.estado = 'leido'
+        self.read_at = datetime.utcnow()
+    
+    def __repr__(self):
+        return f'<NotificationBackup {self.tipo} - {self.destinatario}>'

@@ -526,12 +526,29 @@ def verificar_asociaciones():
         flash('Acceso restringido. Inicia sesión como administrador.', 'error')
         return redirect('/admin/login-new')
     
-    from models import Asociacion
+    from models import Asociacion, NotificationBackup
     
     # Obtener todas las asociaciones pendientes de verificación
     asociaciones_pendientes = Asociacion.query.filter(
         Asociacion.estado.in_(['verificando_documentacion', 'pendiente', 'documentos_requeridos'])
     ).order_by(Asociacion.created_at.desc()).all()
+    
+    # Marcar notificaciones como leídas cuando se accede al panel
+    try:
+        notifications = NotificationBackup.query.filter_by(
+            tipo='asociacion_registro',
+            estado='pendiente'
+        ).all()
+        
+        for notification in notifications:
+            notification.mark_as_read()
+        
+        if notifications:
+            db.session.commit()
+            print(f"✅ {len(notifications)} notificaciones marcadas como leídas")
+            
+    except Exception as e:
+        print(f"⚠️ Error marcando notificaciones: {e}")
     
     return render_template('admin/verificar-asociaciones.html', 
                          asociaciones=asociaciones_pendientes)
