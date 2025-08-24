@@ -541,6 +541,91 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
 
+    # ==================== APIS SEPARADAS POR TIPO DE USUARIO ====================""
+    
+    @app.route('/api/usuarios-neurodivergentes')
+    def get_usuarios_neurodivergentes():
+        """Obtener SOLO usuarios de formularios específicos ND (NeurodivergentProfile)"""
+        try:
+            from models import NeurodivergentProfile
+            from app import db
+            
+            usuarios_data = []
+            
+            # Solo usuarios de la tabla NeurodivergentProfile (formularios específicos)
+            try:
+                usuarios_profile = NeurodivergentProfile.query.all()
+                print(f"🔍 CRM ND - Encontrados {len(usuarios_profile)} perfiles neurodivergentes específicos")
+                
+                for profile in usuarios_profile:
+                    print(f"📋 CRM ND - Perfil: {profile.nombre} {profile.apellidos} ({profile.tipo_neurodivergencia})")
+                    usuarios_data.append({
+                        'id': f'profile_{profile.id}',
+                        'fuente': 'NeurodivergentProfile (formulario específico)',
+                        'nombre': profile.nombre,
+                        'apellidos': profile.apellidos,
+                        'email': profile.email,
+                        'telefono': profile.telefono,
+                        'ciudad': profile.ciudad,
+                        'fecha_nacimiento': profile.fecha_nacimiento.isoformat() if profile.fecha_nacimiento else None,
+                        'tipo_neurodivergencia': profile.tipo_neurodivergencia,
+                        'diagnostico_formal': profile.diagnostico_formal,
+                        'habilidades': profile.habilidades,
+                        'experiencia_laboral': profile.experiencia_laboral,
+                        'formacion_academica': profile.formacion_academica,
+                        'intereses_laborales': profile.intereses_laborales,
+                        'adaptaciones_necesarias': profile.adaptaciones_necesarias,
+                        'motivaciones': profile.motivaciones,
+                        'created_at': profile.created_at.isoformat() if profile.created_at else None
+                    })
+            except Exception as e:
+                print(f"⚠️ Error cargando perfiles ND específicos: {e}")
+            
+            print(f"📊 CRM ND - Total perfiles ND específicos: {len(usuarios_data)}")
+            return jsonify(usuarios_data)
+            
+        except Exception as e:
+            print(f"❌ Error en API usuarios-neurodivergentes: {e}")
+            return jsonify([])
+
+    @app.route('/api/leads-generales')
+    def get_leads_generales():
+        """Obtener SOLO leads del test general (GeneralLead)"""
+        try:
+            from models import GeneralLead
+            from app import db
+            
+            leads_data = []
+            
+            # Solo leads de la tabla GeneralLead (test general)
+            try:
+                leads = GeneralLead.query.all()
+                print(f"🔍 CRM Leads - Encontrados {len(leads)} leads del test general")
+                
+                for lead in leads:
+                    print(f"📋 CRM Leads - Lead: {lead.nombre} {lead.apellidos}")
+                    leads_data.append({
+                        'id': f'lead_{lead.id}',
+                        'fuente': 'GeneralLead (test general)',
+                        'nombre': lead.nombre,
+                        'apellidos': lead.apellidos,
+                        'email': lead.email,
+                        'telefono': getattr(lead, 'telefono', ''),
+                        'ciudad': getattr(lead, 'ciudad', ''),
+                        'fecha_nacimiento': getattr(lead, 'fecha_nacimiento', None),
+                        'tipo_neurodivergencia': getattr(lead, 'resultado_test', 'En proceso'),
+                        'created_at': lead.created_at.isoformat() if lead.created_at else None
+                    })
+            except Exception as e:
+                print(f"⚠️ Error cargando leads generales: {e}")
+            
+            print(f"📊 CRM Leads - Total leads generales: {len(leads_data)}")
+            return jsonify(leads_data)
+            
+        except Exception as e:
+            print(f"❌ Error en API leads-generales: {e}")
+            return jsonify([])
+
     # ==================== RUTAS PARA USUARIOS GENERALES (LEGACY) ====================""
     
     @app.route('/api/usuarios')
