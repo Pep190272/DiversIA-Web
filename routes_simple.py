@@ -61,7 +61,7 @@ def sobre_nosotros():
 
 @app.route('/privacidad')
 def privacidad():
-    return render_template('privacidad.html')
+    return render_template('politica-privacidad.html')
 
 @app.route('/aviso-legal')
 def aviso_legal():
@@ -75,7 +75,9 @@ def terminos():
 @app.route('/registro')
 def registro():
     """Página de registro general"""
-    return render_template('registro.html')
+    from forms import RegistroGeneralForm
+    form = RegistroGeneralForm()
+    return render_template('registro.html', form=form)
 
 # Rutas de registro específicas por neurodivergencia
 @app.route('/registro-tdah', methods=['GET', 'POST'])
