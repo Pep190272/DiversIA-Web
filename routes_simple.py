@@ -82,6 +82,29 @@ def registro():
         try:
             from models import User
             
+            # Verificar si el email ya existe
+            usuario_existente = User.query.filter_by(email=form.email.data).first()
+            if usuario_existente:
+                # Actualizar el usuario existente en lugar de crear uno nuevo
+                usuario_existente.nombre = form.nombre.data
+                usuario_existente.apellidos = form.apellidos.data
+                usuario_existente.telefono = form.telefono.data
+                usuario_existente.ciudad = form.ciudad.data
+                usuario_existente.fecha_nacimiento = form.fecha_nacimiento.data
+                usuario_existente.tipo_neurodivergencia = form.tipo_neurodivergencia.data
+                usuario_existente.diagnostico_formal = form.diagnostico_formal.data == 'si'
+                usuario_existente.habilidades = form.habilidades.data
+                usuario_existente.experiencia_laboral = form.experiencia_laboral.data
+                usuario_existente.formacion_academica = form.formacion_academica.data
+                usuario_existente.intereses_laborales = form.intereses_laborales.data
+                usuario_existente.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+                usuario_existente.motivaciones = form.motivaciones.data
+                
+                db.session.commit()
+                flash(f'¡Test actualizado exitosamente, {form.nombre.data}! Tu información ha sido actualizada.', 'success')
+                print(f"✅ Usuario actualizado: {form.nombre.data} {form.apellidos.data}")
+                return redirect(url_for('personas_nd'))
+            
             # Mapear el campo diagnostico_formal (string a boolean)
             diagnostico_bool = form.diagnostico_formal.data == 'si'
             
