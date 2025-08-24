@@ -375,6 +375,63 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
 
+    # ==================== MIGRACIÓN DE USUARIOS LEGACY A LEADS ====================
+    
+    @app.route('/api/migrate-users-to-leads', methods=['POST'])
+    def migrate_users_to_leads():
+        """Migrar usuarios de la tabla User legacy a GeneralLead"""
+        try:
+            from models import User, GeneralLead
+            from app import db
+            
+            # Obtener todos los usuarios de la tabla legacy
+            usuarios_legacy = User.query.all()
+            migrados = 0
+            
+            for usuario in usuarios_legacy:
+                # Verificar si ya existe en GeneralLead
+                lead_existente = GeneralLead.query.filter_by(email=usuario.email).first()
+                
+                if not lead_existente:
+                    # Migrar a GeneralLead
+                    nuevo_lead = GeneralLead(
+                        nombre=usuario.nombre,
+                        apellidos=usuario.apellidos,
+                        email=usuario.email,
+                        telefono=usuario.telefono,
+                        ciudad=usuario.ciudad,
+                        fecha_nacimiento=usuario.fecha_nacimiento,
+                        tipo_neurodivergencia=usuario.tipo_neurodivergencia,
+                        diagnostico_formal=usuario.diagnostico_formal,
+                        habilidades=usuario.habilidades,
+                        experiencia_laboral=usuario.experiencia_laboral,
+                        formacion_academica=usuario.formacion_academica,
+                        intereses_laborales=usuario.intereses_laborales,
+                        adaptaciones_necesarias=usuario.adaptaciones_necesarias,
+                        motivaciones=usuario.motivaciones,
+                        convertido_a_perfil=False,  # Viene del test general
+                        created_at=usuario.created_at,
+                        updated_at=usuario.updated_at
+                    )
+                    
+                    db.session.add(nuevo_lead)
+                    migrados += 1
+            
+            # Limpiar tabla legacy después de migrar
+            if migrados > 0:
+                User.query.delete()
+                db.session.commit()
+                
+            return jsonify({
+                'success': True, 
+                'message': f'Migrados {migrados} usuarios de legacy a leads generales',
+                'migrados': migrados
+            })
+            
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+
     # ==================== RUTAS PARA LEADS GENERALES (TEST "HAZ MI TEST") ====================
     
     @app.route('/api/leads-generales')
