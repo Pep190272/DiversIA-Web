@@ -20,9 +20,9 @@
         .nd-dislexia { border-left-color: #45b7d1; }
         .nd-discalculia { border-left-color: #96ceb4; }
         .nd-tourette { border-left-color: #feca57; }
-        .nd-dispraxia { border-left-color: #ff9ff3; }
-        .nd-ansiedad { border-left-color: #54a0ff; }
-        .nd-bipolar { border-left-color: #5f27cd; }
+        .nd-tel { border-left-color: #48dbfb; }
+        .nd-disgrafia { border-left-color: #0abde3; }
+        .nd-tps { border-left-color: #74b9ff; }
         .nd-altas { border-left-color: #ff9f43; }
         
         .stats-badge {
@@ -206,9 +206,9 @@
                 
                 // Contar usuarios por tipo
                 const usersByType = {};
-                const types = ['tdah', 'tea', 'dislexia', 'discalculia', 'tourette', 'dispraxia', 'ansiedad', 'bipolar', 'altas_capacidades'];
-                const typeLabels = ['TDAH', 'TEA', 'Dislexia', 'Discalculia', 'Tourette', 'Dispraxia', 'Ansiedad', 'Bipolar', 'Altas Capacidades'];
-                const colors = ['nd-tdah', 'nd-tea', 'nd-dislexia', 'nd-discalculia', 'nd-tourette', 'nd-dispraxia', 'nd-ansiedad', 'nd-bipolar', 'nd-altas'];
+                const types = ['tdah', 'tea', 'tel', 'dislexia', 'discalculia', 'disgrafia', 'tps', 'tourette', 'altas_capacidades'];
+                const typeLabels = ['TDAH', 'TEA', 'TEL', 'Dislexia', 'Discalculia', 'Disgrafía', 'TPS', 'Tourette', 'Altas Capacidades'];
+                const colors = ['nd-tdah', 'nd-tea', 'nd-tel', 'nd-dislexia', 'nd-discalculia', 'nd-disgrafia', 'nd-tps', 'nd-tourette', 'nd-altas'];
                 
                 // Inicializar contadores
                 types.forEach(type => usersByType[type] = 0);
@@ -366,8 +366,8 @@
             fetch('/api/usuarios')
                 .then(response => response.json())
                 .then(allUsers => {
-                    const types = ['tourette', 'dispraxia', 'ansiedad', 'bipolar', 'altas_capacidades'];
-                    const typeLabels = ['Tourette', 'Dispraxia', 'Ansiedad', 'Bipolar', 'Altas Capacidades'];
+                    const types = ['tel', 'disgrafia', 'tps', 'tourette', 'altas_capacidades'];
+                    const typeLabels = ['TEL', 'Disgrafía', 'TPS', 'Tourette', 'Altas Capacidades'];
                     const results = types.map(type => allUsers.filter(user => user.tipo_neurodivergencia === type));
                 
                     let html = '<div class="row">';
