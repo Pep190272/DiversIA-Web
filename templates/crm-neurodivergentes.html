@@ -215,8 +215,9 @@
                 
                 // Contar usuarios por tipo
                 data.forEach(user => {
-                    if (usersByType.hasOwnProperty(user.tipo_neurodivergencia)) {
-                        usersByType[user.tipo_neurodivergencia]++;
+                    const tipoLower = user.tipo_neurodivergencia ? user.tipo_neurodivergencia.toLowerCase() : '';
+                    if (usersByType.hasOwnProperty(tipoLower)) {
+                        usersByType[tipoLower]++;
                     }
                 });
                 
@@ -249,7 +250,7 @@
                 const response = await fetch('/api/usuarios-neurodivergentes');
                 const allData = await response.json();
                 // Filtrar por tipo de neurodivergencia
-                const data = allData.filter(user => user.tipo_neurodivergencia === type.toLowerCase());
+                const data = allData.filter(user => user.tipo_neurodivergencia && user.tipo_neurodivergencia.toLowerCase() === type.toLowerCase());
                 
                 let html = `
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -266,7 +267,7 @@
                             <div class="user-card" onclick="showUserDetails(${user.id})">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <strong>${user.nombre_completo}</strong><br>
+                                        <strong>${user.nombre} ${user.apellidos}</strong><br>
                                         <small class="text-muted">${user.email}</small>
                                     </div>
                                     <div class="col-md-3">

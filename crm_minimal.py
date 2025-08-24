@@ -564,6 +564,7 @@ def create_minimal_crm_routes(app):
                         'fuente': 'NeurodivergentProfile (formulario específico)',
                         'nombre': profile.nombre,
                         'apellidos': profile.apellidos,
+                        'nombre_completo': f"{profile.nombre} {profile.apellidos}",
                         'email': profile.email,
                         'telefono': profile.telefono,
                         'ciudad': profile.ciudad,

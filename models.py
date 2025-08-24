@@ -45,7 +45,7 @@ class NeurodivergentProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
     apellidos = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    email = db.Column(db.String(120), nullable=False, index=True)  # Sin unique - permite duplicado con GeneralLead
     telefono = db.Column(db.String(20), nullable=True)
     ciudad = db.Column(db.String(100), nullable=False)
     fecha_nacimiento = db.Column(db.Date, nullable=False)
