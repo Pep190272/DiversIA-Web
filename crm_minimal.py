@@ -78,6 +78,13 @@ def create_minimal_crm_routes(app):
             return redirect('/diversia-admin')
         return render_template('crm-neurodivergentes.html')
     
+    @app.route('/leads-generales')
+    def leads_generales():
+        """Dashboard de leads generales del test 'Haz mi test' - requiere autenticación"""
+        if 'admin_ok' not in session or not session.get('admin_ok'):
+            return redirect('/diversia-admin')
+        return render_template('crm-leads-generales.html')
+    
     @app.route('/api/minimal/companies')
     def get_companies_minimal():
         """Obtener todas las empresas"""
@@ -368,7 +375,116 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
 
-    # ==================== RUTAS PARA USUARIOS GENERALES ===================="
+    # ==================== RUTAS PARA LEADS GENERALES (TEST "HAZ MI TEST") ====================
+    
+    @app.route('/api/leads-generales')
+    def get_leads_generales():
+        """Obtener todos los leads del test general"""
+        try:
+            from models import GeneralLead
+            from app import db
+            
+            leads = GeneralLead.query.all()
+            
+            leads_data = []
+            for lead in leads:
+                leads_data.append({
+                    'id': lead.id,
+                    'nombre': lead.nombre,
+                    'apellidos': lead.apellidos,
+                    'email': lead.email,
+                    'telefono': lead.telefono,
+                    'ciudad': lead.ciudad,
+                    'fecha_nacimiento': lead.fecha_nacimiento.isoformat() if lead.fecha_nacimiento else None,
+                    'tipo_neurodivergencia': lead.tipo_neurodivergencia,
+                    'diagnostico_formal': lead.diagnostico_formal,
+                    'habilidades': lead.habilidades,
+                    'experiencia_laboral': lead.experiencia_laboral,
+                    'formacion_academica': lead.formacion_academica,
+                    'intereses_laborales': lead.intereses_laborales,
+                    'adaptaciones_necesarias': lead.adaptaciones_necesarias,
+                    'motivaciones': lead.motivaciones,
+                    'convertido_a_perfil': lead.convertido_a_perfil,
+                    'created_at': lead.created_at.isoformat() if lead.created_at else None
+                })
+            
+            return jsonify(leads_data)
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/leads-generales/<int:lead_id>')
+    def get_lead_general(lead_id):
+        """Obtener un lead específico para edición"""
+        try:
+            from models import GeneralLead
+            
+            lead = GeneralLead.query.get_or_404(lead_id)
+            
+            lead_data = {
+                'id': lead.id,
+                'nombre': lead.nombre,
+                'apellidos': lead.apellidos,
+                'email': lead.email,
+                'telefono': lead.telefono,
+                'ciudad': lead.ciudad,
+                'fecha_nacimiento': lead.fecha_nacimiento.isoformat() if lead.fecha_nacimiento else None,
+                'tipo_neurodivergencia': lead.tipo_neurodivergencia,
+                'diagnostico_formal': lead.diagnostico_formal,
+                'habilidades': lead.habilidades,
+                'experiencia_laboral': lead.experiencia_laboral,
+                'formacion_academica': lead.formacion_academica,
+                'intereses_laborales': lead.intereses_laborales,
+                'adaptaciones_necesarias': lead.adaptaciones_necesarias,
+                'motivaciones': lead.motivaciones,
+                'convertido_a_perfil': lead.convertido_a_perfil,
+                'created_at': lead.created_at.isoformat() if lead.created_at else None
+            }
+            
+            return jsonify(lead_data)
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/leads-generales/<int:lead_id>', methods=['PUT'])
+    def update_lead_general(lead_id):
+        """Actualizar información de un lead"""
+        try:
+            from models import GeneralLead
+            from app import db
+            
+            lead = GeneralLead.query.get_or_404(lead_id)
+            data = request.get_json()
+            
+            # Actualizar campos
+            if 'nombre' in data:
+                lead.nombre = data['nombre']
+            if 'apellidos' in data:
+                lead.apellidos = data['apellidos']
+            if 'telefono' in data:
+                lead.telefono = data['telefono']
+            if 'ciudad' in data:
+                lead.ciudad = data['ciudad']
+            if 'habilidades' in data:
+                lead.habilidades = data['habilidades']
+            if 'experiencia_laboral' in data:
+                lead.experiencia_laboral = data['experiencia_laboral']
+            if 'formacion_academica' in data:
+                lead.formacion_academica = data['formacion_academica']
+            if 'intereses_laborales' in data:
+                lead.intereses_laborales = data['intereses_laborales']
+            if 'adaptaciones_necesarias' in data:
+                lead.adaptaciones_necesarias = data['adaptaciones_necesarias']
+            if 'motivaciones' in data:
+                lead.motivaciones = data['motivaciones']
+            if 'convertido_a_perfil' in data:
+                lead.convertido_a_perfil = data['convertido_a_perfil']
+            
+            db.session.commit()
+            
+            return jsonify({'success': True, 'message': 'Lead actualizado correctamente'})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    # ==================== RUTAS PARA USUARIOS GENERALES (LEGACY) ====================""
     
     @app.route('/api/usuarios')
     def get_usuarios():

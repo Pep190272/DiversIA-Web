@@ -2,7 +2,41 @@ from datetime import datetime
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Modelos principales para DiversIA
+# TABLA PARA LEADS GENERALES DEL TEST "HAZ MI TEST" (Personas ND y no-ND)
+class GeneralLead(db.Model):
+    __tablename__ = 'general_leads'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    apellidos = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    telefono = db.Column(db.String(20), nullable=True)
+    ciudad = db.Column(db.String(100), nullable=False)
+    fecha_nacimiento = db.Column(db.Date, nullable=False)
+    
+    # Información básica de neurodivergencia (si aplica)
+    tipo_neurodivergencia = db.Column(db.String(50), nullable=True)  # Puede ser NULL para no-ND
+    diagnostico_formal = db.Column(db.Boolean, default=False)
+    
+    # Información laboral básica
+    habilidades = db.Column(db.Text, nullable=True)
+    experiencia_laboral = db.Column(db.Text, nullable=True)
+    formacion_academica = db.Column(db.Text, nullable=True)
+    intereses_laborales = db.Column(db.Text, nullable=True)
+    adaptaciones_necesarias = db.Column(db.Text, nullable=True)
+    motivaciones = db.Column(db.Text, nullable=True)
+    
+    # Lead status
+    convertido_a_perfil = db.Column(db.Boolean, default=False)  # Si ya completó formulario específico
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<GeneralLead {self.nombre} {self.apellidos}>'
+
+# TABLA LEGACY - MIGRAR A GeneralLead
 class User(db.Model):
     __tablename__ = 'users'
     

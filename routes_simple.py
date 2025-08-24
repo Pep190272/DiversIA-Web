@@ -80,36 +80,36 @@ def registro():
     
     if form.validate_on_submit():
         try:
-            from models import User
+            from models import GeneralLead
             
             # Verificar si el email ya existe
-            usuario_existente = User.query.filter_by(email=form.email.data).first()
-            if usuario_existente:
-                # Actualizar el usuario existente en lugar de crear uno nuevo
-                usuario_existente.nombre = form.nombre.data
-                usuario_existente.apellidos = form.apellidos.data
-                usuario_existente.telefono = form.telefono.data
-                usuario_existente.ciudad = form.ciudad.data
-                usuario_existente.fecha_nacimiento = form.fecha_nacimiento.data
-                usuario_existente.tipo_neurodivergencia = form.tipo_neurodivergencia.data
-                usuario_existente.diagnostico_formal = form.diagnostico_formal.data == 'si'
-                usuario_existente.habilidades = form.habilidades.data
-                usuario_existente.experiencia_laboral = form.experiencia_laboral.data
-                usuario_existente.formacion_academica = form.formacion_academica.data
-                usuario_existente.intereses_laborales = form.intereses_laborales.data
-                usuario_existente.adaptaciones_necesarias = form.adaptaciones_necesarias.data
-                usuario_existente.motivaciones = form.motivaciones.data
+            lead_existente = GeneralLead.query.filter_by(email=form.email.data).first()
+            if lead_existente:
+                # Actualizar el lead existente en lugar de crear uno nuevo
+                lead_existente.nombre = form.nombre.data
+                lead_existente.apellidos = form.apellidos.data
+                lead_existente.telefono = form.telefono.data
+                lead_existente.ciudad = form.ciudad.data
+                lead_existente.fecha_nacimiento = form.fecha_nacimiento.data
+                lead_existente.tipo_neurodivergencia = form.tipo_neurodivergencia.data
+                lead_existente.diagnostico_formal = form.diagnostico_formal.data == 'si'
+                lead_existente.habilidades = form.habilidades.data
+                lead_existente.experiencia_laboral = form.experiencia_laboral.data
+                lead_existente.formacion_academica = form.formacion_academica.data
+                lead_existente.intereses_laborales = form.intereses_laborales.data
+                lead_existente.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+                lead_existente.motivaciones = form.motivaciones.data
                 
                 db.session.commit()
                 flash(f'¡Test actualizado exitosamente, {form.nombre.data}! Tu información ha sido actualizada.', 'success')
-                print(f"✅ Usuario actualizado: {form.nombre.data} {form.apellidos.data}")
+                print(f"✅ Lead actualizado: {form.nombre.data} {form.apellidos.data}")
                 return redirect(url_for('personas_nd'))
             
             # Mapear el campo diagnostico_formal (string a boolean)
             diagnostico_bool = form.diagnostico_formal.data == 'si'
             
-            # Crear nuevo usuario con TODA la información del formulario
-            nuevo_usuario = User(
+            # Crear nuevo lead con TODA la información del formulario
+            nuevo_lead = GeneralLead(
                 # Información personal
                 nombre=form.nombre.data,
                 apellidos=form.apellidos.data,
@@ -131,16 +131,16 @@ def registro():
                 motivaciones=form.motivaciones.data
             )
             
-            db.session.add(nuevo_usuario)
+            db.session.add(nuevo_lead)
             db.session.commit()
             
-            flash(f'¡Test completado exitosamente, {form.nombre.data}! Tu perfil ha sido guardado en nuestro sistema.', 'success')
-            print(f"✅ Usuario registrado: {form.nombre.data} {form.apellidos.data} - {form.tipo_neurodivergencia.data}")
+            flash(f'¡Test completado exitosamente, {form.nombre.data}! Tu información ha sido guardada. Te contactaremos pronto con información sobre formularios específicos.', 'success')
+            print(f"✅ Lead registrado: {form.nombre.data} {form.apellidos.data} - {form.tipo_neurodivergencia.data}")
             
             return redirect(url_for('personas_nd'))
             
         except Exception as e:
-            print(f"❌ Error guardando usuario: {e}")
+            print(f"❌ Error guardando lead: {e}")
             flash('Error al guardar tu información. Por favor intenta de nuevo.', 'error')
             db.session.rollback()
     
