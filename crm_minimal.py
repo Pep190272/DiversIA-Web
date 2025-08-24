@@ -50,14 +50,14 @@ def create_minimal_crm_routes(app):
     def crm_minimal_dashboard():
         """Dashboard del CRM minimal - requiere autenticación"""
         # Verificar si está autenticado como admin
-        if 'admin_user_id' not in session and 'admin_username' not in session:
+        if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
             return redirect('/diversia-admin')
         return render_template('crm-minimal.html')
     
     @app.route('/empresas')
     def empresas_cards():
         """Vista de tarjetas de empresas para edición individual"""
-        if 'admin_user_id' not in session and 'admin_username' not in session:
+        if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
             return redirect('/diversia-admin')
         
         data = load_data()
@@ -67,21 +67,21 @@ def create_minimal_crm_routes(app):
     @app.route('/asociaciones-crm')
     def asociaciones_crm():
         """Dashboard de asociaciones del CRM - requiere autenticación"""
-        if 'admin_user_id' not in session and 'admin_username' not in session:
+        if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
             return redirect('/diversia-admin')
         return render_template('asociaciones-crm.html')
     
     @app.route('/usuarios-neurodivergentes')
     def usuarios_neurodivergentes():
         """Dashboard de usuarios neurodivergentes del CRM - requiere autenticación"""
-        if 'admin_user_id' not in session and 'admin_username' not in session:
+        if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
             return redirect('/diversia-admin')
         return render_template('crm-neurodivergentes.html')
     
     @app.route('/leads-generales')
     def leads_generales():
         """Dashboard de leads generales del test 'Haz mi test' - requiere autenticación"""
-        if 'admin_user_id' not in session and 'admin_username' not in session:
+        if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
             return redirect('/diversia-admin')
         return render_template('crm-leads-generales.html')
     
@@ -1033,7 +1033,7 @@ def create_minimal_crm_routes(app):
         """Página de edición de usuario"""
         try:
             # Verificar que es administrador
-            if 'admin_user_id' not in session and 'admin_username' not in session:
+            if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
                 flash('Acceso restringido. Inicia sesión como administrador.', 'error')
                 return redirect('/admin/login-new')
             
@@ -1048,7 +1048,7 @@ def create_minimal_crm_routes(app):
         """Borrar un usuario específico (User o NeurodivergentProfile)"""
         try:
             # Verificar que es administrador
-            if 'admin_user_id' not in session and 'admin_username' not in session:
+            if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
                 return jsonify({'success': False, 'error': 'Acceso no autorizado'}), 403
             
             # Determinar si es User o NeurodivergentProfile
