@@ -381,7 +381,7 @@ def create_minimal_crm_routes(app):
     def migrate_users_to_leads():
         """Migrar usuarios de la tabla User legacy a GeneralLead"""
         try:
-            from models import User, GeneralLead
+            from models import NeurodivergentProfile, GeneralLead
             from app import db
             
             # Obtener todos los usuarios de la tabla legacy
@@ -547,10 +547,10 @@ def create_minimal_crm_routes(app):
     def get_usuarios():
         """Obtener todos los usuarios neurodivergentes de la base de datos"""
         try:
-            from models import User
+            from models import NeurodivergentProfile
             from app import db
             
-            usuarios = User.query.all()
+            usuarios = NeurodivergentProfile.query.all()
             
             usuarios_data = []
             for user in usuarios:
@@ -581,9 +581,9 @@ def create_minimal_crm_routes(app):
     def get_usuario(user_id):
         """Obtener un usuario específico"""
         try:
-            from models import User
+            from models import NeurodivergentProfile
             
-            user = User.query.get_or_404(user_id)
+            user = NeurodivergentProfile.query.get_or_404(user_id)
             
             user_data = {
                 'id': user.id,

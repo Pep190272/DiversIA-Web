@@ -263,57 +263,196 @@ def podcast_diversia():
 
 @app.route('/registro-discalculia', methods=['GET', 'POST'])
 def registro_discalculia():
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    from forms import RegistroDiscalculiaForm
+    form = RegistroDiscalculiaForm()
     if form.validate_on_submit():
-        flash('¡Registro completado exitosamente!', 'success')
-        return redirect(url_for('personas_nd'))
-    return render_template('registro-general.html', form=form, tipo='Discalculia')
+        try:
+            from models import NeurodivergentProfile
+            # Crear perfil específico
+            nuevo_perfil = NeurodivergentProfile(
+                nombre=form.nombre.data,
+                apellidos=form.apellidos.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                ciudad=form.ciudad.data,
+                fecha_nacimiento=form.fecha_nacimiento.data,
+                tipo_neurodivergencia='discalculia',
+                diagnostico_formal=form.diagnostico_formal.data == 'si',
+                habilidades=form.habilidades.data,
+                experiencia_laboral=form.experiencia_laboral.data,
+                formacion_academica=form.formacion_academica.data,
+                intereses_laborales=form.intereses_laborales.data,
+                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
+                motivaciones=form.motivaciones.data
+            )
+            db.session.add(nuevo_perfil)
+            db.session.commit()
+            flash(f'¡Perfil Discalculia completado, {form.nombre.data}!', 'success')
+            return redirect(url_for('personas_nd'))
+        except Exception as e:
+            flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
+            db.session.rollback()
+    return render_template('registro-discalculia.html', form=form)
 
 @app.route('/registro-tourette', methods=['GET', 'POST'])
 def registro_tourette():
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    from forms import RegistroTouretteForm
+    form = RegistroTouretteForm()
     if form.validate_on_submit():
-        flash('¡Registro completado exitosamente!', 'success')
-        return redirect(url_for('personas_nd'))
-    return render_template('registro-general.html', form=form, tipo='Tourette')
+        try:
+            from models import NeurodivergentProfile
+            nuevo_perfil = NeurodivergentProfile(
+                nombre=form.nombre.data,
+                apellidos=form.apellidos.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                ciudad=form.ciudad.data,
+                fecha_nacimiento=form.fecha_nacimiento.data,
+                tipo_neurodivergencia='tourette',
+                diagnostico_formal=form.diagnostico_formal.data == 'si',
+                habilidades=form.habilidades.data,
+                experiencia_laboral=form.experiencia_laboral.data,
+                formacion_academica=form.formacion_academica.data,
+                intereses_laborales=form.intereses_laborales.data,
+                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
+                motivaciones=form.motivaciones.data
+            )
+            db.session.add(nuevo_perfil)
+            db.session.commit()
+            flash(f'¡Perfil Tourette completado, {form.nombre.data}!', 'success')
+            return redirect(url_for('personas_nd'))
+        except Exception as e:
+            flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
+            db.session.rollback()
+    return render_template('registro-tourette.html', form=form)
 
 @app.route('/registro-dispraxia', methods=['GET', 'POST'])
 def registro_dispraxia():
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    from forms import RegistroDispraxiaForm
+    form = RegistroDispraxiaForm()
     if form.validate_on_submit():
-        flash('¡Registro completado exitosamente!', 'success')
-        return redirect(url_for('personas_nd'))
-    return render_template('registro-general.html', form=form, tipo='Dispraxia')
+        try:
+            from models import NeurodivergentProfile
+            nuevo_perfil = NeurodivergentProfile(
+                nombre=form.nombre.data,
+                apellidos=form.apellidos.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                ciudad=form.ciudad.data,
+                fecha_nacimiento=form.fecha_nacimiento.data,
+                tipo_neurodivergencia='dispraxia',
+                diagnostico_formal=form.diagnostico_formal.data == 'si',
+                habilidades=form.habilidades.data,
+                experiencia_laboral=form.experiencia_laboral.data,
+                formacion_academica=form.formacion_academica.data,
+                intereses_laborales=form.intereses_laborales.data,
+                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
+                motivaciones=form.motivaciones.data
+            )
+            db.session.add(nuevo_perfil)
+            db.session.commit()
+            flash(f'¡Perfil Dispraxia completado, {form.nombre.data}!', 'success')
+            return redirect(url_for('personas_nd'))
+        except Exception as e:
+            flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
+            db.session.rollback()
+    return render_template('registro-dispraxia.html', form=form)
 
 @app.route('/registro-ansiedad', methods=['GET', 'POST'])
 def registro_ansiedad():
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    from forms import RegistroAnsiedadForm
+    form = RegistroAnsiedadForm()
     if form.validate_on_submit():
-        flash('¡Registro completado exitosamente!', 'success')
-        return redirect(url_for('personas_nd'))
-    return render_template('registro-general.html', form=form, tipo='Ansiedad')
+        try:
+            from models import NeurodivergentProfile
+            nuevo_perfil = NeurodivergentProfile(
+                nombre=form.nombre.data,
+                apellidos=form.apellidos.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                ciudad=form.ciudad.data,
+                fecha_nacimiento=form.fecha_nacimiento.data,
+                tipo_neurodivergencia='ansiedad',
+                diagnostico_formal=form.diagnostico_formal.data == 'si',
+                habilidades=form.habilidades.data,
+                experiencia_laboral=form.experiencia_laboral.data,
+                formacion_academica=form.formacion_academica.data,
+                intereses_laborales=form.intereses_laborales.data,
+                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
+                motivaciones=form.motivaciones.data
+            )
+            db.session.add(nuevo_perfil)
+            db.session.commit()
+            flash(f'¡Perfil Ansiedad completado, {form.nombre.data}!', 'success')
+            return redirect(url_for('personas_nd'))
+        except Exception as e:
+            flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
+            db.session.rollback()
+    return render_template('registro-ansiedad.html', form=form)
 
 @app.route('/registro-bipolar', methods=['GET', 'POST'])
 def registro_bipolar():
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    from forms import RegistroBipolarForm
+    form = RegistroBipolarForm()
     if form.validate_on_submit():
-        flash('¡Registro completado exitosamente!', 'success')
-        return redirect(url_for('personas_nd'))
-    return render_template('registro-general.html', form=form, tipo='Bipolar')
+        try:
+            from models import NeurodivergentProfile
+            nuevo_perfil = NeurodivergentProfile(
+                nombre=form.nombre.data,
+                apellidos=form.apellidos.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                ciudad=form.ciudad.data,
+                fecha_nacimiento=form.fecha_nacimiento.data,
+                tipo_neurodivergencia='bipolar',
+                diagnostico_formal=form.diagnostico_formal.data == 'si',
+                habilidades=form.habilidades.data,
+                experiencia_laboral=form.experiencia_laboral.data,
+                formacion_academica=form.formacion_academica.data,
+                intereses_laborales=form.intereses_laborales.data,
+                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
+                motivaciones=form.motivaciones.data
+            )
+            db.session.add(nuevo_perfil)
+            db.session.commit()
+            flash(f'¡Perfil Bipolar completado, {form.nombre.data}!', 'success')
+            return redirect(url_for('personas_nd'))
+        except Exception as e:
+            flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
+            db.session.rollback()
+    return render_template('registro-bipolar.html', form=form)
 
 @app.route('/registro-altas-capacidades', methods=['GET', 'POST'])
 def registro_altas_capacidades():
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    from forms import RegistroAltasCapacidadesForm
+    form = RegistroAltasCapacidadesForm()
     if form.validate_on_submit():
-        flash('¡Registro completado exitosamente!', 'success')
-        return redirect(url_for('personas_nd'))
-    return render_template('registro-general.html', form=form, tipo='Altas Capacidades')
+        try:
+            from models import NeurodivergentProfile
+            nuevo_perfil = NeurodivergentProfile(
+                nombre=form.nombre.data,
+                apellidos=form.apellidos.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                ciudad=form.ciudad.data,
+                fecha_nacimiento=form.fecha_nacimiento.data,
+                tipo_neurodivergencia='altas_capacidades',
+                diagnostico_formal=form.diagnostico_formal.data == 'si',
+                habilidades=form.habilidades.data,
+                experiencia_laboral=form.experiencia_laboral.data,
+                formacion_academica=form.formacion_academica.data,
+                intereses_laborales=form.intereses_laborales.data,
+                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
+                motivaciones=form.motivaciones.data
+            )
+            db.session.add(nuevo_perfil)
+            db.session.commit()
+            flash(f'¡Perfil Altas Capacidades completado, {form.nombre.data}!', 'success')
+            return redirect(url_for('personas_nd'))
+        except Exception as e:
+            flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
+            db.session.rollback()
+    return render_template('registro-altas-capacidades.html', form=form)
 
 @app.route('/registro-asociacion', methods=['GET', 'POST'])
 def registro_asociacion():
