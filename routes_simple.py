@@ -12,8 +12,8 @@ def personas_nd():
 
 @app.route('/empresas', methods=['GET', 'POST'])
 def empresas():
-    from forms import RegistroEmpresaForm
-    form = RegistroEmpresaForm()
+    from forms import EmpresaForm
+    form = EmpresaForm()
     
     if form.validate_on_submit():
         try:
@@ -52,33 +52,8 @@ def comunidad():
 
 @app.route('/contacto', methods=['GET', 'POST'])
 def contacto():
-    from forms import ContactForm
-    form = ContactForm()
-    
-    if form.validate_on_submit():
-        try:
-            from models import FormSubmission
-            nuevo_contacto = FormSubmission(
-                form_type='contacto',
-                nombre=form.nombre.data,
-                email=form.email.data,
-                telefono=form.telefono.data,
-                asunto=form.asunto.data,
-                mensaje=form.mensaje.data,
-                ip_address=request.remote_addr
-            )
-            
-            db.session.add(nuevo_contacto)
-            db.session.commit()
-            
-            flash('¡Mensaje enviado exitosamente! Te responderemos pronto.', 'success')
-            return redirect(url_for('contacto'))
-            
-        except Exception as e:
-            print(f"❌ Error enviando contacto: {e}")
-            flash('Error al enviar el mensaje. Por favor intenta de nuevo.', 'error')
-    
-    return render_template('contacto.html', form=form)
+    """Página de contacto - formulario simple por ahora"""
+    return render_template('contacto.html')
 
 @app.route('/sobre-nosotros')
 def sobre_nosotros():
@@ -105,8 +80,8 @@ def registro():
 # Rutas de registro específicas por neurodivergencia
 @app.route('/registro-tdah', methods=['GET', 'POST'])
 def registro_tdah():
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    from forms import RegistroTDAHForm
+    form = RegistroTDAHForm()
     if form.validate_on_submit():
         # Lógica de registro TDAH aquí
         flash('¡Registro TDAH completado exitosamente!', 'success')
@@ -115,8 +90,8 @@ def registro_tdah():
 
 @app.route('/registro-tea', methods=['GET', 'POST'])  
 def registro_tea():
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    from forms import RegistroTEAForm
+    form = RegistroTEAForm()
     if form.validate_on_submit():
         flash('¡Registro TEA completado exitosamente!', 'success')
         return redirect(url_for('personas_nd'))
@@ -124,12 +99,18 @@ def registro_tea():
 
 @app.route('/registro-dislexia', methods=['GET', 'POST'])
 def registro_dislexia():
-    from forms import RegistroGeneralForm 
-    form = RegistroGeneralForm()
+    from forms import RegistroDislexiaForm 
+    form = RegistroDislexiaForm()
     if form.validate_on_submit():
         flash('¡Registro Dislexia completado exitosamente!', 'success')
         return redirect(url_for('personas_nd'))
     return render_template('registro-dislexia.html', form=form)
+
+# Ruta que faltaba para descargar guía
+@app.route('/descargar-guia-laboral')
+def descargar_guia_laboral():
+    """Descargar guía laboral PDF"""
+    return "Descarga de guía laboral (función temporal)", 200
 
 @app.route('/registro-discalculia', methods=['GET', 'POST'])
 def registro_discalculia():
