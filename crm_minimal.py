@@ -50,14 +50,14 @@ def create_minimal_crm_routes(app):
     def crm_minimal_dashboard():
         """Dashboard del CRM minimal - requiere autenticación"""
         # Verificar si está autenticado como admin
-        if 'admin_ok' not in session or not session.get('admin_ok'):
+        if 'admin_user_id' not in session and 'admin_username' not in session:
             return redirect('/diversia-admin')
         return render_template('crm-minimal.html')
     
     @app.route('/empresas')
     def empresas_cards():
         """Vista de tarjetas de empresas para edición individual"""
-        if 'admin_ok' not in session or not session.get('admin_ok'):
+        if 'admin_user_id' not in session and 'admin_username' not in session:
             return redirect('/diversia-admin')
         
         data = load_data()
@@ -67,21 +67,21 @@ def create_minimal_crm_routes(app):
     @app.route('/asociaciones-crm')
     def asociaciones_crm():
         """Dashboard de asociaciones del CRM - requiere autenticación"""
-        if 'admin_ok' not in session or not session.get('admin_ok'):
+        if 'admin_user_id' not in session and 'admin_username' not in session:
             return redirect('/diversia-admin')
         return render_template('asociaciones-crm.html')
     
     @app.route('/usuarios-neurodivergentes')
     def usuarios_neurodivergentes():
         """Dashboard de usuarios neurodivergentes del CRM - requiere autenticación"""
-        if 'admin_ok' not in session or not session.get('admin_ok'):
+        if 'admin_user_id' not in session and 'admin_username' not in session:
             return redirect('/diversia-admin')
         return render_template('crm-neurodivergentes.html')
     
     @app.route('/leads-generales')
     def leads_generales():
         """Dashboard de leads generales del test 'Haz mi test' - requiere autenticación"""
-        if 'admin_ok' not in session or not session.get('admin_ok'):
+        if 'admin_user_id' not in session and 'admin_username' not in session:
             return redirect('/diversia-admin')
         return render_template('crm-leads-generales.html')
     
@@ -1033,7 +1033,7 @@ def create_minimal_crm_routes(app):
         """Página de edición de usuario"""
         try:
             # Verificar que es administrador
-            if 'admin_ok' not in session or not session.get('admin_ok'):
+            if 'admin_user_id' not in session and 'admin_username' not in session:
                 flash('Acceso restringido. Inicia sesión como administrador.', 'error')
                 return redirect('/admin/login-new')
             
@@ -1042,5 +1042,43 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             flash('Error cargando editor de usuario.', 'error')
             return redirect('/crm-minimal')
+    
+    @app.route('/api/usuario/<user_id>/borrar', methods=['DELETE'])
+    def borrar_usuario(user_id):
+        """Borrar un usuario específico (User o NeurodivergentProfile)"""
+        try:
+            # Verificar que es administrador
+            if 'admin_user_id' not in session and 'admin_username' not in session:
+                return jsonify({'success': False, 'error': 'Acceso no autorizado'}), 403
+            
+            # Determinar si es User o NeurodivergentProfile
+            is_profile = user_id.startswith('profile_')
+            actual_id = user_id.replace('user_', '').replace('profile_', '')
+            
+            if is_profile:
+                from models import NeurodivergentProfile
+                usuario = NeurodivergentProfile.query.get_or_404(actual_id)
+                table_name = 'NeurodivergentProfile'
+            else:
+                from models import User
+                usuario = User.query.get_or_404(actual_id)
+                table_name = 'User'
+            
+            nombre_completo = f"{usuario.nombre} {usuario.apellidos}"
+            
+            # Borrar usuario
+            db.session.delete(usuario)
+            db.session.commit()
+            
+            print(f"🗑️ {table_name} borrado exitosamente: {nombre_completo}")
+            
+            return jsonify({
+                'success': True,
+                'message': f'Usuario {nombre_completo} borrado correctamente'
+            })
+            
+        except Exception as e:
+            print(f"❌ Error borrando usuario {user_id}: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
     
     print("CRM Minimal inicializado correctamente")

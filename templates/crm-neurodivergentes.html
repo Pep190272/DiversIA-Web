@@ -264,21 +264,29 @@
                 if (data && data.length > 0) {
                     data.forEach(user => {
                         html += `
-                            <div class="user-card" onclick="showUserDetails(${user.id})">
+                            <div class="user-card">
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-4" onclick="showUserDetails('${user.id}')" style="cursor: pointer;">
                                         <strong>${user.nombre} ${user.apellidos}</strong><br>
                                         <small class="text-muted">${user.email}</small>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" onclick="showUserDetails('${user.id}')" style="cursor: pointer;">
                                         📍 ${user.ciudad}<br>
                                         📱 ${user.telefono || 'No especificado'}
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" onclick="showUserDetails('${user.id}')" style="cursor: pointer;">
                                         ${user.diagnostico_formal ? '✅ Diagnóstico formal' : '⏳ Sin diagnóstico'}
                                     </div>
                                     <div class="col-md-2 text-end">
-                                        <small class="text-muted">${new Date(user.fecha_registro).toLocaleDateString()}</small>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="editUser('${user.id}')" title="Editar">
+                                                ✏️
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user.id}', '${user.nombre} ${user.apellidos}')" title="Borrar">
+                                                🗑️
+                                            </button>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">${new Date(user.created_at).toLocaleDateString()}</small>
                                     </div>
                                 </div>
                             </div>
@@ -297,7 +305,7 @@
 
         async function showUserDetails(userId) {
             try {
-                const response = await fetch(`/api/usuarios/${userId}`);
+                const response = await fetch(`/api/usuario/${userId}/editar`);
                 const user = await response.json();
                 
                 const modalBody = document.getElementById('userModalBody');
@@ -327,11 +335,68 @@
                             <p><strong>Adaptaciones:</strong> ${user.adaptaciones_necesarias || 'No especificado'}</p>
                         </div>
                     </div>
+                    <div class="row mt-3">
+                        <div class="col-12 text-center">
+                            <button class="btn btn-primary me-2" onclick="editUser('${user.id}')">
+                                ✏️ Editar Perfil
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteUser('${user.id}', '${user.nombre} ${user.apellidos}')">
+                                🗑️ Borrar Perfil
+                            </button>
+                        </div>
+                    </div>
                 `;
                 
                 new bootstrap.Modal(document.getElementById('userModal')).show();
             } catch (error) {
                 console.error('Error loading user details:', error);
+            }
+        }
+
+        // Nueva función para editar usuario
+        async function editUser(userId) {
+            try {
+                // Cerrar modal actual si está abierto
+                const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+                if (modal) modal.hide();
+                
+                // Redirigir a página de edición
+                window.open(`/crm-editar/${userId}`, '_blank');
+            } catch (error) {
+                console.error('Error opening edit page:', error);
+                alert('Error al abrir editor de usuario');
+            }
+        }
+
+        // Nueva función para borrar usuario
+        async function deleteUser(userId, userName) {
+            if (!confirm(`¿Estás seguro de que quieres borrar el perfil de "${userName}"?\n\nEsta acción no se puede deshacer.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/usuario/${userId}/borrar`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ Perfil de "${userName}" borrado exitosamente`);
+                    // Recargar datos
+                    loadOverviewData();
+                    // Cerrar modal si está abierto
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+                    if (modal) modal.hide();
+                } else {
+                    alert(`❌ Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('❌ Error al borrar usuario');
             }
         }
 
