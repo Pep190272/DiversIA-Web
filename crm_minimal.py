@@ -578,10 +578,13 @@ def create_minimal_crm_routes(app):
             except Exception as e:
                 print(f"⚠️ Error cargando tabla User: {e}")
             
-            # 2. Obtener usuarios de la tabla NeurodivergentProfile nueva
+            # 2. Obtener usuarios de la tabla NeurodivergentProfile nueva  
             try:
                 usuarios_profile = NeurodivergentProfile.query.all()
+                print(f"🔍 CRM - Encontrados {len(usuarios_profile)} perfiles neurodivergentes")
+                
                 for profile in usuarios_profile:
+                    print(f"📋 CRM - Perfil: {profile.nombre} {profile.apellidos} ({profile.tipo_neurodivergencia})")
                     usuarios_data.append({
                         'id': f'profile_{profile.id}',
                         'fuente': 'NeurodivergentProfile (nuevo)',
@@ -603,6 +606,8 @@ def create_minimal_crm_routes(app):
                     })
             except Exception as e:
                 print(f"⚠️ Error cargando tabla NeurodivergentProfile: {e}")
+            
+            print(f"📊 CRM - Total usuarios combinados: {len(usuarios_data)}")
             
             return jsonify(usuarios_data)
         except Exception as e:

@@ -362,8 +362,18 @@ def registro_dispraxia():
 def registro_ansiedad():
     from forms import RegistroAnsiedadForm
     form = RegistroAnsiedadForm()
+    
+    # DEBUG: Ver si el formulario se está enviando
+    if request.method == 'POST':
+        print(f"📝 ANSIEDAD - Formulario enviado con datos: {request.form.to_dict()}")
+        print(f"📝 ANSIEDAD - Formulario válido: {form.validate()}")
+        if not form.validate():
+            print(f"❌ ANSIEDAD - Errores de validación: {form.errors}")
+    
     if form.validate_on_submit():
         try:
+            print(f"✅ ANSIEDAD - Guardando perfil para: {form.nombre.data} {form.apellidos.data}")
+            
             from models import NeurodivergentProfile
             nuevo_perfil = NeurodivergentProfile(
                 nombre=form.nombre.data,
@@ -383,11 +393,16 @@ def registro_ansiedad():
             )
             db.session.add(nuevo_perfil)
             db.session.commit()
-            flash(f'¡Perfil Ansiedad completado, {form.nombre.data}!', 'success')
+            
+            print(f"✅ ANSIEDAD - Perfil guardado exitosamente con ID: {nuevo_perfil.id}")
+            flash(f'¡Perfil Ansiedad completado exitosamente, {form.nombre.data}!', 'success')
             return redirect(url_for('personas_nd'))
+            
         except Exception as e:
+            print(f"❌ ANSIEDAD - Error guardando perfil: {e}")
             flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
             db.session.rollback()
+    
     return render_template('registro-ansiedad.html', form=form)
 
 @app.route('/registro-bipolar', methods=['GET', 'POST'])
