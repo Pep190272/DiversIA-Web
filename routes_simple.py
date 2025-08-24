@@ -398,6 +398,44 @@ def descargar_guia_laboral():
         flash('La guía no está disponible en este momento. Por favor, inténtalo más tarde.', 'error')
         return redirect(url_for('personas_nd'))
 
+# Ruta para videos informativos
+@app.route('/videos-informativos')
+def videos_informativos():
+    """Página con videos informativos sobre neurodiversidad"""
+    videos = [
+        {
+            'titulo': 'Neurodiversidad y Empleo - NeurodiverSí',
+            'descripcion': 'Serie educativa sobre inclusión laboral para personas neurodivergentes',
+            'url': 'https://neurodiversi.org/neurovideo/',
+            'categoria': 'Educativo'
+        },
+        {
+            'titulo': 'Microsoft: El futuro del trabajo es neurodiverso',
+            'descripcion': 'Iniciativas de inclusión laboral de Microsoft para personas neurodivergentes',
+            'url': 'https://news.microsoft.com/source/latam/noticias-de-microsoft/el-futuro-del-trabajo-es-neurodiverso/',
+            'categoria': 'Casos de éxito'
+        },
+        {
+            'titulo': 'Fundación Neurodiversidad - Capacitaciones',
+            'descripcion': 'Cursos gratuitos y congresos sobre neurodiversidad e inclusión',
+            'url': 'https://fundacionneurodiversidad.tiendup.com/',
+            'categoria': 'Formación'
+        },
+        {
+            'titulo': 'FLEDNI - Diplomatura en Neurodiversidad',
+            'descripcion': 'Formación profesional sobre neurodiversidad desde perspectiva crítica',
+            'url': 'https://fledni.org/',
+            'categoria': 'Profesional'
+        }
+    ]
+    return render_template('videos-informativos.html', videos=videos)
+
+# Ruta para podcast
+@app.route('/podcast-diversia')
+def podcast_diversia():
+    """Página del podcast DiversIA"""
+    return render_template('podcast-diversia.html')
+
 # Ruta para registro de asociaciones
 @app.route('/registro-asociacion', methods=['GET', 'POST'])
 def registro_asociacion():
