@@ -545,33 +545,64 @@ def create_minimal_crm_routes(app):
     
     @app.route('/api/usuarios')
     def get_usuarios():
-        """Obtener todos los usuarios neurodivergentes de la base de datos"""
+        """Obtener TODOS los usuarios neurodivergentes (tabla User + nuevos perfiles)"""
         try:
-            from models import User  # Restaurar User original
+            from models import User, NeurodivergentProfile
             from app import db
             
-            usuarios = User.query.all()
-            
             usuarios_data = []
-            for user in usuarios:
-                usuarios_data.append({
-                    'id': user.id,
-                    'nombre': user.nombre,
-                    'apellidos': user.apellidos,
-                    'email': user.email,
-                    'telefono': user.telefono,
-                    'ciudad': user.ciudad,
-                    'fecha_nacimiento': user.fecha_nacimiento.isoformat() if user.fecha_nacimiento else None,
-                    'tipo_neurodivergencia': user.tipo_neurodivergencia,
-                    'diagnostico_formal': user.diagnostico_formal,
-                    'habilidades': user.habilidades,
-                    'experiencia_laboral': user.experiencia_laboral,
-                    'formacion_academica': user.formacion_academica,
-                    'intereses_laborales': user.intereses_laborales,
-                    'adaptaciones_necesarias': user.adaptaciones_necesarias,
-                    'motivaciones': user.motivaciones,
-                    'created_at': user.created_at.isoformat() if user.created_at else None
-                })
+            
+            # 1. Obtener usuarios de la tabla User original
+            try:
+                usuarios_user = User.query.all()
+                for user in usuarios_user:
+                    usuarios_data.append({
+                        'id': f'user_{user.id}',
+                        'fuente': 'User (original)',
+                        'nombre': user.nombre,
+                        'apellidos': user.apellidos,
+                        'email': user.email,
+                        'telefono': user.telefono,
+                        'ciudad': user.ciudad,
+                        'fecha_nacimiento': user.fecha_nacimiento.isoformat() if user.fecha_nacimiento else None,
+                        'tipo_neurodivergencia': user.tipo_neurodivergencia,
+                        'diagnostico_formal': user.diagnostico_formal,
+                        'habilidades': user.habilidades,
+                        'experiencia_laboral': user.experiencia_laboral,
+                        'formacion_academica': user.formacion_academica,
+                        'intereses_laborales': user.intereses_laborales,
+                        'adaptaciones_necesarias': user.adaptaciones_necesarias,
+                        'motivaciones': user.motivaciones,
+                        'created_at': user.created_at.isoformat() if user.created_at else None
+                    })
+            except Exception as e:
+                print(f"⚠️ Error cargando tabla User: {e}")
+            
+            # 2. Obtener usuarios de la tabla NeurodivergentProfile nueva
+            try:
+                usuarios_profile = NeurodivergentProfile.query.all()
+                for profile in usuarios_profile:
+                    usuarios_data.append({
+                        'id': f'profile_{profile.id}',
+                        'fuente': 'NeurodivergentProfile (nuevo)',
+                        'nombre': profile.nombre,
+                        'apellidos': profile.apellidos,
+                        'email': profile.email,
+                        'telefono': profile.telefono,
+                        'ciudad': profile.ciudad,
+                        'fecha_nacimiento': profile.fecha_nacimiento.isoformat() if profile.fecha_nacimiento else None,
+                        'tipo_neurodivergencia': profile.tipo_neurodivergencia,
+                        'diagnostico_formal': profile.diagnostico_formal,
+                        'habilidades': profile.habilidades,
+                        'experiencia_laboral': profile.experiencia_laboral,
+                        'formacion_academica': profile.formacion_academica,
+                        'intereses_laborales': profile.intereses_laborales,
+                        'adaptaciones_necesarias': profile.adaptaciones_necesarias,
+                        'motivaciones': profile.motivaciones,
+                        'created_at': profile.created_at.isoformat() if profile.created_at else None
+                    })
+            except Exception as e:
+                print(f"⚠️ Error cargando tabla NeurodivergentProfile: {e}")
             
             return jsonify(usuarios_data)
         except Exception as e:
