@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificaciones Pendientes - DiversIA Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .notification-card {
+            transition: transform 0.2s;
+            border-left: 4px solid #dc3545;
+        }
+        .notification-card:hover {
+            transform: translateY(-2px);
+        }
+        .status-badge {
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1 class="h3">🔔 Notificaciones de Respaldo</h1>
+                <p class="text-muted">Sistema de respaldo cuando falla el email</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="/admin/verificar-asociaciones" class="btn btn-primary">
+                    🔐 Verificar Asociaciones
+                </a>
+                <a href="/crm-minimal" class="btn btn-outline-secondary">← CRM</a>
+            </div>
+        </div>
+
+        <!-- Alerta sobre SendGrid -->
+        <div class="alert alert-warning mb-4">
+            <h5 class="alert-heading">⚠️ Problema con SendGrid Detectado</h5>
+            <p class="mb-2">Los emails no se están enviando por un problema con la API key de SendGrid (Error 401).</p>
+            <p class="mb-2"><strong>Solución:</strong> 
+                <a href="https://sendgrid.com/solutions/email-api/" target="_blank" class="alert-link">
+                    Actualiza tu API key de SendGrid
+                </a> o revisa las notificaciones aquí.
+            </p>
+            <small>Las solicitudes se guardan automáticamente como respaldo - no se pierde información.</small>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h2 class="text-danger">{{ registro_count }}</h2>
+                        <p class="mb-0">Registros Pendientes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h2 class="text-info">{{ notifications|length }}</h2>
+                        <p class="mb-0">Total Notificaciones</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Estado del Sistema de Email</h6>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-danger me-2">❌ SendGrid OFFLINE</span>
+                            <span class="badge bg-success">✅ Respaldo ACTIVO</span>
+                        </div>
+                        <small class="text-muted">Todas las solicitudes se guardan correctamente</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Notificaciones -->
+        {% if notifications %}
+            <div class="row">
+                {% for notification in notifications %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card notification-card h-100">
+                        <div class="card-header d-flex justify-content-between">
+                            <span class="badge bg-warning status-badge">{{ notification.tipo.replace('_', ' ').title() }}</span>
+                            <small class="text-muted">{{ notification.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">{{ notification.asunto }}</h6>
+                            <p class="card-text">
+                                <strong>Para:</strong> {{ notification.destinatario }}<br>
+                                <strong>Estado:</strong> 
+                                <span class="badge bg-{{ 'success' if notification.estado == 'leido' else 'danger' }}">
+                                    {{ notification.estado.title() }}
+                                </span>
+                            </p>
+                            
+                            {% if notification.contenido %}
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    {{ notification.contenido[:150] }}{% if notification.contenido|length > 150 %}...{% endif %}
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            {% if notification.estado == 'pendiente' %}
+                            <form action="/admin/marcar-notificacion-leida/{{ notification.id }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm w-100">
+                                    ✅ Marcar como Leída
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-outline-success btn-sm w-100" disabled>
+                                ✅ Leída el {{ notification.read_at.strftime('%d/%m/%Y') if notification.read_at }}
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <div class="display-1 text-success">✅</div>
+                <h3 class="text-muted">No hay notificaciones pendientes</h3>
+                <p class="text-muted">Todas las notificaciones han sido procesadas.</p>
+                <a href="/admin/verificar-asociaciones" class="btn btn-primary">Ver Verificaciones</a>
+            </div>
+        {% endif %}
+
+        <!-- Instrucciones para arreglar SendGrid -->
+        <div class="card mt-5">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">🔧 Cómo arreglar el problema de email</h5>
+            </div>
+            <div class="card-body">
+                <h6>Opción 1: Actualizar API Key de SendGrid</h6>
+                <ol>
+                    <li>Ve a <a href="https://app.sendgrid.com/settings/api_keys" target="_blank">SendGrid API Keys</a></li>
+                    <li>Crea una nueva API key con permisos completos</li>
+                    <li>Actualiza la variable de entorno <code>SENDGRID_API_KEY</code></li>
+                    <li>Reinicia la aplicación</li>
+                </ol>
+                
+                <h6 class="mt-4">Opción 2: Usar el Sistema de Respaldo</h6>
+                <p class="mb-0">Continúa usando este dashboard para revisar las solicitudes. El sistema funciona perfectamente sin email.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="position-fixed top-0 end-0 p-3" style="z-index: 1060;">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</body>
+</html>
