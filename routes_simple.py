@@ -72,11 +72,55 @@ def terminos():
     return render_template('terminos.html')
 
 # ===== REGISTROS =====
-@app.route('/registro')
+@app.route('/registro', methods=['GET', 'POST'])
 def registro():
-    """Página de registro general"""
+    """Página de registro general - Haz mi test"""
     from forms import RegistroGeneralForm
     form = RegistroGeneralForm()
+    
+    if form.validate_on_submit():
+        try:
+            from models import User
+            
+            # Mapear el campo diagnostico_formal (string a boolean)
+            diagnostico_bool = form.diagnostico_formal.data == 'si'
+            
+            # Crear nuevo usuario con TODA la información del formulario
+            nuevo_usuario = User(
+                # Información personal
+                nombre=form.nombre.data,
+                apellidos=form.apellidos.data,
+                email=form.email.data,
+                telefono=form.telefono.data,
+                ciudad=form.ciudad.data,
+                fecha_nacimiento=form.fecha_nacimiento.data,
+                
+                # Información de neurodivergencia
+                tipo_neurodivergencia=form.tipo_neurodivergencia.data,
+                diagnostico_formal=diagnostico_bool,
+                
+                # Información laboral y personal
+                habilidades=form.habilidades.data,
+                experiencia_laboral=form.experiencia_laboral.data,
+                formacion_academica=form.formacion_academica.data,
+                intereses_laborales=form.intereses_laborales.data,
+                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
+                motivaciones=form.motivaciones.data
+            )
+            
+            db.session.add(nuevo_usuario)
+            db.session.commit()
+            
+            flash(f'¡Test completado exitosamente, {form.nombre.data}! Tu perfil ha sido guardado en nuestro sistema.', 'success')
+            print(f"✅ Usuario registrado: {form.nombre.data} {form.apellidos.data} - {form.tipo_neurodivergencia.data}")
+            
+            return redirect(url_for('personas_nd'))
+            
+        except Exception as e:
+            print(f"❌ Error guardando usuario: {e}")
+            flash('Error al guardar tu información. Por favor intenta de nuevo.', 'error')
+            db.session.rollback()
+    
     return render_template('registro.html', form=form)
 
 # Rutas de registro específicas por neurodivergencia
