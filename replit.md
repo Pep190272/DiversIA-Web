@@ -7,6 +7,17 @@ DiversIA is a web-based employment platform designed to connect neurodivergent i
 Preferred communication style: Simple, everyday language.
 System reliability: Critical requirement - zero tolerance for 500 errors on main routes.
 
+## Code Protection Policy (CRITICAL)
+**NEVER destroy working functionality. Only scale up and improve existing code:**
+- ✅ Add new features by extending existing files
+- ✅ Fix bugs by modifying specific lines only
+- ✅ Preserve all working templates, forms, and routes
+- ❌ NEVER rewrite entire files from scratch
+- ❌ NEVER delete working content
+- ❌ NEVER break existing functionality when adding new features
+- **Protected directories**: templates/, forms.py, existing routes
+- **Policy**: Scale and improve, never destroy previous work
+
 ## System Reliability
 - **PostgreSQL Database**: Production database with 100% uptime and data integrity
 - All form fields MUST be defined in forms.py before being used in templates  
