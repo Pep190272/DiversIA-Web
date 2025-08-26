@@ -25,7 +25,7 @@
                         <form method="POST" novalidate>
                             {{ form.hidden_tag() }}
                             <!-- Campo oculto para tipo de neurodivergencia -->
-                            {{ form.tipo_neurodivergencia(style="display: none;") }}
+                            <input type="hidden" name="tipo_neurodivergencia" value="dislexia">
                             
                             <!-- Información Personal -->
                             <div class="form-section mb-5">
