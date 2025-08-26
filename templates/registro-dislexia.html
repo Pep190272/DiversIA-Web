@@ -117,10 +117,16 @@
                                     {% endfor %}
                                 </div>
                                 
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        {{ form.diagnostico_formal(class="form-check-input") }}
-                                        {{ form.diagnostico_formal.label(class="form-check-label") }}
+                                <div class="mb-4">
+                                    <label class="form-label" for="diagnostico_formal">¿Tienes un diagnóstico formal?</label>
+                                    <select class="form-select" id="diagnostico_formal" name="diagnostico_formal">
+                                        <option value="">Selecciona una opción</option>
+                                        <option value="si">Sí, tengo diagnóstico formal</option>
+                                        <option value="no">No tengo diagnóstico formal</option>
+                                        <option value="proceso">Estoy en proceso de diagnóstico</option>
+                                    </select>
+                                    <div class="form-text">
+                                        Un diagnóstico formal puede ayudar pero no es imprescindible para encontrar trabajo.
                                     </div>
                                 </div>
                             </div>

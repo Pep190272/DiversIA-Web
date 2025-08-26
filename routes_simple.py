@@ -285,8 +285,59 @@ def registro_dislexia():
     from forms import RegistroDislexiaForm 
     form = RegistroDislexiaForm()
     if form.validate_on_submit():
-        flash('¡Registro Dislexia completado exitosamente!', 'success')
-        return redirect(url_for('personas_nd'))
+        try:
+            from models import NeurodivergentProfile
+            
+            # Verificar si ya existe un usuario con este email (actualizar en lugar de crear)
+            perfil_existente = NeurodivergentProfile.query.filter_by(email=form.email.data).first()
+            
+            if perfil_existente:
+                # Actualizar perfil existente
+                perfil_existente.nombre = form.nombre.data
+                perfil_existente.apellidos = form.apellidos.data
+                perfil_existente.telefono = form.telefono.data
+                perfil_existente.ciudad = form.ciudad.data
+                perfil_existente.fecha_nacimiento = form.fecha_nacimiento.data
+                perfil_existente.tipo_neurodivergencia = 'Dislexia'
+                perfil_existente.diagnostico_formal = form.diagnostico_formal.data == 'si'
+                perfil_existente.habilidades = form.habilidades.data
+                perfil_existente.experiencia_laboral = form.experiencia_laboral.data
+                perfil_existente.formacion_academica = form.formacion_academica.data
+                perfil_existente.intereses_laborales = form.intereses_laborales.data
+                perfil_existente.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+                perfil_existente.motivaciones = form.motivaciones.data
+                
+                db.session.commit()
+                print(f"✅ DISLEXIA - Perfil actualizado: {form.nombre.data} {form.apellidos.data}")
+                flash(f'¡Perfil Dislexia actualizado correctamente, {form.nombre.data}!', 'success')
+            else:
+                # Crear nuevo perfil
+                nuevo_perfil = NeurodivergentProfile(
+                    nombre=form.nombre.data,
+                    apellidos=form.apellidos.data,
+                    email=form.email.data,
+                    telefono=form.telefono.data,
+                    ciudad=form.ciudad.data,
+                    fecha_nacimiento=form.fecha_nacimiento.data,
+                    tipo_neurodivergencia='Dislexia',
+                    diagnostico_formal=form.diagnostico_formal.data == 'si',
+                    habilidades=form.habilidades.data,
+                    experiencia_laboral=form.experiencia_laboral.data,
+                    formacion_academica=form.formacion_academica.data,
+                    intereses_laborales=form.intereses_laborales.data,
+                    adaptaciones_necesarias=form.adaptaciones_necesarias.data,
+                    motivaciones=form.motivaciones.data
+                )
+                db.session.add(nuevo_perfil)
+                db.session.commit()
+                print(f"✅ DISLEXIA - Perfil creado: {form.nombre.data} {form.apellidos.data}")
+                flash(f'¡Perfil Dislexia registrado exitosamente, {form.nombre.data}!', 'success')
+            
+            return redirect(url_for('personas_nd'))
+        except Exception as e:
+            print(f"❌ DISLEXIA - Error: {e}")
+            flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
+            db.session.rollback()
     return render_template('registro-dislexia.html', form=form)
 
 # Rutas adicionales que requieren los templates
