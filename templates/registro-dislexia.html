@@ -141,7 +141,7 @@
                                 <div class="mb-3">
                                     {{ form.experiencia_laboral.label(class="form-label") }}
                                     {{ form.experiencia_laboral(class="form-control", rows="4") }}
-                                    <div class="form-text">Puedes usar el botón de audio para escuchar lo que escribes.</div>
+                                    <div class="form-text">Describe tu experiencia laboral anterior.</div>
                                 </div>
                                 
                                 <div class="mb-3">
@@ -223,43 +223,10 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Audio functionality disabled to prevent popup windows -->
 <script>
-// Text-to-speech functionality for dislexia users
-function addTextToSpeechButtons() {
-    const textareas = document.querySelectorAll('textarea');
-    
-    textareas.forEach(textarea => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'position-relative';
-        textarea.parentNode.insertBefore(wrapper, textarea);
-        wrapper.appendChild(textarea);
-        
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'btn btn-sm btn-outline-primary position-absolute';
-        button.style.cssText = 'top: 5px; right: 5px; z-index: 10;';
-        button.innerHTML = '<i data-lucide="volume-2" aria-hidden="true"></i>';
-        button.setAttribute('aria-label', 'Leer texto en voz alta');
-        
-        button.addEventListener('click', function() {
-            const text = textarea.value;
-            if (text && 'speechSynthesis' in window) {
-                speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'es-ES';
-                speechSynthesis.speak(utterance);
-            }
-        });
-        
-        wrapper.appendChild(button);
-    });
-    
-    // Re-initialize icons after adding buttons
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-}
-
-document.addEventListener('DOMContentLoaded', addTextToSpeechButtons);
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Formulario dislexia cargado - popups deshabilitados');
+});
 </script>
 {% endblock %}
