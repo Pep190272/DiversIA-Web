@@ -143,7 +143,12 @@ class RegistroTEAForm(RegistroGeneralForm):
         ('propioceptiva', 'Sensibilidad propioceptiva')
     ])
     
-    rutinas_importantes = BooleanField('¿Son importantes las rutinas en tu día a día?')
+    rutinas_importantes = SelectField('¿Son importantes las rutinas en tu día a día?', choices=[
+        ('', 'Selecciona una opción'),
+        ('si', 'Sí'),
+        ('no', 'No'),
+        ('no_se', 'No lo sé')
+    ], validators=[Optional()])
     
     comunicacion_preferida = SelectField('Forma de comunicación preferida', choices=[
         ('', 'Selecciona una opción'),

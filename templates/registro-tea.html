@@ -120,10 +120,8 @@
                                 </div>
                                 
                                 <div class="mb-4">
-                                    <div class="form-check">
-                                        {{ form.rutinas_importantes(class="form-check-input") }}
-                                        {{ form.rutinas_importantes.label(class="form-check-label") }}
-                                    </div>
+                                    {{ form.rutinas_importantes.label(class="form-label") }}
+                                    {{ form.rutinas_importantes(class="form-select") }}
                                     <div class="form-text">
                                         Las rutinas pueden ser importantes para tu bienestar y productividad.
                                     </div>
