@@ -24,6 +24,8 @@
                     <div class="card-body p-4">
                         <form method="POST" novalidate>
                             {{ form.hidden_tag() }}
+                            <!-- Campo oculto para tipo de neurodivergencia -->
+                            {{ form.tipo_neurodivergencia(style="display: none;") }}
                             
                             <!-- Información Personal -->
                             <div class="form-section mb-5">
@@ -135,10 +137,11 @@
                                     </div>
                                 </div>
                                 
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        {{ form.diagnostico_formal(class="form-check-input") }}
-                                        {{ form.diagnostico_formal.label(class="form-check-label") }}
+                                <div class="mb-4">
+                                    {{ form.diagnostico_formal.label(class="form-label") }}
+                                    {{ form.diagnostico_formal(class="form-select") }}
+                                    <div class="form-text">
+                                        Un diagnóstico formal puede ayudar pero no es imprescindible para encontrar trabajo.
                                     </div>
                                 </div>
                             </div>

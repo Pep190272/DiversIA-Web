@@ -117,6 +117,12 @@ class RegistroTDAHForm(RegistroGeneralForm):
     ])
 
 class RegistroTEAForm(RegistroGeneralForm):
+    # Sobrescribir tipo_neurodivergencia para que no sea requerido (ya sabemos que es TEA)
+    tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', 
+        choices=[('TEA', 'TEA (Espectro Autista)')], 
+        default='TEA',
+        validators=[Optional()])
+    
     nivel_apoyo = SelectField('Nivel de apoyo necesario', choices=[
         ('', 'Selecciona una opción'),
         ('minimo', 'Apoyo mínimo'),
