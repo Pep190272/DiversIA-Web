@@ -1091,5 +1091,11 @@ def create_minimal_crm_routes(app):
             print(f"❌ Error borrando usuario {user_id}: {e}")
             return jsonify({'success': False, 'error': str(e)}), 500
     
+    # Debug: listar rutas registradas
+    print("🔍 Rutas API registradas:")
+    for rule in app.url_map.iter_rules():
+        if 'api/usuario' in str(rule.rule):
+            print(f"  {rule.rule} -> {rule.endpoint} [{', '.join(rule.methods)}]")
+    
     print("CRM Minimal inicializado correctamente")
     
