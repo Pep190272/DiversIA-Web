@@ -21,6 +21,8 @@
                 <div class="card-body p-4">
                     <form method="POST">
                         {{ form.hidden_tag() }}
+                        <!-- Campo oculto para tipo de neurodivergencia -->
+                        {{ form.tipo_neurodivergencia(style="display: none;") }}
                         
                         <!-- Información Personal -->
                         <div class="row g-3 mb-4">

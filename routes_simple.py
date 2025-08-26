@@ -907,21 +907,23 @@ def api_editar_usuario(user_id):
         usuario_data = {
             'id': user_id,
             'fuente': table_name,
-            'nombre': usuario.nombre,
-            'apellidos': usuario.apellidos,
-            'email': usuario.email,
-            'telefono': usuario.telefono,
-            'ciudad': usuario.ciudad,
-            'fecha_nacimiento': usuario.fecha_nacimiento.isoformat() if usuario.fecha_nacimiento else None,
-            'tipo_neurodivergencia': usuario.tipo_neurodivergencia,
-            'diagnostico_formal': usuario.diagnostico_formal,
-            'habilidades': usuario.habilidades,
-            'experiencia_laboral': usuario.experiencia_laboral,
-            'formacion_academica': usuario.formacion_academica,
-            'intereses_laborales': usuario.intereses_laborales,
-            'adaptaciones_necesarias': usuario.adaptaciones_necesarias,
-            'motivaciones': usuario.motivaciones
+            'nombre': usuario.nombre or '',
+            'apellidos': usuario.apellidos or '',
+            'email': usuario.email or '',
+            'telefono': usuario.telefono or '',
+            'ciudad': usuario.ciudad or '',
+            'fecha_nacimiento': usuario.fecha_nacimiento.isoformat() if usuario.fecha_nacimiento else '',
+            'tipo_neurodivergencia': usuario.tipo_neurodivergencia or '',
+            'diagnostico_formal': bool(usuario.diagnostico_formal),
+            'habilidades': usuario.habilidades or '',
+            'experiencia_laboral': usuario.experiencia_laboral or '',
+            'formacion_academica': usuario.formacion_academica or '',
+            'intereses_laborales': usuario.intereses_laborales or '',
+            'adaptaciones_necesarias': usuario.adaptaciones_necesarias or '',
+            'motivaciones': usuario.motivaciones or ''
         }
+        
+        print(f"📤 Sending user data: {usuario_data['nombre']} {usuario_data['apellidos']}")
         
         return jsonify(usuario_data)
         
