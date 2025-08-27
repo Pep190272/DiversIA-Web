@@ -260,8 +260,20 @@
             try {
                 const response = await fetch('/api/usuarios-neurodivergentes');
                 const allData = await response.json();
-                // Filtrar por tipo de neurodivergencia
-                const data = allData.filter(user => user.tipo_neurodivergencia && user.tipo_neurodivergencia.toLowerCase() === type.toLowerCase());
+                // Filtrar por tipo de neurodivergencia con normalización
+                const data = allData.filter(user => {
+                    if (!user.tipo_neurodivergencia) return false;
+                    
+                    const userType = user.tipo_neurodivergencia.toLowerCase();
+                    const searchType = type.toLowerCase();
+                    
+                    // Manejar variaciones específicas
+                    if (searchType === 'tourette') {
+                        return userType === 'tourette' || userType === 'síndrome de tourette' || userType.includes('tourette');
+                    }
+                    
+                    return userType === searchType;
+                });
                 
                 let html = `
                     <div class="d-flex justify-content-between align-items-center mb-3">
