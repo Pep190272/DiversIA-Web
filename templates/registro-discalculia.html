@@ -103,10 +103,11 @@
                         </div>
                         
                         <div class="mb-3">
-                            <div class="form-check">
-                                {{ form.diagnostico_formal(class="form-check-input") }}
-                                {{ form.diagnostico_formal.label(class="form-check-label") }}
-                            </div>
+                            <label class="form-label fw-bold">{{ form.diagnostico_formal.label }}</label>
+                            {{ form.diagnostico_formal(class="form-select") }}
+                            {% if form.diagnostico_formal.errors %}
+                                <div class="text-danger small">{{ form.diagnostico_formal.errors[0] }}</div>
+                            {% endif %}
                         </div>
                         
                         <div class="mb-3">
