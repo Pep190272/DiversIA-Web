@@ -25,6 +25,7 @@
                         {{ form.tipo_neurodivergencia(style="display: none;") }}
                         
                         <!-- Información Personal -->
+                        <h5 class="text-primary mb-3">👤 Información Personal</h5>
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">{{ form.nombre.label }}</label>
@@ -34,6 +35,28 @@
                                 <label class="form-label fw-bold">{{ form.apellidos.label }}</label>
                                 {{ form.apellidos(class="form-control") }}
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.email.label }}</label>
+                                {{ form.email(class="form-control", type="email") }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.telefono.label }}</label>
+                                {{ form.telefono(class="form-control") }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.ciudad.label }}</label>
+                                {{ form.ciudad(class="form-control") }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">{{ form.fecha_nacimiento.label }}</label>
+                                {{ form.fecha_nacimiento(class="form-control", type="date") }}
+                            </div>
+                        </div>
+                        
+                        <!-- Diagnóstico -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">{{ form.diagnostico_formal.label }}</label>
+                            {{ form.diagnostico_formal(class="form-select") }}
                         </div>
                         
                         <!-- Campos específicos de Tourette -->
@@ -68,10 +91,37 @@
                             {{ form.estrategias_control(class="form-control", rows="3") }}
                         </div>
                         
-                        <!-- Resto del formulario -->
+                        <!-- Información Laboral -->
+                        <h5 class="text-primary mb-3">💼 Información Laboral</h5>
+                        
                         <div class="mb-3">
                             <label class="form-label fw-bold">{{ form.habilidades.label }}</label>
                             {{ form.habilidades(class="form-control", rows="3") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.experiencia_laboral.label }}</label>
+                            {{ form.experiencia_laboral(class="form-control", rows="3") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.formacion_academica.label }}</label>
+                            {{ form.formacion_academica(class="form-control", rows="3") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.intereses_laborales.label }}</label>
+                            {{ form.intereses_laborales(class="form-control", rows="3") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ form.adaptaciones_necesarias.label }}</label>
+                            {{ form.adaptaciones_necesarias(class="form-control", rows="3") }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">{{ form.motivaciones.label }}</label>
+                            {{ form.motivaciones(class="form-control", rows="3") }}
                         </div>
                         
                         <div class="mb-4">
