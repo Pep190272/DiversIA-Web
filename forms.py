@@ -197,6 +197,11 @@ class RegistroDislexiaForm(RegistroGeneralForm):
     ])
 
 class RegistroDiscalculiaForm(RegistroGeneralForm):
+    # Sobrescribir tipo_neurodivergencia para que tenga el valor correcto
+    tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', 
+        choices=[('discalculia', 'Discalculia')], 
+        default='discalculia',
+        validators=[Optional()])
     dificultades_matematicas = MultiCheckboxField('Dificultades específicas con matemáticas', choices=[
         ('numeros_basicos', 'Conceptos numéricos básicos'),
         ('calculo_mental', 'Cálculo mental'),
