@@ -19,6 +19,14 @@
                 </div>
                 
                 <div class="card-body p-4">
+                    {% if success %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>¡Éxito!</strong> Tu perfil de Discalculia ha sido completado exitosamente.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                    {% endif %}
+                    
                     <form method="POST">
                         {{ form.hidden_tag() }}
                         <!-- Campo oculto para tipo de neurodivergencia -->

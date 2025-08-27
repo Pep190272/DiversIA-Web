@@ -430,7 +430,8 @@ def registro_discalculia():
             db.session.commit()
             print(f"✅ DISCALCULIA - Perfil guardado: {form.nombre.data} {form.apellidos.data}")
             flash(f'¡Perfil Discalculia completado exitosamente, {form.nombre.data}!', 'success')
-            return redirect('/')
+            # Mantener en la misma página para mostrar el mensaje de éxito
+            return render_template('registro-discalculia.html', form=form, success=True)
         except Exception as e:
             print(f"❌ DISCALCULIA - Error: {e}")
             flash('❌ Error al guardar tu perfil Discalculia. Por favor intenta de nuevo.', 'error')
