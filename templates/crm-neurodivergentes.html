@@ -409,7 +409,7 @@
 
         async function exportAllData() {
             try {
-                const response = await fetch('/api/usuarios');
+                const response = await fetch('/api/usuarios-neurodivergentes');
                 const data = await response.json();
                 
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -429,7 +429,7 @@
             const container = document.getElementById('otros-content');
             container.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
             
-            fetch('/api/usuarios')
+            fetch('/api/usuarios-neurodivergentes')
                 .then(response => response.json())
                 .then(allUsers => {
                     console.log('DEBUG: Todos los usuarios:', allUsers);
