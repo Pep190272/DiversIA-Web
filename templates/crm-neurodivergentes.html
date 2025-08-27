@@ -135,7 +135,7 @@
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#discalculia-tab" role="tab" onclick="loadNeurodivergenceData('Discalculia')">
                             🔢 Discalculia
                         </button>
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tourette-tab" role="tab" onclick="loadNeurodivergenceData('Tourette')">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tourette-tab" role="tab" onclick="loadNeurodivergenceData('Tourette'); console.log('Cargando datos Tourette');">
                             🎯 Tourette
                         </button>
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#otros-tab" role="tab" onclick="loadOtherTypes()">
@@ -253,13 +253,23 @@
         }
 
         async function loadNeurodivergenceData(type) {
+            console.log('🎯 Iniciando carga de datos para tipo:', type);
             const contentId = type.toLowerCase() + '-content';
             const container = document.getElementById(contentId);
-            container.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+            
+            if (!container) {
+                console.error('❌ No se encontró contenedor:', contentId);
+                return;
+            }
+            
+            container.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><p>Cargando datos de ' + type + '...</p></div>';
             
             try {
                 const response = await fetch('/api/usuarios-neurodivergentes');
                 const allData = await response.json();
+                console.log('📊 Todos los datos recibidos:', allData.length);
+                console.log('📋 Tipos disponibles:', allData.map(u => u.tipo_neurodivergencia));
+                
                 // Filtrar por tipo de neurodivergencia con normalización
                 const data = allData.filter(user => {
                     if (!user.tipo_neurodivergencia) return false;
@@ -267,13 +277,19 @@
                     const userType = user.tipo_neurodivergencia.toLowerCase();
                     const searchType = type.toLowerCase();
                     
+                    console.log(`🔍 Comparando: "${userType}" con "${searchType}"`);
+                    
                     // Manejar variaciones específicas
                     if (searchType === 'tourette') {
-                        return userType === 'tourette' || userType === 'síndrome de tourette' || userType.includes('tourette');
+                        const match = userType === 'tourette' || userType === 'síndrome de tourette' || userType.includes('tourette');
+                        console.log(`🎯 Tourette match para "${userType}":`, match);
+                        return match;
                     }
                     
                     return userType === searchType;
                 });
+                
+                console.log('✅ Datos filtrados para', type + ':', data.length);
                 
                 let html = `
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -424,8 +440,19 @@
         }
 
         function switchToTab(type) {
-            // Para Tourette y otros tipos especiales, usar la pestaña "Otros"
-            if (['tel', 'disgrafia', 'tps', 'tourette', 'altas_capacidades'].includes(type)) {
+            console.log('Switching to tab:', type);
+            
+            // Para Tourette, usar su pestaña específica
+            if (type === 'tourette') {
+                const touretteTab = document.querySelector(`[data-bs-target="#tourette-tab"]`);
+                if (touretteTab) {
+                    touretteTab.click();
+                    return;
+                }
+            }
+            
+            // Para otros tipos especiales, usar la pestaña "Otros"  
+            if (['tel', 'disgrafia', 'tps', 'altas_capacidades'].includes(type)) {
                 const othersTab = document.querySelector(`[data-bs-target="#otros-tab"]`);
                 if (othersTab) {
                     othersTab.click();
