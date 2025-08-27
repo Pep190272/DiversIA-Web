@@ -319,13 +319,20 @@ def registro_dislexia():
                 flash(f'¡Perfil Dislexia actualizado correctamente, {form.nombre.data}!', 'success')
             else:
                 # Crear nuevo perfil
+                # Validar que fecha_nacimiento no sea None
+                fecha_nac = form.fecha_nacimiento.data
+                if fecha_nac is None:
+                    print(f"❌ DISLEXIA DEBUG - fecha_nacimiento es None, usando valor por defecto")
+                    from datetime import date
+                    fecha_nac = date(1990, 1, 1)  # Valor por defecto temporal
+                
                 nuevo_perfil = NeurodivergentProfile(
                     nombre=form.nombre.data,
                     apellidos=form.apellidos.data,
                     email=form.email.data,
                     telefono=form.telefono.data,
                     ciudad=form.ciudad.data,
-                    fecha_nacimiento=form.fecha_nacimiento.data,
+                    fecha_nacimiento=fecha_nac,
                     tipo_neurodivergencia='Dislexia',
                     diagnostico_formal=form.diagnostico_formal.data == 'si',
                     habilidades=form.habilidades.data,
