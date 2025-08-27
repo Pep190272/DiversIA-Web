@@ -320,6 +320,47 @@ class EmpleadoForm(FlaskForm):
         ('pending', 'Pendiente')
     ], default='active', validators=[DataRequired()])
 
+class RegistroTELForm(RegistroGeneralForm):
+    """Formulario específico para Trastorno Específico del Lenguaje (TEL)"""
+    # Sobrescribir tipo_neurodivergencia para que tenga el valor correcto
+    tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', 
+        choices=[('tel', 'Trastorno Específico del Lenguaje (TEL)')], 
+        default='tel',
+        validators=[Optional()])
+    
+    # Campos específicos de TEL
+    dificultades_lenguaje = MultiCheckboxField('Principales dificultades del lenguaje', choices=[
+        ('comprension', 'Comprensión del lenguaje hablado'),
+        ('expresion_oral', 'Expresión oral'),
+        ('vocabulario', 'Desarrollo del vocabulario'),
+        ('gramatica', 'Estructuras gramaticales'),
+        ('articulacion', 'Articulación de sonidos'),
+        ('lectura', 'Lectura y comprensión lectora'),
+        ('escritura', 'Expresión escrita')
+    ])
+    
+    edad_diagnostico = SelectField('¿A qué edad recibiste el diagnóstico?', choices=[
+        ('', 'Selecciona una opción'),
+        ('temprana', 'Primera infancia (0-3 años)'),
+        ('preescolar', 'Preescolar (4-5 años)'),
+        ('escolar', 'Escolar (6-12 años)'),
+        ('adolescencia', 'Adolescencia (13-18 años)'),
+        ('adulto', 'Edad adulta (18+ años)')
+    ], validators=[Optional()])
+    
+    terapias_recibidas = MultiCheckboxField('Terapias o tratamientos recibidos', choices=[
+        ('logopedia', 'Logopedia/Terapia del habla'),
+        ('psicopedagogia', 'Psicopedagogía'),
+        ('terapia_ocupacional', 'Terapia ocupacional'),
+        ('apoyo_escolar', 'Apoyo escolar especializado'),
+        ('terapia_familiar', 'Terapia familiar'),
+        ('ninguna', 'Ninguna terapia específica')
+    ])
+    
+    estrategias_comunicacion = TextAreaField('Estrategias que te ayudan en la comunicación', validators=[Optional()])
+    
+    necesidades_laborales = TextAreaField('Necesidades específicas en el entorno laboral', validators=[Optional()])
+
 class RegistroTouretteForm(RegistroGeneralForm):
     # Sobrescribir tipo_neurodivergencia para que tenga el valor correcto
     tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', 
