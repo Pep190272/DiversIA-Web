@@ -432,14 +432,18 @@
             fetch('/api/usuarios')
                 .then(response => response.json())
                 .then(allUsers => {
+                    console.log('DEBUG: Todos los usuarios:', allUsers);
+                    console.log('DEBUG: Tipos encontrados:', [...new Set(allUsers.map(u => u.tipo_neurodivergencia))]);
                     const types = ['tel', 'disgrafia', 'tps', 'tourette', 'altas_capacidades'];
                     const typeLabels = ['TEL', 'Disgrafía', 'TPS', 'Tourette', 'Altas Capacidades'];
                     // Buscar tanto por valor exacto como por variaciones
                     const results = types.map((type, index) => {
                         return allUsers.filter(user => {
                             const userType = user.tipo_neurodivergencia?.toLowerCase();
-                            return userType === type || 
-                                   (type === 'tourette' && (userType === 'síndrome de tourette' || userType.includes('tourette')));
+                            if (type === 'tourette') {
+                                return userType === 'tourette' || userType === 'síndrome de tourette' || userType.includes('tourette');
+                            }
+                            return userType === type;
                         });
                     });
                 
@@ -467,10 +471,24 @@
                 });
                 
                     html += '</div>';
+                    
+                    // Si no hay datos, mostrar mensaje de debug
+                    if (results.every(r => r.length === 0)) {
+                        html += `<div class="alert alert-warning">
+                            <h6>Debug: No se encontraron usuarios en tipos especiales</h6>
+                            <p>Total usuarios: ${allUsers.length}</p>
+                            <p>Tipos encontrados: ${[...new Set(allUsers.map(u => u.tipo_neurodivergencia))].join(', ')}</p>
+                        </div>`;
+                    }
+                    
                     container.innerHTML = html;
                 }).catch(error => {
                 console.error('Error loading other types:', error);
-                container.innerHTML = '<div class="alert alert-danger">Error cargando datos</div>';
+                container.innerHTML = `<div class="alert alert-danger">
+                    <h6>Error cargando datos</h6>
+                    <p>Error: ${error.message}</p>
+                    <button onclick="loadOtherTypes()" class="btn btn-sm btn-primary">Reintentar</button>
+                </div>`;
             });
         }
     </script>
