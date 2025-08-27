@@ -434,7 +434,14 @@
                 .then(allUsers => {
                     const types = ['tel', 'disgrafia', 'tps', 'tourette', 'altas_capacidades'];
                     const typeLabels = ['TEL', 'Disgrafía', 'TPS', 'Tourette', 'Altas Capacidades'];
-                    const results = types.map(type => allUsers.filter(user => user.tipo_neurodivergencia === type));
+                    // Buscar tanto por valor exacto como por variaciones
+                    const results = types.map((type, index) => {
+                        return allUsers.filter(user => {
+                            const userType = user.tipo_neurodivergencia?.toLowerCase();
+                            return userType === type || 
+                                   (type === 'tourette' && (userType === 'síndrome de tourette' || userType.includes('tourette')));
+                        });
+                    });
                 
                     let html = '<div class="row">';
                 

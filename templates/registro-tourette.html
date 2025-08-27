@@ -59,10 +59,8 @@
                         </div>
                         
                         <div class="mb-3">
-                            <div class="form-check">
-                                {{ form.medicacion_tics(class="form-check-input") }}
-                                {{ form.medicacion_tics.label(class="form-check-label") }}
-                            </div>
+                            <label class="form-label fw-bold">{{ form.medicacion_tics.label }}</label>
+                            {{ form.medicacion_tics(class="form-select") }}
                         </div>
                         
                         <div class="mb-3">

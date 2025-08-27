@@ -321,6 +321,11 @@ class EmpleadoForm(FlaskForm):
     ], default='active', validators=[DataRequired()])
 
 class RegistroTouretteForm(RegistroGeneralForm):
+    # Sobrescribir tipo_neurodivergencia para que tenga el valor correcto
+    tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', 
+        choices=[('tourette', 'Síndrome de Tourette')], 
+        default='tourette',
+        validators=[Optional()])
     tipos_tics = MultiCheckboxField('Tipos de tics que experimentas', choices=[
         ('motor_simple', 'Tics motores simples'),
         ('motor_complejo', 'Tics motores complejos'),
@@ -338,7 +343,12 @@ class RegistroTouretteForm(RegistroGeneralForm):
         ('variable', 'Variable según el estrés')
     ], validators=[Optional()])
     
-    medicacion_tics = BooleanField('¿Tomas medicación para los tics?')
+    medicacion_tics = SelectField('¿Tomas medicación para los tics?', choices=[
+        ('', 'Selecciona una opción'),
+        ('si', 'Sí'),
+        ('no', 'No'),
+        ('ocasional', 'Ocasionalmente')
+    ], validators=[Optional()])
     
     estrategias_control = TextAreaField('Estrategias que te ayudan a manejar los tics', validators=[Optional()])
 
