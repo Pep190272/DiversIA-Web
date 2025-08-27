@@ -135,6 +135,9 @@
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#discalculia-tab" role="tab" onclick="loadNeurodivergenceData('Discalculia')">
                             🔢 Discalculia
                         </button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tourette-tab" role="tab" onclick="loadNeurodivergenceData('Tourette')">
+                            🎯 Tourette
+                        </button>
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#otros-tab" role="tab" onclick="loadOtherTypes()">
                             ➕ Otros
                         </button>
@@ -161,6 +164,9 @@
                     </div>
                     <div class="tab-pane fade" id="discalculia-tab">
                         <div id="discalculia-content">Cargando...</div>
+                    </div>
+                    <div class="tab-pane fade" id="tourette-tab">
+                        <div id="tourette-content">Cargando...</div>
                     </div>
                     <div class="tab-pane fade" id="otros-tab">
                         <div id="otros-content">Cargando...</div>
@@ -215,7 +221,12 @@
                 
                 // Contar usuarios por tipo
                 data.forEach(user => {
-                    const tipoLower = user.tipo_neurodivergencia ? user.tipo_neurodivergencia.toLowerCase() : '';
+                    let tipoLower = user.tipo_neurodivergencia ? user.tipo_neurodivergencia.toLowerCase() : '';
+                    
+                    // Normalizar nombres de tipos
+                    if (tipoLower === 'síndrome de tourette') tipoLower = 'tourette';
+                    if (tipoLower === 'altas capacidades' || tipoLower === 'superdotación') tipoLower = 'altas_capacidades';
+                    
                     if (usersByType.hasOwnProperty(tipoLower)) {
                         usersByType[tipoLower]++;
                     }
@@ -401,6 +412,15 @@
         }
 
         function switchToTab(type) {
+            // Para Tourette y otros tipos especiales, usar la pestaña "Otros"
+            if (['tel', 'disgrafia', 'tps', 'tourette', 'altas_capacidades'].includes(type)) {
+                const othersTab = document.querySelector(`[data-bs-target="#otros-tab"]`);
+                if (othersTab) {
+                    othersTab.click();
+                    return;
+                }
+            }
+            
             const tabButton = document.querySelector(`[data-bs-target="#${type}-tab"]`);
             if (tabButton) {
                 tabButton.click();
