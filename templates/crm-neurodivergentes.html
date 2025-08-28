@@ -266,7 +266,12 @@
 
         async function loadNeurodivergenceData(type) {
             console.log('🎯 Iniciando carga de datos para tipo:', type);
-            const contentId = type.toLowerCase() + '-content';
+            let contentId;
+            if (type === 'Disgrafía') {
+                contentId = 'disgrafia-content';
+            } else {
+                contentId = type.toLowerCase() + '-content';
+            }
             const container = document.getElementById(contentId);
             
             if (!container) {
@@ -305,7 +310,7 @@
                     }
                     
                     if (searchType === 'disgrafía') {
-                        const match = userType === 'disgrafía' || userType === 'disgrafia' || userType.includes('disgraf');
+                        const match = userType === 'disgrafía' || userType === 'disgrafia' || userType.includes('disgraf') || userType.toLowerCase().includes('disgraf');
                         console.log(`✍️ Disgrafía match para "${userType}":`, match);
                         return match;
                     }
