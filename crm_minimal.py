@@ -68,10 +68,9 @@ def create_minimal_crm_routes(app):
     
     @app.route('/asociaciones-crm')
     def asociaciones_crm():
-        """Dashboard de asociaciones del CRM - TEMPORALMENTE SIN AUTENTICACIÓN PARA DEBUG"""
-        # Comentado temporalmente para debug
-        # if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
-        #     return redirect('/diversia-admin')
+        """Dashboard de asociaciones del CRM - requiere autenticación"""
+        if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
+            return redirect('/diversia-admin')
         
         try:
             data = load_data()
