@@ -120,7 +120,7 @@
                                 <div class="form-check">
                                     {{ form.aceptar_privacidad(class="form-check-input" + (" is-invalid" if form.aceptar_privacidad.errors else "")) }}
                                     <label class="form-check-label" for="{{ form.aceptar_privacidad.id }}">
-                                        He leído y acepto la <a href="{{ url_for('privacidad') }}" target="_blank" class="text-decoration-none">Política de Privacidad</a>
+                                        He leído y acepto la <a href="{{ url_for('politica_privacidad') }}" target="_blank" class="text-decoration-none">Política de Privacidad</a>
                                     </label>
                                     {% if form.aceptar_privacidad.errors %}
                                         <div class="invalid-feedback d-block">
