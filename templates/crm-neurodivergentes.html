@@ -310,8 +310,12 @@
                     }
                     
                     if (searchType === 'disgrafía') {
-                        const match = userType === 'disgrafía' || userType === 'disgrafia' || userType.includes('disgraf') || userType.toLowerCase().includes('disgraf');
-                        console.log(`✍️ Disgrafía match para "${userType}":`, match);
+                        // Normalizar acentos para comparación
+                        const normalizedUserType = userType.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+                        const match = userType === 'disgrafía' || userType === 'disgrafia' || userType === 'Disgrafía' || 
+                                     userType.includes('disgraf') || normalizedUserType.includes('disgrafia') || 
+                                     normalizedUserType.includes('disgraf');
+                        console.log(`✍️ Disgrafía match para "${userType}" (normalizado: "${normalizedUserType}"):`, match);
                         return match;
                     }
                     
