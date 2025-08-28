@@ -684,43 +684,6 @@ def create_minimal_crm_routes(app):
             print(f"❌ Error en API usuarios-neurodivergentes: {e}")
             return jsonify([])
 
-    @app.route('/api/leads-generales')
-    def get_leads_generales():
-        """Obtener SOLO leads del test general (GeneralLead)"""
-        try:
-            from models import GeneralLead
-            from app import db
-            
-            leads_data = []
-            
-            # Solo leads de la tabla GeneralLead (test general)
-            try:
-                leads = GeneralLead.query.all()
-                print(f"🔍 CRM Leads - Encontrados {len(leads)} leads del test general")
-                
-                for lead in leads:
-                    print(f"📋 CRM Leads - Lead: {lead.nombre} {lead.apellidos}")
-                    leads_data.append({
-                        'id': f'lead_{lead.id}',
-                        'fuente': 'GeneralLead (test general)',
-                        'nombre': lead.nombre,
-                        'apellidos': lead.apellidos,
-                        'email': lead.email,
-                        'telefono': getattr(lead, 'telefono', ''),
-                        'ciudad': getattr(lead, 'ciudad', ''),
-                        'fecha_nacimiento': getattr(lead, 'fecha_nacimiento', None),
-                        'tipo_neurodivergencia': getattr(lead, 'resultado_test', 'En proceso'),
-                        'created_at': lead.created_at.isoformat() if lead.created_at else None
-                    })
-            except Exception as e:
-                print(f"⚠️ Error cargando leads generales: {e}")
-            
-            print(f"📊 CRM Leads - Total leads generales: {len(leads_data)}")
-            return jsonify(leads_data)
-            
-        except Exception as e:
-            print(f"❌ Error en API leads-generales: {e}")
-            return jsonify([])
 
     # ==================== RUTAS PARA USUARIOS GENERALES (LEGACY) ====================""
     
