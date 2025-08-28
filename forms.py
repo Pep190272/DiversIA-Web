@@ -454,6 +454,69 @@ class RegistroTouretteForm(RegistroGeneralForm):
     
     estrategias_control = TextAreaField('Estrategias que te ayudan a manejar los tics', validators=[Optional()])
 
+class RegistroTPSForm(RegistroGeneralForm):
+    """Formulario específico para TPS (Trastorno del Procesamiento Sensorial)"""
+    # Sobrescribir tipo_neurodivergencia para que tenga el valor correcto
+    tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', 
+        choices=[('tps', 'Trastorno del Procesamiento Sensorial (TPS)')], 
+        default='tps',
+        validators=[Optional()])
+    
+    # Campos específicos de TPS
+    tipos_dificultades_sensoriales = MultiCheckboxField('Principales dificultades sensoriales', choices=[
+        ('auditivas', 'Procesamiento auditivo'),
+        ('visuales', 'Procesamiento visual'),
+        ('tactiles', 'Procesamiento táctil'),
+        ('propioceptivas', 'Procesamiento propioceptivo'),
+        ('vestibulares', 'Procesamiento vestibular'),
+        ('gustativas', 'Procesamiento gustativo'),
+        ('olfativas', 'Procesamiento olfativo'),
+        ('interoceptivas', 'Procesamiento interoceptivo')
+    ])
+    
+    patron_respuesta = SelectField('Patrón de respuesta sensorial predominante', choices=[
+        ('', 'Selecciona una opción'),
+        ('hipersensibilidad', 'Hipersensibilidad (sobrerespuesta)'),
+        ('hiposensibilidad', 'Hiposensibilidad (subrespuesta)'),
+        ('busqueda_sensorial', 'Búsqueda sensorial'),
+        ('evitacion_sensorial', 'Evitación sensorial'),
+        ('mixto', 'Patrón mixto')
+    ], validators=[Optional()])
+    
+    edad_diagnostico = SelectField('¿A qué edad recibiste el diagnóstico?', choices=[
+        ('', 'Selecciona una opción'),
+        ('temprana', 'Primera infancia (0-3 años)'),
+        ('preescolar', 'Preescolar (4-6 años)'),
+        ('escolar', 'Escolar (7-12 años)'),
+        ('adolescencia', 'Adolescencia (13-18 años)'),
+        ('adulto', 'Edad adulta (18+ años)')
+    ], validators=[Optional()])
+    
+    terapias_recibidas = MultiCheckboxField('Terapias o tratamientos recibidos', choices=[
+        ('terapia_ocupacional', 'Terapia ocupacional'),
+        ('integracion_sensorial', 'Terapia de integración sensorial'),
+        ('fisioterapia', 'Fisioterapia'),
+        ('terapia_auditiva', 'Terapia auditiva'),
+        ('terapia_vision', 'Terapia de visión'),
+        ('psicopedagogia', 'Psicopedagogía'),
+        ('apoyo_conductual', 'Apoyo conductual'),
+        ('ninguna', 'Ninguna terapia específica')
+    ])
+    
+    estrategias_autorregulacion = MultiCheckboxField('Estrategias de autorregulación que utilizas', choices=[
+        ('herramientas_sensoriales', 'Herramientas sensoriales (fidgets, cojines, etc.)'),
+        ('espacios_tranquilos', 'Búsqueda de espacios tranquilos'),
+        ('rutinas_descanso', 'Rutinas de descanso sensorial'),
+        ('ejercicios_respiracion', 'Ejercicios de respiración'),
+        ('actividad_fisica', 'Actividad física específica'),
+        ('dieta_sensorial', 'Dieta sensorial estructurada'),
+        ('ninguna', 'No uso estrategias específicas')
+    ])
+    
+    desencadenantes_ambientales = TextAreaField('Principales desencadenantes ambientales que te afectan', validators=[Optional()])
+    
+    necesidades_laborales = TextAreaField('Necesidades específicas en el entorno laboral', validators=[Optional()])
+
 class RegistroDispraxiaForm(RegistroGeneralForm):
     dificultades_coordinacion = MultiCheckboxField('Dificultades de coordinación', choices=[
         ('motora_gruesa', 'Motricidad gruesa'),

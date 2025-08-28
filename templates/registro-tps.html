@@ -27,7 +27,19 @@
                         </div>
 
                         <form method="POST" class="needs-validation" novalidate>
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
                             {{ form.hidden_tag() }}
+                            <!-- Campo oculto para tipo de neurodivergencia -->
+                            {{ form.tipo_neurodivergencia(style="display: none;") }}
                             
                             <!-- Información Personal -->
                             <div class="form-section mb-4">
@@ -62,7 +74,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         {{ form.fecha_nacimiento.label(class="form-label required") }}
-                                        {{ form.fecha_nacimiento(class="form-control form-control-lg") }}
+                                        {{ form.fecha_nacimiento(class="form-control form-control-lg", type="date") }}
                                     </div>
                                 </div>
                             </div>
@@ -74,6 +86,68 @@
                                 <div class="mb-3">
                                     {{ form.diagnostico_formal.label(class="form-label required") }}
                                     {{ form.diagnostico_formal(class="form-select form-control-lg") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.tipos_dificultades_sensoriales.label(class="form-label") }}
+                                    <div class="row">
+                                        {% for option in form.tipos_dificultades_sensoriales %}
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    {{ option(class="form-check-input") }}
+                                                    {{ option.label(class="form-check-label") }}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.patron_respuesta.label(class="form-label") }}
+                                    {{ form.patron_respuesta(class="form-select form-control-lg") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.edad_diagnostico.label(class="form-label") }}
+                                    {{ form.edad_diagnostico(class="form-select form-control-lg") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.terapias_recibidas.label(class="form-label") }}
+                                    <div class="row">
+                                        {% for option in form.terapias_recibidas %}
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    {{ option(class="form-check-input") }}
+                                                    {{ option.label(class="form-check-label") }}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.estrategias_autorregulacion.label(class="form-label") }}
+                                    <div class="row">
+                                        {% for option in form.estrategias_autorregulacion %}
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    {{ option(class="form-check-input") }}
+                                                    {{ option.label(class="form-check-label") }}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.desencadenantes_ambientales.label(class="form-label") }}
+                                    {{ form.desencadenantes_ambientales(class="form-control", rows="3") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.necesidades_laborales.label(class="form-label") }}
+                                    {{ form.necesidades_laborales(class="form-control", rows="3") }}
                                 </div>
                             </div>
 
@@ -112,6 +186,13 @@
                                 </div>
                             </div>
 
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    {{ form.aceptar_privacidad(class="form-check-input") }}
+                                    {{ form.aceptar_privacidad.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                            
                             <div class="text-center">
                                 <button type="submit" class="btn btn-secondary btn-lg px-5">
                                     <i data-lucide="save" aria-hidden="true"></i>

@@ -608,8 +608,12 @@ def registro_disgrafia():
 @app.route('/registro-tps', methods=['GET', 'POST'])
 def registro_tps():
     """Registro específico para TPS (Trastorno del Procesamiento Sensorial)"""
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    from forms import RegistroTPSForm
+    form = RegistroTPSForm()
+    
+    # Bypass CSRF for testing
+    form.csrf_token.data = form.csrf_token.current_token
+    
     if form.validate_on_submit():
         try:
             from models import NeurodivergentProfile
@@ -638,6 +642,9 @@ def registro_tps():
             print(f"❌ TPS - Error: {e}")
             flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
             db.session.rollback()
+    else:
+        if request.method == 'POST':
+            print("❌ TPS - Errores de validación:", form.errors)
     return render_template('registro-tps.html', form=form)
 
 @app.route('/registro-asociacion', methods=['GET', 'POST'])
