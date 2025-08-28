@@ -245,8 +245,19 @@
                     if (tipoLower === 'síndrome de tourette') tipoLower = 'tourette';
                     if (tipoLower === 'altas capacidades' || tipoLower === 'superdotación') tipoLower = 'altas_capacidades';
                     
+                    // Normalizar acentos para Disgrafía
+                    if (tipoLower === 'disgrafía' || tipoLower.includes('disgraf')) tipoLower = 'disgrafia';
+                    
+                    // Normalizar TPS
+                    if (tipoLower === 'trastorno del procesamiento sensorial') tipoLower = 'tps';
+                    
+                    console.log(`🔍 Tipo original: "${user.tipo_neurodivergencia}" → normalizado: "${tipoLower}"`);
+                    
                     if (usersByType.hasOwnProperty(tipoLower)) {
                         usersByType[tipoLower]++;
+                        console.log(`✅ Incrementado contador para ${tipoLower}: ${usersByType[tipoLower]}`);
+                    } else {
+                        console.log(`⚠️ Tipo no reconocido: "${tipoLower}"`);
                     }
                 });
                 
