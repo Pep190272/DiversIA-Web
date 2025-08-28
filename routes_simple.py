@@ -19,15 +19,15 @@ def empresas():
         try:
             from models import Company
             nueva_empresa = Company(
-                nombre=form.nombre_empresa.data,
-                email=form.email_contacto.data,
+                nombre_empresa=form.nombre_empresa.data,
+                email_contacto=form.email_contacto.data,
                 telefono=form.telefono.data,
                 sector=form.sector.data,
-                tamaño=form.tamano_empresa.data,
+                tamano_empresa=form.tamano_empresa.data,
                 ciudad=form.ciudad.data,
-                descripcion=form.descripcion.data,
-                website=form.website.data,
-                experiencia_inclusion=form.experiencia_inclusion.data
+                sitio_web=form.website.data,
+                descripcion_empresa=form.descripcion.data,
+                politicas_inclusion=form.experiencia_inclusion.data
             )
             
             db.session.add(nueva_empresa)
