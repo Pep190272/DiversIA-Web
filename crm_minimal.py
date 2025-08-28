@@ -109,6 +109,20 @@ def create_minimal_crm_routes(app):
         data = load_data()
         return jsonify(data.get('companies', []))
     
+    @app.route('/api/asociaciones')
+    def get_asociaciones_api():
+        """API para obtener solo las asociaciones"""
+        try:
+            data = load_data()
+            companies = data.get('companies', [])
+            # Filtrar solo las asociaciones
+            asociaciones = [c for c in companies if c.get('sector') == 'Asociación']
+            print(f"🔍 API: Devolviendo {len(asociaciones)} asociaciones")
+            return jsonify(asociaciones)
+        except Exception as e:
+            print(f"❌ Error en API asociaciones: {e}")
+            return jsonify([]), 500
+    
     @app.route('/api/minimal/companies', methods=['POST'])
     def create_company_minimal():
         """Crear nueva empresa"""

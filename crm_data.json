@@ -43,12 +43,23 @@
       "sector": "Inteligencia artificial",
       "ciudad": "La torre de Claramunt",
       "created_at": "2025-08-22T10:12:00.144277"
+    },
+    {
+      "id": 6,
+      "nombre": "Asssnndnnfbbbf",
+      "email": "Asonn@gmail.com",
+      "telefono": " 677878787",
+      "sector": "Asociación",
+      "ciudad": "Gaban",
+      "notas": "Asociación Ansbbs - tea - apoyo_familias",
+      "created_at": "2025-08-28T17:28:50.748050",
+      "origen": "Formulario Asociación"
     }
   ],
   "contacts": [],
   "stats": {
-    "total_companies": 4,
+    "total_companies": 5,
     "total_contacts": 0,
-    "last_updated": "2025-08-22T18:31:48.842994"
+    "last_updated": "2025-08-28T17:28:50.748064"
   }
 }
