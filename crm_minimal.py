@@ -74,10 +74,9 @@ def create_minimal_crm_routes(app):
         
         try:
             data = load_data()
-            # Filtrar solo las asociaciones (las que tienen sector='Asociación')
-            companies = data.get('companies', [])
-            asociaciones = [c for c in companies if c.get('sector') == 'Asociación']
-            print(f"🔍 Debug: Encontradas {len(asociaciones)} asociaciones en CRM")
+            # Usar tabla separada de asociaciones
+            asociaciones = data.get('asociaciones', [])
+            print(f"🔍 Debug: Encontradas {len(asociaciones)} asociaciones en tabla separada")
             return render_template('asociaciones-crm.html', asociaciones=asociaciones)
         except Exception as e:
             print(f"❌ Error cargando asociaciones: {e}")
@@ -111,17 +110,65 @@ def create_minimal_crm_routes(app):
     
     @app.route('/api/asociaciones')
     def get_asociaciones_api():
-        """API para obtener solo las asociaciones"""
+        """API para obtener asociaciones de la tabla separada"""
         try:
             data = load_data()
-            companies = data.get('companies', [])
-            # Filtrar solo las asociaciones
-            asociaciones = [c for c in companies if c.get('sector') == 'Asociación']
-            print(f"🔍 API: Devolviendo {len(asociaciones)} asociaciones")
+            asociaciones = data.get('asociaciones', [])
+            print(f"🔍 API: Devolviendo {len(asociaciones)} asociaciones de tabla separada")
             return jsonify(asociaciones)
         except Exception as e:
             print(f"❌ Error en API asociaciones: {e}")
             return jsonify([]), 500
+    
+    @app.route('/api/asociaciones/<int:asociacion_id>', methods=['PUT'])
+    def update_asociacion_api(asociacion_id):
+        """API para actualizar asociación específica"""
+        try:
+            update_data = request.get_json()
+            data = load_data()
+            asociaciones = data.get('asociaciones', [])
+            
+            # Encontrar asociación
+            asociacion_index = next((i for i, a in enumerate(asociaciones) if a.get('id') == asociacion_id), None)
+            if asociacion_index is None:
+                return jsonify({'success': False, 'error': 'Asociación no encontrada'}), 404
+            
+            # Actualizar campos
+            asociacion = asociaciones[asociacion_index]
+            asociacion.update({
+                'nombre_asociacion': update_data.get('nombre_asociacion', asociacion.get('nombre_asociacion', '')),
+                'acronimo': update_data.get('acronimo', asociacion.get('acronimo', '')),
+                'pais': update_data.get('pais', asociacion.get('pais', '')),
+                'ciudad': update_data.get('ciudad', asociacion.get('ciudad', '')),
+                'estado': update_data.get('estado', asociacion.get('estado', '')),
+                'email': update_data.get('email', asociacion.get('email', '')),
+                'telefono': update_data.get('telefono', asociacion.get('telefono', '')),
+                'updated_at': datetime.now().isoformat()
+            })
+            
+            asociaciones[asociacion_index] = asociacion
+            data['asociaciones'] = asociaciones
+            save_data(data)
+            
+            return jsonify({'success': True, 'asociacion': asociacion})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/asociaciones/<int:asociacion_id>', methods=['DELETE'])
+    def delete_asociacion_api(asociacion_id):
+        """API para eliminar asociación específica"""
+        try:
+            data = load_data()
+            asociaciones = data.get('asociaciones', [])
+            
+            # Filtrar asociación a eliminar
+            asociaciones_filtradas = [a for a in asociaciones if a.get('id') != asociacion_id]
+            data['asociaciones'] = asociaciones_filtradas
+            save_data(data)
+            
+            return jsonify({'success': True, 'message': 'Asociación eliminada'})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
     
     @app.route('/api/minimal/companies', methods=['POST'])
     def create_company_minimal():

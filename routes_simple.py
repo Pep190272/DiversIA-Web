@@ -729,32 +729,39 @@ def registro_asociacion():
             db.session.add(nueva_asociacion)
             db.session.commit()
             
-            # También guardar en CRM mínimo
+            # También guardar en CRM mínimo - TABLA SEPARADA PARA ASOCIACIONES
             try:
                 from crm_minimal import load_data, save_data
                 
                 crm_data = load_data()
-                companies = crm_data.get('companies', [])
+                asociaciones = crm_data.get('asociaciones', [])
                 
-                # Generar ID único
-                new_id = max([c.get('id', 0) for c in companies], default=0) + 1
+                # Generar ID único para asociaciones
+                new_id = max([a.get('id', 0) for a in asociaciones], default=0) + 1
                 
                 crm_asociacion = {
                     'id': new_id,
-                    'nombre': nueva_asociacion.nombre_asociacion,
+                    'nombre_asociacion': nueva_asociacion.nombre_asociacion,
+                    'acronimo': nueva_asociacion.acronimo,
                     'email': nueva_asociacion.email,
                     'telefono': nueva_asociacion.telefono or '',
-                    'sector': 'Asociación',
                     'ciudad': nueva_asociacion.ciudad,
-                    'notas': f"Asociación {nueva_asociacion.acronimo} - {neurodivergencias} - {servicios}",
+                    'pais': nueva_asociacion.pais,
+                    'tipo_documento': nueva_asociacion.tipo_documento,
+                    'numero_documento': nueva_asociacion.numero_documento,
+                    'neurodivergencias_atendidas': neurodivergencias,
+                    'servicios': servicios,
+                    'contacto_nombre': nueva_asociacion.contacto_nombre,
+                    'contacto_cargo': nueva_asociacion.contacto_cargo,
+                    'estado': nueva_asociacion.estado,
                     'created_at': datetime.now().isoformat(),
                     'origen': 'Formulario Asociación'
                 }
                 
-                companies.append(crm_asociacion)
-                crm_data['companies'] = companies
+                asociaciones.append(crm_asociacion)
+                crm_data['asociaciones'] = asociaciones
                 save_data(crm_data)
-                print(f"✅ Asociación guardada en CRM: {nueva_asociacion.nombre_asociacion}")
+                print(f"✅ Asociación guardada en CRM separado: {nueva_asociacion.nombre_asociacion}")
                 
             except Exception as e:
                 print(f"⚠️ Error guardando asociación en CRM: {e}")
