@@ -479,11 +479,13 @@
                 const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
                 if (modal) modal.hide();
                 
-                // Redirigir a página de edición
-                window.open(`/crm-editar/${userId}`, '_blank');
+                console.log(`🔧 Redirigiendo a editar usuario: ${userId}`);
+                
+                // Redirigir a página de edición en la misma ventana
+                window.location.href = `/crm-editar/${userId}`;
             } catch (error) {
-                console.error('Error opening edit page:', error);
-                alert('Error al abrir editor de usuario');
+                console.error('Error redirecting to edit:', error);
+                alert('Error al abrir el editor');
             }
         }
 

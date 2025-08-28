@@ -1085,4 +1085,23 @@ def api_borrar_usuario(user_id):
         print(f"❌ Error borrando usuario {user_id}: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+# ==================== PÁGINAS DE EDICIÓN CRM ====================
+
+@app.route('/crm-editar/<user_id>')
+def crm_editar_usuario_form(user_id):
+    """Página de edición de usuario"""
+    try:
+        # Verificar que es administrador
+        if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
+            flash('Acceso restringido. Inicia sesión como administrador.', 'error')
+            return redirect('/admin/login-new')
+        
+        print(f"🔧 Abriendo editor para usuario: {user_id}")
+        return render_template('crm-editar-usuario.html', user_id=user_id)
+        
+    except Exception as e:
+        print(f"❌ Error abriendo editor: {e}")
+        flash('Error al abrir el editor de usuario.', 'error')
+        return redirect('/crm-neurodivergentes')
+
 print("✅ Routes simplificado cargado correctamente")
