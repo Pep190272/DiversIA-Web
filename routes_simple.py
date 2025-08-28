@@ -700,6 +700,27 @@ def registro_asociacion():
             db.session.add(nueva_asociacion)
             db.session.commit()
             
+            # También guardar en el CRM para seguimiento
+            try:
+                from models import CrmContact
+                
+                nuevo_contacto_crm = CrmContact(
+                    empresa=nueva_asociacion.nombre_asociacion,
+                    email=nueva_asociacion.email,
+                    telefono=nueva_asociacion.telefono,
+                    sector='Asociación',
+                    ciudad=nueva_asociacion.ciudad,
+                    notas=f"Asociación {nueva_asociacion.acronimo} - {neurodivergencias} - {servicios}",
+                    origen='Formulario Asociaciones'
+                )
+                
+                db.session.add(nuevo_contacto_crm)
+                db.session.commit()
+                print(f"✅ Asociación también guardada en CRM")
+                
+            except Exception as e:
+                print(f"⚠️ Error guardando en CRM: {e}")
+            
             # Enviar notificación inmediata a DiversIA para verificación
             try:
                 from email_notifications import send_association_registration_notification
