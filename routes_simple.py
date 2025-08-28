@@ -658,9 +658,9 @@ def registro_tps():
 @app.route('/registro-asociacion', methods=['GET', 'POST'])
 def registro_asociacion():
     """Registro de asociaciones neurodivergentes"""
-    from forms import RegistroAsociacionForm
+    from forms import AsociacionForm
     
-    form = RegistroAsociacionForm()
+    form = AsociacionForm()
     
     if form.validate_on_submit():
         try:
