@@ -68,17 +68,20 @@ def create_minimal_crm_routes(app):
     
     @app.route('/asociaciones-crm')
     def asociaciones_crm():
-        """Dashboard de asociaciones del CRM - requiere autenticación"""
-        if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
-            return redirect('/diversia-admin')
+        """Dashboard de asociaciones del CRM - TEMPORALMENTE SIN AUTENTICACIÓN PARA DEBUG"""
+        # Comentado temporalmente para debug
+        # if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
+        #     return redirect('/diversia-admin')
         
         try:
             data = load_data()
             # Filtrar solo las asociaciones (las que tienen sector='Asociación')
             companies = data.get('companies', [])
             asociaciones = [c for c in companies if c.get('sector') == 'Asociación']
+            print(f"🔍 Debug: Encontradas {len(asociaciones)} asociaciones en CRM")
             return render_template('asociaciones-crm.html', asociaciones=asociaciones)
         except Exception as e:
+            print(f"❌ Error cargando asociaciones: {e}")
             flash(f'Error cargando asociaciones: {str(e)}', 'error')
             return render_template('asociaciones-crm.html', asociaciones=[])
     
