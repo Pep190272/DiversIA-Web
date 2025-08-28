@@ -141,6 +141,9 @@
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tel-tab" role="tab" onclick="loadNeurodivergenceData('TEL')">
                             🗣️ TEL
                         </button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#disgrafia-tab" role="tab" onclick="loadNeurodivergenceData('Disgrafía')">
+                            ✍️ Disgrafía
+                        </button>
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#otros-tab" role="tab" onclick="loadOtherTypes()">
                             ➕ Otros
                         </button>
@@ -173,6 +176,9 @@
                     </div>
                     <div class="tab-pane fade" id="tel-tab">
                         <div id="tel-content">Cargando...</div>
+                    </div>
+                    <div class="tab-pane fade" id="disgrafia-tab">
+                        <div id="disgrafia-content">Cargando...</div>
                     </div>
                     <div class="tab-pane fade" id="otros-tab">
                         <div id="otros-content">Cargando...</div>
@@ -295,6 +301,12 @@
                     if (searchType === 'tel') {
                         const match = userType === 'tel' || userType === 'trastorno específico del lenguaje' || userType.includes('tel');
                         console.log(`🗣️ TEL match para "${userType}":`, match);
+                        return match;
+                    }
+                    
+                    if (searchType === 'disgrafía') {
+                        const match = userType === 'disgrafía' || userType === 'disgrafia' || userType.includes('disgraf');
+                        console.log(`✍️ Disgrafía match para "${userType}":`, match);
                         return match;
                     }
                     
@@ -472,8 +484,17 @@
                 }
             }
             
+            // Para Disgrafía, usar su pestaña específica
+            if (type === 'disgrafia') {
+                const disgrafiaTab = document.querySelector(`[data-bs-target="#disgrafia-tab"]`);
+                if (disgrafiaTab) {
+                    disgrafiaTab.click();
+                    return;
+                }
+            }
+            
             // Para otros tipos especiales, usar la pestaña "Otros"  
-            if (['disgrafia', 'tps', 'altas_capacidades'].includes(type)) {
+            if (['tps', 'altas_capacidades'].includes(type)) {
                 const othersTab = document.querySelector(`[data-bs-target="#otros-tab"]`);
                 if (othersTab) {
                     othersTab.click();
@@ -514,8 +535,8 @@
                 .then(allUsers => {
                     console.log('DEBUG: Todos los usuarios:', allUsers);
                     console.log('DEBUG: Tipos encontrados:', [...new Set(allUsers.map(u => u.tipo_neurodivergencia))]);
-                    const types = ['disgrafia', 'tps', 'altas_capacidades'];
-                    const typeLabels = ['Disgrafía', 'TPS', 'Altas Capacidades'];
+                    const types = ['tps', 'altas_capacidades'];
+                    const typeLabels = ['TPS', 'Altas Capacidades'];
                     // Buscar tanto por valor exacto como por variaciones
                     const results = types.map((type, index) => {
                         return allUsers.filter(user => {

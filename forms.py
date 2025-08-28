@@ -361,6 +361,67 @@ class RegistroTELForm(RegistroGeneralForm):
     
     necesidades_laborales = TextAreaField('Necesidades específicas en el entorno laboral', validators=[Optional()])
 
+class RegistroDisgrafiaForm(RegistroGeneralForm):
+    """Formulario específico para Disgrafía"""
+    # Sobrescribir tipo_neurodivergencia para que tenga el valor correcto
+    tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', 
+        choices=[('disgrafia', 'Disgrafía')], 
+        default='disgrafia',
+        validators=[Optional()])
+    
+    # Campos específicos de Disgrafía
+    dificultades_escritura = MultiCheckboxField('Principales dificultades en la escritura', choices=[
+        ('formacion_letras', 'Formación y trazo de letras'),
+        ('espaciado', 'Espaciado entre letras y palabras'),
+        ('tamaño_letras', 'Tamaño irregular de las letras'),
+        ('presion_lapiz', 'Presión del lápiz (muy fuerte o muy suave)'),
+        ('velocidad_escritura', 'Velocidad de escritura muy lenta'),
+        ('fatiga_rapida', 'Fatiga rápida al escribir'),
+        ('organizacion_texto', 'Organización del texto en la página'),
+        ('ortografia', 'Errores ortográficos frecuentes')
+    ])
+    
+    tipo_disgrafia = SelectField('Tipo de disgrafía predominante', choices=[
+        ('', 'Selecciona una opción'),
+        ('motriz', 'Disgrafía motriz (problemas motrices)'),
+        ('especifica', 'Disgrafía específica (problemas perceptivos)'),
+        ('mixta', 'Disgrafía mixta'),
+        ('no_especificado', 'No especificado')
+    ], validators=[Optional()])
+    
+    edad_diagnostico = SelectField('¿A qué edad recibiste el diagnóstico?', choices=[
+        ('', 'Selecciona una opción'),
+        ('preescolar', 'Preescolar (3-5 años)'),
+        ('escolar_temprana', 'Escolar temprana (6-8 años)'),
+        ('escolar_media', 'Escolar media (9-12 años)'),
+        ('adolescencia', 'Adolescencia (13-18 años)'),
+        ('adulto', 'Edad adulta (18+ años)')
+    ], validators=[Optional()])
+    
+    terapias_recibidas = MultiCheckboxField('Terapias o tratamientos recibidos', choices=[
+        ('terapia_ocupacional', 'Terapia ocupacional'),
+        ('psicomotricidad', 'Psicomotricidad'),
+        ('apoyo_pedagogico', 'Apoyo pedagógico especializado'),
+        ('logopedia', 'Logopedia'),
+        ('psicopedagogia', 'Psicopedagogía'),
+        ('fisioterapia', 'Fisioterapia'),
+        ('ninguna', 'Ninguna terapia específica')
+    ])
+    
+    herramientas_apoyo = MultiCheckboxField('Herramientas de apoyo que utilizas', choices=[
+        ('ordenador', 'Ordenador/Tablet para escribir'),
+        ('lapices_especiales', 'Lápices o bolígrafos ergonómicos'),
+        ('guias_escritura', 'Guías de escritura'),
+        ('papel_pautado', 'Papel pautado especial'),
+        ('software_voz', 'Software de dictado por voz'),
+        ('correctores', 'Correctores ortográficos'),
+        ('ninguna', 'Ninguna herramienta específica')
+    ])
+    
+    estrategias_compensacion = TextAreaField('Estrategias que te ayudan a compensar las dificultades', validators=[Optional()])
+    
+    necesidades_laborales = TextAreaField('Necesidades específicas en el entorno laboral', validators=[Optional()])
+
 class RegistroTouretteForm(RegistroGeneralForm):
     # Sobrescribir tipo_neurodivergencia para que tenga el valor correcto
     tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', 

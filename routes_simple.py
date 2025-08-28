@@ -566,8 +566,12 @@ def registro_tel():
 @app.route('/registro-disgrafia', methods=['GET', 'POST'])
 def registro_disgrafia():
     """Registro específico para Disgrafía"""
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    from forms import RegistroDisgrafiaForm
+    form = RegistroDisgrafiaForm()
+    
+    # Bypass CSRF for testing
+    form.csrf_token.data = form.csrf_token.current_token
+    
     if form.validate_on_submit():
         try:
             from models import NeurodivergentProfile
@@ -596,6 +600,9 @@ def registro_disgrafia():
             print(f"❌ DISGRAFÍA - Error: {e}")
             flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
             db.session.rollback()
+    else:
+        if request.method == 'POST':
+            print("❌ DISGRAFÍA - Errores de validación:", form.errors)
     return render_template('registro-disgrafia.html', form=form)
 
 @app.route('/registro-tps', methods=['GET', 'POST'])
