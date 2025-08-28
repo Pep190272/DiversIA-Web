@@ -71,7 +71,16 @@ def create_minimal_crm_routes(app):
         """Dashboard de asociaciones del CRM - requiere autenticación"""
         if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
             return redirect('/diversia-admin')
-        return render_template('asociaciones-crm.html')
+        
+        try:
+            data = load_data()
+            # Filtrar solo las asociaciones (las que tienen sector='Asociación')
+            companies = data.get('companies', [])
+            asociaciones = [c for c in companies if c.get('sector') == 'Asociación']
+            return render_template('asociaciones-crm.html', asociaciones=asociaciones)
+        except Exception as e:
+            flash(f'Error cargando asociaciones: {str(e)}', 'error')
+            return render_template('asociaciones-crm.html', asociaciones=[])
     
     @app.route('/usuarios-neurodivergentes')
     def usuarios_neurodivergentes():
