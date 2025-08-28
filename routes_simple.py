@@ -705,13 +705,13 @@ def registro_asociacion():
                 from models import CrmContact
                 
                 nuevo_contacto_crm = CrmContact(
-                    empresa=nueva_asociacion.nombre_asociacion,
+                    name=nueva_asociacion.contacto_nombre or nueva_asociacion.nombre_asociacion,
                     email=nueva_asociacion.email,
-                    telefono=nueva_asociacion.telefono,
-                    sector='Asociación',
-                    ciudad=nueva_asociacion.ciudad,
-                    notas=f"Asociación {nueva_asociacion.acronimo} - {neurodivergencias} - {servicios}",
-                    origen='Formulario Asociaciones'
+                    phone=nueva_asociacion.telefono,
+                    company=nueva_asociacion.nombre_asociacion,
+                    contact_reason='partnership',
+                    city=nueva_asociacion.ciudad,
+                    notes=f"Asociación {nueva_asociacion.acronimo} - {neurodivergencias} - {servicios}"
                 )
                 
                 db.session.add(nuevo_contacto_crm)
