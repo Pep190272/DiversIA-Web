@@ -33,6 +33,35 @@ def empresas():
             db.session.add(nueva_empresa)
             db.session.commit()
             
+            # También guardar en CRM mínimo
+            try:
+                from crm_minimal import load_data, save_data
+                
+                crm_data = load_data()
+                companies = crm_data.get('companies', [])
+                
+                # Generar ID único
+                new_id = max([c.get('id', 0) for c in companies], default=0) + 1
+                
+                crm_company = {
+                    'id': new_id,
+                    'nombre': nueva_empresa.nombre_empresa,
+                    'email': nueva_empresa.email_contacto,
+                    'telefono': nueva_empresa.telefono or '',
+                    'sector': nueva_empresa.sector,
+                    'ciudad': nueva_empresa.ciudad,
+                    'created_at': datetime.now().isoformat(),
+                    'origen': 'Formulario Web Empresa'
+                }
+                
+                companies.append(crm_company)
+                crm_data['companies'] = companies
+                save_data(crm_data)
+                print(f"✅ Empresa guardada en CRM: {nueva_empresa.nombre_empresa}")
+                
+            except Exception as e:
+                print(f"⚠️ Error guardando empresa en CRM: {e}")
+            
             flash('¡Empresa registrada exitosamente! Te contactaremos pronto.', 'success')
             return redirect(url_for('empresas'))
             
@@ -700,26 +729,35 @@ def registro_asociacion():
             db.session.add(nueva_asociacion)
             db.session.commit()
             
-            # También guardar en el CRM para seguimiento
+            # También guardar en CRM mínimo
             try:
-                from models import CrmContact
+                from crm_minimal import load_data, save_data
                 
-                nuevo_contacto_crm = CrmContact(
-                    name=nueva_asociacion.contacto_nombre or nueva_asociacion.nombre_asociacion,
-                    email=nueva_asociacion.email,
-                    phone=nueva_asociacion.telefono,
-                    company=nueva_asociacion.nombre_asociacion,
-                    contact_reason='partnership',
-                    city=nueva_asociacion.ciudad,
-                    notes=f"Asociación {nueva_asociacion.acronimo} - {neurodivergencias} - {servicios}"
-                )
+                crm_data = load_data()
+                companies = crm_data.get('companies', [])
                 
-                db.session.add(nuevo_contacto_crm)
-                db.session.commit()
-                print(f"✅ Asociación también guardada en CRM")
+                # Generar ID único
+                new_id = max([c.get('id', 0) for c in companies], default=0) + 1
+                
+                crm_asociacion = {
+                    'id': new_id,
+                    'nombre': nueva_asociacion.nombre_asociacion,
+                    'email': nueva_asociacion.email,
+                    'telefono': nueva_asociacion.telefono or '',
+                    'sector': 'Asociación',
+                    'ciudad': nueva_asociacion.ciudad,
+                    'notas': f"Asociación {nueva_asociacion.acronimo} - {neurodivergencias} - {servicios}",
+                    'created_at': datetime.now().isoformat(),
+                    'origen': 'Formulario Asociación'
+                }
+                
+                companies.append(crm_asociacion)
+                crm_data['companies'] = companies
+                save_data(crm_data)
+                print(f"✅ Asociación guardada en CRM: {nueva_asociacion.nombre_asociacion}")
                 
             except Exception as e:
-                print(f"⚠️ Error guardando en CRM: {e}")
+                print(f"⚠️ Error guardando asociación en CRM: {e}")
             
             # Enviar notificación inmediata a DiversIA para verificación
             try:
