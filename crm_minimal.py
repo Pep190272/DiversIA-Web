@@ -120,6 +120,22 @@ def create_minimal_crm_routes(app):
             print(f"❌ Error en API asociaciones: {e}")
             return jsonify([]), 500
     
+    @app.route('/api/asociaciones/<int:asociacion_id>')
+    def get_asociacion_individual(asociacion_id):
+        """API para obtener una asociación específica"""
+        try:
+            data = load_data()
+            asociaciones = data.get('asociaciones', [])
+            
+            # Encontrar asociación específica
+            asociacion = next((a for a in asociaciones if a.get('id') == asociacion_id), None)
+            if asociacion is None:
+                return jsonify({'success': False, 'error': 'Asociación no encontrada'}), 404
+            
+            return jsonify({'success': True, 'asociacion': asociacion})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
     @app.route('/api/asociaciones/<int:asociacion_id>', methods=['PUT'])
     def update_asociacion_api(asociacion_id):
         """API para actualizar asociación específica"""
