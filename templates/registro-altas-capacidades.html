@@ -3,75 +3,206 @@
 {% block title %}Registro Altas Capacidades - DiversIA{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #28a745, #1e7e34); color: white;">
-                    <div class="d-flex align-items-center justify-content-center mb-3">
-                        <span style="font-size: 2rem;">🎓</span>
-                        <h1 class="h3 mb-0 ms-3">Registro Altas Capacidades</h1>
+<section class="registration-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="registration-card card shadow-sm">
+                    <div class="card-header bg-success text-white text-center py-4">
+                        <div class="d-flex align-items-center justify-content-center mb-3">
+                            <div class="icon-wrapper me-3">
+                                <i data-lucide="brain" aria-hidden="true"></i>
+                            </div>
+                            <h1 class="h3 mb-0">Registro Altas Capacidades</h1>
+                        </div>
+                        <p class="mb-0">Superdotación y Altas Capacidades</p>
                     </div>
-                </div>
-                
-                <div class="card-body p-4">
-                    <form method="POST">
-                        {{ form.hidden_tag() }}
-                        
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                {{ form.nombre.label(class="form-label fw-bold") }}
-                                {{ form.nombre(class="form-control") }}
-                            </div>
-                            <div class="col-md-6">
-                                {{ form.apellidos.label(class="form-label fw-bold") }}
-                                {{ form.apellidos(class="form-control") }}
-                            </div>
+                    
+                    <div class="card-body p-4">
+                        <div class="info-section mb-4">
+                            <h2 class="h5 text-success mb-3">Sobre las Altas Capacidades</h2>
+                            <p class="text-muted">
+                                Las altas capacidades incluyen la superdotación y talentos específicos que van más allá de la media en una o varias áreas.
+                            </p>
                         </div>
-                        
-                        <h5 class="text-primary mb-3">🎓 Información sobre Altas Capacidades</h5>
-                        
-                        <div class="mb-3">
-                            {{ form.area_talento.label(class="form-label fw-bold") }}
-                            {% for option in form.area_talento %}
-                                <div class="form-check">
-                                    {{ option(class="form-check-input") }}
-                                    {{ option.label(class="form-check-label") }}
+
+                        <form method="POST" class="needs-validation" novalidate>
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                            {{ form.hidden_tag() }}
+                            <!-- Campo oculto para tipo de neurodivergencia -->
+                            {{ form.tipo_neurodivergencia(style="display: none;") }}
+                            
+                            <!-- Información Personal -->
+                            <div class="form-section mb-4">
+                                <h3 class="section-title">Información Personal</h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.nombre.label(class="form-label required") }}
+                                        {{ form.nombre(class="form-control form-control-lg") }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.apellidos.label(class="form-label required") }}
+                                        {{ form.apellidos(class="form-control form-control-lg") }}
+                                    </div>
                                 </div>
-                            {% endfor %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ form.nivel_ci.label(class="form-label fw-bold") }}
-                            {{ form.nivel_ci(class="form-select") }}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="form-check">
-                                {{ form.desafios_sociales(class="form-check-input") }}
-                                {{ form.desafios_sociales.label(class="form-check-label") }}
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.email.label(class="form-label required") }}
+                                        {{ form.email(class="form-control form-control-lg") }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.telefono.label(class="form-label required") }}
+                                        {{ form.telefono(class="form-control form-control-lg") }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.ciudad.label(class="form-label required") }}
+                                        {{ form.ciudad(class="form-control form-control-lg") }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.fecha_nacimiento.label(class="form-label required") }}
+                                        {{ form.fecha_nacimiento(class="form-control form-control-lg", type="date") }}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ form.necesidades_estimulo.label(class="form-label fw-bold") }}
-                            {{ form.necesidades_estimulo(class="form-control", rows="3") }}
-                        </div>
-                        
-                        <div class="mb-4">
-                            <div class="form-check">
-                                {{ form.aceptar_privacidad(class="form-check-input") }}
-                                {{ form.aceptar_privacidad.label(class="form-check-label") }}
+                            <!-- Información Específica Altas Capacidades -->
+                            <div class="form-section mb-4">
+                                <h3 class="section-title">Información sobre Altas Capacidades</h3>
+                                
+                                <div class="mb-3">
+                                    {{ form.diagnostico_formal.label(class="form-label required") }}
+                                    {{ form.diagnostico_formal(class="form-select form-control-lg") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.area_talento.label(class="form-label") }}
+                                    <div class="row">
+                                        {% for option in form.area_talento %}
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    {{ option(class="form-check-input") }}
+                                                    {{ option.label(class="form-check-label") }}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.nivel_ci.label(class="form-label") }}
+                                    {{ form.nivel_ci(class="form-select form-control-lg") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.edad_deteccion.label(class="form-label") }}
+                                    {{ form.edad_deteccion(class="form-select form-control-lg") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.perfeccionismo.label(class="form-label") }}
+                                    {{ form.perfeccionismo(class="form-select form-control-lg") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.desafios_sociales(class="form-check-input") }}
+                                        {{ form.desafios_sociales.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.multipotencialidad(class="form-check-input") }}
+                                        {{ form.multipotencialidad.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.estrategias_gestion.label(class="form-label") }}
+                                    <div class="row">
+                                        {% for option in form.estrategias_gestion %}
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    {{ option(class="form-check-input") }}
+                                                    {{ option.label(class="form-check-label") }}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.necesidades_estimulo.label(class="form-label") }}
+                                    {{ form.necesidades_estimulo(class="form-control", rows="3") }}
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-success btn-lg">Completar Registro</button>
-                        </div>
-                    </form>
+
+                            <!-- Perfil Profesional -->
+                            <div class="form-section mb-4">
+                                <h3 class="section-title">Perfil Profesional y Académico</h3>
+                                
+                                <div class="mb-3">
+                                    {{ form.habilidades.label(class="form-label") }}
+                                    {{ form.habilidades(class="form-control", rows="3") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.experiencia_laboral.label(class="form-label") }}
+                                    {{ form.experiencia_laboral(class="form-control", rows="3") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.formacion_academica.label(class="form-label") }}
+                                    {{ form.formacion_academica(class="form-control", rows="3") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.intereses_laborales.label(class="form-label") }}
+                                    {{ form.intereses_laborales(class="form-control", rows="3") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.adaptaciones_necesarias.label(class="form-label") }}
+                                    {{ form.adaptaciones_necesarias(class="form-control", rows="3") }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.motivaciones.label(class="form-label") }}
+                                    {{ form.motivaciones(class="form-control", rows="3") }}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    {{ form.aceptar_privacidad(class="form-check-input") }}
+                                    {{ form.aceptar_privacidad.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success btn-lg px-5">
+                                    <i data-lucide="save" aria-hidden="true"></i>
+                                    Completar Registro Altas Capacidades
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

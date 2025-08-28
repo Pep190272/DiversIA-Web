@@ -579,6 +579,14 @@ class RegistroBipolarForm(RegistroGeneralForm):
     apoyo_terapeutico = BooleanField('¿Recibes apoyo terapéutico regular?')
 
 class RegistroAltasCapacidadesForm(RegistroGeneralForm):
+    """Formulario específico para Altas Capacidades/Superdotación"""
+    # Sobrescribir tipo_neurodivergencia para que tenga el valor correcto
+    tipo_neurodivergencia = SelectField('Tipo de neurodivergencia', 
+        choices=[('altas_capacidades', 'Superdotación/Altas Capacidades')], 
+        default='altas_capacidades',
+        validators=[Optional()])
+    
+    # Campos específicos de Altas Capacidades
     area_talento = MultiCheckboxField('Áreas de talento destacado', choices=[
         ('intelectual', 'Capacidad intelectual general'),
         ('academica', 'Aptitud académica específica'),
@@ -596,9 +604,38 @@ class RegistroAltasCapacidadesForm(RegistroGeneralForm):
         ('no_evaluado', 'No he sido evaluado')
     ], validators=[Optional()])
     
+    edad_deteccion = SelectField('¿A qué edad se detectaron las altas capacidades?', choices=[
+        ('', 'Selecciona una opción'),
+        ('temprana', 'Primera infancia (0-5 años)'),
+        ('escolar_primaria', 'Educación primaria (6-12 años)'),
+        ('escolar_secundaria', 'Educación secundaria (13-18 años)'),
+        ('adulto', 'Edad adulta (18+ años)'),
+        ('no_detectado', 'No han sido detectadas formalmente')
+    ], validators=[Optional()])
+    
     desafios_sociales = BooleanField('¿Experimentas desafíos sociales relacionados con tus altas capacidades?')
     
+    perfeccionismo = SelectField('Nivel de perfeccionismo', choices=[
+        ('', 'Selecciona una opción'),
+        ('bajo', 'Bajo'),
+        ('moderado', 'Moderado'),
+        ('alto', 'Alto'),
+        ('muy_alto', 'Muy alto - puede ser limitante')
+    ], validators=[Optional()])
+    
+    multipotencialidad = BooleanField('¿Te consideras multipotencial (múltiples intereses y talentos)?')
+    
     necesidades_estimulo = TextAreaField('Necesidades específicas de estimulación intelectual en el trabajo', validators=[Optional()])
+    
+    estrategias_gestion = MultiCheckboxField('Estrategias que utilizas para gestionar tus altas capacidades', choices=[
+        ('organizacion_avanzada', 'Sistemas de organización avanzados'),
+        ('proyectos_paralelos', 'Múltiples proyectos paralelos'),
+        ('mentoring', 'Mentoring o coaching'),
+        ('redes_profesionales', 'Redes profesionales especializadas'),
+        ('formacion_continua', 'Formación continua autodidacta'),
+        ('mindfulness', 'Mindfulness y gestión emocional'),
+        ('ninguna', 'No uso estrategias específicas')
+    ])
 
 # EmpresaForm ya está definido anteriormente en la línea 173, esta es una duplicación
 

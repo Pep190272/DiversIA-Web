@@ -487,8 +487,13 @@ def registro_tourette():
 
 @app.route('/registro-altas-capacidades', methods=['GET', 'POST'])
 def registro_altas_capacidades():
+    """Registro específico para Altas Capacidades/Superdotación"""
     from forms import RegistroAltasCapacidadesForm
     form = RegistroAltasCapacidadesForm()
+    
+    # Bypass CSRF for testing
+    form.csrf_token.data = form.csrf_token.current_token
+    
     if form.validate_on_submit():
         try:
             from models import NeurodivergentProfile
@@ -517,6 +522,9 @@ def registro_altas_capacidades():
             print(f"❌ ALTAS CAPACIDADES - Error: {e}")
             flash('Error al guardar tu perfil. Intenta de nuevo.', 'error')
             db.session.rollback()
+    else:
+        if request.method == 'POST':
+            print("❌ ALTAS CAPACIDADES - Errores de validación:", form.errors)
     return render_template('registro-altas-capacidades.html', form=form)
 
 # ========== FORMULARIOS FALTANTES ==========

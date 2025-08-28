@@ -147,6 +147,9 @@
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tps-tab" role="tab" onclick="loadNeurodivergenceData('TPS')">
                             🔴 TPS
                         </button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#altas-capacidades-tab" role="tab" onclick="loadNeurodivergenceData('Altas Capacidades')">
+                            🧠 Altas Capacidades
+                        </button>
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#otros-tab" role="tab" onclick="loadOtherTypes()">
                             ➕ Otros
                         </button>
@@ -185,6 +188,9 @@
                     </div>
                     <div class="tab-pane fade" id="tps-tab">
                         <div id="tps-content">Cargando...</div>
+                    </div>
+                    <div class="tab-pane fade" id="altas-capacidades-tab">
+                        <div id="altas-capacidades-content">Cargando...</div>
                     </div>
                     <div class="tab-pane fade" id="otros-tab">
                         <div id="otros-content">Cargando...</div>
@@ -251,6 +257,10 @@
                     // Normalizar TPS
                     if (tipoLower === 'trastorno del procesamiento sensorial') tipoLower = 'tps';
                     
+                    // Normalizar Altas Capacidades
+                    if (tipoLower === 'superdotación/altas capacidades' || tipoLower.includes('superdotación') || 
+                        tipoLower.includes('altas capacidades')) tipoLower = 'altas_capacidades';
+                    
                     console.log(`🔍 Tipo original: "${user.tipo_neurodivergencia}" → normalizado: "${tipoLower}"`);
                     
                     if (usersByType.hasOwnProperty(tipoLower)) {
@@ -288,6 +298,8 @@
                 contentId = 'disgrafia-content';
             } else if (type === 'TPS') {
                 contentId = 'tps-content';
+            } else if (type === 'Altas Capacidades') {
+                contentId = 'altas-capacidades-content';
             } else {
                 contentId = type.toLowerCase() + '-content';
             }
@@ -343,6 +355,14 @@
                                      userType.toLowerCase().includes('procesamiento sensorial') ||
                                      userType.toLowerCase().includes('trastorno del procesamiento sensorial');
                         console.log(`🔴 TPS match para "${userType}":`, match);
+                        return match;
+                    }
+                    
+                    if (searchType === 'altas capacidades') {
+                        const match = userType.includes('superdotación') || userType.includes('altas capacidades') ||
+                                     userType.toLowerCase().includes('superdotacion') || 
+                                     userType.toLowerCase().includes('altas capacidades');
+                        console.log(`🧠 Altas Capacidades match para "${userType}":`, match);
                         return match;
                     }
                     
@@ -538,11 +558,11 @@
                 }
             }
             
-            // Para otros tipos especiales, usar la pestaña "Otros"  
-            if (['altas_capacidades'].includes(type)) {
-                const othersTab = document.querySelector(`[data-bs-target="#otros-tab"]`);
-                if (othersTab) {
-                    othersTab.click();
+            // Para Altas Capacidades, usar su pestaña específica
+            if (type === 'altas_capacidades') {
+                const altasTab = document.querySelector(`[data-bs-target="#altas-capacidades-tab"]`);
+                if (altasTab) {
+                    altasTab.click();
                     return;
                 }
             }
