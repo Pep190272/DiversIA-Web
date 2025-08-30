@@ -1,4 +1,12 @@
 from app import app
+
+# Configuración CORS para permitir formularios desde el navegador
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
 from flask import render_template
 
 # Routes principales - WEB PÚBLICA DE DIVERSIA
