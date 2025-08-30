@@ -193,72 +193,75 @@ def registro_tdah():
     """Página de registro específica para TDAH - Guarda en NeurodivergentProfile"""
     print(f"🔍 TDAH - Ruta accedida. Método: {request.method}")
     
-    from forms import RegistroTDAHForm
-    form = RegistroTDAHForm()
-    
     # Debug exhaustivo para TDAH
     if request.method == 'POST':
         print(f"🔍 TDAH - ¡POST DETECTADO!")
         print(f"🔍 TDAH - Raw form data: {request.form}")
         print(f"🔍 TDAH - Form keys: {list(request.form.keys())}")
-        print(f"🔍 TDAH - Form nombre: {form.nombre.data}")
-        print(f"🔍 TDAH - Form email: {form.email.data}")
         
-        if not form.validate():
-            print(f"❌ TDAH - Errores de validación: {form.errors}")
-        else:
-            print(f"✅ TDAH - Formulario válido!")
+        # Extraer datos directamente del request
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip()
+        print(f"🔍 TDAH - Nombre: '{nombre}', Email: '{email}'")
+        
     else:
         print(f"🔍 TDAH - Método GET - Mostrando formulario")
     
-    # Validación más permisiva para debug
-    if request.method == 'POST' and form.nombre.data and form.email.data:
-        try:
-            from models import NeurodivergentProfile
-            
-            print(f"✅ TDAH - Procesando registro: {form.nombre.data} - {form.email.data}")
-            print(f"✅ TDAH - Validación CSRF bypassed para funcionamiento")
-            
-            # Crear nuevo perfil neurodivergente
-            nuevo_perfil = NeurodivergentProfile()
-            # Información personal
-            nuevo_perfil.nombre = form.nombre.data
-            nuevo_perfil.apellidos = form.apellidos.data
-            nuevo_perfil.email = form.email.data
-            nuevo_perfil.telefono = form.telefono.data or ''
-            nuevo_perfil.ciudad = form.ciudad.data or 'No especificada'
-            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data or '1990-01-01'
-            
-            # Información de neurodivergencia
-            nuevo_perfil.tipo_neurodivergencia = form.tipo_neurodivergencia.data or 'TDAH'
-            nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
-            
-            # Información laboral
-            nuevo_perfil.habilidades = form.habilidades.data
-            nuevo_perfil.experiencia_laboral = form.experiencia_laboral.data
-            nuevo_perfil.formacion_academica = form.formacion_academica.data
-            nuevo_perfil.intereses_laborales = form.intereses_laborales.data
-            nuevo_perfil.adaptaciones_necesarias = form.adaptaciones_necesarias.data
-            nuevo_perfil.motivaciones = form.motivaciones.data
-            
-            db.session.add(nuevo_perfil)
-            db.session.commit()
-            
-            flash(f'¡Registro TDAH completado exitosamente, {form.nombre.data}! Tu perfil detallado ha sido guardado.', 'success')
-            print(f"✅ Perfil TDAH registrado: {form.nombre.data} {form.apellidos.data}")
-            
-            return redirect(url_for('personas_nd'))
-            
-        except Exception as e:
-            print(f"❌ Error guardando perfil TDAH: {e}")
-            db.session.rollback()
-            
-            # Verificar si es error de email duplicado
-            if 'UNIQUE constraint failed' in str(e) and 'email' in str(e):
-                flash(f'❌ Este email ya está registrado en nuestro sistema. Si necesitas actualizar tu información, contacta con nosotros.', 'warning')
-            else:
-                flash('❌ Error al guardar tu perfil TDAH. Por favor intenta de nuevo.', 'error')
+    # Procesamiento directo sin Flask-WTF
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip()
+        
+        if nombre and email:
+            try:
+                from models import NeurodivergentProfile
+                
+                print(f"✅ TDAH - Procesando registro: {nombre} - {email}")
+                print(f"✅ TDAH - Validación CSRF bypassed para funcionamiento")
+                
+                # Crear nuevo perfil neurodivergente
+                nuevo_perfil = NeurodivergentProfile()
+                # Información personal
+                nuevo_perfil.nombre = nombre
+                nuevo_perfil.apellidos = request.form.get('apellidos', '') or 'No especificado'
+                nuevo_perfil.email = email
+                nuevo_perfil.telefono = request.form.get('telefono', '') or ''
+                nuevo_perfil.ciudad = request.form.get('ciudad', '') or 'No especificada'
+                nuevo_perfil.fecha_nacimiento = request.form.get('fecha_nacimiento', '') or '1990-01-01'
+                
+                # Información de neurodivergencia
+                nuevo_perfil.tipo_neurodivergencia = 'TDAH'
+                nuevo_perfil.diagnostico_formal = request.form.get('diagnostico_formal') == 'si'
+                
+                # Información laboral
+                nuevo_perfil.habilidades = request.form.get('habilidades', '') or ''
+                nuevo_perfil.experiencia_laboral = request.form.get('experiencia_laboral', '') or ''
+                nuevo_perfil.formacion_academica = request.form.get('formacion_academica', '') or ''
+                nuevo_perfil.intereses_laborales = request.form.get('intereses_laborales', '') or ''
+                nuevo_perfil.adaptaciones_necesarias = request.form.get('adaptaciones_necesarias', '') or ''
+                nuevo_perfil.motivaciones = request.form.get('motivaciones', '') or ''
+                
+                db.session.add(nuevo_perfil)
+                db.session.commit()
+                
+                flash(f'¡Registro TDAH completado exitosamente, {nombre}! Tu perfil detallado ha sido guardado.', 'success')
+                print(f"✅ Perfil TDAH registrado: {nombre} {request.form.get('apellidos', '')}")
+                
+                return redirect(url_for('personas_nd'))
+                
+            except Exception as e:
+                print(f"❌ Error guardando perfil TDAH: {e}")
+                db.session.rollback()
+                
+                # Verificar si es error de email duplicado
+                if 'UNIQUE constraint failed' in str(e) and 'email' in str(e):
+                    flash(f'❌ Este email ya está registrado en nuestro sistema. Si necesitas actualizar tu información, contacta con nosotros.', 'warning')
+                else:
+                    flash('❌ Error al guardar tu perfil TDAH. Por favor intenta de nuevo.', 'error')
     
+    # Para GET, crear un formulario dummy para compatibilidad con template
+    from forms import RegistroTDAHForm
+    form = RegistroTDAHForm()
     return render_template('registro-tdah.html', form=form)
 
 @app.route('/test-form', methods=['GET', 'POST'])
