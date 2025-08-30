@@ -228,7 +228,27 @@
                 const data = await response.json();
                 
                 console.log('Usuarios cargados:', data);
+                
+                // Actualizar todas las estadísticas
                 document.getElementById('total-users').textContent = data.length || 0;
+                
+                // Calcular usuarios con diagnóstico formal
+                const withDiagnosis = data.filter(user => user.diagnostico_formal === true || user.diagnostico_formal === 'true').length;
+                document.getElementById('with-diagnosis').textContent = withDiagnosis;
+                
+                // Calcular usuarios buscando empleo (basado en intereses_laborales)
+                const jobSeekers = data.filter(user => user.intereses_laborales && user.intereses_laborales.trim().length > 0).length;
+                document.getElementById('job-seekers').textContent = jobSeekers;
+                
+                // Calcular registros de este mes
+                const currentMonth = new Date().getMonth();
+                const currentYear = new Date().getFullYear();
+                const thisMonth = data.filter(user => {
+                    if (!user.created_at) return false;
+                    const userDate = new Date(user.created_at);
+                    return userDate.getMonth() === currentMonth && userDate.getFullYear() === currentYear;
+                }).length;
+                document.getElementById('this-month').textContent = thisMonth;
                 
                 // Crear tarjetas de resumen
                 const overviewContainer = document.getElementById('overview-cards');
