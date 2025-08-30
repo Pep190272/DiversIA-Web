@@ -279,6 +279,48 @@ def test_form():
     
     return render_template('test-form.html')
 
+@app.route('/test-tdah-simple', methods=['GET', 'POST'])
+def test_tdah_simple():
+    """Test ultra simple para TDAH"""
+    print(f"🧪 TDAH SIMPLE - Método: {request.method}")
+    
+    if request.method == 'POST':
+        print(f"🧪 TDAH SIMPLE - ¡POST RECIBIDO!")
+        print(f"🧪 TDAH SIMPLE - Datos: {request.form}")
+        nombre = request.form.get('nombre', '')
+        email = request.form.get('email', '')
+        print(f"🧪 TDAH SIMPLE - Nombre: {nombre}, Email: {email}")
+        
+        # Guardar directamente en base de datos
+        try:
+            from models import NeurodivergentProfile
+            nuevo_perfil = NeurodivergentProfile()
+            nuevo_perfil.nombre = nombre
+            nuevo_perfil.apellidos = 'Test Simple'
+            nuevo_perfil.email = email
+            nuevo_perfil.telefono = ''
+            nuevo_perfil.ciudad = 'Test'
+            nuevo_perfil.fecha_nacimiento = '1990-01-01'
+            nuevo_perfil.tipo_neurodivergencia = 'TDAH'
+            nuevo_perfil.diagnostico_formal = False
+            nuevo_perfil.habilidades = ''
+            nuevo_perfil.experiencia_laboral = ''
+            nuevo_perfil.formacion_academica = ''
+            nuevo_perfil.intereses_laborales = ''
+            nuevo_perfil.adaptaciones_necesarias = ''
+            nuevo_perfil.motivaciones = ''
+            
+            db.session.add(nuevo_perfil)
+            db.session.commit()
+            print(f"✅ TDAH SIMPLE - Guardado: {nombre}")
+            
+            return f"<h1>¡ÉXITO TDAH!</h1><p>Guardado: {nombre} - {email}</p><p><a href='/admin/login-new'>Ver en CRM</a></p>"
+        except Exception as e:
+            print(f"❌ TDAH SIMPLE - Error: {e}")
+            return f"<h1>Error</h1><p>{e}</p>"
+    
+    return render_template('test-tdah-simple.html')
+
 @app.route('/registro-tea', methods=['GET', 'POST'])  
 def registro_tea():
     """Registro específico para TEA (Trastorno del Espectro Autista)"""
