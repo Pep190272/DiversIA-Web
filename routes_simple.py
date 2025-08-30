@@ -261,6 +261,21 @@ def registro_tdah():
     
     return render_template('registro-tdah.html', form=form)
 
+@app.route('/test-form', methods=['GET', 'POST'])
+def test_form():
+    """Formulario de prueba simple sin Flask-WTF"""
+    print(f"🧪 TEST FORM - Método: {request.method}")
+    
+    if request.method == 'POST':
+        print(f"🧪 TEST FORM - ¡POST RECIBIDO!")
+        print(f"🧪 TEST FORM - Datos: {request.form}")
+        nombre = request.form.get('nombre', '')
+        email = request.form.get('email', '')
+        print(f"🧪 TEST FORM - Nombre: {nombre}, Email: {email}")
+        return f"<h1>¡Éxito!</h1><p>Recibido: {nombre} - {email}</p>"
+    
+    return render_template('test-form.html')
+
 @app.route('/registro-tea', methods=['GET', 'POST'])  
 def registro_tea():
     """Registro específico para TEA (Trastorno del Espectro Autista)"""
