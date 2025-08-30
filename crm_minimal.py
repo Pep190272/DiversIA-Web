@@ -90,10 +90,7 @@ def create_minimal_crm_routes(app):
             return redirect('/diversia-admin')
         return render_template('crm-neurodivergentes.html')
     
-    @app.route('/crm-neurodivergentes')
-    def crm_neurodivergentes_direct():
-        """Acceso directo para testing - SIN AUTENTICACIÓN"""
-        return render_template('crm-neurodivergentes.html')
+    # RUTA ELIMINADA - Usar solo /usuarios-neurodivergentes para evitar duplicación
     
     @app.route('/leads-generales')
     def leads_generales():
