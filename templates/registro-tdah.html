@@ -22,7 +22,7 @@
 
                 <div class="card">
                     <div class="card-body p-4">
-                        <form method="POST" novalidate>
+                        <form method="POST" novalidate action="{{ url_for('registro_tdah') }}">
                             {{ form.hidden_tag() }}
                             <!-- Campo oculto para tipo de neurodivergencia -->
                             {{ form.tipo_neurodivergencia(style="display: none;") }}
