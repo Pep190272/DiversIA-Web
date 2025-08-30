@@ -1,4 +1,4 @@
 #!/bin/bash
-echo "🚀 Iniciando DiversIA Server con Flask directo..."
+echo "🌐 Iniciando DiversIA Web Preview Server..."
 cd /home/runner/workspace
-exec python -u main.py
+exec python -u preview_server.py

@@ -105,5 +105,8 @@ import task_manager
 import colaboradores_manager  # noqa: F401
 
 if __name__ == "__main__":
-    # Only run Flask dev server if called directly, not when imported by gunicorn
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # Flask development server optimized for web preview
+    print("🌐 Iniciando DiversIA Web Preview Server...")
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False, threaded=True)
