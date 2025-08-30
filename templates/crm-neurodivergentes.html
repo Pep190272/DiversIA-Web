@@ -216,32 +216,30 @@
             loadOverviewData();
         });
 
-        async function loadOverviewData() {
-            alert('🔄 Iniciando carga de estadísticas...'); // Para debugging móvil
-            try {
-                const response = await fetch('/api/usuarios-neurodivergentes');
-                const data = await response.json();
-                alert('Datos cargados: ' + data.length + ' usuarios'); // Para debugging móvil
+        function loadOverviewData() {
+            fetch('/api/usuarios-neurodivergentes')
+            .then(response => response.json())
+            .then(data => {
                 
                 console.log('📊 Usuarios cargados:', data.length);
                 
-                // ACTUALIZAR ESTADÍSTICAS PRINCIPALES
-                const totalUsers = data.length;
-                const withDiagnosis = data.filter(user => user.diagnostico_formal === true).length;
-                const jobSeekers = data.filter(user => user.intereses_laborales && user.intereses_laborales.trim().length > 0).length;
-                const thisMonth = data.filter(user => user.created_at && user.created_at.includes('2025-08')).length;
+                // CALCULAR ESTADÍSTICAS
+                var totalUsers = data.length;
+                var withDiagnosis = 0;
+                var jobSeekers = 0;  
+                var thisMonth = 0;
                 
-                // ACTUALIZAR DOM
-                try {
-                    document.getElementById('total-users').innerText = totalUsers;
-                    document.getElementById('with-diagnosis').innerText = withDiagnosis;
-                    document.getElementById('job-seekers').innerText = jobSeekers;
-                    document.getElementById('this-month').innerText = thisMonth;
-                    
-                    alert('Estadísticas actualizadas: ' + totalUsers + '/' + withDiagnosis + '/' + jobSeekers + '/' + thisMonth);
-                } catch (e) {
-                    alert('Error actualizando DOM: ' + e.message);
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].diagnostico_formal === true) withDiagnosis++;
+                    if (data[i].intereses_laborales && data[i].intereses_laborales.length > 3) jobSeekers++;
+                    if (data[i].created_at && data[i].created_at.indexOf('2025-08') >= 0) thisMonth++;
                 }
+                
+                // ACTUALIZAR NÚMEROS
+                document.getElementById('total-users').innerHTML = totalUsers;
+                document.getElementById('with-diagnosis').innerHTML = withDiagnosis;
+                document.getElementById('job-seekers').innerHTML = jobSeekers;
+                document.getElementById('this-month').innerHTML = thisMonth;
                 
                 // Crear tarjetas de resumen
                 const overviewContainer = document.getElementById('overview-cards');
@@ -299,9 +297,10 @@
                     `;
                     overviewContainer.innerHTML += card;
                 });
-            } catch (error) {
-                console.error('Error loading overview:', error);
-            }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }
 
         async function loadNeurodivergenceData(type) {
