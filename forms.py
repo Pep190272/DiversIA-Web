@@ -639,59 +639,6 @@ class RegistroAltasCapacidadesForm(RegistroGeneralForm):
 
 # EmpresaForm ya está definido anteriormente en la línea 173, esta es una duplicación
 
-# Formulario para ofertas de trabajo
-class OfertaTrabajoForm(FlaskForm):
-    titulo = StringField('Título del Puesto', validators=[DataRequired()])
-    titulo_puesto = StringField('Título del Puesto', validators=[DataRequired()])
-    descripcion = TextAreaField('Descripción del Puesto', validators=[DataRequired()])
-    tipo_contrato = SelectField('Tipo de contrato', choices=[
-        ('', 'Selecciona tipo'),
-        ('completo', 'Tiempo completo'),
-        ('parcial', 'Tiempo parcial'),
-        ('temporal', 'Temporal'),
-        ('practicas', 'Prácticas')
-    ], validators=[Optional()])
-    modalidad_trabajo = SelectField('Modalidad de trabajo', choices=[
-        ('', 'Selecciona modalidad'),
-        ('presencial', 'Presencial'),
-        ('remoto', 'Remoto'),
-        ('hibrido', 'Híbrido')
-    ], validators=[Optional()])
-    salario_min = StringField('Salario mínimo', validators=[Optional()])
-    salario_max = StringField('Salario máximo', validators=[Optional()])
-    requisitos = TextAreaField('Requisitos', validators=[DataRequired()])
-    beneficios = TextAreaField('Beneficios y Adaptaciones', validators=[Optional()])
-    adaptaciones_disponibles = MultiCheckboxField('Adaptaciones disponibles', choices=[
-        ('horario_flexible', 'Horario flexible'),
-        ('trabajo_remoto', 'Trabajo remoto'),
-        ('ambiente_tranquilo', 'Espacios de trabajo tranquilos'),
-        ('tecnologia_asistiva', 'Tecnología asistiva'),
-        ('formacion_equipo', 'Formación del equipo'),
-        ('mentor', 'Programa de mentoring'),
-        ('pausas_extra', 'Pausas adicionales'),
-        ('instrucciones_escritas', 'Instrucciones por escrito')
-    ])
-    aceptar_privacidad = BooleanField('Acepto la política de privacidad', validators=[DataRequired()])
-    salario_max = StringField('Salario Máximo', validators=[Optional()])
-    modalidad = SelectField('Modalidad de Trabajo', choices=[
-        ('presencial', 'Presencial'),
-        ('remoto', 'Remoto'),
-        ('hibrido', 'Híbrido')
-    ], validators=[DataRequired()])
-    ubicacion = StringField('Ubicación', validators=[DataRequired()])
-    
-    neurodivergencias_buscadas = MultiCheckboxField('Tipos de neurodivergencia que buscan específicamente', choices=[
-        ('tdah', 'TDAH'),
-        ('tea', 'TEA (Espectro Autista)'),
-        ('dislexia', 'Dislexia'),
-        ('discalculia', 'Discalculia'),
-        ('tourette', 'Síndrome de Tourette'),
-        ('dispraxia', 'Dispraxia'),
-        ('ansiedad', 'Trastornos de Ansiedad'),
-        ('bipolar', 'Trastorno Bipolar'),
-        ('altas_capacidades', 'Altas Capacidades'),
-        ('todas', 'Abierto a todas las neurodivergencias')
-    ])
 
 # Nuevo formulario para asociaciones
 class AsociacionForm(FlaskForm):
