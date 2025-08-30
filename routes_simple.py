@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from app import app, db
 from datetime import datetime
 import json
@@ -18,17 +18,16 @@ def empresas():
     if form.validate_on_submit():
         try:
             from models import Company
-            nueva_empresa = Company(
-                nombre_empresa=form.nombre_empresa.data,
-                email_contacto=form.email_contacto.data,
-                telefono=form.telefono.data,
-                sector=form.sector.data,
-                tamano_empresa=form.tamano_empresa.data,
-                ciudad=form.ciudad.data,
-                sitio_web=form.website.data,
-                descripcion_empresa=form.descripcion.data,
-                politicas_inclusion=form.experiencia_inclusion.data
-            )
+            nueva_empresa = Company()
+            nueva_empresa.nombre_empresa = form.nombre_empresa.data
+            nueva_empresa.email_contacto = form.email_contacto.data
+            nueva_empresa.telefono = form.telefono.data
+            nueva_empresa.sector = form.sector.data
+            nueva_empresa.tamano_empresa = form.tamano_empresa.data
+            nueva_empresa.ciudad = form.ciudad.data
+            nueva_empresa.sitio_web = form.website.data
+            nueva_empresa.descripcion_empresa = form.descripcion.data
+            nueva_empresa.politicas_inclusion = form.experiencia_inclusion.data
             
             db.session.add(nueva_empresa)
             db.session.commit()
@@ -143,27 +142,26 @@ def registro():
             diagnostico_bool = form.diagnostico_formal.data == 'si'
             
             # Crear nuevo lead con TODA la información del formulario
-            nuevo_lead = GeneralLead(
-                # Información personal
-                nombre=form.nombre.data,
-                apellidos=form.apellidos.data,
-                email=form.email.data,
-                telefono=form.telefono.data,
-                ciudad=form.ciudad.data,
-                fecha_nacimiento=form.fecha_nacimiento.data,
-                
-                # Información de neurodivergencia
-                tipo_neurodivergencia=form.tipo_neurodivergencia.data,
-                diagnostico_formal=diagnostico_bool,
-                
-                # Información laboral y personal
-                habilidades=form.habilidades.data,
-                experiencia_laboral=form.experiencia_laboral.data,
-                formacion_academica=form.formacion_academica.data,
-                intereses_laborales=form.intereses_laborales.data,
-                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
-                motivaciones=form.motivaciones.data
-            )
+            nuevo_lead = GeneralLead()
+            # Información personal
+            nuevo_lead.nombre = form.nombre.data
+            nuevo_lead.apellidos = form.apellidos.data
+            nuevo_lead.email = form.email.data
+            nuevo_lead.telefono = form.telefono.data
+            nuevo_lead.ciudad = form.ciudad.data
+            nuevo_lead.fecha_nacimiento = form.fecha_nacimiento.data
+            
+            # Información de neurodivergencia
+            nuevo_lead.tipo_neurodivergencia = form.tipo_neurodivergencia.data
+            nuevo_lead.diagnostico_formal = diagnostico_bool
+            
+            # Información laboral y personal
+            nuevo_lead.habilidades = form.habilidades.data
+            nuevo_lead.experiencia_laboral = form.experiencia_laboral.data
+            nuevo_lead.formacion_academica = form.formacion_academica.data
+            nuevo_lead.intereses_laborales = form.intereses_laborales.data
+            nuevo_lead.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+            nuevo_lead.motivaciones = form.motivaciones.data
             
             db.session.add(nuevo_lead)
             db.session.commit()
