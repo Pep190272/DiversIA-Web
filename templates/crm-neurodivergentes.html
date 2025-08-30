@@ -217,49 +217,31 @@
         });
 
         async function loadOverviewData() {
-            console.log('🔄 Iniciando carga de estadísticas...');
+            alert('🔄 Iniciando carga de estadísticas...'); // Para debugging móvil
             try {
                 const response = await fetch('/api/usuarios-neurodivergentes');
-                console.log('📡 Respuesta recibida, status:', response.status);
                 const data = await response.json();
+                alert('Datos cargados: ' + data.length + ' usuarios'); // Para debugging móvil
                 
                 console.log('📊 Usuarios cargados:', data.length);
                 
                 // ACTUALIZAR ESTADÍSTICAS PRINCIPALES
-                console.log('🔢 Actualizando estadísticas...');
+                const totalUsers = data.length;
+                const withDiagnosis = data.filter(user => user.diagnostico_formal === true).length;
+                const jobSeekers = data.filter(user => user.intereses_laborales && user.intereses_laborales.trim().length > 0).length;
+                const thisMonth = data.filter(user => user.created_at && user.created_at.includes('2025-08')).length;
                 
-                // Total usuarios
-                const totalUsers = data.length || 0;
-                document.getElementById('total-users').textContent = totalUsers;
-                console.log(`✅ Total usuarios: ${totalUsers}`);
-                
-                // Usuarios con diagnóstico formal
-                const withDiagnosis = data.filter(user => {
-                    return user.diagnostico_formal === true || user.diagnostico_formal === 'true' || user.diagnostico_formal === 'si';
-                }).length;
-                document.getElementById('with-diagnosis').textContent = withDiagnosis;
-                console.log(`✅ Con diagnóstico: ${withDiagnosis}`);
-                
-                // Usuarios buscando empleo (tienen intereses laborales)
-                const jobSeekers = data.filter(user => {
-                    return user.intereses_laborales && typeof user.intereses_laborales === 'string' && user.intereses_laborales.trim().length > 0;
-                }).length;
-                document.getElementById('job-seekers').textContent = jobSeekers;
-                console.log(`✅ Buscando empleo: ${jobSeekers}`);
-                
-                // Registros de este mes (agosto 2025)
-                const currentMonth = new Date().getMonth(); // 7 = agosto
-                const currentYear = new Date().getFullYear(); // 2025
-                const thisMonth = data.filter(user => {
-                    if (!user.created_at) return false;
-                    const userDate = new Date(user.created_at);
-                    const isThisMonth = userDate.getMonth() === currentMonth && userDate.getFullYear() === currentYear;
-                    return isThisMonth;
-                }).length;
-                document.getElementById('this-month').textContent = thisMonth;
-                console.log(`✅ Este mes: ${thisMonth}`);
-                
-                console.log('🎯 ¡Todas las estadísticas actualizadas!');
+                // ACTUALIZAR DOM
+                try {
+                    document.getElementById('total-users').innerText = totalUsers;
+                    document.getElementById('with-diagnosis').innerText = withDiagnosis;
+                    document.getElementById('job-seekers').innerText = jobSeekers;
+                    document.getElementById('this-month').innerText = thisMonth;
+                    
+                    alert('Estadísticas actualizadas: ' + totalUsers + '/' + withDiagnosis + '/' + jobSeekers + '/' + thisMonth);
+                } catch (e) {
+                    alert('Error actualizando DOM: ' + e.message);
+                }
                 
                 // Crear tarjetas de resumen
                 const overviewContainer = document.getElementById('overview-cards');
