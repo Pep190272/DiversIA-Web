@@ -191,14 +191,25 @@ def registro():
 @app.route('/registro-tdah', methods=['GET', 'POST'])
 def registro_tdah():
     """Página de registro específica para TDAH - Guarda en NeurodivergentProfile"""
+    print(f"🔍 TDAH - Ruta accedida. Método: {request.method}")
+    
     from forms import RegistroTDAHForm
     form = RegistroTDAHForm()
     
-    # Debug para TDAH
+    # Debug exhaustivo para TDAH
     if request.method == 'POST':
-        print(f"🔍 TDAH - Datos recibidos: {list(request.form.keys())}")
+        print(f"🔍 TDAH - ¡POST DETECTADO!")
+        print(f"🔍 TDAH - Raw form data: {request.form}")
+        print(f"🔍 TDAH - Form keys: {list(request.form.keys())}")
+        print(f"🔍 TDAH - Form nombre: {form.nombre.data}")
+        print(f"🔍 TDAH - Form email: {form.email.data}")
+        
         if not form.validate():
             print(f"❌ TDAH - Errores de validación: {form.errors}")
+        else:
+            print(f"✅ TDAH - Formulario válido!")
+    else:
+        print(f"🔍 TDAH - Método GET - Mostrando formulario")
     
     # Validación más permisiva para debug
     if request.method == 'POST' and form.nombre.data and form.email.data:
