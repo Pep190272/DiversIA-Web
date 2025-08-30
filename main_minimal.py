@@ -1,11 +1,20 @@
 from app import app
 from flask import render_template
 
-# Routes principales - WEB PÚBLICA DE DIVERSIA
+# Start with just the basic routes - WEB PÚBLICA DE DIVERSIA
 @app.route('/')
 def index():
     """Página principal pública de DiversIA"""
     return render_template('index.html')
+
+@app.route('/test')
+def test():
+    """Simple test route"""
+    return '''
+    <h1>✅ DiversIA Working!</h1>
+    <p>Basic server is running correctly.</p>
+    <a href="/">Home</a>
+    '''
 
 # Panel de administración movido a ruta específica
 @app.route('/admin-dashboard')
@@ -77,32 +86,8 @@ def admin_dashboard():
     </html>
     """
 
-# Importar rutas simplificadas
-import routes_simple  # noqa: F401
-
-# Sistema de login que FUNCIONA
-import login_system  # noqa: F401
-
-# CRM Minimal - Sistema principal
-try:
-    from crm_minimal import create_minimal_crm_routes
-    create_minimal_crm_routes(app)
-    print("✅ CRM Minimal cargado")
-except Exception as e:
-    print(f"⚠️ Error CRM: {e}")
-
-# Admin básico
-try:
-    import admin_final  # noqa: F401
-    print("✅ Admin disponible: /admin/login-new")
-except Exception as e:
-    print(f"⚠️ Error admin: {e}")
-
-# Email Marketing System
-import email_marketing_manager  # noqa: F401
-import email_notifications  # noqa: F401
-import task_manager
-import colaboradores_manager  # noqa: F401
+# Test basic functionality first
+print("✅ Minimal main app loaded successfully")
 
 if __name__ == "__main__":
     # Only run Flask dev server if called directly, not when imported by gunicorn
