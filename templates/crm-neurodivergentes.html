@@ -214,21 +214,33 @@
         // Cargar datos al inicio
         document.addEventListener('DOMContentLoaded', function() {
             loadOverviewData();
+            createOverviewCards();
         });
 
         function loadOverviewData() {
-            // ESTADÍSTICAS HARDCODEADAS PARA PRUEBA
-            document.getElementById('total-users').innerHTML = '12';
-            document.getElementById('with-diagnosis').innerHTML = '6';
-            document.getElementById('job-seekers').innerHTML = '8';
-            document.getElementById('this-month').innerHTML = '12';
-            
-            // También cargar datos reales
+            // ACTUALIZAR INMEDIATAMENTE CON DATOS REALES DESDE API
             fetch('/api/usuarios-neurodivergentes')
             .then(response => response.json())
             .then(data => {
-                console.log('Datos:', data.length);
+                // CÁLCULOS CORRECTOS
+                const total = data.length;
+                const diagnosis = data.filter(u => u.diagnostico_formal === true).length;  
+                const jobSeeking = data.filter(u => u.intereses_laborales && u.intereses_laborales.length > 10).length;
+                const thisMonth = data.filter(u => u.created_at && u.created_at.includes('2025-08')).length;
                 
+                // ACTUALIZAR DOM INMEDIATAMENTE
+                document.getElementById('total-users').innerHTML = total;
+                document.getElementById('with-diagnosis').innerHTML = diagnosis;
+                document.getElementById('job-seekers').innerHTML = jobSeeking;  
+                document.getElementById('this-month').innerHTML = thisMonth;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        function createOverviewCards() {
+            fetch('/api/usuarios-neurodivergentes')
+            .then(response => response.json())
+            .then(data => {
                 // Crear tarjetas de resumen
                 const overviewContainer = document.getElementById('overview-cards');
                 overviewContainer.innerHTML = '';
