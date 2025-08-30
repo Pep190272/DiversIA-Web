@@ -188,10 +188,19 @@ def registro():
     return render_template('registro.html', form=form)
 
 # Rutas de registro específicas por neurodivergencia
-@app.route('/registro-tdah', methods=['GET', 'POST'])
+@app.route('/registro-tdah', methods=['GET', 'POST', 'OPTIONS'])
 def registro_tdah():
     """Página de registro específica para TDAH - Guarda en NeurodivergentProfile"""
     print(f"🔍 TDAH - Ruta accedida. Método: {request.method}")
+    
+    # Manejar preflight OPTIONS para CORS
+    if request.method == 'OPTIONS':
+        print(f"🔍 TDAH - OPTIONS request (CORS preflight)")
+        response = app.make_default_options_response()
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        return response
     
     # Debug exhaustivo para TDAH
     if request.method == 'POST':
