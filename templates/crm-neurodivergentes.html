@@ -150,9 +150,6 @@
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#altas-capacidades-tab" role="tab" onclick="loadNeurodivergenceData('Altas Capacidades')">
                             🧠 Altas Capacidades
                         </button>
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#otros-tab" role="tab" onclick="loadOtherTypes()">
-                            ➕ Otros
-                        </button>
                     </div>
                 </nav>
 
@@ -192,9 +189,6 @@
                     <div class="tab-pane fade" id="altas-capacidades-tab">
                         <div id="altas-capacidades-content">Cargando...</div>
                     </div>
-                    <div class="tab-pane fade" id="otros-tab">
-                        <div id="otros-content">Cargando...</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -223,32 +217,49 @@
         });
 
         async function loadOverviewData() {
+            console.log('🔄 Iniciando carga de estadísticas...');
             try {
                 const response = await fetch('/api/usuarios-neurodivergentes');
+                console.log('📡 Respuesta recibida, status:', response.status);
                 const data = await response.json();
                 
-                console.log('Usuarios cargados:', data);
+                console.log('📊 Usuarios cargados:', data.length);
                 
-                // Actualizar todas las estadísticas
-                document.getElementById('total-users').textContent = data.length || 0;
+                // ACTUALIZAR ESTADÍSTICAS PRINCIPALES
+                console.log('🔢 Actualizando estadísticas...');
                 
-                // Calcular usuarios con diagnóstico formal
-                const withDiagnosis = data.filter(user => user.diagnostico_formal === true || user.diagnostico_formal === 'true').length;
+                // Total usuarios
+                const totalUsers = data.length || 0;
+                document.getElementById('total-users').textContent = totalUsers;
+                console.log(`✅ Total usuarios: ${totalUsers}`);
+                
+                // Usuarios con diagnóstico formal
+                const withDiagnosis = data.filter(user => {
+                    return user.diagnostico_formal === true || user.diagnostico_formal === 'true' || user.diagnostico_formal === 'si';
+                }).length;
                 document.getElementById('with-diagnosis').textContent = withDiagnosis;
+                console.log(`✅ Con diagnóstico: ${withDiagnosis}`);
                 
-                // Calcular usuarios buscando empleo (basado en intereses_laborales)
-                const jobSeekers = data.filter(user => user.intereses_laborales && user.intereses_laborales.trim().length > 0).length;
+                // Usuarios buscando empleo (tienen intereses laborales)
+                const jobSeekers = data.filter(user => {
+                    return user.intereses_laborales && typeof user.intereses_laborales === 'string' && user.intereses_laborales.trim().length > 0;
+                }).length;
                 document.getElementById('job-seekers').textContent = jobSeekers;
+                console.log(`✅ Buscando empleo: ${jobSeekers}`);
                 
-                // Calcular registros de este mes
-                const currentMonth = new Date().getMonth();
-                const currentYear = new Date().getFullYear();
+                // Registros de este mes (agosto 2025)
+                const currentMonth = new Date().getMonth(); // 7 = agosto
+                const currentYear = new Date().getFullYear(); // 2025
                 const thisMonth = data.filter(user => {
                     if (!user.created_at) return false;
                     const userDate = new Date(user.created_at);
-                    return userDate.getMonth() === currentMonth && userDate.getFullYear() === currentYear;
+                    const isThisMonth = userDate.getMonth() === currentMonth && userDate.getFullYear() === currentYear;
+                    return isThisMonth;
                 }).length;
                 document.getElementById('this-month').textContent = thisMonth;
+                console.log(`✅ Este mes: ${thisMonth}`);
+                
+                console.log('🎯 ¡Todas las estadísticas actualizadas!');
                 
                 // Crear tarjetas de resumen
                 const overviewContainer = document.getElementById('overview-cards');
