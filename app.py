@@ -27,24 +27,17 @@ app.config.update(
 )
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-# configure the database - USAR SOLO POSTGRESQL
-try:
-    database_url = os.environ.get("DATABASE_URL")
-    if database_url:
-        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-        print("✅ Using PostgreSQL database (ÚNICA BASE DE DATOS)")
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_recycle": 300,
-            "pool_pre_ping": True,
-        }
-    else:
-        # Fallback a SQLite solo si no hay PostgreSQL disponible
-        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///diversia.db"
-        print("⚠️ Using SQLite database (fallback)")
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {}
-except Exception as e:
-    print(f"⚠️ Database config error: {e}")
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///diversia.db"
+# configure the database - SOLO POSTGRESQL (CRÍTICO: Sin fallback SQLite)
+database_url = os.environ.get("DATABASE_URL")
+if not database_url:
+    raise RuntimeError("❌ CRÍTICO: DATABASE_URL no configurada. PostgreSQL es obligatorio.")
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+print("✅ Using PostgreSQL database (ÚNICA BASE DE DATOS - SIN FALLBACK)")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
 
 # Security headers
 @app.after_request
