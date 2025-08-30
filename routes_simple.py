@@ -176,12 +176,11 @@ def registro():
             db.session.commit()
             
             flash(f'¡Test completado exitosamente, {form.nombre.data}! Tu información ha sido guardada. Te contactaremos pronto con información sobre formularios específicos.', 'success')
-            print(f"✅ Lead registrado: {form.nombre.data} {form.apellidos.data} - {form.tipo_neurodivergencia.data}")
+            # Lead registrado exitosamente
             
             return redirect(url_for('personas_nd'))
             
         except Exception as e:
-            print(f"❌ Error guardando lead: {e}")
             flash('Error al guardar tu información. Por favor intenta de nuevo.', 'error')
             db.session.rollback()
     

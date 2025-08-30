@@ -645,10 +645,8 @@ def create_minimal_crm_routes(app):
             # Solo usuarios de la tabla NeurodivergentProfile (formularios específicos)
             try:
                 usuarios_profile = NeurodivergentProfile.query.all()
-                print(f"🔍 CRM ND - Encontrados {len(usuarios_profile)} perfiles neurodivergentes específicos")
-                
+                # Procesar perfiles neurodivergentes
                 for profile in usuarios_profile:
-                    print(f"📋 CRM ND - Perfil: {profile.nombre} {profile.apellidos} ({profile.tipo_neurodivergencia})")
                     usuarios_data.append({
                         'id': f'profile_{profile.id}',
                         'fuente': 'NeurodivergentProfile (formulario específico)',
@@ -672,11 +670,9 @@ def create_minimal_crm_routes(app):
             except Exception as e:
                 print(f"⚠️ Error cargando perfiles ND específicos: {e}")
             
-            print(f"📊 CRM ND - Total perfiles ND específicos: {len(usuarios_data)}")
             return jsonify(usuarios_data)
             
         except Exception as e:
-            print(f"❌ Error en API usuarios-neurodivergentes: {e}")
             return jsonify([])
 
 
