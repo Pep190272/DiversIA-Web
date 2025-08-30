@@ -225,9 +225,9 @@ def registro_tdah():
             nuevo_perfil.nombre = form.nombre.data
             nuevo_perfil.apellidos = form.apellidos.data
             nuevo_perfil.email = form.email.data
-            nuevo_perfil.telefono = form.telefono.data
-            nuevo_perfil.ciudad = form.ciudad.data
-            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.telefono = form.telefono.data or ''
+            nuevo_perfil.ciudad = form.ciudad.data or 'No especificada'
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data or '1990-01-01'
             
             # Información de neurodivergencia
             nuevo_perfil.tipo_neurodivergencia = form.tipo_neurodivergencia.data or 'TDAH'
@@ -467,9 +467,9 @@ def registro_discalculia():
             nuevo_perfil.nombre = form.nombre.data
             nuevo_perfil.apellidos = form.apellidos.data
             nuevo_perfil.email = form.email.data
-            nuevo_perfil.telefono = form.telefono.data
-            nuevo_perfil.ciudad = form.ciudad.data
-            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.telefono = form.telefono.data or ''
+            nuevo_perfil.ciudad = form.ciudad.data or 'No especificada'
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data or '1990-01-01'
             nuevo_perfil.tipo_neurodivergencia = 'discalculia'
             nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
             nuevo_perfil.habilidades = form.habilidades.data
@@ -510,9 +510,9 @@ def registro_tourette():
             nuevo_perfil.nombre = form.nombre.data
             nuevo_perfil.apellidos = form.apellidos.data
             nuevo_perfil.email = form.email.data
-            nuevo_perfil.telefono = form.telefono.data
-            nuevo_perfil.ciudad = form.ciudad.data
-            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.telefono = form.telefono.data or ''
+            nuevo_perfil.ciudad = form.ciudad.data or 'No especificada'
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data or '1990-01-01'
             nuevo_perfil.tipo_neurodivergencia = 'tourette'
             nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
             nuevo_perfil.habilidades = form.habilidades.data
@@ -550,9 +550,9 @@ def registro_altas_capacidades():
             nuevo_perfil.nombre = form.nombre.data
             nuevo_perfil.apellidos = form.apellidos.data
             nuevo_perfil.email = form.email.data
-            nuevo_perfil.telefono = form.telefono.data
-            nuevo_perfil.ciudad = form.ciudad.data
-            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.telefono = form.telefono.data or ''
+            nuevo_perfil.ciudad = form.ciudad.data or 'No especificada'
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data or '1990-01-01'
             nuevo_perfil.tipo_neurodivergencia = 'Superdotación/Altas Capacidades'
             nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
             nuevo_perfil.habilidades = form.habilidades.data
@@ -591,9 +591,9 @@ def registro_tel():
             nuevo_perfil.nombre = form.nombre.data
             nuevo_perfil.apellidos = form.apellidos.data
             nuevo_perfil.email = form.email.data
-            nuevo_perfil.telefono = form.telefono.data
-            nuevo_perfil.ciudad = form.ciudad.data
-            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.telefono = form.telefono.data or ''
+            nuevo_perfil.ciudad = form.ciudad.data or 'No especificada'
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data or '1990-01-01'
             nuevo_perfil.tipo_neurodivergencia = 'TEL'
             nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
             nuevo_perfil.habilidades = form.habilidades.data
@@ -630,9 +630,9 @@ def registro_disgrafia():
             nuevo_perfil.nombre = form.nombre.data
             nuevo_perfil.apellidos = form.apellidos.data
             nuevo_perfil.email = form.email.data
-            nuevo_perfil.telefono = form.telefono.data
-            nuevo_perfil.ciudad = form.ciudad.data
-            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.telefono = form.telefono.data or ''
+            nuevo_perfil.ciudad = form.ciudad.data or 'No especificada'
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data or '1990-01-01'
             nuevo_perfil.tipo_neurodivergencia = 'Disgrafía'
             nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
             nuevo_perfil.habilidades = form.habilidades.data
@@ -669,9 +669,9 @@ def registro_tps():
             nuevo_perfil.nombre = form.nombre.data
             nuevo_perfil.apellidos = form.apellidos.data
             nuevo_perfil.email = form.email.data
-            nuevo_perfil.telefono = form.telefono.data
-            nuevo_perfil.ciudad = form.ciudad.data
-            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.telefono = form.telefono.data or ''
+            nuevo_perfil.ciudad = form.ciudad.data or 'No especificada'
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data or '1990-01-01'
             nuevo_perfil.tipo_neurodivergencia = 'TPS'
             nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
             nuevo_perfil.habilidades = form.habilidades.data
