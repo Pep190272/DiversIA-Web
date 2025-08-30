@@ -198,29 +198,26 @@ def registro_tdah():
             print(f"✅ TDAH - Formulario validado correctamente")
             
             # Crear nuevo perfil neurodivergente
-            nuevo_perfil = NeurodivergentProfile(
-                # Información personal
-                nombre=form.nombre.data,
-                apellidos=form.apellidos.data,
-                email=form.email.data,
-                telefono=form.telefono.data,
-                ciudad=form.ciudad.data,
-                fecha_nacimiento=form.fecha_nacimiento.data,
-                
-                # Información de neurodivergencia
-                tipo_neurodivergencia=form.tipo_neurodivergencia.data or 'TDAH',
-                diagnostico_formal=form.diagnostico_formal.data == 'si',
-                
-                # Información laboral
-                habilidades=form.habilidades.data,
-                experiencia_laboral=form.experiencia_laboral.data,
-                formacion_academica=form.formacion_academica.data,
-                intereses_laborales=form.intereses_laborales.data,
-                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
-                motivaciones=form.motivaciones.data,
-                
-                # TDAH: Campos específicos omitidos para compatibilidad con modelo base
-            )
+            nuevo_perfil = NeurodivergentProfile()
+            # Información personal
+            nuevo_perfil.nombre = form.nombre.data
+            nuevo_perfil.apellidos = form.apellidos.data
+            nuevo_perfil.email = form.email.data
+            nuevo_perfil.telefono = form.telefono.data
+            nuevo_perfil.ciudad = form.ciudad.data
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            
+            # Información de neurodivergencia
+            nuevo_perfil.tipo_neurodivergencia = form.tipo_neurodivergencia.data or 'TDAH'
+            nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
+            
+            # Información laboral
+            nuevo_perfil.habilidades = form.habilidades.data
+            nuevo_perfil.experiencia_laboral = form.experiencia_laboral.data
+            nuevo_perfil.formacion_academica = form.formacion_academica.data
+            nuevo_perfil.intereses_laborales = form.intereses_laborales.data
+            nuevo_perfil.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+            nuevo_perfil.motivaciones = form.motivaciones.data
             
             db.session.add(nuevo_perfil)
             db.session.commit()
@@ -282,22 +279,21 @@ def registro_tea():
                 print(f"✅ TEA - Perfil actualizado: {form.nombre.data} {form.apellidos.data}")
             else:
                 # Crear nuevo perfil
-                nuevo_perfil = NeurodivergentProfile(
-                    nombre=form.nombre.data,
-                    apellidos=form.apellidos.data,
-                    email=form.email.data,
-                    telefono=form.telefono.data,
-                    ciudad=form.ciudad.data,
-                    fecha_nacimiento=form.fecha_nacimiento.data,
-                    tipo_neurodivergencia='TEA',
-                    diagnostico_formal=form.diagnostico_formal.data == 'si',
-                    habilidades=form.habilidades.data,
-                    experiencia_laboral=form.experiencia_laboral.data,
-                    formacion_academica=form.formacion_academica.data,
-                    intereses_laborales=form.intereses_laborales.data,
-                    adaptaciones_necesarias=form.adaptaciones_necesarias.data,
-                    motivaciones=form.motivaciones.data
-                )
+                nuevo_perfil = NeurodivergentProfile()
+                nuevo_perfil.nombre = form.nombre.data
+                nuevo_perfil.apellidos = form.apellidos.data
+                nuevo_perfil.email = form.email.data
+                nuevo_perfil.telefono = form.telefono.data
+                nuevo_perfil.ciudad = form.ciudad.data
+                nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+                nuevo_perfil.tipo_neurodivergencia = 'TEA'
+                nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
+                nuevo_perfil.habilidades = form.habilidades.data
+                nuevo_perfil.experiencia_laboral = form.experiencia_laboral.data
+                nuevo_perfil.formacion_academica = form.formacion_academica.data
+                nuevo_perfil.intereses_laborales = form.intereses_laborales.data
+                nuevo_perfil.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+                nuevo_perfil.motivaciones = form.motivaciones.data
                 db.session.add(nuevo_perfil)
                 db.session.commit()
                 flash(f'¡Perfil TEA completado exitosamente, {form.nombre.data}!', 'success')
@@ -358,22 +354,21 @@ def registro_dislexia():
                     from datetime import date
                     fecha_nac = date(1990, 1, 1)  # Valor por defecto temporal
                 
-                nuevo_perfil = NeurodivergentProfile(
-                    nombre=form.nombre.data,
-                    apellidos=form.apellidos.data,
-                    email=form.email.data,
-                    telefono=form.telefono.data,
-                    ciudad=form.ciudad.data,
-                    fecha_nacimiento=fecha_nac,
-                    tipo_neurodivergencia='Dislexia',
-                    diagnostico_formal=form.diagnostico_formal.data == 'si',
-                    habilidades=form.habilidades.data,
-                    experiencia_laboral=form.experiencia_laboral.data,
-                    formacion_academica=form.formacion_academica.data,
-                    intereses_laborales=form.intereses_laborales.data,
-                    adaptaciones_necesarias=form.adaptaciones_necesarias.data,
-                    motivaciones=form.motivaciones.data
-                )
+                nuevo_perfil = NeurodivergentProfile()
+                nuevo_perfil.nombre = form.nombre.data
+                nuevo_perfil.apellidos = form.apellidos.data
+                nuevo_perfil.email = form.email.data
+                nuevo_perfil.telefono = form.telefono.data
+                nuevo_perfil.ciudad = form.ciudad.data
+                nuevo_perfil.fecha_nacimiento = fecha_nac
+                nuevo_perfil.tipo_neurodivergencia = 'Dislexia'
+                nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
+                nuevo_perfil.habilidades = form.habilidades.data
+                nuevo_perfil.experiencia_laboral = form.experiencia_laboral.data
+                nuevo_perfil.formacion_academica = form.formacion_academica.data
+                nuevo_perfil.intereses_laborales = form.intereses_laborales.data
+                nuevo_perfil.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+                nuevo_perfil.motivaciones = form.motivaciones.data
                 db.session.add(nuevo_perfil)
                 db.session.commit()
                 print(f"✅ DISLEXIA - Perfil creado: {form.nombre.data} {form.apellidos.data}")
@@ -442,22 +437,21 @@ def registro_discalculia():
         try:
             from models import NeurodivergentProfile
             # Crear perfil específico
-            nuevo_perfil = NeurodivergentProfile(
-                nombre=form.nombre.data,
-                apellidos=form.apellidos.data,
-                email=form.email.data,
-                telefono=form.telefono.data,
-                ciudad=form.ciudad.data,
-                fecha_nacimiento=form.fecha_nacimiento.data,
-                tipo_neurodivergencia='discalculia',
-                diagnostico_formal=form.diagnostico_formal.data == 'si',
-                habilidades=form.habilidades.data,
-                experiencia_laboral=form.experiencia_laboral.data,
-                formacion_academica=form.formacion_academica.data,
-                intereses_laborales=form.intereses_laborales.data,
-                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
-                motivaciones=form.motivaciones.data
-            )
+            nuevo_perfil = NeurodivergentProfile()
+            nuevo_perfil.nombre = form.nombre.data
+            nuevo_perfil.apellidos = form.apellidos.data
+            nuevo_perfil.email = form.email.data
+            nuevo_perfil.telefono = form.telefono.data
+            nuevo_perfil.ciudad = form.ciudad.data
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.tipo_neurodivergencia = 'discalculia'
+            nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
+            nuevo_perfil.habilidades = form.habilidades.data
+            nuevo_perfil.experiencia_laboral = form.experiencia_laboral.data
+            nuevo_perfil.formacion_academica = form.formacion_academica.data
+            nuevo_perfil.intereses_laborales = form.intereses_laborales.data
+            nuevo_perfil.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+            nuevo_perfil.motivaciones = form.motivaciones.data
             db.session.add(nuevo_perfil)
             db.session.commit()
             print(f"✅ DISCALCULIA - Perfil guardado: {form.nombre.data} {form.apellidos.data}")
@@ -486,22 +480,21 @@ def registro_tourette():
     if csrf_valid:
         try:
             from models import NeurodivergentProfile
-            nuevo_perfil = NeurodivergentProfile(
-                nombre=form.nombre.data,
-                apellidos=form.apellidos.data,
-                email=form.email.data,
-                telefono=form.telefono.data,
-                ciudad=form.ciudad.data,
-                fecha_nacimiento=form.fecha_nacimiento.data,
-                tipo_neurodivergencia='tourette',
-                diagnostico_formal=form.diagnostico_formal.data == 'si',
-                habilidades=form.habilidades.data,
-                experiencia_laboral=form.experiencia_laboral.data,
-                formacion_academica=form.formacion_academica.data,
-                intereses_laborales=form.intereses_laborales.data,
-                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
-                motivaciones=form.motivaciones.data
-            )
+            nuevo_perfil = NeurodivergentProfile()
+            nuevo_perfil.nombre = form.nombre.data
+            nuevo_perfil.apellidos = form.apellidos.data
+            nuevo_perfil.email = form.email.data
+            nuevo_perfil.telefono = form.telefono.data
+            nuevo_perfil.ciudad = form.ciudad.data
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.tipo_neurodivergencia = 'tourette'
+            nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
+            nuevo_perfil.habilidades = form.habilidades.data
+            nuevo_perfil.experiencia_laboral = form.experiencia_laboral.data
+            nuevo_perfil.formacion_academica = form.formacion_academica.data
+            nuevo_perfil.intereses_laborales = form.intereses_laborales.data
+            nuevo_perfil.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+            nuevo_perfil.motivaciones = form.motivaciones.data
             db.session.add(nuevo_perfil)
             db.session.commit()
             print(f"✅ TOURETTE - Perfil guardado: {form.nombre.data}")
@@ -523,28 +516,27 @@ def registro_altas_capacidades():
     from forms import RegistroAltasCapacidadesForm
     form = RegistroAltasCapacidadesForm()
     
-    # Bypass CSRF for testing
-    form.csrf_token.data = form.csrf_token.current_token
+    # Bypass CSRF for testing - comment out problematic lines
+    # form.csrf_token.data = form.csrf_token.current_token
     
     if form.validate_on_submit():
         try:
             from models import NeurodivergentProfile
-            nuevo_perfil = NeurodivergentProfile(
-                nombre=form.nombre.data,
-                apellidos=form.apellidos.data,
-                email=form.email.data,
-                telefono=form.telefono.data,
-                ciudad=form.ciudad.data,
-                fecha_nacimiento=form.fecha_nacimiento.data,
-                tipo_neurodivergencia='Superdotación/Altas Capacidades',
-                diagnostico_formal=form.diagnostico_formal.data == 'si',
-                habilidades=form.habilidades.data,
-                experiencia_laboral=form.experiencia_laboral.data,
-                formacion_academica=form.formacion_academica.data,
-                intereses_laborales=form.intereses_laborales.data,
-                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
-                motivaciones=form.motivaciones.data
-            )
+            nuevo_perfil = NeurodivergentProfile()
+            nuevo_perfil.nombre = form.nombre.data
+            nuevo_perfil.apellidos = form.apellidos.data
+            nuevo_perfil.email = form.email.data
+            nuevo_perfil.telefono = form.telefono.data
+            nuevo_perfil.ciudad = form.ciudad.data
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.tipo_neurodivergencia = 'Superdotación/Altas Capacidades'
+            nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
+            nuevo_perfil.habilidades = form.habilidades.data
+            nuevo_perfil.experiencia_laboral = form.experiencia_laboral.data
+            nuevo_perfil.formacion_academica = form.formacion_academica.data
+            nuevo_perfil.intereses_laborales = form.intereses_laborales.data
+            nuevo_perfil.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+            nuevo_perfil.motivaciones = form.motivaciones.data
             db.session.add(nuevo_perfil)
             db.session.commit()
             print(f"✅ ALTAS CAPACIDADES - Perfil guardado: {form.nombre.data}")
@@ -567,28 +559,27 @@ def registro_tel():
     from forms import RegistroTELForm
     form = RegistroTELForm()
     
-    # Bypass CSRF for testing
-    form.csrf_token.data = form.csrf_token.current_token
+    # Bypass CSRF for testing - comment out problematic lines
+    # form.csrf_token.data = form.csrf_token.current_token
     
     if form.validate_on_submit():
         try:
             from models import NeurodivergentProfile
-            nuevo_perfil = NeurodivergentProfile(
-                nombre=form.nombre.data,
-                apellidos=form.apellidos.data,
-                email=form.email.data,
-                telefono=form.telefono.data,
-                ciudad=form.ciudad.data,
-                fecha_nacimiento=form.fecha_nacimiento.data,
-                tipo_neurodivergencia='TEL',
-                diagnostico_formal=form.diagnostico_formal.data == 'si',
-                habilidades=form.habilidades.data,
-                experiencia_laboral=form.experiencia_laboral.data,
-                formacion_academica=form.formacion_academica.data,
-                intereses_laborales=form.intereses_laborales.data,
-                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
-                motivaciones=form.motivaciones.data
-            )
+            nuevo_perfil = NeurodivergentProfile()
+            nuevo_perfil.nombre = form.nombre.data
+            nuevo_perfil.apellidos = form.apellidos.data
+            nuevo_perfil.email = form.email.data
+            nuevo_perfil.telefono = form.telefono.data
+            nuevo_perfil.ciudad = form.ciudad.data
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.tipo_neurodivergencia = 'TEL'
+            nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
+            nuevo_perfil.habilidades = form.habilidades.data
+            nuevo_perfil.experiencia_laboral = form.experiencia_laboral.data
+            nuevo_perfil.formacion_academica = form.formacion_academica.data
+            nuevo_perfil.intereses_laborales = form.intereses_laborales.data
+            nuevo_perfil.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+            nuevo_perfil.motivaciones = form.motivaciones.data
             db.session.add(nuevo_perfil)
             db.session.commit()
             print(f"✅ TEL - Perfil guardado: {form.nombre.data}")
@@ -609,28 +600,27 @@ def registro_disgrafia():
     from forms import RegistroDisgrafiaForm
     form = RegistroDisgrafiaForm()
     
-    # Bypass CSRF for testing
-    form.csrf_token.data = form.csrf_token.current_token
+    # Bypass CSRF for testing - comment out problematic lines
+    # form.csrf_token.data = form.csrf_token.current_token
     
     if form.validate_on_submit():
         try:
             from models import NeurodivergentProfile
-            nuevo_perfil = NeurodivergentProfile(
-                nombre=form.nombre.data,
-                apellidos=form.apellidos.data,
-                email=form.email.data,
-                telefono=form.telefono.data,
-                ciudad=form.ciudad.data,
-                fecha_nacimiento=form.fecha_nacimiento.data,
-                tipo_neurodivergencia='Disgrafía',
-                diagnostico_formal=form.diagnostico_formal.data == 'si',
-                habilidades=form.habilidades.data,
-                experiencia_laboral=form.experiencia_laboral.data,
-                formacion_academica=form.formacion_academica.data,
-                intereses_laborales=form.intereses_laborales.data,
-                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
-                motivaciones=form.motivaciones.data
-            )
+            nuevo_perfil = NeurodivergentProfile()
+            nuevo_perfil.nombre = form.nombre.data
+            nuevo_perfil.apellidos = form.apellidos.data
+            nuevo_perfil.email = form.email.data
+            nuevo_perfil.telefono = form.telefono.data
+            nuevo_perfil.ciudad = form.ciudad.data
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.tipo_neurodivergencia = 'Disgrafía'
+            nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
+            nuevo_perfil.habilidades = form.habilidades.data
+            nuevo_perfil.experiencia_laboral = form.experiencia_laboral.data
+            nuevo_perfil.formacion_academica = form.formacion_academica.data
+            nuevo_perfil.intereses_laborales = form.intereses_laborales.data
+            nuevo_perfil.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+            nuevo_perfil.motivaciones = form.motivaciones.data
             db.session.add(nuevo_perfil)
             db.session.commit()
             print(f"✅ DISGRAFÍA - Perfil guardado: {form.nombre.data}")
@@ -651,28 +641,27 @@ def registro_tps():
     from forms import RegistroTPSForm
     form = RegistroTPSForm()
     
-    # Bypass CSRF for testing
-    form.csrf_token.data = form.csrf_token.current_token
+    # Bypass CSRF for testing - comment out problematic lines
+    # form.csrf_token.data = form.csrf_token.current_token
     
     if form.validate_on_submit():
         try:
             from models import NeurodivergentProfile
-            nuevo_perfil = NeurodivergentProfile(
-                nombre=form.nombre.data,
-                apellidos=form.apellidos.data,
-                email=form.email.data,
-                telefono=form.telefono.data,
-                ciudad=form.ciudad.data,
-                fecha_nacimiento=form.fecha_nacimiento.data,
-                tipo_neurodivergencia='TPS',
-                diagnostico_formal=form.diagnostico_formal.data == 'si',
-                habilidades=form.habilidades.data,
-                experiencia_laboral=form.experiencia_laboral.data,
-                formacion_academica=form.formacion_academica.data,
-                intereses_laborales=form.intereses_laborales.data,
-                adaptaciones_necesarias=form.adaptaciones_necesarias.data,
-                motivaciones=form.motivaciones.data
-            )
+            nuevo_perfil = NeurodivergentProfile()
+            nuevo_perfil.nombre = form.nombre.data
+            nuevo_perfil.apellidos = form.apellidos.data
+            nuevo_perfil.email = form.email.data
+            nuevo_perfil.telefono = form.telefono.data
+            nuevo_perfil.ciudad = form.ciudad.data
+            nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+            nuevo_perfil.tipo_neurodivergencia = 'TPS'
+            nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
+            nuevo_perfil.habilidades = form.habilidades.data
+            nuevo_perfil.experiencia_laboral = form.experiencia_laboral.data
+            nuevo_perfil.formacion_academica = form.formacion_academica.data
+            nuevo_perfil.intereses_laborales = form.intereses_laborales.data
+            nuevo_perfil.adaptaciones_necesarias = form.adaptaciones_necesarias.data
+            nuevo_perfil.motivaciones = form.motivaciones.data
             db.session.add(nuevo_perfil)
             db.session.commit()
             print(f"✅ TPS - Perfil guardado: {form.nombre.data}")
@@ -703,31 +692,30 @@ def registro_asociacion():
             servicios = ','.join(form.servicios.data) if form.servicios.data else ''
             certificaciones = ','.join(form.certificaciones.data) if form.certificaciones.data else ''
             
-            nueva_asociacion = Asociacion(
-                nombre_asociacion=form.nombre_asociacion.data,
-                acronimo=form.acronimo.data,
-                pais=form.pais.data,
-                otro_pais=form.otro_pais.data if form.pais.data == 'otro' else None,
-                tipo_documento=form.tipo_documento.data,
-                numero_documento=form.numero_documento.data,
-                descripcion_otro_documento=form.descripcion_otro_documento.data if form.tipo_documento.data == 'otro' else None,
-                neurodivergencias_atendidas=neurodivergencias,
-                servicios=servicios,
-                certificaciones=certificaciones,
-                ciudad=form.ciudad.data,
-                direccion=form.direccion.data,
-                telefono=form.telefono.data,
-                email=form.email.data,
-                sitio_web=form.sitio_web.data,
-                descripcion=form.descripcion.data,
-                años_funcionamiento=form.años_funcionamiento.data,
-                numero_socios=form.numero_socios.data,
-                contacto_nombre=form.contacto_nombre.data,
-                contacto_cargo=form.contacto_cargo.data,
-                estado='pendiente',
-                ip_solicitud=request.remote_addr,
-                user_agent=request.user_agent.string[:500] if request.user_agent else None
-            )
+            nueva_asociacion = Asociacion()
+            nueva_asociacion.nombre_asociacion = form.nombre_asociacion.data
+            nueva_asociacion.acronimo = form.acronimo.data
+            nueva_asociacion.pais = form.pais.data
+            nueva_asociacion.otro_pais = form.otro_pais.data if form.pais.data == 'otro' else None
+            nueva_asociacion.tipo_documento = form.tipo_documento.data
+            nueva_asociacion.numero_documento = form.numero_documento.data
+            nueva_asociacion.descripcion_otro_documento = form.descripcion_otro_documento.data if form.tipo_documento.data == 'otro' else None
+            nueva_asociacion.neurodivergencias_atendidas = neurodivergencias
+            nueva_asociacion.servicios = servicios
+            nueva_asociacion.certificaciones = certificaciones
+            nueva_asociacion.ciudad = form.ciudad.data
+            nueva_asociacion.direccion = form.direccion.data
+            nueva_asociacion.telefono = form.telefono.data
+            nueva_asociacion.email = form.email.data
+            nueva_asociacion.sitio_web = form.sitio_web.data
+            nueva_asociacion.descripcion = form.descripcion.data
+            nueva_asociacion.años_funcionamiento = form.años_funcionamiento.data
+            nueva_asociacion.numero_socios = form.numero_socios.data
+            nueva_asociacion.contacto_nombre = form.contacto_nombre.data
+            nueva_asociacion.contacto_cargo = form.contacto_cargo.data
+            nueva_asociacion.estado = 'pendiente'
+            nueva_asociacion.ip_solicitud = request.remote_addr
+            nueva_asociacion.user_agent = request.user_agent.string[:500] if request.user_agent else None
             
             db.session.add(nueva_asociacion)
             db.session.commit()
@@ -1107,9 +1095,11 @@ def api_editar_usuario(user_id):
         
         print(f"📤 Sending user data: {usuario_data['nombre']} {usuario_data['apellidos']}")
         
+        from flask import jsonify
         return jsonify(usuario_data)
         
     except Exception as e:
+        from flask import jsonify
         print(f"❌ Error editando usuario {user_id}: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -1145,12 +1135,14 @@ def api_borrar_usuario(user_id):
         
         print(f"🗑️ {table_name} borrado exitosamente: {nombre_completo}")
         
+        from flask import jsonify
         return jsonify({
             'success': True,
             'message': f'Usuario {nombre_completo} borrado correctamente'
         })
         
     except Exception as e:
+        from flask import jsonify
         print(f"❌ Error borrando usuario {user_id}: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
