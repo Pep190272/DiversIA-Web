@@ -18,12 +18,24 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-# configure the database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///diversia.db"
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-}
+# configure the database with fallback
+try:
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url and "neon.tech" not in database_url:
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+        print("✅ Using PostgreSQL database")
+    else:
+        # Use SQLite as reliable fallback
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///diversia.db"
+        print("✅ Using SQLite database (reliable mode)")
+    
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_recycle": 300,
+        "pool_pre_ping": True,
+    }
+except Exception as e:
+    print(f"⚠️ Database config error: {e}")
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///diversia.db"
 
 # Security headers
 @app.after_request
