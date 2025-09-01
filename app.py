@@ -16,28 +16,26 @@ db = SQLAlchemy(model_class=Base)
 # create the app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
-
-# Configuración de cookies y sesiones
-app.config.update(
-    SESSION_COOKIE_SECURE=False,  # Para desarrollo
-    SESSION_COOKIE_HTTPONLY=True,  # Seguridad
-    SESSION_COOKIE_SAMESITE='Lax',  # CSRF protection
-    PERMANENT_SESSION_LIFETIME=7200,  # 2 horas
-    SESSION_PERMANENT=False
-)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-# configure the database - SOLO POSTGRESQL (CRÍTICO: Sin fallback SQLite)
-database_url = os.environ.get("DATABASE_URL")
-if not database_url:
-    raise RuntimeError("❌ CRÍTICO: DATABASE_URL no configurada. PostgreSQL es obligatorio.")
-
-app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-print("✅ Using PostgreSQL database (ÚNICA BASE DE DATOS - SIN FALLBACK)")
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-}
+# configure the database with fallback
+try:
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url and "neon.tech" not in database_url:
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+        print("✅ Using PostgreSQL database")
+    else:
+        # Use SQLite as reliable fallback
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///diversia.db"
+        print("✅ Using SQLite database (reliable mode)")
+    
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_recycle": 300,
+        "pool_pre_ping": True,
+    }
+except Exception as e:
+    print(f"⚠️ Database config error: {e}")
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///diversia.db"
 
 # Security headers
 @app.after_request

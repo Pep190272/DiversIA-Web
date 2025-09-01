@@ -1,40 +1,85 @@
 {
   "companies": [
     {
-      "id": 1,
-      "nombre": "TechInclusiva SL",
-      "email": "test.diversia.empresa@gmail.com",
-      "telefono": "555-0125",
-      "sector": "tecnologia",
-      "ciudad": "Valencia",
-      "created_at": "2025-09-01T08:22:44.605598",
-      "origen": "Formulario Web Empresa"
-    },
-    {
       "id": 2,
-      "nombre": "TestEmpresa2",
-      "email": "test.diversia.empresa2@gmail.com",
-      "telefono": "555-0126",
-      "sector": "salud",
-      "ciudad": "Sevilla",
-      "created_at": "2025-09-01T08:23:08.660610",
-      "origen": "Formulario Web Empresa"
+      "nombre": "Auria",
+      "email": "albertpinyol@auria.org",
+      "telefono": "",
+      "sector": "Otros",
+      "ciudad": "Barcelona",
+      "fecha_contacto": "2025-07-30",
+      "notas": "",
+      "created_at": "2025-08-22T10:11:21.820583",
+      "updated_at": "2025-08-22T18:31:13.384603"
     },
     {
       "id": 3,
-      "nombre": "TechInclusiva",
-      "email": "test.diversia.empresa@gmail.com",
-      "telefono": "555-0137",
-      "sector": "Tecnología",
-      "ciudad": "Madrid",
-      "created_at": "2025-09-01T09:00:15.133265",
+      "nombre": "Atípicos",
+      "email": "veronicamapo@gmail.com",
+      "telefono": "",
+      "sector": "Otros",
+      "ciudad": "Barcelona",
+      "fecha_contacto": "2025-07-29",
+      "notas": "",
+      "created_at": "2025-08-22T10:11:21.820591",
+      "updated_at": "2025-08-22T18:31:48.842988"
+    },
+    {
+      "id": 4,
+      "nombre": "Fundacion Ingada",
+      "email": "info@fundacioningada.net",
+      "telefono": "",
+      "sector": "Asociacion neurodivergentes",
+      "ciudad": "Galicia",
+      "fecha_contacto": "",
+      "notas": "",
+      "created_at": "2025-08-22T10:11:21.820599"
+    },
+    {
+      "id": 5,
+      "nombre": "Acelerai",
+      "email": "automatizatunegocio@acelerai.eu",
+      "telefono": "+34687408629",
+      "sector": "Inteligencia artificial",
+      "ciudad": "La torre de Claramunt",
+      "created_at": "2025-08-22T10:12:00.144277"
+    },
+    {
+      "id": 6,
+      "nombre": "Ass",
+      "email": "Ass@gmail.com",
+      "telefono": "777777777",
+      "sector": "educacion",
+      "ciudad": "Barcelona",
+      "created_at": "2025-08-28T17:45:33.062517",
       "origen": "Formulario Web Empresa"
     }
   ],
   "contacts": [],
   "stats": {
-    "total_companies": 3,
+    "total_companies": 5,
     "total_contacts": 0,
-    "last_updated": "2025-09-01T09:00:15.133280"
-  }
+    "last_updated": "2025-08-28T17:49:53.432580"
+  },
+  "asociaciones": [
+    {
+      "id": 1,
+      "nombre_asociacion": "Asssa Editada",
+      "acronimo": "ASE",
+      "email": "Asa@gmail.com",
+      "telefono": "777777777",
+      "ciudad": "BarceloNa",
+      "pais": "ES",
+      "tipo_documento": "nif_es",
+      "numero_documento": "20225528h",
+      "neurodivergencias_atendidas": "dislexia,discalculia",
+      "servicios": "terapia,evaluacion",
+      "contacto_nombre": "Joscep",
+      "contacto_cargo": "Ceo",
+      "estado": "pendiente",
+      "created_at": "2025-08-28T17:48:06.567670",
+      "origen": "Formulario Asociación",
+      "updated_at": "2025-08-28T17:49:53.432571"
+    }
+  ]
 }

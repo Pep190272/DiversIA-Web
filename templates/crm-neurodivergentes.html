@@ -84,7 +84,7 @@
             <div class="col-md-3">
                 <div class="card bg-primary text-white">
                     <div class="card-body">
-                        <h4 id="total-users">12</h4>
+                        <h4 id="total-users">0</h4>
                         <p class="mb-0">Total Registrados</p>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
             <div class="col-md-3">
                 <div class="card bg-success text-white">
                     <div class="card-body">
-                        <h4 id="with-diagnosis">1</h4>
+                        <h4 id="with-diagnosis">0</h4>
                         <p class="mb-0">Con Diagnóstico</p>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
             <div class="col-md-3">
                 <div class="card bg-info text-white">
                     <div class="card-body">
-                        <h4 id="job-seekers">8</h4>
+                        <h4 id="job-seekers">0</h4>
                         <p class="mb-0">Buscando Empleo</p>
                     </div>
                 </div>
@@ -108,7 +108,7 @@
             <div class="col-md-3">
                 <div class="card bg-warning text-white">
                     <div class="card-body">
-                        <h4 id="this-month">12</h4>
+                        <h4 id="this-month">0</h4>
                         <p class="mb-0">Este Mes</p>
                     </div>
                 </div>
@@ -150,6 +150,9 @@
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#altas-capacidades-tab" role="tab" onclick="loadNeurodivergenceData('Altas Capacidades')">
                             🧠 Altas Capacidades
                         </button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#otros-tab" role="tab" onclick="loadOtherTypes()">
+                            ➕ Otros
+                        </button>
                     </div>
                 </nav>
 
@@ -189,6 +192,9 @@
                     <div class="tab-pane fade" id="altas-capacidades-tab">
                         <div id="altas-capacidades-content">Cargando...</div>
                     </div>
+                    <div class="tab-pane fade" id="otros-tab">
+                        <div id="otros-content">Cargando...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -214,33 +220,16 @@
         // Cargar datos al inicio
         document.addEventListener('DOMContentLoaded', function() {
             loadOverviewData();
-            createOverviewCards();
         });
 
-        function loadOverviewData() {
-            // ACTUALIZAR INMEDIATAMENTE CON DATOS REALES DESDE API
-            fetch('/api/usuarios-neurodivergentes')
-            .then(response => response.json())
-            .then(data => {
-                // CÁLCULOS CORRECTOS
-                const total = data.length;
-                const diagnosis = data.filter(u => u.diagnostico_formal === true).length;  
-                const jobSeeking = data.filter(u => u.intereses_laborales && u.intereses_laborales.length > 10).length;
-                const thisMonth = data.filter(u => u.created_at && u.created_at.includes('2025-08')).length;
+        async function loadOverviewData() {
+            try {
+                const response = await fetch('/api/usuarios-neurodivergentes');
+                const data = await response.json();
                 
-                // ACTUALIZAR DOM INMEDIATAMENTE
-                document.getElementById('total-users').innerHTML = total;
-                document.getElementById('with-diagnosis').innerHTML = diagnosis;
-                document.getElementById('job-seekers').innerHTML = jobSeeking;  
-                document.getElementById('this-month').innerHTML = thisMonth;
-            })
-            .catch(error => console.error('Error:', error));
-        }
-        
-        function createOverviewCards() {
-            fetch('/api/usuarios-neurodivergentes')
-            .then(response => response.json())
-            .then(data => {
+                console.log('Usuarios cargados:', data);
+                document.getElementById('total-users').textContent = data.length || 0;
+                
                 // Crear tarjetas de resumen
                 const overviewContainer = document.getElementById('overview-cards');
                 overviewContainer.innerHTML = '';
@@ -297,10 +286,9 @@
                     `;
                     overviewContainer.innerHTML += card;
                 });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            } catch (error) {
+                console.error('Error loading overview:', error);
+            }
         }
 
         async function loadNeurodivergenceData(type) {
@@ -604,6 +592,73 @@
             }
         }
 
+        function loadOtherTypes() {
+            // Cargar Tourette, Dispraxia, Ansiedad, Bipolar, Altas Capacidades
+            const container = document.getElementById('otros-content');
+            container.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+            
+            fetch('/api/usuarios-neurodivergentes')
+                .then(response => response.json())
+                .then(allUsers => {
+                    console.log('DEBUG: Todos los usuarios:', allUsers);
+                    console.log('DEBUG: Tipos encontrados:', [...new Set(allUsers.map(u => u.tipo_neurodivergencia))]);
+                    const types = ['altas_capacidades'];
+                    const typeLabels = ['Altas Capacidades'];
+                    // Buscar tanto por valor exacto como por variaciones
+                    const results = types.map((type, index) => {
+                        return allUsers.filter(user => {
+                            const userType = user.tipo_neurodivergencia?.toLowerCase();
+                            if (type === 'tourette') {
+                                return userType === 'tourette' || userType === 'síndrome de tourette' || userType.includes('tourette');
+                            }
+                            return userType === type;
+                        });
+                    });
+                
+                    let html = '<div class="row">';
+                
+                results.forEach((data, index) => {
+                    html += `
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>${typeLabels[index]} - ${data.length} registros</h6>
+                                </div>
+                                <div class="card-body">
+                                    ${data.slice(0, 3).map(user => `
+                                        <div class="border-bottom pb-2 mb-2" onclick="showUserDetails(${user.id})">
+                                            <strong>${user.nombre} ${user.apellidos}</strong><br>
+                                            <small class="text-muted">${user.email} - ${user.ciudad}</small>
+                                        </div>
+                                    `).join('')}
+                                    ${data.length > 3 ? `<small class="text-muted">Y ${data.length - 3} más...</small>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                    html += '</div>';
+                    
+                    // Si no hay datos, mostrar mensaje de debug
+                    if (results.every(r => r.length === 0)) {
+                        html += `<div class="alert alert-warning">
+                            <h6>Debug: No se encontraron usuarios en tipos especiales</h6>
+                            <p>Total usuarios: ${allUsers.length}</p>
+                            <p>Tipos encontrados: ${[...new Set(allUsers.map(u => u.tipo_neurodivergencia))].join(', ')}</p>
+                        </div>`;
+                    }
+                    
+                    container.innerHTML = html;
+                }).catch(error => {
+                console.error('Error loading other types:', error);
+                container.innerHTML = `<div class="alert alert-danger">
+                    <h6>Error cargando datos</h6>
+                    <p>Error: ${error.message}</p>
+                    <button onclick="loadOtherTypes()" class="btn btn-sm btn-primary">Reintentar</button>
+                </div>`;
+            });
+        }
     </script>
 </body>
 </html>
