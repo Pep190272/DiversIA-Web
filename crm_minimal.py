@@ -471,7 +471,7 @@ def create_minimal_crm_routes(app):
     def migrate_users_to_leads():
         """Migrar usuarios de la tabla User legacy a GeneralLead"""
         try:
-            from models import NeurodivergentProfile, GeneralLead
+            from models import User, NeurodivergentProfile, GeneralLead
             from app import db
             
             # Obtener todos los usuarios de la tabla legacy
@@ -509,7 +509,7 @@ def create_minimal_crm_routes(app):
             
             # Limpiar tabla legacy después de migrar
             if migrados > 0:
-                User.query.delete()
+                db.session.query(User).delete()
                 db.session.commit()
                 
             return jsonify({
@@ -628,6 +628,169 @@ def create_minimal_crm_routes(app):
             db.session.commit()
             
             return jsonify({'success': True, 'message': 'Lead actualizado correctamente'})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/leads-generales/<int:lead_id>', methods=['DELETE'])
+    def delete_lead_general(lead_id):
+        """Eliminar un lead específico"""
+        try:
+            from models import GeneralLead
+            from app import db
+            
+            lead = GeneralLead.query.get_or_404(lead_id)
+            db.session.delete(lead)
+            db.session.commit()
+            
+            return jsonify({'success': True, 'message': 'Lead eliminado correctamente'})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/leads-generales/bulk-delete', methods=['POST'])
+    def bulk_delete_leads():
+        """Eliminar múltiples leads seleccionados"""
+        try:
+            from models import GeneralLead
+            from app import db
+            
+            data = request.get_json()
+            lead_ids = data.get('lead_ids', [])
+            
+            if not lead_ids:
+                return jsonify({'success': False, 'error': 'No se seleccionaron leads para eliminar'}), 400
+            
+            # Eliminar leads seleccionados
+            deleted_count = GeneralLead.query.filter(GeneralLead.id.in_(lead_ids)).delete(synchronize_session=False)
+            db.session.commit()
+            
+            return jsonify({
+                'success': True, 
+                'message': f'{deleted_count} leads eliminados correctamente',
+                'deleted_count': deleted_count
+            })
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/leads-generales/bulk-export', methods=['POST'])
+    def bulk_export_leads():
+        """Exportar múltiples leads seleccionados a CSV"""
+        try:
+            from models import GeneralLead
+            from flask import make_response
+            
+            data = request.get_json()
+            lead_ids = data.get('lead_ids', [])
+            
+            if not lead_ids:
+                return jsonify({'success': False, 'error': 'No se seleccionaron leads para exportar'}), 400
+            
+            # Obtener leads seleccionados
+            leads = GeneralLead.query.filter(GeneralLead.id.in_(lead_ids)).all()
+            
+            if not leads:
+                return jsonify({'success': False, 'error': 'No se encontraron leads para exportar'}), 404
+            
+            # Crear CSV
+            output = io.StringIO()
+            writer = csv.writer(output)
+            
+            # Escribir encabezados
+            writer.writerow([
+                'ID', 'Nombre', 'Apellidos', 'Email', 'Teléfono', 'Ciudad', 
+                'Tipo Neurodivergencia', 'Diagnóstico Formal', 'Habilidades',
+                'Experiencia Laboral', 'Formación Académica', 'Intereses Laborales',
+                'Adaptaciones Necesarias', 'Motivaciones', 'Convertido a Perfil',
+                'Fecha Registro'
+            ])
+            
+            # Escribir datos
+            for lead in leads:
+                writer.writerow([
+                    lead.id,
+                    lead.nombre,
+                    lead.apellidos,
+                    lead.email,
+                    lead.telefono or '',
+                    lead.ciudad,
+                    lead.tipo_neurodivergencia or '',
+                    'Sí' if lead.diagnostico_formal else 'No',
+                    lead.habilidades or '',
+                    lead.experiencia_laboral or '',
+                    lead.formacion_academica or '',
+                    lead.intereses_laborales or '',
+                    lead.adaptaciones_necesarias or '',
+                    lead.motivaciones or '',
+                    'Sí' if lead.convertido_a_perfil else 'No',
+                    lead.created_at.strftime('%Y-%m-%d %H:%M:%S') if lead.created_at else ''
+                ])
+            
+            # Preparar respuesta
+            output.seek(0)
+            response = make_response(output.getvalue())
+            response.headers['Content-Type'] = 'text/csv'
+            response.headers['Content-Disposition'] = f'attachment; filename=leads_seleccionados_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+            
+            return response
+            
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/leads-generales/export-all')
+    def export_all_leads():
+        """Exportar todos los leads a CSV"""
+        try:
+            from models import GeneralLead
+            from flask import make_response
+            
+            leads = GeneralLead.query.all()
+            
+            if not leads:
+                return jsonify({'success': False, 'error': 'No hay leads para exportar'})
+            
+            # Crear CSV
+            output = io.StringIO()
+            writer = csv.writer(output)
+            
+            # Escribir encabezados
+            writer.writerow([
+                'ID', 'Nombre', 'Apellidos', 'Email', 'Teléfono', 'Ciudad', 
+                'Tipo Neurodivergencia', 'Diagnóstico Formal', 'Habilidades',
+                'Experiencia Laboral', 'Formación Académica', 'Intereses Laborales',
+                'Adaptaciones Necesarias', 'Motivaciones', 'Convertido a Perfil',
+                'Fecha Registro'
+            ])
+            
+            # Escribir datos
+            for lead in leads:
+                writer.writerow([
+                    lead.id,
+                    lead.nombre,
+                    lead.apellidos,
+                    lead.email,
+                    lead.telefono or '',
+                    lead.ciudad,
+                    lead.tipo_neurodivergencia or '',
+                    'Sí' if lead.diagnostico_formal else 'No',
+                    lead.habilidades or '',
+                    lead.experiencia_laboral or '',
+                    lead.formacion_academica or '',
+                    lead.intereses_laborales or '',
+                    lead.adaptaciones_necesarias or '',
+                    lead.motivaciones or '',
+                    'Sí' if lead.convertido_a_perfil else 'No',
+                    lead.created_at.strftime('%Y-%m-%d %H:%M:%S') if lead.created_at else ''
+                ])
+            
+            # Preparar respuesta
+            output.seek(0)
+            response = make_response(output.getvalue())
+            response.headers['Content-Type'] = 'text/csv'
+            response.headers['Content-Disposition'] = f'attachment; filename=todos_los_leads_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+            
+            return response
+            
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
 

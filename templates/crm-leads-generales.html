@@ -102,9 +102,9 @@
             </div>
         </div>
 
-        <!-- Filtros -->
+        <!-- Filtros y Acciones -->
         <div class="row mb-4">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <select class="form-select" id="filter-type" onchange="filterLeads()">
                     <option value="">Todos los leads</option>
                     <option value="nd">Solo neurodivergentes</option>
@@ -113,13 +113,33 @@
                     <option value="not-converted">No convertidos</option>
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <input type="text" class="form-control" id="search-input" placeholder="Buscar por nombre o email..." onkeyup="searchLeads()">
             </div>
-            <div class="col-md-4">
-                <button class="btn btn-outline-primary" onclick="showBulkActions()">
-                    📧 Acciones Masivas
-                </button>
+            <div class="col-md-6">
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll()" id="select-all-btn">
+                        ☐ Seleccionar Todo
+                    </button>
+                    <button class="btn btn-sm btn-success" onclick="exportSelected()" id="export-selected-btn" disabled>
+                        📊 Exportar Seleccionados
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteSelected()" id="delete-selected-btn" disabled>
+                        🗑️ Eliminar Seleccionados
+                    </button>
+                    <button class="btn btn-sm btn-info" onclick="exportAllLeads()">
+                        📋 Exportar Todos
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información de selección -->
+        <div class="row mb-3" id="selection-info" style="display: none;">
+            <div class="col-12">
+                <div class="alert alert-info mb-0">
+                    <span id="selected-count">0</span> leads seleccionados
+                </div>
             </div>
         </div>
 
@@ -171,8 +191,10 @@
                 const response = await fetch('/api/leads-generales');
                 allLeads = await response.json();
                 
+                selectedLeads.clear(); // Limpiar selección al recargar
                 updateStatistics();
                 displayLeads(allLeads);
+                updateSelectionUI();
                 
             } catch (error) {
                 console.error('Error loading leads:', error);
@@ -193,6 +215,8 @@
             document.getElementById('converted-leads').textContent = converted;
         }
 
+        let selectedLeads = new Set();
+
         function displayLeads(leads) {
             const container = document.getElementById('leads-container');
             
@@ -211,27 +235,45 @@
                 const convertedBadge = lead.convertido_a_perfil ? 
                     `<span class="converted-badge ms-2">✓ Convertido</span>` : '';
 
+                const isSelected = selectedLeads.has(lead.id);
+                const selectedClass = isSelected ? 'border-primary bg-light' : '';
+
                 html += `
-                    <div class="lead-card" onclick="editLead(${lead.id})">
+                    <div class="lead-card ${selectedClass}" style="position: relative;">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-1">
+                                <div class="form-check">
+                                    <input class="form-check-input lead-checkbox" type="checkbox" 
+                                           id="lead-${lead.id}" value="${lead.id}" 
+                                           ${isSelected ? 'checked' : ''}
+                                           onchange="toggleLeadSelection(${lead.id})">
+                                </div>
+                            </div>
+                            <div class="col-md-5" onclick="editLead(${lead.id})" style="cursor: pointer;">
                                 <h6 class="mb-1">${lead.nombre} ${lead.apellidos}</h6>
                                 <small class="text-muted">${lead.email}</small>
                                 <div class="mt-2">${badge}${convertedBadge}</div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" onclick="editLead(${lead.id})" style="cursor: pointer;">
                                 <small class="text-muted">Ciudad:</small><br>
                                 <span>${lead.ciudad}</span><br>
                                 <small class="text-muted">Teléfono:</small><br>
                                 <span>${lead.telefono || 'No especificado'}</span>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2" onclick="editLead(${lead.id})" style="cursor: pointer;">
                                 <small class="text-muted">Registrado:</small><br>
                                 <span>${new Date(lead.created_at).toLocaleDateString()}</span><br>
                                 <small class="text-muted">Experiencia:</small><br>
-                                <span class="text-truncate d-block" style="max-width: 150px;">
+                                <span class="text-truncate d-block" style="max-width: 120px;">
                                     ${lead.experiencia_laboral || 'No especificada'}
                                 </span>
+                            </div>
+                            <div class="col-md-1">
+                                <button class="btn btn-sm btn-outline-danger" 
+                                        onclick="deleteIndividualLead(${lead.id}, event)"
+                                        title="Eliminar lead">
+                                    🗑️
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -363,50 +405,236 @@
         }
 
         function filterLeads() {
-            const filter = document.getElementById('filter-type').value;
-            let filteredLeads = allLeads;
-
-            switch(filter) {
-                case 'nd':
-                    filteredLeads = allLeads.filter(lead => lead.tipo_neurodivergencia);
-                    break;
-                case 'no-nd':
-                    filteredLeads = allLeads.filter(lead => !lead.tipo_neurodivergencia);
-                    break;
-                case 'converted':
-                    filteredLeads = allLeads.filter(lead => lead.convertido_a_perfil);
-                    break;
-                case 'not-converted':
-                    filteredLeads = allLeads.filter(lead => !lead.convertido_a_perfil);
-                    break;
-            }
-
-            displayLeads(filteredLeads);
+            updateLeadDisplay();
+            updateSelectionUI();
         }
 
         function searchLeads() {
+            updateLeadDisplay();
+            updateSelectionUI();
+        }
+
+        async function exportAllLeads() {
+            try {
+                const response = await fetch('/api/leads-generales/export-all');
+                
+                if (response.ok) {
+                    // Descargar archivo CSV
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `todos_los_leads_${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    alert(`✅ ${allLeads.length} leads exportados correctamente`);
+                } else {
+                    const result = await response.json();
+                    alert('❌ Error exportando leads: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error exporting all leads:', error);
+                alert('❌ Error exportando todos los leads');
+            }
+        }
+
+        function toggleLeadSelection(leadId) {
+            if (selectedLeads.has(leadId)) {
+                selectedLeads.delete(leadId);
+            } else {
+                selectedLeads.add(leadId);
+            }
+            updateSelectionUI();
+            updateLeadDisplay();
+        }
+
+        function toggleSelectAll() {
+            const currentLeads = getCurrentFilteredLeads();
+            const allSelected = currentLeads.every(lead => selectedLeads.has(lead.id));
+            
+            if (allSelected) {
+                // Deseleccionar todos los visibles
+                currentLeads.forEach(lead => selectedLeads.delete(lead.id));
+            } else {
+                // Seleccionar todos los visibles
+                currentLeads.forEach(lead => selectedLeads.add(lead.id));
+            }
+            
+            updateSelectionUI();
+            displayLeads(currentLeads);
+        }
+
+        function updateSelectionUI() {
+            const count = selectedLeads.size;
+            const selectAllBtn = document.getElementById('select-all-btn');
+            const exportBtn = document.getElementById('export-selected-btn');
+            const deleteBtn = document.getElementById('delete-selected-btn');
+            const selectionInfo = document.getElementById('selection-info');
+            const selectedCountSpan = document.getElementById('selected-count');
+            
+            // Actualizar contador
+            selectedCountSpan.textContent = count;
+            
+            // Mostrar/ocultar información de selección
+            if (count > 0) {
+                selectionInfo.style.display = 'block';
+                exportBtn.disabled = false;
+                deleteBtn.disabled = false;
+            } else {
+                selectionInfo.style.display = 'none';
+                exportBtn.disabled = true;
+                deleteBtn.disabled = true;
+            }
+            
+            // Actualizar texto del botón de seleccionar todo
+            const currentLeads = getCurrentFilteredLeads();
+            const allSelected = currentLeads.length > 0 && currentLeads.every(lead => selectedLeads.has(lead.id));
+            selectAllBtn.innerHTML = allSelected ? '☑️ Deseleccionar Todo' : '☐ Seleccionar Todo';
+        }
+
+        function getCurrentFilteredLeads() {
+            const filter = document.getElementById('filter-type').value;
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const filteredLeads = allLeads.filter(lead => 
-                lead.nombre.toLowerCase().includes(searchTerm) ||
-                lead.apellidos.toLowerCase().includes(searchTerm) ||
-                lead.email.toLowerCase().includes(searchTerm)
-            );
+            
+            let filteredLeads = allLeads;
+            
+            // Aplicar filtro por tipo
+            switch(filter) {
+                case 'nd':
+                    filteredLeads = filteredLeads.filter(lead => lead.tipo_neurodivergencia);
+                    break;
+                case 'no-nd':
+                    filteredLeads = filteredLeads.filter(lead => !lead.tipo_neurodivergencia);
+                    break;
+                case 'converted':
+                    filteredLeads = filteredLeads.filter(lead => lead.convertido_a_perfil);
+                    break;
+                case 'not-converted':
+                    filteredLeads = filteredLeads.filter(lead => !lead.convertido_a_perfil);
+                    break;
+            }
+            
+            // Aplicar búsqueda
+            if (searchTerm) {
+                filteredLeads = filteredLeads.filter(lead => 
+                    lead.nombre.toLowerCase().includes(searchTerm) ||
+                    lead.apellidos.toLowerCase().includes(searchTerm) ||
+                    lead.email.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            return filteredLeads;
+        }
+
+        function updateLeadDisplay() {
+            const filteredLeads = getCurrentFilteredLeads();
             displayLeads(filteredLeads);
         }
 
-        function exportAllLeads() {
-            const dataStr = JSON.stringify(allLeads, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'leads_generales_' + new Date().toISOString().split('T')[0] + '.json';
-            link.click();
-            URL.revokeObjectURL(url);
+        async function deleteSelected() {
+            if (selectedLeads.size === 0) {
+                alert('No hay leads seleccionados');
+                return;
+            }
+            
+            const count = selectedLeads.size;
+            if (!confirm(`¿Estás seguro de que quieres eliminar ${count} leads seleccionados? Esta acción no se puede deshacer.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/leads-generales/bulk-delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ lead_ids: Array.from(selectedLeads) })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ ${result.deleted_count} leads eliminados correctamente`);
+                    selectedLeads.clear();
+                    loadLeads(); // Recargar datos
+                } else {
+                    alert('❌ Error eliminando leads: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error deleting selected leads:', error);
+                alert('❌ Error eliminando leads seleccionados');
+            }
         }
 
-        function showBulkActions() {
-            alert('Función de acciones masivas (envío de emails, etc.) - Próximamente disponible');
+        async function exportSelected() {
+            if (selectedLeads.size === 0) {
+                alert('No hay leads seleccionados para exportar');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/leads-generales/bulk-export', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ lead_ids: Array.from(selectedLeads) })
+                });
+                
+                if (response.ok) {
+                    // Descargar archivo CSV
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `leads_seleccionados_${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    alert(`✅ ${selectedLeads.size} leads exportados correctamente`);
+                } else {
+                    const result = await response.json();
+                    alert('❌ Error exportando leads: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error exporting selected leads:', error);
+                alert('❌ Error exportando leads seleccionados');
+            }
+        }
+
+        async function deleteIndividualLead(leadId, event) {
+            event.stopPropagation(); // Evitar que se abra el modal de edición
+            
+            const lead = allLeads.find(l => l.id === leadId);
+            if (!lead) return;
+            
+            if (!confirm(`¿Estás seguro de que quieres eliminar a ${lead.nombre} ${lead.apellidos}? Esta acción no se puede deshacer.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/leads-generales/${leadId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Lead eliminado correctamente');
+                    selectedLeads.delete(leadId); // Remover de selección si estaba seleccionado
+                    loadLeads(); // Recargar datos
+                } else {
+                    alert('❌ Error eliminando lead: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error deleting lead:', error);
+                alert('❌ Error eliminando lead');
+            }
         }
     </script>
 </body>
