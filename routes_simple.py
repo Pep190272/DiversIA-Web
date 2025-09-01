@@ -20,8 +20,6 @@ def empresas():
         try:
             from models import Company
             
-            print(f"✅ Empresa - Procesando registro: {form.nombre_empresa.data} - {form.email_contacto.data}")
-            print(f"✅ Empresa - Validación CSRF bypassed para funcionamiento")
             
             nueva_empresa = Company()
             nueva_empresa.nombre_empresa = form.nombre_empresa.data
@@ -61,7 +59,6 @@ def empresas():
                 companies.append(crm_company)
                 crm_data['companies'] = companies
                 save_data(crm_data)
-                print(f"✅ Empresa guardada en CRM: {nueva_empresa.nombre_empresa}")
                 
             except Exception as e:
                 print(f"⚠️ Error guardando empresa en CRM: {e}")
@@ -91,7 +88,6 @@ def empresas():
                     'ciudad': nueva_empresa.ciudad
                 })
                 
-                print(f"✅ Emails enviados para empresa: {nueva_empresa.nombre_empresa}")
                 
             except Exception as e:
                 print(f"⚠️ Error enviando emails de empresa: {e}")

@@ -5,8 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-# Set up logging
-logging.basicConfig(level=logging.DEBUG)
+# Set up logging for production
+logging.basicConfig(level=logging.INFO)
 
 class Base(DeclarativeBase):
     pass
@@ -33,7 +33,7 @@ if not database_url:
     raise RuntimeError("❌ CRÍTICO: DATABASE_URL no configurada. PostgreSQL es obligatorio.")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-print("✅ Using PostgreSQL database (ÚNICA BASE DE DATOS - SIN FALLBACK)")
+print("✅ PostgreSQL database connected")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
@@ -59,7 +59,6 @@ with app.app_context():
         print("✅ Database initialized successfully")
     except Exception as e:
         print(f"⚠️ Database error: {e}")
-        print("Application will run with limited functionality")
 
 
 @app.route('/admin/system-status')
