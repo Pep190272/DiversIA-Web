@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { emailService } from '@/lib/email';
 
 const registroTDAHSchema = z.object({
   nombre: z.string().min(1, 'El nombre es requerido'),
@@ -92,6 +93,33 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    // Enviar emails de forma asíncrona (no bloquear la respuesta)
+    Promise.all([
+      // Email de bienvenida al usuario
+      emailService.sendWelcomeEmail({
+        nombre: validatedData.nombre,
+        email: validatedData.email,
+        tipo_neurodivergencia: 'TDAH',
+      }),
+      // Email de notificación a DiversIA
+      emailService.sendNotificationEmail({
+        nombre: `${validatedData.nombre} ${validatedData.apellidos}`,
+        email: validatedData.email,
+        telefono: validatedData.telefono || undefined,
+        ciudad: validatedData.ciudad,
+        tipo_neurodivergencia: 'TDAH',
+        fecha_registro: new Date().toLocaleString('es-ES', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      }),
+    ]).catch(error => {
+      console.error('❌ Error enviando emails:', error);
+    });
+
     return NextResponse.json({
       success: true,
       message: `¡Registro TDAH completado exitosamente, ${validatedData.nombre}! Tu perfil detallado ha sido guardado.`,
@@ -103,7 +131,7 @@ export async function POST(request: NextRequest) {
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: 'Datos de formulario inválidos', details: error.errors },
+        { success: false, error: 'Datos de formulario inválidos', details: error.issues },
         { status: 400 }
       );
     }

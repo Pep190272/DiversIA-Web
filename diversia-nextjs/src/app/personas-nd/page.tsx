@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { 
-  BrainIcon, 
   LightBulbIcon, 
   UserGroupIcon, 
   ArrowRightIcon,
@@ -66,7 +65,9 @@ export default function PersonasNDPage() {
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center p-6 bg-white rounded-lg shadow">
-              <BrainIcon className="w-16 h-16 mx-auto text-purple-600 mb-4" />
+              <div className="w-16 h-16 mx-auto text-purple-600 mb-4 flex items-center justify-center bg-purple-100 rounded-full">
+              <span className="text-2xl">🧠</span>
+            </div>
               <h3 className="text-xl font-semibold mb-3">Entendemos tu Mente</h3>
               <p className="text-gray-600">
                 Nuestros formularios están diseñados por psicólogos especializados en neurodivergencia. 

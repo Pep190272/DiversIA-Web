@@ -53,6 +53,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/admin">
 }
 
+// Validate ../../src/app/contacto/page.tsx
+{
+  const handler = {} as typeof import("../../src/app/contacto/page.js")
+  handler satisfies AppPageConfig<"/contacto">
+}
+
 // Validate ../../src/app/empresas/page.tsx
 {
   const handler = {} as typeof import("../../src/app/empresas/page.js")
@@ -63,6 +69,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../src/app/page.js")
   handler satisfies AppPageConfig<"/">
+}
+
+// Validate ../../src/app/personas-nd/page.tsx
+{
+  const handler = {} as typeof import("../../src/app/personas-nd/page.js")
+  handler satisfies AppPageConfig<"/personas-nd">
 }
 
 // Validate ../../src/app/registro-tdah/page.tsx
@@ -87,6 +99,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../src/app/api/registro/route.js")
   handler satisfies RouteHandlerConfig<"/api/registro">
+}
+
+// Validate ../../src/app/api/test-email/route.ts
+{
+  const handler = {} as typeof import("../../src/app/api/test-email/route.js")
+  handler satisfies RouteHandlerConfig<"/api/test-email">
 }
 
 // Validate ../../src/app/api/usuarios-neurodivergentes/route.ts
