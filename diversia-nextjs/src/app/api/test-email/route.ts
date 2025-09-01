@@ -6,12 +6,12 @@ export async function POST(request: NextRequest) {
     const { type = 'test' } = await request.json();
 
     if (type === 'configuration') {
-      // Probar la configuración de email
-      const testResults = await emailService.testConfiguration();
+      // Probar la configuración de Gmail
+      const testResult = await emailService.testGmailConfiguration();
       return NextResponse.json({
-        success: true,
-        results: testResults,
-        message: 'Test de configuración completado'
+        success: testResult,
+        service: 'Gmail',
+        message: testResult ? 'Gmail configurado correctamente' : 'Gmail no configurado'
       });
     }
 
@@ -19,20 +19,20 @@ export async function POST(request: NextRequest) {
       // Probar email de bienvenida
       const success = await emailService.sendWelcomeEmail({
         nombre: 'Usuario Test',
-        email: process.env.GMAIL_USER || 'test@diversia.com',
+        email: 'diversiaeternals@gmail.com',
         tipo_neurodivergencia: 'TDAH'
       });
 
       return NextResponse.json({
         success,
-        message: success ? 'Email de bienvenida enviado' : 'Error enviando email de bienvenida'
+        message: success ? 'Email de bienvenida enviado con Gmail' : 'Error enviando email de bienvenida'
       });
     }
 
     if (type === 'notification') {
       // Probar email de notificación
       const success = await emailService.sendNotificationEmail({
-        nombre: 'Usuario Test',
+        nombre: 'Usuario Test Gmail',
         email: 'test@diversia.com',
         telefono: '+34 600 000 000',
         ciudad: 'Madrid',
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success,
-        message: success ? 'Email de notificación enviado' : 'Error enviando email de notificación'
+        message: success ? 'Email de notificación enviado con Gmail' : 'Error enviando email de notificación'
       });
     }
 

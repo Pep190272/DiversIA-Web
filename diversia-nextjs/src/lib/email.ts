@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import sgMail from '@sendgrid/mail';
 
 // Configuración de tipos
 export interface EmailConfig {
@@ -24,39 +23,27 @@ export interface NotificationEmailData {
   fecha_registro: string;
 }
 
-// Clase principal para manejo de emails
+// Clase principal para manejo de emails - SOLO GMAIL
 export class EmailService {
   private transporter: nodemailer.Transporter | null = null;
-  private useGmail: boolean = false;
-  private useSendGrid: boolean = false;
+  private isConfigured: boolean = false;
 
   constructor() {
-    this.initializeServices();
+    this.initializeGmail();
   }
 
-  private initializeServices() {
-    // Verificar si tenemos credenciales de Gmail (PRIORIDAD)
+  private initializeGmail() {
+    // Solo Gmail - nada más
     const gmailUser = process.env.GMAIL_USER;
-    const gmailPassword = process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASSWORD;
+    const gmailPassword = process.env.GMAIL_APP_PASSWORD;
 
     if (gmailUser && gmailPassword) {
       this.setupGmail(gmailUser, gmailPassword);
-      this.useGmail = true;
-      console.log('✅ Gmail configurado como servicio principal de email');
+      this.isConfigured = true;
+      console.log('✅ Gmail configurado correctamente');
     } else {
-      console.warn('⚠️ Gmail no configurado - se requieren GMAIL_USER y GMAIL_APP_PASSWORD');
-    }
-    
-    // SendGrid como backup solamente
-    const sendGridKey = process.env.SENDGRID_API_KEY;
-    if (sendGridKey) {
-      sgMail.setApiKey(sendGridKey);
-      this.useSendGrid = true;
-      console.log('📧 SendGrid disponible como backup');
-    }
-
-    if (!this.useGmail && !this.useSendGrid) {
-      console.error('❌ No se encontraron credenciales de email configuradas');
+      console.error('❌ Gmail no configurado - se requieren GMAIL_USER y GMAIL_APP_PASSWORD');
+      this.isConfigured = false;
     }
   }
 
@@ -65,41 +52,21 @@ export class EmailService {
       service: 'gmail',
       auth: {
         user: user,
-        pass: password, // Debe ser una App Password, no la contraseña normal
+        pass: password, // App Password de Google
       },
     });
   }
 
-  // Método principal para enviar emails (GMAIL PRIMERO)
+  // Método principal para enviar emails - SOLO GMAIL
   async sendEmail(config: EmailConfig): Promise<boolean> {
-    try {
-      // PRIORIDAD 1: Intentar con Gmail
-      if (this.useGmail && this.transporter) {
-        console.log('📧 Enviando email con Gmail...');
-        return await this.sendWithGmail(config);
-      }
-      
-      // FALLBACK: Si Gmail no está disponible, usar SendGrid
-      else if (this.useSendGrid) {
-        console.log('📧 Gmail no disponible, usando SendGrid como fallback...');
-        return await this.sendWithSendGrid(config);
-      } 
-      
-      // ERROR: Ningún servicio disponible
-      else {
-        console.error('❌ No hay servicios de email configurados. Configure Gmail (GMAIL_USER + GMAIL_APP_PASSWORD)');
-        return false;
-      }
-    } catch (error) {
-      console.error('❌ Error enviando email:', error);
+    if (!this.isConfigured || !this.transporter) {
+      console.error('❌ Gmail no configurado. Configure GMAIL_USER y GMAIL_APP_PASSWORD');
       return false;
     }
-  }
 
-  private async sendWithGmail(config: EmailConfig): Promise<boolean> {
     try {
-      if (!this.transporter) return false;
-
+      console.log('📧 Enviando email con Gmail...');
+      
       const mailOptions = {
         from: process.env.GMAIL_USER,
         to: config.to,
@@ -112,32 +79,7 @@ export class EmailService {
       console.log('✅ Email enviado con Gmail:', result.messageId);
       return true;
     } catch (error) {
-      console.error('❌ Error con Gmail:', error);
-      
-      // Si falla Gmail, intentar con SendGrid como backup
-      if (this.useSendGrid) {
-        console.log('🔄 Intentando con SendGrid como backup...');
-        return await this.sendWithSendGrid(config);
-      }
-      return false;
-    }
-  }
-
-  private async sendWithSendGrid(config: EmailConfig): Promise<boolean> {
-    try {
-      const msg = {
-        to: config.to,
-        from: 'noreply@diversia.com',
-        subject: config.subject,
-        text: config.text,
-        html: config.html
-      };
-
-      await sgMail.send(msg);
-      console.log('✅ Email enviado con SendGrid');
-      return true;
-    } catch (error) {
-      console.error('❌ Error con SendGrid:', error);
+      console.error('❌ Error enviando email con Gmail:', error);
       return false;
     }
   }
@@ -157,7 +99,7 @@ export class EmailService {
 
   // Email de notificación para DiversIA
   async sendNotificationEmail(data: NotificationEmailData): Promise<boolean> {
-    const diversiaEmail = process.env.DIVERSIA_EMAIL || 'diversiaeternals@gmail.com';
+    const diversiaEmail = 'diversiaeternals@gmail.com';
     const notificationHtml = this.generateNotificationEmail(data);
     const notificationText = this.generateNotificationEmailText(data);
 
@@ -217,7 +159,7 @@ export class EmailService {
 
                 <p>Mientras tanto, mantente atento/a a tu correo. Te contactaremos pronto con oportunidades emocionantes.</p>
 
-                <a href="mailto:contacto@diversia.com" class="button">Contáctanos si tienes preguntas</a>
+                <a href="mailto:diversiaeternals@gmail.com" class="button">Contáctanos si tienes preguntas</a>
 
                 <p><strong>¡Gracias por confiar en DiversIA para tu futuro laboral!</strong></p>
             </div>
@@ -253,7 +195,7 @@ Trabajamos con empresas que:
 
 Mantente atento/a a tu correo. Te contactaremos pronto con oportunidades emocionantes.
 
-Si tienes preguntas, responde a este email o escríbenos a contacto@diversia.com
+Si tienes preguntas, responde a este email o escríbenos a diversiaeternals@gmail.com
 
 ¡Gracias por confiar en DiversIA para tu futuro laboral!
 
@@ -341,27 +283,25 @@ Accede al panel administrativo para ver todos los detalles del perfil.
   }
 
   // Método para probar la configuración
-  async testConfiguration(): Promise<{ gmail: boolean; sendgrid: boolean }> {
-    const testEmail = process.env.GMAIL_USER || 'test@diversia.com';
-    
-    const gmailTest = this.useGmail ? await this.sendEmail({
-      to: testEmail,
-      subject: 'Test de configuración Gmail - DiversIA',
-      text: 'Este es un email de prueba para verificar la configuración de Gmail.',
-      html: '<p>Este es un email de prueba para verificar la configuración de Gmail.</p>'
-    }) : false;
+  async testGmailConfiguration(): Promise<boolean> {
+    if (!this.isConfigured || !this.transporter) {
+      console.log('❌ Gmail no configurado');
+      return false;
+    }
 
-    const sendgridTest = this.useSendGrid ? await this.sendEmail({
-      to: testEmail,
-      subject: 'Test de configuración SendGrid - DiversIA',
-      text: 'Este es un email de prueba para verificar la configuración de SendGrid.',
-      html: '<p>Este es un email de prueba para verificar la configuración de SendGrid.</p>'
-    }) : false;
-
-    return {
-      gmail: gmailTest,
-      sendgrid: sendgridTest
-    };
+    try {
+      const testEmail = process.env.GMAIL_USER || 'test@diversia.com';
+      
+      return await this.sendEmail({
+        to: testEmail,
+        subject: 'Test de configuración Gmail - DiversIA',
+        text: 'Este es un email de prueba para verificar que Gmail está funcionando correctamente.',
+        html: '<p>Este es un email de prueba para verificar que Gmail está funcionando correctamente.</p>'
+      });
+    } catch (error) {
+      console.error('❌ Error en test de Gmail:', error);
+      return false;
+    }
   }
 }
 
