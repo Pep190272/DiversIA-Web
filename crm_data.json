@@ -1,9 +1,30 @@
 {
-  "companies": [],
+  "companies": [
+    {
+      "id": 1,
+      "nombre": "TechInclusiva SL",
+      "email": "test.diversia.empresa@gmail.com",
+      "telefono": "555-0125",
+      "sector": "tecnologia",
+      "ciudad": "Valencia",
+      "created_at": "2025-09-01T08:22:44.605598",
+      "origen": "Formulario Web Empresa"
+    },
+    {
+      "id": 2,
+      "nombre": "TestEmpresa2",
+      "email": "test.diversia.empresa2@gmail.com",
+      "telefono": "555-0126",
+      "sector": "salud",
+      "ciudad": "Sevilla",
+      "created_at": "2025-09-01T08:23:08.660610",
+      "origen": "Formulario Web Empresa"
+    }
+  ],
   "contacts": [],
   "stats": {
-    "total_companies": 0,
+    "total_companies": 2,
     "total_contacts": 0,
-    "last_updated": "2025-08-30T22:15:40.657503"
+    "last_updated": "2025-09-01T08:23:08.660626"
   }
 }

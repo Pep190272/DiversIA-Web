@@ -112,6 +112,9 @@ import email_notifications  # noqa: F401
 import task_manager
 import colaboradores_manager  # noqa: F401
 
+# Sistema de test de emails
+import email_test_endpoint  # noqa: F401
+
 if __name__ == "__main__":
     # Flask development server optimized for web preview
     print("🌐 Iniciando DiversIA Web Preview Server...")

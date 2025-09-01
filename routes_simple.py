@@ -69,6 +69,33 @@ def empresas():
             flash('¡Empresa registrada exitosamente! Te contactaremos pronto.', 'success')
             return redirect(url_for('empresas'))
             
+            # Enviar emails automáticos
+            try:
+                from flask_email_service import email_service
+                
+                # Email de bienvenida a la empresa
+                email_service.send_welcome_email_company(
+                    nombre_empresa=nueva_empresa.nombre_empresa,
+                    email=nueva_empresa.email_contacto,
+                    sector=nueva_empresa.sector,
+                    tamano=nueva_empresa.tamano_empresa
+                )
+                
+                # Email de notificación a DiversIA
+                email_service.send_notification_email("empresa", {
+                    'nombre_empresa': nueva_empresa.nombre_empresa,
+                    'email_contacto': nueva_empresa.email_contacto,
+                    'telefono': nueva_empresa.telefono,
+                    'sector': nueva_empresa.sector,
+                    'tamano_empresa': nueva_empresa.tamano_empresa,
+                    'ciudad': nueva_empresa.ciudad
+                })
+                
+                print(f"✅ Emails enviados para empresa: {nueva_empresa.nombre_empresa}")
+                
+            except Exception as e:
+                print(f"⚠️ Error enviando emails de empresa: {e}")
+            
         except Exception as e:
             print(f"❌ Error registrando empresa: {e}")
             flash('Error al registrar la empresa. Por favor intenta de nuevo.', 'error')
@@ -175,6 +202,32 @@ def registro():
             db.session.add(nuevo_lead)
             db.session.commit()
             
+            # Enviar emails automáticos
+            try:
+                from flask_email_service import email_service
+                
+                # Email de bienvenida al usuario
+                email_service.send_welcome_email_user(
+                    nombre=form.nombre.data,
+                    email=form.email.data,
+                    tipo_neurodivergencia=form.tipo_neurodivergencia.data
+                )
+                
+                # Email de notificación a DiversIA
+                email_service.send_notification_email("usuario", {
+                    'nombre': form.nombre.data,
+                    'apellidos': form.apellidos.data,
+                    'email': form.email.data,
+                    'telefono': form.telefono.data,
+                    'ciudad': form.ciudad.data,
+                    'tipo_neurodivergencia': form.tipo_neurodivergencia.data
+                })
+                
+                print(f"✅ Emails enviados para registro general: {form.nombre.data}")
+                
+            except Exception as e:
+                print(f"⚠️ Error enviando emails de registro general: {e}")
+            
             flash(f'¡Test completado exitosamente, {form.nombre.data}! Tu información ha sido guardada. Te contactaremos pronto con información sobre formularios específicos.', 'success')
             # Lead registrado exitosamente
             
@@ -251,6 +304,32 @@ def registro_tdah():
                 
                 db.session.add(nuevo_perfil)
                 db.session.commit()
+                
+                # Enviar emails automáticos
+                try:
+                    from flask_email_service import email_service
+                    
+                    # Email de bienvenida al usuario TDAH
+                    email_service.send_welcome_email_user(
+                        nombre=nombre,
+                        email=email,
+                        tipo_neurodivergencia="TDAH"
+                    )
+                    
+                    # Email de notificación a DiversIA
+                    email_service.send_notification_email("usuario", {
+                        'nombre': nombre,
+                        'apellidos': request.form.get('apellidos', ''),
+                        'email': email,
+                        'telefono': request.form.get('telefono', ''),
+                        'ciudad': request.form.get('ciudad', ''),
+                        'tipo_neurodivergencia': 'TDAH'
+                    })
+                    
+                    print(f"✅ Emails enviados para registro TDAH: {nombre}")
+                    
+                except Exception as e:
+                    print(f"⚠️ Error enviando emails de TDAH: {e}")
                 
                 flash(f'¡Registro TDAH completado exitosamente, {nombre}! Tu perfil detallado ha sido guardado.', 'success')
                 print(f"✅ Perfil TDAH registrado: {nombre} {request.form.get('apellidos', '')}")
