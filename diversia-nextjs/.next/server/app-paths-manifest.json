@@ -1,0 +1,15 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/registro-tdah/route": "app/api/registro-tdah/route.js",
+  "/api/registro/route": "app/api/registro/route.js",
+  "/api/test-email/route": "app/api/test-email/route.js",
+  "/api/usuarios/route": "app/api/usuarios/route.js",
+  "/api/usuarios-neurodivergentes/route": "app/api/usuarios-neurodivergentes/route.js",
+  "/admin/page": "app/admin/page.js",
+  "/contacto/page": "app/contacto/page.js",
+  "/empresas/page": "app/empresas/page.js",
+  "/page": "app/page.js",
+  "/personas-nd/page": "app/personas-nd/page.js",
+  "/registro-tdah/page": "app/registro-tdah/page.js",
+  "/registro/page": "app/registro/page.js"
+}

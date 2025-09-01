@@ -7,14 +7,17 @@ class CookieBanner {
     }
 
     init() {
-        // Solo mostrar banner si no hay consentimiento previo
-        if (!this.hasConsent()) {
-            this.showBanner();
-        } else {
-            // Cargar scripts según consentimiento guardado
-            const consent = this.getConsent();
-            this.loadScripts(consent);
-        }
+        // Esperar un poco antes de verificar consentimiento para evitar parpadeo
+        setTimeout(() => {
+            // Solo mostrar banner si no hay consentimiento previo
+            if (!this.hasConsent()) {
+                this.showBanner();
+            } else {
+                // Cargar scripts según consentimiento guardado
+                const consent = this.getConsent();
+                this.loadScripts(consent);
+            }
+        }, 500); // Esperar 500ms
     }
 
     hasConsent() {

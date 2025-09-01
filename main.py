@@ -1,4 +1,12 @@
 from app import app
+
+# Configuración CORS para permitir formularios desde el navegador
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
 from flask import render_template
 
 # Routes principales - WEB PÚBLICA DE DIVERSIA
@@ -104,5 +112,12 @@ import email_notifications  # noqa: F401
 import task_manager
 import colaboradores_manager  # noqa: F401
 
+# Sistema de test de emails
+import email_test_endpoint  # noqa: F401
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # Flask development server optimized for web preview
+    print("🌐 Iniciando DiversIA Web Preview Server...")
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False, threaded=True)

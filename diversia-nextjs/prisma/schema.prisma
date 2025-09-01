@@ -1,0 +1,410 @@
+// Prisma Schema for DiversIA
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// TABLA PARA LEADS GENERALES DEL TEST "HAZ MI TEST" (Personas ND y no-ND)
+model GeneralLead {
+  id                    Int      @id @default(autoincrement())
+  nombre                String   @db.VarChar(100)
+  apellidos             String   @db.VarChar(100)
+  email                 String   @unique @db.VarChar(120)
+  telefono              String?  @db.VarChar(20)
+  ciudad                String   @db.VarChar(100)
+  fecha_nacimiento      DateTime @db.Date
+  
+  // Información básica de neurodivergencia (si aplica)
+  tipo_neurodivergencia String?  @db.VarChar(50) // Puede ser NULL para no-ND
+  diagnostico_formal    Boolean  @default(false)
+  
+  // Información laboral básica
+  habilidades           String?  @db.Text
+  experiencia_laboral   String?  @db.Text
+  formacion_academica   String?  @db.Text
+  intereses_laborales   String?  @db.Text
+  adaptaciones_necesarias String? @db.Text
+  motivaciones          String?  @db.Text
+  
+  // Lead status
+  convertido_a_perfil   Boolean  @default(false) // Si ya completó formulario específico
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("general_leads")
+  @@index([email])
+  @@index([created_at])
+}
+
+// TABLA PARA PERFILES NEURODIVERGENTES ESPECÍFICOS NUEVOS (formularios detallados)
+model NeurodivergentProfile {
+  id                    Int      @id @default(autoincrement())
+  nombre                String   @db.VarChar(100)
+  apellidos             String   @db.VarChar(100)
+  email                 String   @db.VarChar(120) // Sin unique - permite duplicado con GeneralLead
+  telefono              String?  @db.VarChar(20)
+  ciudad                String   @db.VarChar(100)
+  fecha_nacimiento      DateTime @db.Date
+  
+  // Información de neurodivergencia específica
+  tipo_neurodivergencia String   @db.VarChar(50)
+  diagnostico_formal    Boolean  @default(false)
+  
+  // Información laboral detallada
+  habilidades           String?  @db.Text
+  experiencia_laboral   String?  @db.Text
+  formacion_academica   String?  @db.Text
+  intereses_laborales   String?  @db.Text
+  adaptaciones_necesarias String? @db.Text
+  motivaciones          String?  @db.Text
+  
+  // Campos específicos por tipo - almacenados como JSON para flexibilidad
+  campos_especificos    String?  @db.Text // JSON con campos específicos del tipo
+  
+  // Campos específicos TDAH (los más comunes)
+  tipo_tdah             String?  @db.VarChar(50)
+  nivel_atencion        String?  @db.VarChar(50)
+  impulsividad          String?  @db.VarChar(50)
+  hiperactividad        String?  @db.VarChar(50)
+  medicacion            String?  @db.VarChar(50)
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("neurodivergent_profiles_new")
+  @@index([email])
+  @@index([created_at])
+}
+
+// TABLA USER ORIGINAL - MANTENER INTACTA (datos importantes guardados aquí)
+model User {
+  id                    Int      @id @default(autoincrement())
+  nombre                String   @db.VarChar(100)
+  apellidos             String   @db.VarChar(100)
+  email                 String   @unique @db.VarChar(120)
+  telefono              String?  @db.VarChar(20)
+  ciudad                String   @db.VarChar(100)
+  fecha_nacimiento      DateTime @db.Date
+  
+  // Información de neurodivergencia
+  tipo_neurodivergencia String   @db.VarChar(50)
+  diagnostico_formal    Boolean  @default(false)
+  
+  // Información laboral
+  habilidades           String?  @db.Text
+  experiencia_laboral   String?  @db.Text
+  formacion_academica   String?  @db.Text
+  intereses_laborales   String?  @db.Text
+  adaptaciones_necesarias String? @db.Text
+  motivaciones          String?  @db.Text
+  
+  // Campos específicos TDAH
+  tipo_tdah             String?  @db.VarChar(20)
+  nivel_atencion        String?  @db.VarChar(10)
+  impulsividad          String?  @db.VarChar(10)
+  hiperactividad        String?  @db.VarChar(10)
+  medicacion            Boolean  @default(false)
+  
+  // Campos específicos TEA
+  nivel_comunicacion    String?  @db.VarChar(10)
+  sensibilidades        String?  @db.Text
+  rutinas_importantes   String?  @db.Text
+  
+  // Campos específicos Dislexia
+  areas_dificultad      String?  @db.VarChar(100)
+  herramientas_apoyo    String?  @db.Text
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @updatedAt @db.Timestamptz(6)
+  
+  // Relaciones
+  test_results          TestResult[]
+
+  @@map("users")
+  @@index([email])
+  @@index([created_at])
+}
+
+model Company {
+  id                    Int      @id @default(autoincrement())
+  nombre_empresa        String   @db.VarChar(200)
+  email_contacto        String   @db.VarChar(120)
+  telefono              String?  @db.VarChar(20)
+  sector                String   @db.VarChar(100)
+  tamano_empresa        String   @db.VarChar(50)
+  ciudad                String   @db.VarChar(100)
+  sitio_web             String?  @db.VarChar(200)
+  descripcion_empresa   String?  @db.Text
+  
+  // Información de inclusión
+  experiencia_neurodivergentes Boolean @default(false)
+  politicas_inclusion   String?  @db.Text
+  adaptaciones_disponibles String? @db.Text
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @updatedAt @db.Timestamptz(6)
+  
+  // Relaciones
+  job_offers            JobOffer[]
+
+  @@map("companies")
+  @@index([email_contacto])
+  @@index([created_at])
+}
+
+model JobOffer {
+  id                    Int      @id @default(autoincrement())
+  company_id            Int
+  
+  titulo_puesto         String   @db.VarChar(200)
+  descripcion           String   @db.Text
+  tipo_contrato         String   @db.VarChar(50)
+  modalidad_trabajo     String   @db.VarChar(50)
+  
+  salario_min           Int?
+  salario_max           Int?
+  
+  requisitos            String?  @db.Text
+  adaptaciones_disponibles String? @db.Text
+  neurodivergencias_target String? @db.VarChar(200)
+  
+  activa                Boolean  @default(true)
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @updatedAt @db.Timestamptz(6)
+  
+  // Relaciones
+  company               Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@map("job_offers")
+  @@index([created_at])
+}
+
+model TestResult {
+  id                    Int      @id @default(autoincrement())
+  user_id               Int
+  
+  tipo_test             String   @db.VarChar(50) // 'neurocognitivo', 'matching', etc.
+  puntuacion_total      Int
+  resultados_detalle    String?  @db.Text // JSON string
+  
+  recomendaciones       String?  @db.Text
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  
+  // Relaciones
+  user                  User     @relation(fields: [user_id], references: [id])
+
+  @@map("test_results")
+  @@index([created_at])
+}
+
+// Modelos para CRM Administrativo
+model Admin {
+  id                    Int      @id @default(autoincrement())
+  username              String   @unique @db.VarChar(80)
+  email                 String   @unique @db.VarChar(120)
+  password_hash         String   @db.VarChar(256)
+  
+  // Información adicional
+  full_name             String?  @db.VarChar(150)
+  active                Boolean  @default(true)
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  last_login            DateTime? @db.Timestamptz(6)
+
+  @@map("admins")
+}
+
+model CrmContact {
+  id                    Int      @id @default(autoincrement())
+  
+  // Información básica
+  name                  String   @db.VarChar(150)
+  email                 String   @db.VarChar(120)
+  phone                 String?  @db.VarChar(20)
+  company               String?  @db.VarChar(200)
+  
+  // Información específica DiversIA
+  neurodivergence       String?  @db.VarChar(50)
+  contact_reason        String?  @db.VarChar(100) // 'job_search', 'hiring', 'partnership'
+  city                  String?  @db.VarChar(100)
+  
+  // Estado del contacto
+  status                String   @default("new") @db.VarChar(20) // 'new', 'contacted', 'closed'
+  notes                 String?  @db.Text
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("crm_contacts")
+  @@index([name])
+  @@index([email])
+  @@index([created_at])
+}
+
+// Modelo para Email Marketing de Asociaciones
+model EmailMarketing {
+  id                    Int      @id @default(autoincrement())
+  comunidad_autonoma    String   @db.VarChar(100)
+  asociacion            String   @db.VarChar(200)
+  email                 String   @db.VarChar(120)
+  telefono              String?  @db.VarChar(20)
+  direccion             String?  @db.VarChar(300)
+  servicios             String?  @db.Text
+  fecha_enviado         String?  @db.VarChar(20) // Formato: 30/07/2025
+  respuesta             String?  @db.Text // Columna para respuestas del CSV
+  notas_especiales      String?  @db.Text // Para notas como "VACACIONES HASTA..."
+  notas_personalizadas  String?  @db.Text // Nueva columna para notas manuales
+  
+  // Campos de seguimiento
+  estado_email          String   @default("enviado") @db.VarChar(50) // enviado, abierto, respondido, rebotado
+  fecha_respuesta       DateTime? @db.Timestamptz(6)
+  tipo_respuesta        String?  @db.VarChar(100) // interesado, no_interesado, info_solicitada
+  seguimiento_programado DateTime? @db.Timestamptz(6)
+  
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("email_marketing")
+}
+
+model Task {
+  id                    Int      @id @default(autoincrement())
+  tarea                 String   @db.VarChar(300)
+  colaborador           String?  @db.VarChar(100)
+  fecha_inicio          String?  @db.VarChar(50)
+  fecha_final           String?  @db.VarChar(50)
+  estado                String   @default("Pendiente") @db.VarChar(50) // Pendiente, En curso, Completado
+  notas                 String?  @db.Text
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("tasks")
+}
+
+// Modelos para formularios web
+model FormSubmission {
+  id                    Int      @id @default(autoincrement())
+  
+  form_type             String   @db.VarChar(50) // 'contact', 'registration', 'company'
+  data                  String   @db.Text // JSON string con los datos del formulario
+  
+  // Información de origen
+  ip_address            String?  @db.VarChar(45)
+  user_agent            String?  @db.VarChar(200)
+  
+  // Estado
+  processed             Boolean  @default(false)
+  crm_id                Int?     // ID en el sistema CRM si se procesa
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  processed_at          DateTime? @db.Timestamptz(6)
+
+  @@map("form_submissions")
+  @@index([form_type])
+  @@index([created_at])
+}
+
+model Employee {
+  id                    Int      @id @default(autoincrement())
+  name                  String   @db.VarChar(150)
+  email                 String   @unique @db.VarChar(120)
+  rol                   String   @db.VarChar(100) // Developer, Designer, Marketing, Manager, etc.
+  department            String?  @db.VarChar(100)
+  
+  // Campos adicionales para ficha completa
+  telefono              String?  @db.VarChar(20)
+  fecha_ingreso         String?  @db.VarChar(20) // Formato: YYYY-MM-DD
+  especialidades        String?  @db.Text // Habilidades específicas
+  notas                 String?  @db.Text // Notas adicionales
+  
+  // Estado y timestamps
+  active                Boolean  @default(true)
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("employees")
+}
+
+model Asociacion {
+  id                    Int      @id @default(autoincrement())
+  
+  // Información básica
+  nombre_asociacion     String   @db.VarChar(200)
+  acronimo              String?  @db.VarChar(20)
+  pais                  String   @db.VarChar(10)
+  otro_pais             String?  @db.VarChar(100)
+  
+  // Información legal
+  tipo_documento        String   @db.VarChar(100)
+  numero_documento      String   @db.VarChar(50)
+  descripcion_otro_documento String? @db.Text
+  
+  // Servicios y neurodivergencias (JSON strings)
+  neurodivergencias_atendidas String? @db.Text
+  servicios             String?  @db.Text
+  certificaciones       String?  @db.Text
+  
+  // Información de contacto
+  ciudad                String   @db.VarChar(100)
+  direccion             String?  @db.Text
+  telefono              String?  @db.VarChar(20)
+  email                 String   @db.VarChar(120)
+  sitio_web             String?  @db.VarChar(200)
+  descripcion           String?  @db.Text
+  
+  // Información operativa
+  años_funcionamiento   Int?
+  numero_socios         Int?
+  
+  // Contacto responsable
+  contacto_nombre       String?  @db.VarChar(150)
+  contacto_cargo        String?  @db.VarChar(100)
+  
+  // Información de auditoría
+  ip_solicitud          String?  @db.VarChar(45)
+  user_agent            String?  @db.VarChar(500)
+  estado                String   @default("pendiente") @db.VarChar(20)
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("asociaciones")
+  @@index([created_at])
+}
+
+model NotificationBackup {
+  id                    Int      @id @default(autoincrement())
+  tipo                  String   @db.VarChar(50) // 'asociacion_registro', 'asociacion_estado', etc.
+  destinatario          String   @db.VarChar(120)
+  asunto                String   @db.VarChar(200)
+  contenido             String   @db.Text // Datos en texto plano
+  email_html            String?  @db.Text // Contenido HTML del email
+  
+  estado                String   @default("pendiente") @db.VarChar(20) // 'pendiente', 'enviado', 'leido'
+  prioridad             String   @default("media") @db.VarChar(10) // 'alta', 'media', 'baja'
+  
+  // Timestamps
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  sent_at               DateTime? @db.Timestamptz(6)
+  read_at               DateTime? @db.Timestamptz(6)
+
+  @@map("notifications_backup")
+  @@index([created_at])
+}

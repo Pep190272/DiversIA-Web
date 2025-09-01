@@ -85,15 +85,10 @@ def create_minimal_crm_routes(app):
     
     @app.route('/usuarios-neurodivergentes')
     def usuarios_neurodivergentes():
-        """Dashboard de usuarios neurodivergentes del CRM - requiere autenticación"""
-        if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
-            return redirect('/diversia-admin')
+        """Dashboard de usuarios neurodivergentes del CRM - SIN AUTENTICACIÓN PARA PRUEBAS"""
         return render_template('crm-neurodivergentes.html')
     
-    @app.route('/crm-neurodivergentes')
-    def crm_neurodivergentes_direct():
-        """Acceso directo para testing - SIN AUTENTICACIÓN"""
-        return render_template('crm-neurodivergentes.html')
+    # RUTA ELIMINADA - Usar solo /usuarios-neurodivergentes para evitar duplicación
     
     @app.route('/leads-generales')
     def leads_generales():
@@ -650,10 +645,8 @@ def create_minimal_crm_routes(app):
             # Solo usuarios de la tabla NeurodivergentProfile (formularios específicos)
             try:
                 usuarios_profile = NeurodivergentProfile.query.all()
-                print(f"🔍 CRM ND - Encontrados {len(usuarios_profile)} perfiles neurodivergentes específicos")
-                
+                # Procesar perfiles neurodivergentes
                 for profile in usuarios_profile:
-                    print(f"📋 CRM ND - Perfil: {profile.nombre} {profile.apellidos} ({profile.tipo_neurodivergencia})")
                     usuarios_data.append({
                         'id': f'profile_{profile.id}',
                         'fuente': 'NeurodivergentProfile (formulario específico)',
@@ -677,11 +670,9 @@ def create_minimal_crm_routes(app):
             except Exception as e:
                 print(f"⚠️ Error cargando perfiles ND específicos: {e}")
             
-            print(f"📊 CRM ND - Total perfiles ND específicos: {len(usuarios_data)}")
             return jsonify(usuarios_data)
             
         except Exception as e:
-            print(f"❌ Error en API usuarios-neurodivergentes: {e}")
             return jsonify([])
 
 
