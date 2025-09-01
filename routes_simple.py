@@ -450,6 +450,34 @@ def registro_tea():
                 db.session.commit()
                 flash(f'¡Perfil TEA actualizado exitosamente, {form.nombre.data}! Tu información ha sido actualizada.', 'success')
                 print(f"✅ TEA - Perfil actualizado: {form.nombre.data} {form.apellidos.data}")
+                
+                # Enviar emails automáticos para actualización TEA
+                try:
+                    from flask_email_service import email_service
+                    
+                    # Email de bienvenida al usuario TEA
+                    email_service.send_welcome_email_user(
+                        nombre=form.nombre.data,
+                        email=form.email.data,
+                        tipo_neurodivergencia="TEA"
+                    )
+                    
+                    # Email de notificación a DiversIA
+                    email_service.send_notification_email("usuario", {
+                        'nombre': form.nombre.data,
+                        'apellidos': form.apellidos.data,
+                        'email': form.email.data,
+                        'telefono': form.telefono.data,
+                        'ciudad': form.ciudad.data,
+                        'tipo_neurodivergencia': 'TEA',
+                        'diagnostico_formal': form.diagnostico_formal.data,
+                        'habilidades': form.habilidades.data
+                    })
+                    
+                    print(f"✅ TEA - Emails enviados para actualización: {form.nombre.data}")
+                    
+                except Exception as e:
+                    print(f"⚠️ Error enviando emails de TEA (actualización): {e}")
             else:
                 # Crear nuevo perfil
                 nuevo_perfil = NeurodivergentProfile()
@@ -471,6 +499,34 @@ def registro_tea():
                 db.session.commit()
                 flash(f'¡Perfil TEA completado exitosamente, {form.nombre.data}!', 'success')
                 print(f"✅ TEA - Nuevo perfil guardado: {form.nombre.data} {form.apellidos.data}")
+                
+                # Enviar emails automáticos para nuevo registro TEA
+                try:
+                    from flask_email_service import email_service
+                    
+                    # Email de bienvenida al usuario TEA
+                    email_service.send_welcome_email_user(
+                        nombre=form.nombre.data,
+                        email=form.email.data,
+                        tipo_neurodivergencia="TEA"
+                    )
+                    
+                    # Email de notificación a DiversIA
+                    email_service.send_notification_email("usuario", {
+                        'nombre': form.nombre.data,
+                        'apellidos': form.apellidos.data,
+                        'email': form.email.data,
+                        'telefono': form.telefono.data,
+                        'ciudad': form.ciudad.data,
+                        'tipo_neurodivergencia': 'TEA',
+                        'diagnostico_formal': form.diagnostico_formal.data,
+                        'habilidades': form.habilidades.data
+                    })
+                    
+                    print(f"✅ TEA - Emails enviados exitosamente: {form.nombre.data}")
+                    
+                except Exception as e:
+                    print(f"⚠️ Error enviando emails de TEA: {e}")
             
             return redirect(url_for('personas_nd'))
             
@@ -518,6 +574,34 @@ def registro_dislexia():
                 db.session.commit()
                 print(f"✅ DISLEXIA - Perfil actualizado: {form.nombre.data} {form.apellidos.data}")
                 flash(f'¡Perfil Dislexia actualizado correctamente, {form.nombre.data}!', 'success')
+                
+                # Enviar emails automáticos para actualización Dislexia
+                try:
+                    from flask_email_service import email_service
+                    
+                    # Email de bienvenida al usuario Dislexia
+                    email_service.send_welcome_email_user(
+                        nombre=form.nombre.data,
+                        email=form.email.data,
+                        tipo_neurodivergencia="Dislexia"
+                    )
+                    
+                    # Email de notificación a DiversIA
+                    email_service.send_notification_email("usuario", {
+                        'nombre': form.nombre.data,
+                        'apellidos': form.apellidos.data,
+                        'email': form.email.data,
+                        'telefono': form.telefono.data,
+                        'ciudad': form.ciudad.data,
+                        'tipo_neurodivergencia': 'Dislexia',
+                        'diagnostico_formal': form.diagnostico_formal.data,
+                        'habilidades': form.habilidades.data
+                    })
+                    
+                    print(f"✅ DISLEXIA - Emails enviados para actualización: {form.nombre.data}")
+                    
+                except Exception as e:
+                    print(f"⚠️ Error enviando emails de Dislexia (actualización): {e}")
             else:
                 # Crear nuevo perfil
                 # Validar que fecha_nacimiento no sea None
@@ -546,6 +630,34 @@ def registro_dislexia():
                 db.session.commit()
                 print(f"✅ DISLEXIA - Perfil creado: {form.nombre.data} {form.apellidos.data}")
                 flash(f'¡Perfil Dislexia registrado exitosamente, {form.nombre.data}!', 'success')
+                
+                # Enviar emails automáticos para nuevo registro Dislexia
+                try:
+                    from flask_email_service import email_service
+                    
+                    # Email de bienvenida al usuario Dislexia
+                    email_service.send_welcome_email_user(
+                        nombre=form.nombre.data,
+                        email=form.email.data,
+                        tipo_neurodivergencia="Dislexia"
+                    )
+                    
+                    # Email de notificación a DiversIA
+                    email_service.send_notification_email("usuario", {
+                        'nombre': form.nombre.data,
+                        'apellidos': form.apellidos.data,
+                        'email': form.email.data,
+                        'telefono': form.telefono.data,
+                        'ciudad': form.ciudad.data,
+                        'tipo_neurodivergencia': 'Dislexia',
+                        'diagnostico_formal': form.diagnostico_formal.data,
+                        'habilidades': form.habilidades.data
+                    })
+                    
+                    print(f"✅ DISLEXIA - Emails enviados exitosamente: {form.nombre.data}")
+                    
+                except Exception as e:
+                    print(f"⚠️ Error enviando emails de Dislexia: {e}")
             
             return redirect(url_for('personas_nd'))
         except Exception as e:
@@ -630,6 +742,34 @@ def registro_discalculia():
             print(f"✅ DISCALCULIA - Perfil guardado: {form.nombre.data} {form.apellidos.data}")
             flash(f'¡Perfil Discalculia completado exitosamente, {form.nombre.data}!', 'success')
             
+            # Enviar emails automáticos para nuevo registro Discalculia
+            try:
+                from flask_email_service import email_service
+                
+                # Email de bienvenida al usuario Discalculia
+                email_service.send_welcome_email_user(
+                    nombre=form.nombre.data,
+                    email=form.email.data,
+                    tipo_neurodivergencia="Discalculia"
+                )
+                
+                # Email de notificación a DiversIA
+                email_service.send_notification_email("usuario", {
+                    'nombre': form.nombre.data,
+                    'apellidos': form.apellidos.data,
+                    'email': form.email.data,
+                    'telefono': form.telefono.data,
+                    'ciudad': form.ciudad.data,
+                    'tipo_neurodivergencia': 'Discalculia',
+                    'diagnostico_formal': form.diagnostico_formal.data,
+                    'habilidades': form.habilidades.data
+                })
+                
+                print(f"✅ DISCALCULIA - Emails enviados exitosamente: {form.nombre.data}")
+                
+            except Exception as e:
+                print(f"⚠️ Error enviando emails de Discalculia: {e}")
+            
             return redirect(url_for('personas_nd'))
             
         except Exception as e:
@@ -672,6 +812,34 @@ def registro_tourette():
             db.session.commit()
             print(f"✅ TOURETTE - Perfil guardado: {form.nombre.data}")
             flash(f'¡Perfil Síndrome de Tourette completado, {form.nombre.data}!', 'success')
+            
+            # Enviar emails automáticos para nuevo registro Tourette
+            try:
+                from flask_email_service import email_service
+                
+                # Email de bienvenida al usuario Tourette
+                email_service.send_welcome_email_user(
+                    nombre=form.nombre.data,
+                    email=form.email.data,
+                    tipo_neurodivergencia="Síndrome de Tourette"
+                )
+                
+                # Email de notificación a DiversIA
+                email_service.send_notification_email("usuario", {
+                    'nombre': form.nombre.data,
+                    'apellidos': form.apellidos.data,
+                    'email': form.email.data,
+                    'telefono': form.telefono.data,
+                    'ciudad': form.ciudad.data,
+                    'tipo_neurodivergencia': 'Síndrome de Tourette',
+                    'diagnostico_formal': form.diagnostico_formal.data,
+                    'habilidades': form.habilidades.data
+                })
+                
+                print(f"✅ TOURETTE - Emails enviados exitosamente: {form.nombre.data}")
+                
+            except Exception as e:
+                print(f"⚠️ Error enviando emails de Tourette: {e}")
             return redirect(url_for('personas_nd'))
         except Exception as e:
             print(f"❌ TOURETTE - Error: {e}")
@@ -712,6 +880,34 @@ def registro_altas_capacidades():
             db.session.commit()
             print(f"✅ ALTAS CAPACIDADES - Perfil guardado: {form.nombre.data}")
             flash(f'¡Perfil Altas Capacidades completado, {form.nombre.data}!', 'success')
+            
+            # Enviar emails automáticos para nuevo registro Altas Capacidades
+            try:
+                from flask_email_service import email_service
+                
+                # Email de bienvenida al usuario Altas Capacidades
+                email_service.send_welcome_email_user(
+                    nombre=form.nombre.data,
+                    email=form.email.data,
+                    tipo_neurodivergencia="Altas Capacidades"
+                )
+                
+                # Email de notificación a DiversIA
+                email_service.send_notification_email("usuario", {
+                    'nombre': form.nombre.data,
+                    'apellidos': form.apellidos.data,
+                    'email': form.email.data,
+                    'telefono': form.telefono.data,
+                    'ciudad': form.ciudad.data,
+                    'tipo_neurodivergencia': 'Altas Capacidades',
+                    'diagnostico_formal': form.diagnostico_formal.data,
+                    'habilidades': form.habilidades.data
+                })
+                
+                print(f"✅ ALTAS CAPACIDADES - Emails enviados exitosamente: {form.nombre.data}")
+                
+            except Exception as e:
+                print(f"⚠️ Error enviando emails de Altas Capacidades: {e}")
             return redirect(url_for('personas_nd'))
         except Exception as e:
             print(f"❌ ALTAS CAPACIDADES - Error: {e}")
@@ -753,6 +949,34 @@ def registro_tel():
             db.session.commit()
             print(f"✅ TEL - Perfil guardado: {form.nombre.data}")
             flash(f'¡Perfil TEL completado, {form.nombre.data}!', 'success')
+            
+            # Enviar emails automáticos para nuevo registro TEL
+            try:
+                from flask_email_service import email_service
+                
+                # Email de bienvenida al usuario TEL
+                email_service.send_welcome_email_user(
+                    nombre=form.nombre.data,
+                    email=form.email.data,
+                    tipo_neurodivergencia="TEL"
+                )
+                
+                # Email de notificación a DiversIA
+                email_service.send_notification_email("usuario", {
+                    'nombre': form.nombre.data,
+                    'apellidos': form.apellidos.data,
+                    'email': form.email.data,
+                    'telefono': form.telefono.data,
+                    'ciudad': form.ciudad.data,
+                    'tipo_neurodivergencia': 'TEL',
+                    'diagnostico_formal': form.diagnostico_formal.data,
+                    'habilidades': form.habilidades.data
+                })
+                
+                print(f"✅ TEL - Emails enviados exitosamente: {form.nombre.data}")
+                
+            except Exception as e:
+                print(f"⚠️ Error enviando emails de TEL: {e}")
             return redirect(url_for('personas_nd'))
         except Exception as e:
             print(f"❌ TEL - Error: {e}")
@@ -792,6 +1016,34 @@ def registro_disgrafia():
             db.session.commit()
             print(f"✅ DISGRAFÍA - Perfil guardado: {form.nombre.data}")
             flash(f'¡Perfil Disgrafía completado, {form.nombre.data}!', 'success')
+            
+            # Enviar emails automáticos para nuevo registro Disgrafía
+            try:
+                from flask_email_service import email_service
+                
+                # Email de bienvenida al usuario Disgrafía
+                email_service.send_welcome_email_user(
+                    nombre=form.nombre.data,
+                    email=form.email.data,
+                    tipo_neurodivergencia="Disgrafía"
+                )
+                
+                # Email de notificación a DiversIA
+                email_service.send_notification_email("usuario", {
+                    'nombre': form.nombre.data,
+                    'apellidos': form.apellidos.data,
+                    'email': form.email.data,
+                    'telefono': form.telefono.data,
+                    'ciudad': form.ciudad.data,
+                    'tipo_neurodivergencia': 'Disgrafía',
+                    'diagnostico_formal': form.diagnostico_formal.data,
+                    'habilidades': form.habilidades.data
+                })
+                
+                print(f"✅ DISGRAFÍA - Emails enviados exitosamente: {form.nombre.data}")
+                
+            except Exception as e:
+                print(f"⚠️ Error enviando emails de Disgrafía: {e}")
             return redirect(url_for('personas_nd'))
         except Exception as e:
             print(f"❌ DISGRAFÍA - Error: {e}")
@@ -831,6 +1083,34 @@ def registro_tps():
             db.session.commit()
             print(f"✅ TPS - Perfil guardado: {form.nombre.data}")
             flash(f'¡Perfil TPS completado, {form.nombre.data}!', 'success')
+            
+            # Enviar emails automáticos para nuevo registro TPS
+            try:
+                from flask_email_service import email_service
+                
+                # Email de bienvenida al usuario TPS
+                email_service.send_welcome_email_user(
+                    nombre=form.nombre.data,
+                    email=form.email.data,
+                    tipo_neurodivergencia="TPS"
+                )
+                
+                # Email de notificación a DiversIA
+                email_service.send_notification_email("usuario", {
+                    'nombre': form.nombre.data,
+                    'apellidos': form.apellidos.data,
+                    'email': form.email.data,
+                    'telefono': form.telefono.data,
+                    'ciudad': form.ciudad.data,
+                    'tipo_neurodivergencia': 'TPS',
+                    'diagnostico_formal': form.diagnostico_formal.data,
+                    'habilidades': form.habilidades.data
+                })
+                
+                print(f"✅ TPS - Emails enviados exitosamente: {form.nombre.data}")
+                
+            except Exception as e:
+                print(f"⚠️ Error enviando emails de TPS: {e}")
             return redirect(url_for('personas_nd'))
         except Exception as e:
             print(f"❌ TPS - Error: {e}")
@@ -922,33 +1202,64 @@ def registro_asociacion():
             except Exception as e:
                 print(f"⚠️ Error guardando asociación en CRM: {e}")
             
-            # Enviar notificación inmediata a DiversIA para verificación
+            # Enviar emails automáticos con Gmail (nuevo sistema moderno)
             try:
-                from email_notifications import send_association_registration_notification
+                from flask_email_service import email_service
                 
-                association_data = {
+                # Email de bienvenida a la Asociación
+                email_service.send_welcome_email_association(
+                    nombre_asociacion=nueva_asociacion.nombre_asociacion,
+                    email=nueva_asociacion.email,
+                    contacto_nombre=nueva_asociacion.contacto_nombre,
+                    pais=nueva_asociacion.pais
+                )
+                
+                # Email de notificación a DiversIA
+                email_service.send_notification_email("asociacion", {
                     'nombre_asociacion': nueva_asociacion.nombre_asociacion,
                     'acronimo': nueva_asociacion.acronimo,
-                    'pais': nueva_asociacion.pais,
-                    'ciudad': nueva_asociacion.ciudad,
                     'email': nueva_asociacion.email,
                     'telefono': nueva_asociacion.telefono,
-                    'tipo_documento': nueva_asociacion.tipo_documento,
-                    'numero_documento': nueva_asociacion.numero_documento,
-                    'neurodivergencias_atendidas': nueva_asociacion.neurodivergencias_atendidas,
-                    'servicios': nueva_asociacion.servicios,
+                    'ciudad': nueva_asociacion.ciudad,
+                    'pais': nueva_asociacion.pais,
                     'contacto_nombre': nueva_asociacion.contacto_nombre,
-                    'contacto_cargo': nueva_asociacion.contacto_cargo
-                }
+                    'contacto_cargo': nueva_asociacion.contacto_cargo,
+                    'neurodivergencias_atendidas': nueva_asociacion.neurodivergencias_atendidas,
+                    'servicios': nueva_asociacion.servicios
+                })
                 
-                email_sent = send_association_registration_notification(association_data)
-                if email_sent:
-                    print(f"✅ Notificación de verificación enviada a DiversIA")
-                else:
-                    print(f"⚠️ No se pudo enviar la notificación a DiversIA")
-                    
+                print(f"✅ ASOCIACIÓN - Emails Gmail enviados exitosamente: {nueva_asociacion.nombre_asociacion}")
+                
             except Exception as e:
-                print(f"⚠️ Error enviando notificación: {e}")
+                print(f"⚠️ Error enviando emails Gmail de Asociación: {e}")
+                
+                # Fallback al sistema anterior si Gmail falla
+                try:
+                    from email_notifications import send_association_registration_notification
+                    
+                    association_data = {
+                        'nombre_asociacion': nueva_asociacion.nombre_asociacion,
+                        'acronimo': nueva_asociacion.acronimo,
+                        'pais': nueva_asociacion.pais,
+                        'ciudad': nueva_asociacion.ciudad,
+                        'email': nueva_asociacion.email,
+                        'telefono': nueva_asociacion.telefono,
+                        'tipo_documento': nueva_asociacion.tipo_documento,
+                        'numero_documento': nueva_asociacion.numero_documento,
+                        'neurodivergencias_atendidas': nueva_asociacion.neurodivergencias_atendidas,
+                        'servicios': nueva_asociacion.servicios,
+                        'contacto_nombre': nueva_asociacion.contacto_nombre,
+                        'contacto_cargo': nueva_asociacion.contacto_cargo
+                    }
+                    
+                    email_sent = send_association_registration_notification(association_data)
+                    if email_sent:
+                        print(f"✅ Notificación fallback enviada a DiversIA")
+                    else:
+                        print(f"⚠️ No se pudo enviar la notificación fallback")
+                        
+                except Exception as e2:
+                    print(f"⚠️ Error en sistema fallback: {e2}")
             
             print(f"✅ Asociación registrada: {nueva_asociacion.nombre_asociacion}")
             flash('¡Solicitud enviada! Te contactaremos cuando hayamos verificado tu asociación.', 'info')

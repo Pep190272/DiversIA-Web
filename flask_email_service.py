@@ -222,6 +222,103 @@ DiversIA - Conectando talento neurodivergente con oportunidades extraordinarias
 
         return self.send_email(email, subject, html_content)
 
+    def send_welcome_email_association(self, nombre_asociacion, email, contacto_nombre, pais):
+        """Email de bienvenida para asociaciones neurodivergentes"""
+        subject = f"🤝 Bienvenida a DiversIA - {nombre_asociacion}"
+        
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+                body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+                .content {{ background: #ffffff; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
+                .highlight {{ background: #ecfdf5; padding: 20px; border-radius: 8px; border-left: 4px solid #059669; margin: 20px 0; }}
+                .button {{ background: #059669; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0; }}
+                .footer {{ text-align: center; color: #666; font-size: 14px; margin-top: 30px; }}
+                ul {{ margin: 15px 0; padding-left: 20px; }}
+                li {{ margin: 8px 0; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🤝 ¡Bienvenida a la Red DiversIA!</h1>
+                    <p>Juntos fortalecemos la comunidad neurodivergente</p>
+                </div>
+                <div class="content">
+                    <h2>Estimado/a {contacto_nombre},</h2>
+                    <p>¡Es un honor recibir a <strong>{nombre_asociacion}</strong> en la red de DiversIA! Su solicitud ha sido recibida y valoramos enormemente su compromiso con la comunidad neurodivergente.</p>
+                    
+                    <div class="highlight">
+                        <h3>📋 ¿Qué sigue ahora?</h3>
+                        <ul>
+                            <li>Nuestro equipo revisará su documentación en los próximos días</li>
+                            <li>Verificaremos que {nombre_asociacion} cumple con nuestros estándares</li>
+                            <li>Les contactaremos para coordinar la integración completa</li>
+                            <li>Una vez aprobada, aparecerán en nuestro directorio oficial</li>
+                        </ul>
+                    </div>
+
+                    <h3>🌟 Beneficios de formar parte de DiversIA:</h3>
+                    <ul>
+                        <li>✅ Visibilidad en nuestra plataforma nacional</li>
+                        <li>✅ Conexión con otras asociaciones comprometidas</li>
+                        <li>✅ Acceso a recursos especializados</li>
+                        <li>✅ Participación en eventos y programas conjuntos</li>
+                        <li>✅ Red de apoyo profesional continuo</li>
+                    </ul>
+
+                    <p><strong>País:</strong> {pais}</p>
+
+                    <p>Nos pondremos en contacto pronto para avanzar en el proceso de verificación.</p>
+
+                    <a href="mailto:diversiaeternals@gmail.com" class="button">¿Preguntas? Contáctanos</a>
+
+                    <p><strong>¡Gracias por fortalecer nuestra comunidad!</strong></p>
+                </div>
+                <div class="footer">
+                    <p>DiversIA - Conectando y fortaleciendo la comunidad neurodivergente</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        text_content = f"""
+Estimado/a {contacto_nombre},
+
+¡Es un honor recibir a {nombre_asociacion} en la red de DiversIA!
+
+Su solicitud ha sido recibida y valoramos enormemente su compromiso con la comunidad neurodivergente.
+
+¿Qué sigue ahora?
+- Nuestro equipo revisará su documentación en los próximos días
+- Verificaremos que {nombre_asociacion} cumple con nuestros estándares
+- Les contactaremos para coordinar la integración completa
+- Una vez aprobada, aparecerán en nuestro directorio oficial
+
+Beneficios de formar parte de DiversIA:
+✅ Visibilidad en nuestra plataforma nacional
+✅ Conexión con otras asociaciones comprometidas  
+✅ Acceso a recursos especializados
+✅ Participación en eventos y programas conjuntos
+✅ Red de apoyo profesional continuo
+
+País: {pais}
+
+Nos pondremos en contacto pronto para avanzar en el proceso de verificación.
+
+¡Gracias por fortalecer nuestra comunidad!
+
+DiversIA - Conectando y fortaleciendo la comunidad neurodivergente
+        """
+
+        return self.send_email(email, subject, html_content, text_content)
+
     def send_notification_email(self, tipo, datos):
         """Enviar email de notificación a DiversIA"""
         diversia_email = "diversiaeternals@gmail.com"
