@@ -35,26 +35,28 @@ export class EmailService {
   }
 
   private initializeServices() {
-    // Verificar si tenemos credenciales de Gmail
+    // Verificar si tenemos credenciales de Gmail (PRIORIDAD)
     const gmailUser = process.env.GMAIL_USER;
     const gmailPassword = process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASSWORD;
 
     if (gmailUser && gmailPassword) {
       this.setupGmail(gmailUser, gmailPassword);
       this.useGmail = true;
-      console.log('✅ Gmail configurado como servicio de email');
+      console.log('✅ Gmail configurado como servicio principal de email');
+    } else {
+      console.warn('⚠️ Gmail no configurado - se requieren GMAIL_USER y GMAIL_APP_PASSWORD');
     }
     
-    // Verificar si tenemos SendGrid como backup
+    // SendGrid como backup solamente
     const sendGridKey = process.env.SENDGRID_API_KEY;
     if (sendGridKey) {
       sgMail.setApiKey(sendGridKey);
       this.useSendGrid = true;
-      console.log('✅ SendGrid configurado como backup');
+      console.log('📧 SendGrid disponible como backup');
     }
 
     if (!this.useGmail && !this.useSendGrid) {
-      console.warn('⚠️ No se encontraron credenciales de email configuradas');
+      console.error('❌ No se encontraron credenciales de email configuradas');
     }
   }
 
@@ -68,15 +70,24 @@ export class EmailService {
     });
   }
 
-  // Método principal para enviar emails
+  // Método principal para enviar emails (GMAIL PRIMERO)
   async sendEmail(config: EmailConfig): Promise<boolean> {
     try {
+      // PRIORIDAD 1: Intentar con Gmail
       if (this.useGmail && this.transporter) {
+        console.log('📧 Enviando email con Gmail...');
         return await this.sendWithGmail(config);
-      } else if (this.useSendGrid) {
+      }
+      
+      // FALLBACK: Si Gmail no está disponible, usar SendGrid
+      else if (this.useSendGrid) {
+        console.log('📧 Gmail no disponible, usando SendGrid como fallback...');
         return await this.sendWithSendGrid(config);
-      } else {
-        console.error('❌ No hay servicios de email configurados');
+      } 
+      
+      // ERROR: Ningún servicio disponible
+      else {
+        console.error('❌ No hay servicios de email configurados. Configure Gmail (GMAIL_USER + GMAIL_APP_PASSWORD)');
         return false;
       }
     } catch (error) {
