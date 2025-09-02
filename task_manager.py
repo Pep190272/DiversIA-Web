@@ -684,26 +684,8 @@ TASKS_TABLE_TEMPLATE = '''
         }
         
         function showGoogleDriveConfigModal(message = 'Configuración necesaria') {
-            const modal = new bootstrap.Modal(document.getElementById('googleDriveModal'));
-            
-            // Mostrar mensaje de configuración
-            document.getElementById('gdrive-loading').classList.add('d-none');
-            document.getElementById('gdrive-files').classList.add('d-none');
-            document.getElementById('gdrive-error').classList.remove('d-none');
-            document.getElementById('gdrive-error').innerHTML = `
-                <div class="alert alert-info">
-                    <h6>🔧 Google Drive - Configuración Pendiente</h6>
-                    <p><strong>La función de Google Drive no está completamente configurada aún.</strong></p>
-                    <p>Mientras tanto, puedes usar la opción <strong>"📂 Local"</strong> para subir archivos CSV desde tu computadora, que funciona perfectamente.</p>
-                    
-                    <hr>
-                    <small class="text-muted">
-                        <strong>Para el administrador:</strong> Para habilitar Google Drive, configura las variables GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET.
-                    </small>
-                </div>
-            `;
-            
-            modal.show();
+            // Mostrar alert simple que funciona en cualquier entorno
+            alert('🔧 Google Drive - Configuración Pendiente\n\nLa función de Google Drive no está completamente configurada aún.\n\nMientras tanto, puedes usar la opción "📂 Local" para subir archivos CSV desde tu computadora, que funciona perfectamente.');
         }
         
         function loadGoogleDriveFiles() {
