@@ -1421,6 +1421,22 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
             text-align: center;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            max-height: 400px;
+            overflow: hidden;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            max-height: 300px;
+            overflow: hidden;
+        }
+        
+        canvas {
+            max-width: 100% !important;
+            max-height: 300px !important;
+            height: 300px !important;
+            object-fit: contain;
         }
         
         .metric-number {
@@ -1504,13 +1520,17 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
             <div class="col-md-6">
                 <div class="metric-card">
                     <h5 class="text-center mb-3">📈 Progresión del Funnel</h5>
-                    <canvas id="funnelChart" width="400" height="300"></canvas>
+                    <div class="chart-container">
+                        <canvas id="funnelChart"></canvas>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="metric-card">
                     <h5 class="text-center mb-3">🌍 Distribución Geográfica</h5>
-                    <canvas id="geoChart" width="400" height="300"></canvas>
+                    <div class="chart-container">
+                        <canvas id="geoChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1633,17 +1653,12 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
             {% endfor %}
         ];
         
-        console.log('Funnel Data:', funnelData);
-        console.log('Geo Data:', geoData);
-
         // Inicializar gráficos al cargar
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing charts...');
             try {
                 initializeFunnelChart();
                 initializeGeoChart();
                 addHoverEffects();
-                console.log('Charts initialized successfully');
             } catch (error) {
                 console.error('Error initializing charts:', error);
             }
@@ -1656,7 +1671,6 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                 return;
             }
             
-            console.log('Creating funnel chart with data:', funnelData);
             const ctx = funnelElement.getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
@@ -1691,6 +1705,7 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    devicePixelRatio: 1,
                     indexAxis: 'y',
                     plugins: {
                         legend: {
@@ -1727,7 +1742,6 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                 return;
             }
             
-            console.log('Creating geo chart with data:', geoData);
             const ctx = geoElement.getContext('2d');
             
             // Filtrar datos con al menos 1 respuesta para el gráfico
@@ -1763,6 +1777,7 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    devicePixelRatio: 1,
                     plugins: {
                         legend: {
                             position: 'bottom'
