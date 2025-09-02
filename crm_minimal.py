@@ -350,6 +350,44 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
     
+    @app.route('/api/neurodivergent/stats')
+    def get_neurodivergent_stats():
+        """API para obtener estadísticas de personas neurodivergentes"""
+        try:
+            from models import db
+            from sqlalchemy import text
+            
+            # Obtener estadísticas generales
+            general_stats = db.session.execute(text("""
+                SELECT 
+                    COUNT(*) as total_registros,
+                    COUNT(CASE WHEN diagnostico_formal = true THEN 1 END) as con_diagnostico,
+                    COUNT(CASE WHEN DATE(created_at) = CURRENT_DATE THEN 1 END) as hoy,
+                    COUNT(CASE WHEN DATE(created_at) >= DATE_TRUNC('month', CURRENT_DATE) THEN 1 END) as este_mes
+                FROM neurodivergent_profiles_new
+            """)).fetchone()
+            
+            # Obtener distribución por tipo de neurodivergencia
+            type_distribution = db.session.execute(text("""
+                SELECT tipo_neurodivergencia, COUNT(*) as total 
+                FROM neurodivergent_profiles_new 
+                GROUP BY tipo_neurodivergencia 
+                ORDER BY total DESC
+            """)).fetchall()
+            
+            return jsonify({
+                'success': True,
+                'stats': {
+                    'total_registros': general_stats[0],
+                    'con_diagnostico': general_stats[1],
+                    'registros_hoy': general_stats[2],
+                    'registros_este_mes': general_stats[3]
+                },
+                'type_distribution': [{'tipo': row[0], 'count': row[1]} for row in type_distribution]
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
     @app.route('/api/minimal/import-csv', methods=['POST'])
     def import_csv_minimal():
         """Importar CSV con formato específico de DiversIA"""

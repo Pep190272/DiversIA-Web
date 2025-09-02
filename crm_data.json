@@ -3,7 +3,7 @@
     {
       "id": 1,
       "nombre": "Acelerai ",
-      "email": "automarizatunegocio@acelerai.eu",
+      "email": "automatizatunegocio@acelerai.eu",
       "telefono": "687408629",
       "sector": "",
       "ciudad": "la torre de claramunt",
@@ -11,14 +11,14 @@
       "origen": "Formulario Web Empresa",
       "fecha_contacto": "",
       "notas": "",
-      "updated_at": "2025-09-02T12:23:46.932674"
+      "updated_at": "2025-09-02T12:40:05.764330"
     }
   ],
   "contacts": [],
   "stats": {
     "total_companies": 1,
     "total_contacts": 0,
-    "last_updated": "2025-09-02T12:23:46.932682"
+    "last_updated": "2025-09-02T12:40:05.764340"
   },
   "asociaciones": [
     {

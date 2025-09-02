@@ -84,7 +84,7 @@
             <div class="col-md-3">
                 <div class="card bg-primary text-white">
                     <div class="card-body">
-                        <h4 id="total-users">12</h4>
+                        <h4 id="total-users">⏳</h4>
                         <p class="mb-0">Total Registrados</p>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
             <div class="col-md-3">
                 <div class="card bg-success text-white">
                     <div class="card-body">
-                        <h4 id="with-diagnosis">1</h4>
+                        <h4 id="with-diagnosis">⏳</h4>
                         <p class="mb-0">Con Diagnóstico</p>
                     </div>
                 </div>
@@ -100,16 +100,32 @@
             <div class="col-md-3">
                 <div class="card bg-info text-white">
                     <div class="card-body">
-                        <h4 id="job-seekers">8</h4>
-                        <p class="mb-0">Buscando Empleo</p>
+                        <h4 id="today-registrations">⏳</h4>
+                        <p class="mb-0">Registros Hoy</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card bg-warning text-white">
                     <div class="card-body">
-                        <h4 id="this-month">12</h4>
+                        <h4 id="this-month">⏳</h4>
                         <p class="mb-0">Este Mes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard de Estadísticas por Tipo -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📊 Dashboard de Registros por Tipo de Neurodivergencia</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="type-stats-container">
+                            <!-- Se llenan dinámicamente con estadísticas por tipo -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -213,12 +229,64 @@
     <script>
         // Cargar datos al inicio
         document.addEventListener('DOMContentLoaded', function() {
+            loadStatsData();
             loadOverviewData();
             createOverviewCards();
         });
 
-        function loadOverviewData() {
-            // ACTUALIZAR INMEDIATAMENTE CON DATOS REALES DESDE API
+        async function loadStatsData() {
+            try {
+                const response = await fetch('/api/neurodivergent/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Actualizar estadísticas principales
+                    document.getElementById('total-users').textContent = data.stats.total_registros;
+                    document.getElementById('with-diagnosis').textContent = data.stats.con_diagnostico;
+                    document.getElementById('today-registrations').textContent = data.stats.registros_hoy;
+                    document.getElementById('this-month').textContent = data.stats.registros_este_mes;
+                    
+                    // Crear dashboard por tipo
+                    createTypeStatsDashboard(data.type_distribution);
+                } else {
+                    console.error('Error cargando estadísticas:', data.error);
+                }
+            } catch (error) {
+                console.error('Error en la petición de estadísticas:', error);
+                // Fallback a método anterior
+                loadOverviewDataFallback();
+            }
+        }
+
+        function createTypeStatsDashboard(typeDistribution) {
+            const container = document.getElementById('type-stats-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const colors = [
+                'bg-danger', 'bg-success', 'bg-info', 'bg-warning', 
+                'bg-primary', 'bg-secondary', 'bg-dark'
+            ];
+            
+            typeDistribution.forEach((item, index) => {
+                const colorClass = colors[index % colors.length];
+                const card = `
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                        <div class="card ${colorClass} text-white">
+                            <div class="card-body text-center">
+                                <h4>${item.count}</h4>
+                                <p class="mb-0 small">${item.tipo}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        function loadOverviewDataFallback() {
+            // FALLBACK: ACTUALIZAR CON DATOS REALES DESDE API ORIGINAL
             fetch('/api/usuarios-neurodivergentes')
             .then(response => response.json())
             .then(data => {
@@ -226,15 +294,20 @@
                 const total = data.length;
                 const diagnosis = data.filter(u => u.diagnostico_formal === true).length;  
                 const jobSeeking = data.filter(u => u.intereses_laborales && u.intereses_laborales.length > 10).length;
-                const thisMonth = data.filter(u => u.created_at && u.created_at.includes('2025-08')).length;
+                const thisMonth = data.filter(u => u.created_at && u.created_at.includes('2025-09')).length;
                 
                 // ACTUALIZAR DOM INMEDIATAMENTE
                 document.getElementById('total-users').innerHTML = total;
                 document.getElementById('with-diagnosis').innerHTML = diagnosis;
-                document.getElementById('job-seekers').innerHTML = jobSeeking;  
+                document.getElementById('today-registrations').innerHTML = jobSeeking;  
                 document.getElementById('this-month').innerHTML = thisMonth;
             })
             .catch(error => console.error('Error:', error));
+        }
+
+        function loadOverviewData() {
+            // Mantener compatibilidad con código existente
+            loadOverviewDataFallback();
         }
         
         function createOverviewCards() {
