@@ -678,15 +678,10 @@ TASKS_TABLE_TEMPLATE = '''
         
         // ===== GOOGLE DRIVE FUNCTIONS =====
         function showGoogleDriveModal() {
-            // Por ahora mostrar directamente el modal de configuración
-            // ya que Google Drive no está completamente configurado
-            showGoogleDriveConfigModal('Google Drive - Configuración Pendiente');
-        }
-        
-        function showGoogleDriveConfigModal(message = 'Configuración necesaria') {
             // Mostrar alert simple que funciona en cualquier entorno
             alert('🔧 Google Drive - Configuración Pendiente\n\nLa función de Google Drive no está completamente configurada aún.\n\nMientras tanto, puedes usar la opción "📂 Local" para subir archivos CSV desde tu computadora, que funciona perfectamente.');
         }
+        
         
         function loadGoogleDriveFiles() {
             const loading = document.getElementById('gdrive-loading');
