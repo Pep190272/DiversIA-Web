@@ -178,20 +178,20 @@ DiversIA - Conectando talento neurodivergente con oportunidades extraordinarias
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🤝 ¡Bienvenida a DiversIA!</h1>
+                    <h1>🤝 ¡Bienvenida {nombre_empresa} a DiversIA!</h1>
                     <p>Juntos construiremos un futuro laboral más inclusivo</p>
                 </div>
                 <div class="content">
                     <h2>Estimado equipo de {nombre_empresa},</h2>
-                    <p>¡Nos emociona que hayan decidido unirse a DiversIA! Su compromiso con la inclusión laboral marca la diferencia en la vida de personas con neurodivergencia.</p>
+                    <p>¡Nos emociona enormemente que <strong>{nombre_empresa}</strong> haya decidido unirse a DiversIA! Su compromiso con la inclusión laboral marca la diferencia en la vida de personas con neurodivergencia.</p>
                     
                     <div class="highlight">
-                        <h3>💼 ¿Qué viene ahora?</h3>
+                        <h3>💼 ¿Qué viene ahora para {nombre_empresa}?</h3>
                         <ul>
-                            <li>Nuestro equipo revisará su perfil empresarial</li>
-                            <li>Identificaremos candidatos que encajen perfectamente con su cultura</li>
-                            <li>Les presentaremos talento neurodivergente excepcional</li>
-                            <li>Les apoyaremos en todo el proceso de inclusión</li>
+                            <li>Nuestro equipo revisará el perfil específico de {nombre_empresa}</li>
+                            <li>Identificaremos candidatos que encajen perfectamente con la cultura de {nombre_empresa}</li>
+                            <li>Les presentaremos talento neurodivergente excepcional para {nombre_empresa}</li>
+                            <li>Les apoyaremos en todo el proceso de inclusión en {nombre_empresa}</li>
                         </ul>
                     </div>
 
@@ -204,9 +204,11 @@ DiversIA - Conectando talento neurodivergente con oportunidades extraordinarias
                         <li>✅ Perspectivas frescas para resolver problemas</li>
                     </ul>
 
-                    <p><strong>Sector:</strong> {sector}{tamano_text}</p>
+                    <p><strong>Sector de {nombre_empresa}:</strong> {sector}{tamano_text}</p>
 
-                    <p>Nos pondremos en contacto pronto para discutir cómo podemos ayudarles a encontrar el talento perfecto para {nombre_empresa}.</p>
+                    <p>Nos pondremos en contacto pronto para discutir cómo DiversIA puede ayudar específicamente a <strong>{nombre_empresa}</strong> a encontrar el talento tecnológico neurodivergente perfecto para sus proyectos e innovaciones.</p>
+                    
+                    <p>Sabemos que el sector de <strong>{sector}</strong> necesita perfiles únicos con habilidades especializadas, y en DiversIA tenemos candidatos excepcionales que pueden aportar exactamente lo que {nombre_empresa} está buscando.</p>
 
                     <a href="mailto:diversiaeternals@gmail.com" class="button">Contáctanos para más información</a>
 
