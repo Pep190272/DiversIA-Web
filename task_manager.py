@@ -13,11 +13,14 @@ from email_notifications import send_employee_notification, send_task_assignment
 
 # Google Drive imports
 try:
-    from google.oauth2 import service_account
+    from google_auth_oauthlib.flow import Flow
+    from google.auth.transport.requests import Request
+    from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
     from googleapiclient.errors import HttpError
     import json
     import os
+    import secrets
     GOOGLE_DRIVE_AVAILABLE = True
 except ImportError:
     GOOGLE_DRIVE_AVAILABLE = False
@@ -675,9 +678,49 @@ TASKS_TABLE_TEMPLATE = '''
         
         // ===== GOOGLE DRIVE FUNCTIONS =====
         function showGoogleDriveModal() {
+            // Primero intentar autenticar con Google
+            authenticateWithGoogle();
+        }
+        
+        function authenticateWithGoogle() {
+            fetch('/auth/google-drive')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.auth_url) {
+                        // Abrir ventana de autenticación de Google
+                        window.open(data.auth_url, 'google-auth', 'width=500,height=600,scrollbars=yes,resizable=yes');
+                    } else {
+                        // Mostrar modal con mensaje de configuración
+                        showGoogleDriveConfigModal();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error de autenticación:', error);
+                    showGoogleDriveConfigModal();
+                });
+        }
+        
+        function showGoogleDriveConfigModal() {
             const modal = new bootstrap.Modal(document.getElementById('googleDriveModal'));
+            
+            // Mostrar mensaje de configuración
+            document.getElementById('gdrive-loading').classList.add('d-none');
+            document.getElementById('gdrive-files').classList.add('d-none');
+            document.getElementById('gdrive-error').classList.remove('d-none');
+            document.getElementById('gdrive-error').innerHTML = `
+                <h6>🔧 Configuración de Google Drive</h6>
+                <p>Para usar Google Drive necesitas configurar las credenciales OAuth2:</p>
+                <ol>
+                    <li>Ve a <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                    <li>Crea un proyecto o selecciona uno existente</li>
+                    <li>Habilita las APIs de Google Drive y Google Sheets</li>
+                    <li>Crea credenciales OAuth 2.0</li>
+                    <li>Configura el Client ID y Client Secret</li>
+                </ol>
+                <p><strong>Por ahora puedes usar la opción "📂 Local" para subir archivos desde tu computadora.</strong></p>
+            `;
+            
             modal.show();
-            loadGoogleDriveFiles();
         }
         
         function loadGoogleDriveFiles() {
@@ -1358,30 +1401,128 @@ TASKS_ANALYTICS_TEMPLATE = '''
 # GOOGLE DRIVE INTEGRATION
 # ============================================
 
+# Configuración OAuth2 para Google Drive
+SCOPES = [
+    'https://www.googleapis.com/auth/drive.readonly',
+    'https://www.googleapis.com/auth/spreadsheets.readonly'
+]
+
+# Configuración OAuth2 simplificada (usar variables de entorno en producción)
+CLIENT_CONFIG = {
+    "web": {
+        "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com",
+        "client_secret": "YOUR_CLIENT_SECRET",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "redirect_uris": ["http://localhost:5000/oauth2callback"]
+    }
+}
+
+@app.route('/auth/google-drive')
+def auth_google_drive():
+    """Iniciar autenticación OAuth2 con Google Drive"""
+    if not GOOGLE_DRIVE_AVAILABLE:
+        return jsonify({'error': 'Google Drive no disponible'}), 400
+    
+    try:
+        # Crear flow OAuth2
+        flow = Flow.from_client_config(
+            CLIENT_CONFIG,
+            scopes=SCOPES
+        )
+        flow.redirect_uri = request.url_root.rstrip('/') + '/oauth2callback'
+        
+        # Generar estado para seguridad
+        state = secrets.token_urlsafe(32)
+        session['oauth_state'] = state
+        
+        # Obtener URL de autorización
+        authorization_url, _ = flow.authorization_url(
+            access_type='offline',
+            include_granted_scopes='true',
+            state=state,
+            prompt='select_account'  # Esto fuerza la selección de cuenta
+        )
+        
+        return jsonify({
+            'success': True,
+            'auth_url': authorization_url
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Error de autenticación: {str(e)}'}), 500
+
+@app.route('/oauth2callback')
+def oauth2callback():
+    """Callback para completar autenticación OAuth2"""
+    if not GOOGLE_DRIVE_AVAILABLE:
+        return "Google Drive no disponible", 400
+    
+    try:
+        # Verificar estado para seguridad
+        state = request.args.get('state')
+        if state != session.get('oauth_state'):
+            return "Estado de OAuth inválido", 400
+        
+        # Completar flujo OAuth2
+        flow = Flow.from_client_config(
+            CLIENT_CONFIG,
+            scopes=SCOPES,
+            state=state
+        )
+        flow.redirect_uri = request.url_root.rstrip('/') + '/oauth2callback'
+        
+        # Obtener token
+        flow.fetch_token(authorization_response=request.url)
+        
+        # Guardar credenciales en sesión
+        credentials = flow.credentials
+        session['google_credentials'] = {
+            'token': credentials.token,
+            'refresh_token': credentials.refresh_token,
+            'token_uri': credentials.token_uri,
+            'client_id': credentials.client_id,
+            'client_secret': credentials.client_secret,
+            'scopes': credentials.scopes
+        }
+        
+        # Redirigir de vuelta a tareas con éxito
+        return '''
+        <script>
+            alert('✅ Autenticación exitosa con Google Drive');
+            window.location.href = '/tasks';
+        </script>
+        '''
+        
+    except Exception as e:
+        return f"Error en callback: {str(e)}", 500
+
 def get_google_drive_service():
-    """Inicializar servicio de Google Drive usando service account credentials"""
+    """Obtener servicio de Google Drive usando credenciales de sesión"""
     if not GOOGLE_DRIVE_AVAILABLE:
         return None
     
     try:
-        # Buscar credenciales de service account
-        credentials_json = os.environ.get('GOOGLE_SERVICE_ACCOUNT_JSON')
-        if not credentials_json:
+        # Obtener credenciales de la sesión
+        creds_data = session.get('google_credentials')
+        if not creds_data:
             return None
-            
-        # Parse JSON credentials
-        credentials_info = json.loads(credentials_json)
         
-        # Configurar scopes
-        SCOPES = [
-            'https://www.googleapis.com/auth/drive.readonly',
-            'https://www.googleapis.com/auth/spreadsheets.readonly'
-        ]
-        
-        # Crear credenciales
-        credentials = service_account.Credentials.from_service_account_info(
-            credentials_info, scopes=SCOPES
+        # Crear objeto de credenciales
+        credentials = Credentials(
+            token=creds_data['token'],
+            refresh_token=creds_data.get('refresh_token'),
+            token_uri=creds_data['token_uri'],
+            client_id=creds_data['client_id'],
+            client_secret=creds_data['client_secret'],
+            scopes=creds_data['scopes']
         )
+        
+        # Refrescar token si es necesario
+        if credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
+            # Actualizar sesión con nuevo token
+            session['google_credentials']['token'] = credentials.token
         
         # Construir servicio
         service = build('drive', 'v3', credentials=credentials)
@@ -1392,29 +1533,31 @@ def get_google_drive_service():
         return None
 
 def get_google_sheets_service():
-    """Inicializar servicio de Google Sheets"""
+    """Obtener servicio de Google Sheets usando credenciales de sesión"""
     if not GOOGLE_DRIVE_AVAILABLE:
         return None
         
     try:
-        # Buscar credenciales de service account
-        credentials_json = os.environ.get('GOOGLE_SERVICE_ACCOUNT_JSON')
-        if not credentials_json:
+        # Obtener credenciales de la sesión
+        creds_data = session.get('google_credentials')
+        if not creds_data:
             return None
-            
-        # Parse JSON credentials
-        credentials_info = json.loads(credentials_json)
         
-        # Configurar scopes
-        SCOPES = [
-            'https://www.googleapis.com/auth/drive.readonly',
-            'https://www.googleapis.com/auth/spreadsheets.readonly'
-        ]
-        
-        # Crear credenciales
-        credentials = service_account.Credentials.from_service_account_info(
-            credentials_info, scopes=SCOPES
+        # Crear objeto de credenciales
+        credentials = Credentials(
+            token=creds_data['token'],
+            refresh_token=creds_data.get('refresh_token'),
+            token_uri=creds_data['token_uri'],
+            client_id=creds_data['client_id'],
+            client_secret=creds_data['client_secret'],
+            scopes=creds_data['scopes']
         )
+        
+        # Refrescar token si es necesario
+        if credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
+            # Actualizar sesión con nuevo token
+            session['google_credentials']['token'] = credentials.token
         
         # Construir servicio
         service = build('sheets', 'v4', credentials=credentials)
