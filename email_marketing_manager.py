@@ -1632,6 +1632,9 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
             }{% if not loop.last %},{% endif %}
             {% endfor %}
         ];
+        
+        console.log('Funnel Data:', funnelData);
+        console.log('Geo Data:', geoData);
 
         // Inicializar gráficos al cargar
         document.addEventListener('DOMContentLoaded', function() {
@@ -1643,7 +1646,7 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
         function initializeFunnelChart() {
             const ctx = document.getElementById('funnelChart').getContext('2d');
             new Chart(ctx, {
-                type: 'funnel',
+                type: 'bar',
                 data: {
                     labels: ['Contactos', 'Respuestas', 'Interesados', 'Reuniones', 'NDAs'],
                     datasets: [{
@@ -1675,6 +1678,7 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    indexAxis: 'y',
                     plugins: {
                         legend: {
                             display: false
@@ -1683,18 +1687,20 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                             callbacks: {
                                 label: function(context) {
                                     const total = funnelData.contactos;
-                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
-                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                    const percentage = total > 0 ? ((context.parsed.x / total) * 100).toFixed(1) : 0;
+                                    return `${context.label}: ${context.parsed.x} (${percentage}%)`;
                                 }
                             }
                         }
                     },
                     scales: {
                         x: {
-                            display: false
+                            beginAtZero: true
                         },
                         y: {
-                            display: false
+                            grid: {
+                                display: false
+                            }
                         }
                     }
                 }
@@ -1703,18 +1709,34 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
 
         function initializeGeoChart() {
             const ctx = document.getElementById('geoChart').getContext('2d');
+            
+            // Filtrar datos con al menos 1 respuesta para el gráfico
+            const filteredGeoData = geoData.filter(d => d.total > 0);
+            
+            if (filteredGeoData.length === 0) {
+                // Si no hay datos, mostrar mensaje
+                ctx.fillStyle = '#666';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Sin datos geográficos', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: geoData.map(d => d.name),
+                    labels: filteredGeoData.map(d => d.name),
                     datasets: [{
-                        data: geoData.map(d => d.nda),
+                        data: filteredGeoData.map(d => Math.max(d.total, 1)), // Usar total en lugar de nda para mejor visualización
                         backgroundColor: [
                             '#FF6384',
                             '#36A2EB',
                             '#FFCE56',
                             '#4BC0C0',
-                            '#9966FF'
+                            '#9966FF',
+                            '#FF9F40',
+                            '#C9CBCF',
+                            '#4BC0C0'
                         ]
                     }]
                 },
@@ -1728,9 +1750,9 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    const data = geoData[context.dataIndex];
-                                    const percentage = ((data.nda / data.total) * 100).toFixed(1);
-                                    return `${context.label}: ${data.nda}/${data.total} (${percentage}%)`;
+                                    const data = filteredGeoData[context.dataIndex];
+                                    const percentage = data.total > 0 ? ((data.nda / data.total) * 100).toFixed(1) : 0;
+                                    return `${context.label}: ${data.total} contactos, ${data.nda} NDAs (${percentage}%)`;
                                 }
                             }
                         }
@@ -1759,6 +1781,7 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
             
             switch(type) {
                 case 'respuesta':
+                    const tasaRespuesta = funnelData.contactos > 0 ? ((funnelData.respuestas / funnelData.contactos) * 100).toFixed(1) : 0;
                     content = `
                         <h5>📧 Tasa de Respuesta</h5>
                         <div class="row">
@@ -1767,19 +1790,66 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
                                 <small>Respuestas recibidas</small>
                             </div>
                             <div class="col-6 text-center">
-                                <h3 class="text-primary">{{ tasa_respuesta }}%</h3>
+                                <h3 class="text-primary">${tasaRespuesta}%</h3>
                                 <small>Tasa de conversión</small>
                             </div>
                         </div>
+                        <hr>
+                        <p class="text-muted">De ${funnelData.contactos} contactos iniciales, ${funnelData.respuestas} han respondido.</p>
                     `;
                     break;
                 case 'reunion':
+                    const tasaReuniones = funnelData.respuestas > 0 ? ((funnelData.reuniones / funnelData.respuestas) * 100).toFixed(1) : 0;
                     content = `
                         <h5>🤝 Reuniones Programadas</h5>
-                        <p class="lead">${funnelData.reuniones} reuniones confirmadas de ${funnelData.respuestas} respuestas</p>
+                        <div class="row">
+                            <div class="col-6 text-center">
+                                <h3 class="text-warning">${funnelData.reuniones}</h3>
+                                <small>Reuniones confirmadas</small>
+                            </div>
+                            <div class="col-6 text-center">
+                                <h3 class="text-info">${tasaReuniones}%</h3>
+                                <small>De las respuestas</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <p class="text-muted">${funnelData.reuniones} reuniones programadas de ${funnelData.respuestas} respuestas recibidas.</p>
                     `;
                     break;
-                // Más casos según necesidad
+                case 'interesados':
+                    content = `
+                        <h5>👍 Interesados Detectados</h5>
+                        <div class="text-center">
+                            <h3 class="text-success">${funnelData.interesados}</h3>
+                            <small>Respuestas positivas identificadas</small>
+                        </div>
+                        <hr>
+                        <p class="text-muted">Asociaciones que han mostrado interés en colaboración usando palabras clave positivas.</p>
+                    `;
+                    break;
+                case 'comunidades':
+                    content = `
+                        <h5>🗺️ Análisis Geográfico</h5>
+                        <div class="text-center">
+                            <h3 class="text-primary">${geoData.length}</h3>
+                            <small>Comunidades con mejor conversión</small>
+                        </div>
+                        <hr>
+                        <div class="mt-3">
+                            ${geoData.map(d => `
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span><strong>${d.name}</strong></span>
+                                    <span>
+                                        <span class="badge bg-primary">${d.nda}/${d.total}</span>
+                                        <small class="text-muted">(${((d.nda/d.total)*100).toFixed(1)}%)</small>
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    break;
+                default:
+                    content = `<h5>Información no disponible</h5><p>No hay detalles adicionales para mostrar.</p>`;
             }
             
             document.getElementById('modalBody').innerHTML = content;
