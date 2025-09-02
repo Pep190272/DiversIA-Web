@@ -139,8 +139,22 @@ def registro():
     from forms import RegistroLeadForm
     form = RegistroLeadForm()
     
+    # Debug completo del formulario
+    if request.method == 'POST':
+        print(f"🔍 Registro Simple - POST detectado")
+        print(f"🔍 Form validate(): {form.validate()}")
+        print(f"🔍 Form errors: {form.errors}")
+        print(f"🔍 Datos del formulario:")
+        print(f"  - Nombre: '{form.nombre.data}'")
+        print(f"  - Apellidos: '{form.apellidos.data}'")
+        print(f"  - Email: '{form.email.data}'")
+        print(f"  - Ciudad: '{form.ciudad.data}'")
+        print(f"  - Intereses: '{form.intereses.data}'")
+        print(f"  - Como conociste: '{form.como_conociste.data}'")
+        print(f"  - Privacidad: '{form.aceptar_privacidad.data}'")
+    
     # Validación más permisiva para debug
-    if request.method == 'POST' and form.nombre.data and form.email.data:
+    if request.method == 'POST' and form.nombre.data and form.email.data and form.aceptar_privacidad.data:
         try:
             from models import GeneralLead
             
@@ -218,8 +232,22 @@ def registro():
             return redirect(url_for('gracias'))
             
         except Exception as e:
+            print(f"❌ Error en registro simple: {e}")
+            import traceback
+            traceback.print_exc()
             flash('Error al guardar tu información. Por favor intenta de nuevo.', 'error')
             db.session.rollback()
+    
+    # Si llegamos aquí y es POST, mostrar errores específicos
+    if request.method == 'POST':
+        if not form.nombre.data:
+            flash('El nombre es obligatorio', 'error')
+        if not form.email.data:
+            flash('El email es obligatorio', 'error')
+        if not form.ciudad.data:
+            flash('La ciudad es obligatoria', 'error')
+        if not form.aceptar_privacidad.data:
+            flash('Debes aceptar la política de privacidad', 'error')
     
     return render_template('registro.html', form=form)
 
