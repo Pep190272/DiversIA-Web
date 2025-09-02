@@ -598,14 +598,9 @@
                                         ${user.diagnostico_formal ? '✅ Diagnóstico formal' : '⏳ Sin diagnóstico'}
                                     </div>
                                     <div class="col-md-2 text-end">
-                                        <div class="btn-group" role="group">
-                                            <button class="btn btn-sm btn-outline-primary" onclick="editUser('${user.id}')" title="Editar">
-                                                ✏️
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user.id}', '${user.nombre} ${user.apellidos}')" title="Borrar">
-                                                🗑️
-                                            </button>
-                                        </div>
+                                        <button class="btn btn-sm btn-outline-info" onclick="showUserDetails('${user.id}')" title="Ver Detalles">
+                                            👁️ Ver
+                                        </button>
                                         <small class="text-muted d-block mt-1">${new Date(user.created_at).toLocaleDateString()}</small>
                                     </div>
                                 </div>
@@ -625,7 +620,7 @@
 
         async function showUserDetails(userId) {
             try {
-                const response = await fetch(`/api/usuario/${userId}/editar`);
+                const response = await fetch(`/api/usuario/${userId}/detalles`);
                 const user = await response.json();
                 
                 const modalBody = document.getElementById('userModalBody');
@@ -657,12 +652,9 @@
                     </div>
                     <div class="row mt-3">
                         <div class="col-12 text-center">
-                            <button class="btn btn-primary me-2" onclick="editUser('${user.id}')">
-                                ✏️ Editar Perfil
-                            </button>
-                            <button class="btn btn-danger" onclick="deleteUser('${user.id}', '${user.nombre} ${user.apellidos}')">
-                                🗑️ Borrar Perfil
-                            </button>
+                            <small class="text-muted">
+                                ℹ️ Para editar o eliminar usuarios, accede al panel de administración
+                            </small>
                         </div>
                     </div>
                 `;

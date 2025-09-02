@@ -350,6 +350,78 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
     
+    @app.route('/api/usuario/<user_id>/detalles')
+    def get_user_details_public(user_id):
+        """API pública para obtener detalles de usuario (solo lectura)"""
+        try:
+            from models import db, NeurodivergentProfile
+            
+            # Determinar si es User o NeurodivergentProfile
+            is_profile = user_id.startswith('profile_')
+            actual_id = user_id.replace('user_', '').replace('profile_', '')
+            
+            if is_profile:
+                usuario = NeurodivergentProfile.query.get_or_404(actual_id)
+                user_data = {
+                    'id': f'profile_{usuario.id}',
+                    'nombre': usuario.nombre or '',
+                    'apellidos': usuario.apellidos or '',
+                    'email': usuario.email or '',
+                    'telefono': usuario.telefono or '',
+                    'ciudad': usuario.ciudad or '',
+                    'fecha_nacimiento': usuario.fecha_nacimiento.strftime('%Y-%m-%d') if usuario.fecha_nacimiento else '',
+                    'tipo_neurodivergencia': usuario.tipo_neurodivergencia or '',
+                    'diagnostico_formal': usuario.diagnostico_formal,
+                    'experiencia_laboral': usuario.experiencia_laboral or '',
+                    'formacion_academica': usuario.formacion_academica or '',
+                    'habilidades': usuario.habilidades or '',
+                    'intereses_laborales': usuario.intereses_laborales or '',
+                    'adaptaciones_necesarias': usuario.adaptaciones_necesarias or ''
+                }
+            else:
+                from models import User
+                usuario = User.query.get_or_404(actual_id)
+                user_data = {
+                    'id': f'user_{usuario.id}',
+                    'nombre': usuario.nombre or '',
+                    'apellidos': usuario.apellidos or '',
+                    'email': usuario.email or '',
+                    'telefono': usuario.telefono or '',
+                    'ciudad': usuario.ciudad or '',
+                    'fecha_nacimiento': '',
+                    'tipo_neurodivergencia': '',
+                    'diagnostico_formal': False,
+                    'experiencia_laboral': '',
+                    'formacion_academica': '',
+                    'habilidades': '',
+                    'intereses_laborales': '',
+                    'adaptaciones_necesarias': ''
+                }
+            
+            return jsonify(user_data)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+    @app.route('/crm-editar/<user_id>')
+    def edit_user_form(user_id):
+        """Formulario de edición de usuario"""
+        try:
+            from models import db, NeurodivergentProfile
+            
+            # Determinar si es User o NeurodivergentProfile
+            is_profile = user_id.startswith('profile_')
+            actual_id = user_id.replace('user_', '').replace('profile_', '')
+            
+            if is_profile:
+                usuario = NeurodivergentProfile.query.get_or_404(actual_id)
+            else:
+                from models import User
+                usuario = User.query.get_or_404(actual_id)
+            
+            return render_template('edit_user.html', user=usuario, user_id=user_id)
+        except Exception as e:
+            return f"Error: {e}", 500
+
     @app.route('/api/neurodivergent/ai-insights')
     def get_ai_insights():
         """API para obtener insights inteligentes para entrenamiento de IA"""
