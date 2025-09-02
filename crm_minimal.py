@@ -228,7 +228,7 @@ def create_minimal_crm_routes(app):
     
     @app.route('/api/minimal/companies/<int:company_id>', methods=['PUT'])
     def update_company_minimal(company_id):
-        """Actualizar empresa específica"""
+        """Actualizar empresa específica - Con sincronización PostgreSQL"""
         try:
             update_data = request.get_json()
             
@@ -256,6 +256,24 @@ def create_minimal_crm_routes(app):
             companies[company_index] = company
             data['companies'] = companies
             save_data(data)
+            
+            # 🔄 SINCRONIZACIÓN CON POSTGRESQL - Protección de datos
+            try:
+                from models import db, Company
+                pg_company = Company.query.filter_by(nombre_empresa=company['nombre'].strip()).first()
+                if pg_company:
+                    pg_company.email_contacto = company['email']
+                    pg_company.telefono = company['telefono']
+                    pg_company.sector = company['sector']
+                    pg_company.ciudad = company['ciudad']
+                    pg_company.updated_at = datetime.utcnow()
+                    db.session.commit()
+                    print(f"✅ Empresa {company['nombre']} sincronizada con PostgreSQL")
+                else:
+                    print(f"⚠️ Empresa {company['nombre']} no encontrada en PostgreSQL")
+            except Exception as sync_error:
+                print(f"❌ Error sincronizando con PostgreSQL: {sync_error}")
+                # No fallar la operación del CRM por errores de sincronización
             
             return jsonify({'success': True, 'company': company})
         except Exception as e:
@@ -287,6 +305,48 @@ def create_minimal_crm_routes(app):
             save_data(data)
             
             return jsonify({'success': True, 'message': f'{count} empresas eliminadas'})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/sync/companies', methods=['POST'])
+    def sync_companies_manual():
+        """Sincronización manual completa entre CRM y PostgreSQL"""
+        try:
+            from models import db, Company
+            
+            # Obtener datos del CRM
+            data = load_data()
+            crm_companies = data.get('companies', [])
+            
+            # Obtener datos de PostgreSQL
+            pg_companies = Company.query.all()
+            
+            sync_results = []
+            
+            # Sincronizar CRM -> PostgreSQL
+            for crm_company in crm_companies:
+                if crm_company.get('nombre'):
+                    pg_company = Company.query.filter_by(nombre_empresa=crm_company['nombre'].strip()).first()
+                    if pg_company:
+                        # Actualizar PostgreSQL con datos del CRM
+                        pg_company.email_contacto = crm_company.get('email', pg_company.email_contacto)
+                        pg_company.telefono = crm_company.get('telefono', pg_company.telefono)
+                        pg_company.sector = crm_company.get('sector', pg_company.sector)
+                        pg_company.ciudad = crm_company.get('ciudad', pg_company.ciudad)
+                        pg_company.updated_at = datetime.utcnow()
+                        sync_results.append(f"✅ {crm_company['nombre']} → PostgreSQL")
+                    else:
+                        sync_results.append(f"⚠️ {crm_company['nombre']} no encontrada en PostgreSQL")
+            
+            db.session.commit()
+            
+            return jsonify({
+                'success': True, 
+                'message': 'Sincronización completada',
+                'results': sync_results,
+                'crm_count': len(crm_companies),
+                'pg_count': len(pg_companies)
+            })
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
     
