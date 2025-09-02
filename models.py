@@ -13,7 +13,7 @@ class GeneralLead(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     telefono = db.Column(db.String(20), nullable=True)
     ciudad = db.Column(db.String(100), nullable=False)
-    fecha_nacimiento = db.Column(db.Date, nullable=False)
+    fecha_nacimiento = db.Column(db.Date, nullable=True)  # Permitir nulo para leads simples
     
     # Información básica de neurodivergencia (si aplica)
     tipo_neurodivergencia = db.Column(db.String(50), nullable=True)  # Puede ser NULL para no-ND
