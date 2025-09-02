@@ -1,9 +1,20 @@
 {
-  "companies": [],
+  "companies": [
+    {
+      "id": 1,
+      "nombre": "Acelerai ",
+      "email": "jose190272@gmail.com",
+      "telefono": "687408629",
+      "sector": "tecnologia",
+      "ciudad": "la torre de claramunt",
+      "created_at": "2025-09-02T12:13:32.006196",
+      "origen": "Formulario Web Empresa"
+    }
+  ],
   "contacts": [],
   "stats": {
-    "total_companies": 0,
+    "total_companies": 1,
     "total_contacts": 0,
-    "last_updated": "2025-09-01T15:19:40.894767"
+    "last_updated": "2025-09-02T12:13:32.006208"
   }
 }

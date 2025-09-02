@@ -385,7 +385,7 @@ class Asociacion(db.Model):
     
     # Información operativa
     años_funcionamiento = db.Column(db.Integer, nullable=True)
-    numero_socios = db.Column(db.Integer, nullable=True)
+    numero_socios = db.Column(db.String(50), nullable=True)  # Cambiado de Integer a String para aceptar rangos
     
     # Contacto responsable
     contacto_nombre = db.Column(db.String(150), nullable=True)
