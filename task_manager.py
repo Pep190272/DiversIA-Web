@@ -781,8 +781,7 @@ TASKS_TABLE_TEMPLATE = '''
                 
                 if (data.success) {
                     alert(`✅ ${data.message}`);
-                    // Cerrar modal y recargar página
-                    bootstrap.Modal.getInstance(document.getElementById('googleDriveModal')).hide();
+                    // Recargar página
                     location.reload();
                 } else {
                     alert(`❌ Error: ${data.error}`);
