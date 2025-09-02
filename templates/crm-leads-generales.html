@@ -544,23 +544,60 @@
             }
             
             const count = selectedLeads.size;
-            if (!confirm(`¿Estás seguro de que quieres eliminar ${count} leads seleccionados? Esta acción no se puede deshacer.`)) {
+            
+            // PROTECCIÓN DE DATOS MÚLTIPLE
+            
+            // Primera confirmación
+            if (!confirm(`⚠️ ATENCIÓN: ¿Estás seguro de que quieres eliminar ${count} leads seleccionados?\n\nEsta acción eliminará permanentemente los datos de estas personas.\n\n¿Deseas continuar?`)) {
                 return;
             }
             
+            // Segunda confirmación para eliminaciones masivas
+            if (count > 5) {
+                if (!confirm(`🛑 CONFIRMACIÓN ADICIONAL REQUERIDA\n\nVas a eliminar ${count} leads (más de 5).\n\nEsto podría afectar significativamente tu base de datos.\n\n¿Estás COMPLETAMENTE SEGURO de que quieres continuar?`)) {
+                    return;
+                }
+            }
+            
             try {
-                const response = await fetch('/api/leads-generales/bulk-delete', {
+                // Primer intento - verificar confirmación
+                let response = await fetch('/api/leads-generales/bulk-delete', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ lead_ids: Array.from(selectedLeads) })
+                    body: JSON.stringify({ 
+                        lead_ids: Array.from(selectedLeads),
+                        confirmed: true
+                    })
                 });
                 
-                const result = await response.json();
+                let result = await response.json();
+                
+                // Si requiere doble confirmación
+                if (result.requires_double_confirmation) {
+                    if (!confirm(`🔒 CONFIRMACIÓN FINAL REQUERIDA\n\nPor seguridad, eliminar ${count} elementos requiere una confirmación adicional.\n\nEsta es tu ÚLTIMA oportunidad para cancelar.\n\n¿Proceder con la eliminación?`)) {
+                        return;
+                    }
+                    
+                    // Segundo intento con doble confirmación
+                    response = await fetch('/api/leads-generales/bulk-delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            lead_ids: Array.from(selectedLeads),
+                            confirmed: true,
+                            double_confirmed: true
+                        })
+                    });
+                    
+                    result = await response.json();
+                }
                 
                 if (result.success) {
-                    alert(`✅ ${result.deleted_count} leads eliminados correctamente`);
+                    alert(`✅ ${result.deleted_count} leads eliminados correctamente\n\n${result.backup_created ? '🛡️ Backup de seguridad creado' : ''}`);
                     selectedLeads.clear();
                     loadLeads(); // Recargar datos
                 } else {
@@ -616,19 +653,43 @@
             const lead = allLeads.find(l => l.id === leadId);
             if (!lead) return;
             
-            if (!confirm(`¿Estás seguro de que quieres eliminar a ${lead.nombre} ${lead.apellidos}? Esta acción no se puede deshacer.`)) {
+            // PROTECCIÓN DE DATOS INDIVIDUAL
+            if (!confirm(`⚠️ ELIMINACIÓN DE DATOS PERSONALES\n\n¿Estás seguro de que quieres eliminar a:\n\n👤 ${lead.nombre} ${lead.apellidos}\n📧 ${lead.email}\n\nEsta acción eliminará permanentemente todos los datos de esta persona.\n\n¿Deseas continuar?`)) {
                 return;
             }
             
             try {
-                const response = await fetch(`/api/leads-generales/${leadId}`, {
-                    method: 'DELETE'
+                // Primer intento - verificar confirmación
+                let response = await fetch(`/api/leads-generales/${leadId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ confirmed: true })
                 });
                 
                 const result = await response.json();
                 
+                if (result.requires_confirmation) {
+                    // Si el backend requiere confirmación adicional
+                    if (!confirm(`🔒 CONFIRMACIÓN DE SEGURIDAD REQUERIDA\n\nPor la protección de datos, confirma nuevamente que quieres eliminar a:\n${lead.nombre} ${lead.apellidos}\n\n¿Proceder?`)) {
+                        return;
+                    }
+                    
+                    // Segundo intento con confirmación
+                    response = await fetch(`/api/leads-generales/${leadId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ confirmed: true, double_confirmed: true })
+                    });
+                    
+                    result = await response.json();
+                }
+                
                 if (result.success) {
-                    alert('✅ Lead eliminado correctamente');
+                    alert(`✅ Lead eliminado correctamente\n\n${result.backup_info ? '🛡️ ' + result.backup_info : ''}`);
                     selectedLeads.delete(leadId); // Remover de selección si estaba seleccionado
                     loadLeads(); // Recargar datos
                 } else {

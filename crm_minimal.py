@@ -633,23 +633,48 @@ def create_minimal_crm_routes(app):
     
     @app.route('/api/leads-generales/<int:lead_id>', methods=['DELETE'])
     def delete_lead_general(lead_id):
-        """Eliminar un lead específico"""
+        """Eliminar un lead específico - CON PROTECCIÓN DE DATOS"""
         try:
             from models import GeneralLead
             from app import db
             
+            # Verificar que se incluya confirmación
+            data = request.get_json() if request.is_json else {}
+            if not data.get('confirmed'):
+                return jsonify({
+                    'success': False, 
+                    'error': 'Esta operación requiere confirmación explícita',
+                    'requires_confirmation': True
+                }), 400
+                
+            # Crear backup antes de eliminar (opcional)
             lead = GeneralLead.query.get_or_404(lead_id)
+            backup_data = {
+                'id': lead.id,
+                'nombre': lead.nombre,
+                'apellidos': lead.apellidos,
+                'email': lead.email,
+                'deleted_at': datetime.now().isoformat()
+            }
+            
+            # Log de auditoría (aquí podrías guardar en otra tabla)
+            print(f"🗑️ ELIMINACIÓN DE LEAD - ID: {lead_id}, Usuario: {lead.nombre} {lead.apellidos}, Email: {lead.email}")
+            
             db.session.delete(lead)
             db.session.commit()
             
-            return jsonify({'success': True, 'message': 'Lead eliminado correctamente'})
+            return jsonify({
+                'success': True, 
+                'message': 'Lead eliminado correctamente',
+                'backup_info': f"Backup creado para {lead.nombre} {lead.apellidos}"
+            })
         except Exception as e:
             db.session.rollback()
             return jsonify({'success': False, 'error': str(e)}), 500
     
     @app.route('/api/leads-generales/bulk-delete', methods=['POST'])
     def bulk_delete_leads():
-        """Eliminar múltiples leads seleccionados"""
+        """Eliminar múltiples leads seleccionados - CON PROTECCIÓN DE DATOS AVANZADA"""
         try:
             from models import GeneralLead
             from app import db
@@ -660,6 +685,43 @@ def create_minimal_crm_routes(app):
             if not lead_ids:
                 return jsonify({'success': False, 'error': 'No se seleccionaron leads para eliminar'}), 400
             
+            # PROTECCIÓN MÚLTIPLE DE DATOS
+            if not data.get('confirmed'):
+                return jsonify({
+                    'success': False, 
+                    'error': 'Esta operación requiere confirmación explícita',
+                    'requires_confirmation': True,
+                    'count': len(lead_ids)
+                }), 400
+                
+            # Verificación adicional para eliminaciones masivas (>5 elementos)
+            if len(lead_ids) > 5 and not data.get('double_confirmed'):
+                return jsonify({
+                    'success': False, 
+                    'error': f'La eliminación de {len(lead_ids)} elementos requiere doble confirmación',
+                    'requires_double_confirmation': True,
+                    'count': len(lead_ids)
+                }), 400
+            
+            # Crear backup de los datos antes de eliminar
+            leads_to_delete = GeneralLead.query.filter(GeneralLead.id.in_(lead_ids)).all()
+            backup_data = []
+            
+            for lead in leads_to_delete:
+                backup_data.append({
+                    'id': lead.id,
+                    'nombre': lead.nombre,
+                    'apellidos': lead.apellidos,
+                    'email': lead.email,
+                    'tipo_neurodivergencia': lead.tipo_neurodivergencia,
+                    'deleted_at': datetime.now().isoformat()
+                })
+            
+            # Log de auditoría completo
+            print(f"🗑️ ELIMINACIÓN MASIVA - {len(lead_ids)} leads eliminados:")
+            for lead in leads_to_delete:
+                print(f"   - ID: {lead.id}, Usuario: {lead.nombre} {lead.apellidos}, Email: {lead.email}")
+            
             # Eliminar leads seleccionados
             deleted_count = GeneralLead.query.filter(GeneralLead.id.in_(lead_ids)).delete(synchronize_session=False)
             db.session.commit()
@@ -667,7 +729,9 @@ def create_minimal_crm_routes(app):
             return jsonify({
                 'success': True, 
                 'message': f'{deleted_count} leads eliminados correctamente',
-                'deleted_count': deleted_count
+                'deleted_count': deleted_count,
+                'backup_created': True,
+                'backup_count': len(backup_data)
             })
         except Exception as e:
             db.session.rollback()

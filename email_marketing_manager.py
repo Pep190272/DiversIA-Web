@@ -1464,47 +1464,54 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
 
     <div class="funnel-container">
         <div class="funnel-title">
-            Funnel de Ventas - DiversIA (Agosto 2025)
+            📊 Métricas Detalladas
         </div>
         
-        <!-- Paso 1: Contactos iniciales -->
-        <div class="funnel-step">
-            <div class="funnel-box">
-                <div class="funnel-number">{{ contactos_iniciales }}</div>
-                <div class="funnel-label">Contactos iniciales</div>
+        <!-- Metricas principales interactivas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="metric-card clickable" onclick="showDetails('respuesta')" style="cursor: pointer;">
+                    <div class="metric-number">{{ tasa_respuesta }}%</div>
+                    <div class="metric-label">Tasa de Respuesta</div>
+                    <small class="text-muted">{{ respuestas_totales }}/{{ contactos_iniciales }}</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card clickable" onclick="showDetails('reunion')" style="cursor: pointer;">
+                    <div class="metric-number">{{ reuniones_count }}</div>
+                    <div class="metric-label">Reuniones Programadas</div>
+                    <small class="text-muted">{{ tasa_reuniones }}% de respuestas</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card clickable" onclick="showDetails('interesados')" style="cursor: pointer;">
+                    <div class="metric-number">{{ interesados_count }}</div>
+                    <div class="metric-label">Interesados</div>
+                    <small class="text-success">Positivos detectados</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card clickable" onclick="showDetails('comunidades')" style="cursor: pointer;">
+                    <div class="metric-number">{{ mejores_comunidades|length }}</div>
+                    <div class="metric-label">Top Comunidades</div>
+                    <small class="text-primary">Con mejor conversión</small>
+                </div>
             </div>
         </div>
-        
-        <div class="funnel-arrow">▼</div>
-        
-        <!-- Paso 2: Respuestas -->
-        <div class="funnel-step">
-            <div class="funnel-box step-respuestas">
-                <div class="funnel-number">{{ respuestas_totales }}</div>
-                <div class="funnel-label">Respuestas</div>
-                <div class="funnel-percentage">({{ tasa_respuesta }}%)</div>
+
+        <!-- Gráficos interactivos -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="metric-card">
+                    <h5 class="text-center mb-3">📈 Progresión del Funnel</h5>
+                    <canvas id="funnelChart" width="400" height="300"></canvas>
+                </div>
             </div>
-        </div>
-        
-        <div class="funnel-arrow">▼</div>
-        
-        <!-- Paso 3: Reuniones -->
-        <div class="funnel-step">
-            <div class="funnel-box step-reuniones">
-                <div class="funnel-number">{{ reuniones_count }}</div>
-                <div class="funnel-label">Reuniones</div>
-                <div class="funnel-percentage">({{ tasa_reuniones }}% de respuestas)</div>
-            </div>
-        </div>
-        
-        <div class="funnel-arrow">▼</div>
-        
-        <!-- Paso 4: NDA en proceso -->
-        <div class="funnel-step">
-            <div class="funnel-box step-nda">
-                <div class="funnel-number">{{ nda_count }}</div>
-                <div class="funnel-label">NDA en proceso</div>
-                <div class="funnel-percentage">({{ tasa_nda }}% de reuniones)</div>
+            <div class="col-md-6">
+                <div class="metric-card">
+                    <h5 class="text-center mb-3">🌍 Distribución Geográfica</h5>
+                    <canvas id="geoChart" width="400" height="300"></canvas>
+                </div>
             </div>
         </div>
         
@@ -1602,6 +1609,201 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Datos para gráficos desde el backend
+        const funnelData = {
+            contactos: {{ contactos_iniciales }},
+            respuestas: {{ respuestas_totales }},
+            reuniones: {{ reuniones_count }},
+            nda: {{ nda_count }},
+            interesados: {{ interesados_count }}
+        };
+
+        // Datos geográficos
+        const geoData = [
+            {% for comunidad, stats in mejores_comunidades %}
+            {
+                name: '{{ comunidad }}',
+                total: {{ stats.total }},
+                respuestas: {{ stats.respuestas }},
+                nda: {{ stats.nda }}
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        // Inicializar gráficos al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFunnelChart();
+            initializeGeoChart();
+            addHoverEffects();
+        });
+
+        function initializeFunnelChart() {
+            const ctx = document.getElementById('funnelChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'funnel',
+                data: {
+                    labels: ['Contactos', 'Respuestas', 'Interesados', 'Reuniones', 'NDAs'],
+                    datasets: [{
+                        label: 'Funnel de Conversión',
+                        data: [
+                            funnelData.contactos,
+                            funnelData.respuestas,
+                            funnelData.interesados,
+                            funnelData.reuniones,
+                            funnelData.nda
+                        ],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.8)',
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(243, 156, 18, 0.8)',
+                            'rgba(155, 89, 182, 0.8)',
+                            'rgba(231, 76, 60, 0.8)'
+                        ],
+                        borderColor: [
+                            '#3498db',
+                            '#2ecc71',
+                            '#f39c12',
+                            '#9b59b6',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = funnelData.contactos;
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false
+                        },
+                        y: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeGeoChart() {
+            const ctx = document.getElementById('geoChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: geoData.map(d => d.name),
+                    datasets: [{
+                        data: geoData.map(d => d.nda),
+                        backgroundColor: [
+                            '#FF6384',
+                            '#36A2EB',
+                            '#FFCE56',
+                            '#4BC0C0',
+                            '#9966FF'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const data = geoData[context.dataIndex];
+                                    const percentage = ((data.nda / data.total) * 100).toFixed(1);
+                                    return `${context.label}: ${data.nda}/${data.total} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function addHoverEffects() {
+            document.querySelectorAll('.clickable').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.08)';
+                });
+            });
+        }
+
+        function showDetails(type) {
+            const detailsModal = new bootstrap.Modal(document.getElementById('detailsModal') || createModal());
+            let content = '';
+            
+            switch(type) {
+                case 'respuesta':
+                    content = `
+                        <h5>📧 Tasa de Respuesta</h5>
+                        <div class="row">
+                            <div class="col-6 text-center">
+                                <h3 class="text-success">${funnelData.respuestas}</h3>
+                                <small>Respuestas recibidas</small>
+                            </div>
+                            <div class="col-6 text-center">
+                                <h3 class="text-primary">{{ tasa_respuesta }}%</h3>
+                                <small>Tasa de conversión</small>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'reunion':
+                    content = `
+                        <h5>🤝 Reuniones Programadas</h5>
+                        <p class="lead">${funnelData.reuniones} reuniones confirmadas de ${funnelData.respuestas} respuestas</p>
+                    `;
+                    break;
+                // Más casos según necesidad
+            }
+            
+            document.getElementById('modalBody').innerHTML = content;
+            detailsModal.show();
+        }
+
+        function createModal() {
+            const modalHTML = `
+                <div class="modal fade" id="detailsModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Detalles</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" id="modalBody"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            return document.getElementById('detailsModal');
+        }
+    </script>
 </body>
 </html>
 '''
