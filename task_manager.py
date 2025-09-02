@@ -678,26 +678,9 @@ TASKS_TABLE_TEMPLATE = '''
         
         // ===== GOOGLE DRIVE FUNCTIONS =====
         function showGoogleDriveModal() {
-            // Primero intentar autenticar con Google
-            authenticateWithGoogle();
-        }
-        
-        function authenticateWithGoogle() {
-            fetch('/auth/google-drive')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.configured && data.auth_url) {
-                        // Abrir ventana de autenticación de Google
-                        window.open(data.auth_url, 'google-auth', 'width=500,height=600,scrollbars=yes,resizable=yes');
-                    } else {
-                        // Mostrar modal con mensaje de configuración
-                        showGoogleDriveConfigModal(data.message || 'Configuración necesaria');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error de autenticación:', error);
-                    showGoogleDriveConfigModal('Error de conexión');
-                });
+            // Por ahora mostrar directamente el modal de configuración
+            // ya que Google Drive no está completamente configurado
+            showGoogleDriveConfigModal('Google Drive - Configuración Pendiente');
         }
         
         function showGoogleDriveConfigModal(message = 'Configuración necesaria') {
