@@ -686,21 +686,21 @@ TASKS_TABLE_TEMPLATE = '''
             fetch('/auth/google-drive')
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success && data.auth_url) {
+                    if (data.success && data.configured && data.auth_url) {
                         // Abrir ventana de autenticación de Google
                         window.open(data.auth_url, 'google-auth', 'width=500,height=600,scrollbars=yes,resizable=yes');
                     } else {
                         // Mostrar modal con mensaje de configuración
-                        showGoogleDriveConfigModal();
+                        showGoogleDriveConfigModal(data.message || 'Configuración necesaria');
                     }
                 })
                 .catch(error => {
                     console.error('Error de autenticación:', error);
-                    showGoogleDriveConfigModal();
+                    showGoogleDriveConfigModal('Error de conexión');
                 });
         }
         
-        function showGoogleDriveConfigModal() {
+        function showGoogleDriveConfigModal(message = 'Configuración necesaria') {
             const modal = new bootstrap.Modal(document.getElementById('googleDriveModal'));
             
             // Mostrar mensaje de configuración
@@ -708,16 +708,16 @@ TASKS_TABLE_TEMPLATE = '''
             document.getElementById('gdrive-files').classList.add('d-none');
             document.getElementById('gdrive-error').classList.remove('d-none');
             document.getElementById('gdrive-error').innerHTML = `
-                <h6>🔧 Configuración de Google Drive</h6>
-                <p>Para usar Google Drive necesitas configurar las credenciales OAuth2:</p>
-                <ol>
-                    <li>Ve a <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
-                    <li>Crea un proyecto o selecciona uno existente</li>
-                    <li>Habilita las APIs de Google Drive y Google Sheets</li>
-                    <li>Crea credenciales OAuth 2.0</li>
-                    <li>Configura el Client ID y Client Secret</li>
-                </ol>
-                <p><strong>Por ahora puedes usar la opción "📂 Local" para subir archivos desde tu computadora.</strong></p>
+                <div class="alert alert-info">
+                    <h6>🔧 Google Drive - Configuración Pendiente</h6>
+                    <p><strong>La función de Google Drive no está completamente configurada aún.</strong></p>
+                    <p>Mientras tanto, puedes usar la opción <strong>"📂 Local"</strong> para subir archivos CSV desde tu computadora, que funciona perfectamente.</p>
+                    
+                    <hr>
+                    <small class="text-muted">
+                        <strong>Para el administrador:</strong> Para habilitar Google Drive, configura las variables GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET.
+                    </small>
+                </div>
             `;
             
             modal.show();
@@ -1408,26 +1408,43 @@ SCOPES = [
 ]
 
 # Configuración OAuth2 simplificada (usar variables de entorno en producción)
-CLIENT_CONFIG = {
-    "web": {
-        "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com",
-        "client_secret": "YOUR_CLIENT_SECRET",
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "redirect_uris": ["http://localhost:5000/oauth2callback"]
+def get_client_config():
+    """Obtener configuración de cliente desde variables de entorno"""
+    client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+    
+    if not client_id or not client_secret:
+        return None
+    
+    return {
+        "web": {
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "redirect_uris": [request.url_root.rstrip('/') + '/oauth2callback'] if request else ["http://localhost:5000/oauth2callback"]
+        }
     }
-}
 
 @app.route('/auth/google-drive')
 def auth_google_drive():
     """Iniciar autenticación OAuth2 con Google Drive"""
     if not GOOGLE_DRIVE_AVAILABLE:
-        return jsonify({'error': 'Google Drive no disponible'}), 400
+        return jsonify({'error': 'Google Drive no disponible', 'configured': False}), 400
+    
+    # Verificar si están configuradas las credenciales
+    client_config = get_client_config()
+    if not client_config:
+        return jsonify({
+            'error': 'Credenciales de Google no configuradas', 
+            'configured': False,
+            'message': 'Necesitas configurar GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET'
+        }), 400
     
     try:
         # Crear flow OAuth2
         flow = Flow.from_client_config(
-            CLIENT_CONFIG,
+            client_config,
             scopes=SCOPES
         )
         flow.redirect_uri = request.url_root.rstrip('/') + '/oauth2callback'
@@ -1446,11 +1463,12 @@ def auth_google_drive():
         
         return jsonify({
             'success': True,
+            'configured': True,
             'auth_url': authorization_url
         })
         
     except Exception as e:
-        return jsonify({'error': f'Error de autenticación: {str(e)}'}), 500
+        return jsonify({'error': f'Error de autenticación: {str(e)}', 'configured': False}), 500
 
 @app.route('/oauth2callback')
 def oauth2callback():
