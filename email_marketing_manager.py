@@ -1638,13 +1638,26 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
 
         // Inicializar gráficos al cargar
         document.addEventListener('DOMContentLoaded', function() {
-            initializeFunnelChart();
-            initializeGeoChart();
-            addHoverEffects();
+            console.log('DOM loaded, initializing charts...');
+            try {
+                initializeFunnelChart();
+                initializeGeoChart();
+                addHoverEffects();
+                console.log('Charts initialized successfully');
+            } catch (error) {
+                console.error('Error initializing charts:', error);
+            }
         });
 
         function initializeFunnelChart() {
-            const ctx = document.getElementById('funnelChart').getContext('2d');
+            const funnelElement = document.getElementById('funnelChart');
+            if (!funnelElement) {
+                console.error('funnelChart element not found');
+                return;
+            }
+            
+            console.log('Creating funnel chart with data:', funnelData);
+            const ctx = funnelElement.getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1708,7 +1721,14 @@ EMAIL_MARKETING_FUNNEL_VENTAS_TEMPLATE = '''
         }
 
         function initializeGeoChart() {
-            const ctx = document.getElementById('geoChart').getContext('2d');
+            const geoElement = document.getElementById('geoChart');
+            if (!geoElement) {
+                console.error('geoChart element not found');
+                return;
+            }
+            
+            console.log('Creating geo chart with data:', geoData);
+            const ctx = geoElement.getContext('2d');
             
             // Filtrar datos con al menos 1 respuesta para el gráfico
             const filteredGeoData = geoData.filter(d => d.total > 0);
