@@ -350,40 +350,98 @@ def create_minimal_crm_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
     
-    @app.route('/api/neurodivergent/stats')
-    def get_neurodivergent_stats():
-        """API para obtener estadísticas de personas neurodivergentes"""
+    @app.route('/api/neurodivergent/ai-insights')
+    def get_ai_insights():
+        """API para obtener insights inteligentes para entrenamiento de IA"""
         try:
             from models import db
             from sqlalchemy import text
             
-            # Obtener estadísticas generales
-            general_stats = db.session.execute(text("""
+            # Análisis de nivel educativo
+            education_analysis = db.session.execute(text("""
                 SELECT 
-                    COUNT(*) as total_registros,
-                    COUNT(CASE WHEN diagnostico_formal = true THEN 1 END) as con_diagnostico,
-                    COUNT(CASE WHEN DATE(created_at) = CURRENT_DATE THEN 1 END) as hoy,
-                    COUNT(CASE WHEN DATE(created_at) >= DATE_TRUNC('month', CURRENT_DATE) THEN 1 END) as este_mes
-                FROM neurodivergent_profiles_new
-            """)).fetchone()
-            
-            # Obtener distribución por tipo de neurodivergencia
-            type_distribution = db.session.execute(text("""
-                SELECT tipo_neurodivergencia, COUNT(*) as total 
+                    CASE 
+                        WHEN LOWER(formacion_academica) LIKE '%primaria%' OR LOWER(formacion_academica) LIKE '%egb%' 
+                             OR formacion_academica = 'No acabé la primaria' THEN 'Educación Primaria'
+                        WHEN LOWER(formacion_academica) LIKE '%eso%' OR LOWER(formacion_academica) LIKE '%bachiller%' 
+                             OR LOWER(formacion_academica) LIKE '%fp%' OR LOWER(formacion_academica) LIKE '%grado medio%' THEN 'Educación Secundaria'
+                        WHEN LOWER(formacion_academica) LIKE '%máster%' OR LOWER(formacion_academica) LIKE '%master%' 
+                             OR LOWER(formacion_academica) LIKE '%universidad%' OR LOWER(formacion_academica) LIKE '%grado%' THEN 'Educación Superior'
+                        WHEN formacion_academica IS NULL OR formacion_academica = '' THEN 'Sin especificar'
+                        ELSE 'Otro'
+                    END as nivel_educativo,
+                    COUNT(*) as total
                 FROM neurodivergent_profiles_new 
-                GROUP BY tipo_neurodivergencia 
+                GROUP BY nivel_educativo
                 ORDER BY total DESC
             """)).fetchall()
             
+            # Análisis de experiencia laboral
+            work_experience = db.session.execute(text("""
+                SELECT 
+                    CASE 
+                        WHEN LOWER(experiencia_laboral) LIKE '%ninguna%' OR LOWER(experiencia_laboral) LIKE '%sin experiencia%' THEN 'Sin experiencia'
+                        WHEN experiencia_laboral ~ '[0-9]+.*año' THEN 'Con experiencia (años especificados)'
+                        WHEN LENGTH(experiencia_laboral) > 50 THEN 'Experiencia detallada'
+                        WHEN experiencia_laboral IS NOT NULL AND experiencia_laboral != '' THEN 'Experiencia básica'
+                        ELSE 'Sin especificar'
+                    END as tipo_experiencia,
+                    COUNT(*) as total
+                FROM neurodivergent_profiles_new 
+                GROUP BY tipo_experiencia
+                ORDER BY total DESC
+            """)).fetchall()
+            
+            # Análisis de adaptaciones necesarias
+            adaptations_analysis = db.session.execute(text("""
+                SELECT 
+                    CASE 
+                        WHEN LOWER(adaptaciones_necesarias) LIKE '%ambiente%' OR LOWER(adaptaciones_necesarias) LIKE '%colaborativ%' THEN 'Ambiente de trabajo'
+                        WHEN LOWER(adaptaciones_necesarias) LIKE '%silenc%' OR LOWER(adaptaciones_necesarias) LIKE '%ruido%' THEN 'Control acústico'
+                        WHEN LOWER(adaptaciones_necesarias) LIKE '%música%' OR LOWER(adaptaciones_necesarias) LIKE '%sonido%' THEN 'Estímulos auditivos'
+                        WHEN LOWER(adaptaciones_necesarias) LIKE '%comprens%' OR LOWER(adaptaciones_necesarias) LIKE '%comunic%' THEN 'Comunicación clara'
+                        WHEN adaptaciones_necesarias IS NOT NULL AND adaptaciones_necesarias != '' THEN 'Otras adaptaciones'
+                        ELSE 'Sin adaptaciones específicas'
+                    END as tipo_adaptacion,
+                    COUNT(*) as total
+                FROM neurodivergent_profiles_new 
+                GROUP BY tipo_adaptacion
+                ORDER BY total DESC
+            """)).fetchall()
+            
+            # Análisis de diagnóstico formal vs autodiagnóstico
+            diagnosis_insights = db.session.execute(text("""
+                SELECT 
+                    diagnostico_formal,
+                    tipo_neurodivergencia,
+                    COUNT(*) as total
+                FROM neurodivergent_profiles_new 
+                GROUP BY diagnostico_formal, tipo_neurodivergencia
+                ORDER BY total DESC
+            """)).fetchall()
+            
+            # Estadísticas básicas
+            basic_stats = db.session.execute(text("""
+                SELECT 
+                    COUNT(*) as total_perfiles,
+                    COUNT(CASE WHEN diagnostico_formal = true THEN 1 END) as con_diagnostico_formal,
+                    COUNT(CASE WHEN experiencia_laboral IS NOT NULL AND experiencia_laboral != '' THEN 1 END) as con_experiencia,
+                    COUNT(CASE WHEN adaptaciones_necesarias IS NOT NULL AND adaptaciones_necesarias != '' THEN 1 END) as necesitan_adaptaciones
+                FROM neurodivergent_profiles_new
+            """)).fetchone()
+            
             return jsonify({
                 'success': True,
-                'stats': {
-                    'total_registros': general_stats[0],
-                    'con_diagnostico': general_stats[1],
-                    'registros_hoy': general_stats[2],
-                    'registros_este_mes': general_stats[3]
+                'ai_insights': {
+                    'total_perfiles': basic_stats[0],
+                    'con_diagnostico_formal': basic_stats[1],
+                    'con_experiencia_laboral': basic_stats[2],
+                    'necesitan_adaptaciones': basic_stats[3]
                 },
-                'type_distribution': [{'tipo': row[0], 'count': row[1]} for row in type_distribution]
+                'education_levels': [{'nivel': row[0], 'count': row[1]} for row in education_analysis],
+                'work_experience_types': [{'tipo': row[0], 'count': row[1]} for row in work_experience],
+                'adaptation_needs': [{'tipo': row[0], 'count': row[1]} for row in adaptations_analysis],
+                'diagnosis_breakdown': [{'formal': row[0], 'tipo': row[1], 'count': row[2]} for row in diagnosis_insights]
             })
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
