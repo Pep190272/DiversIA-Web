@@ -11,6 +11,17 @@ from app import app, db
 from models import Task, Employee
 from email_notifications import send_employee_notification, send_task_assignment_notification
 
+# Google Drive imports
+try:
+    from google.oauth2 import service_account
+    from googleapiclient.discovery import build
+    from googleapiclient.errors import HttpError
+    import json
+    import os
+    GOOGLE_DRIVE_AVAILABLE = True
+except ImportError:
+    GOOGLE_DRIVE_AVAILABLE = False
+
 @app.route('/tasks')
 def tasks_dashboard():
     """Dashboard principal de gestión de tareas"""
@@ -102,7 +113,12 @@ def import_tasks_csv():
                 existing.colaborador = row.get('Colaborador', '').strip()
                 existing.fecha_inicio = row.get('Fecha de inicio', '').strip()
                 existing.fecha_final = row.get('Fecha final', '').strip()
-                existing.estado = row.get('Pendiente', 'Pendiente').strip()
+                # Buscar estado en diferentes posibles nombres de columna
+                estado_value = (row.get('Estado', '') or 
+                               row.get('Pendiente', '') or 
+                               row.get('Status', '') or 
+                               'Pendiente').strip()
+                existing.estado = estado_value
                 existing.updated_at = datetime.now()
                 updated_count += 1
             else:
@@ -112,7 +128,10 @@ def import_tasks_csv():
                     colaborador = row.get('Colaborador', '').strip(),
                     fecha_inicio = row.get('Fecha de inicio', '').strip(),
                     fecha_final = row.get('Fecha final', '').strip(),
-                    estado = row.get('Pendiente', 'Pendiente').strip(),
+                    estado = (row.get('Estado', '') or 
+                             row.get('Pendiente', '') or 
+                             row.get('Status', '') or 
+                             'Pendiente').strip(),
                     notas = ''
                 )
                 db.session.add(new_task)
@@ -413,11 +432,27 @@ TASKS_TABLE_TEMPLATE = '''
                 
                 <!-- Acciones rápidas -->
                 <div class="row mb-3">
-                    <div class="col-md-4">
-                        <form action="/tasks/import" method="post" enctype="multipart/form-data" class="d-flex">
-                            <input type="file" name="file" class="form-control me-2" accept=".csv" required>
-                            <button type="submit" class="btn btn-success">Importar CSV</button>
-                        </form>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">📁 Importar Tareas</h6>
+                            </div>
+                            <div class="card-body">
+                                <!-- Importar desde archivo local -->
+                                <form action="/tasks/import" method="post" enctype="multipart/form-data" class="d-flex mb-2">
+                                    <input type="file" name="file" class="form-control me-2" accept=".csv" required>
+                                    <button type="submit" class="btn btn-success btn-sm">📂 Local</button>
+                                </form>
+                                
+                                <!-- Importar desde Google Drive -->
+                                <div class="d-flex">
+                                    <button class="btn btn-primary btn-sm" onclick="showGoogleDriveModal()">
+                                        🌐 Google Drive
+                                    </button>
+                                    <small class="text-muted ms-2 align-self-center">CSV y Google Sheets</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <div class="input-group">
@@ -573,6 +608,41 @@ TASKS_TABLE_TEMPLATE = '''
         </div>
     </div>
     
+    <!-- Modal de Google Drive -->
+    <div class="modal fade" id="googleDriveModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🌐 Importar desde Google Drive</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="gdrive-loading" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2">Cargando archivos de Google Drive...</p>
+                    </div>
+                    
+                    <div id="gdrive-error" class="alert alert-warning d-none">
+                        <h6>⚠️ Google Drive no configurado</h6>
+                        <p>Para usar esta función necesitas configurar las credenciales de Google Drive.</p>
+                        <small>Contacta al administrador para obtener acceso.</small>
+                    </div>
+                    
+                    <div id="gdrive-files" class="d-none">
+                        <h6>📁 Archivos disponibles (CSV y Google Sheets):</h6>
+                        <div id="files-list" class="mt-3">
+                            <!-- Los archivos se cargarán aquí dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="refresh-files" onclick="loadGoogleDriveFiles()">🔄 Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
         function deleteTask(id) {
             if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
@@ -603,6 +673,119 @@ TASKS_TABLE_TEMPLATE = '''
             document.getElementById('taskForm').reset();
         }
         
+        // ===== GOOGLE DRIVE FUNCTIONS =====
+        function showGoogleDriveModal() {
+            const modal = new bootstrap.Modal(document.getElementById('googleDriveModal'));
+            modal.show();
+            loadGoogleDriveFiles();
+        }
+        
+        function loadGoogleDriveFiles() {
+            const loading = document.getElementById('gdrive-loading');
+            const error = document.getElementById('gdrive-error');
+            const files = document.getElementById('gdrive-files');
+            
+            // Mostrar loading, ocultar otros
+            loading.classList.remove('d-none');
+            error.classList.add('d-none');
+            files.classList.add('d-none');
+            
+            fetch('/tasks/google-drive-files')
+                .then(response => response.json())
+                .then(data => {
+                    loading.classList.add('d-none');
+                    
+                    if (data.success) {
+                        displayGoogleDriveFiles(data.files);
+                        files.classList.remove('d-none');
+                    } else {
+                        error.classList.remove('d-none');
+                    }
+                })
+                .catch(err => {
+                    loading.classList.add('d-none');
+                    error.classList.remove('d-none');
+                    console.error('Error cargando archivos de Google Drive:', err);
+                });
+        }
+        
+        function displayGoogleDriveFiles(fileList) {
+            const container = document.getElementById('files-list');
+            
+            if (fileList.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">No se encontraron archivos CSV o Google Sheets</div>';
+                return;
+            }
+            
+            let html = '';
+            fileList.forEach(file => {
+                const typeIcon = file.type === 'Google Sheets' ? '📊' : '📄';
+                const typeClass = file.type === 'Google Sheets' ? 'text-success' : 'text-primary';
+                
+                html += `
+                    <div class="card mb-2">
+                        <div class="card-body py-2">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h6 class="mb-1">${typeIcon} ${file.name}</h6>
+                                    <small class="${typeClass}">${file.type}</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">
+                                        ${file.created ? new Date(file.created).toLocaleDateString('es-ES') : 'N/A'}
+                                    </small>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <button class="btn btn-sm btn-primary me-1" 
+                                            onclick="importFromGoogleDrive('${file.id}', '${file.name}')">
+                                        📥 Importar
+                                    </button>
+                                    ${file.view_link ? `<a href="${file.view_link}" target="_blank" class="btn btn-sm btn-outline-secondary">👁️</a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function importFromGoogleDrive(fileId, fileName) {
+            if (!confirm(`¿Importar tareas desde "${fileName}"?`)) {
+                return;
+            }
+            
+            // Mostrar loading en el botón
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            fetch('/tasks/import-from-google-drive', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ file_id: fileId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                buttons.forEach(btn => btn.disabled = false);
+                
+                if (data.success) {
+                    alert(`✅ ${data.message}`);
+                    // Cerrar modal y recargar página
+                    bootstrap.Modal.getInstance(document.getElementById('googleDriveModal')).hide();
+                    location.reload();
+                } else {
+                    alert(`❌ Error: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                buttons.forEach(btn => btn.disabled = false);
+                alert(`❌ Error de conexión: ${error}`);
+                console.error('Error importando desde Google Drive:', error);
+            });
+        }
 
         
         // Gestión de tareas manuales
@@ -1170,5 +1353,246 @@ TASKS_ANALYTICS_TEMPLATE = '''
 </body>
 </html>
 '''
+
+# ============================================
+# GOOGLE DRIVE INTEGRATION
+# ============================================
+
+def get_google_drive_service():
+    """Inicializar servicio de Google Drive usando service account credentials"""
+    if not GOOGLE_DRIVE_AVAILABLE:
+        return None
+    
+    try:
+        # Buscar credenciales de service account
+        credentials_json = os.environ.get('GOOGLE_SERVICE_ACCOUNT_JSON')
+        if not credentials_json:
+            return None
+            
+        # Parse JSON credentials
+        credentials_info = json.loads(credentials_json)
+        
+        # Configurar scopes
+        SCOPES = [
+            'https://www.googleapis.com/auth/drive.readonly',
+            'https://www.googleapis.com/auth/spreadsheets.readonly'
+        ]
+        
+        # Crear credenciales
+        credentials = service_account.Credentials.from_service_account_info(
+            credentials_info, scopes=SCOPES
+        )
+        
+        # Construir servicio
+        service = build('drive', 'v3', credentials=credentials)
+        return service
+        
+    except Exception as e:
+        print(f"Error inicializando Google Drive: {e}")
+        return None
+
+def get_google_sheets_service():
+    """Inicializar servicio de Google Sheets"""
+    if not GOOGLE_DRIVE_AVAILABLE:
+        return None
+        
+    try:
+        # Buscar credenciales de service account
+        credentials_json = os.environ.get('GOOGLE_SERVICE_ACCOUNT_JSON')
+        if not credentials_json:
+            return None
+            
+        # Parse JSON credentials
+        credentials_info = json.loads(credentials_json)
+        
+        # Configurar scopes
+        SCOPES = [
+            'https://www.googleapis.com/auth/drive.readonly',
+            'https://www.googleapis.com/auth/spreadsheets.readonly'
+        ]
+        
+        # Crear credenciales
+        credentials = service_account.Credentials.from_service_account_info(
+            credentials_info, scopes=SCOPES
+        )
+        
+        # Construir servicio
+        service = build('sheets', 'v4', credentials=credentials)
+        return service
+        
+    except Exception as e:
+        print(f"Error inicializando Google Sheets: {e}")
+        return None
+
+@app.route('/tasks/google-drive-files')
+def list_google_drive_files():
+    """Listar archivos CSV y hojas de cálculo de Google Drive"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return jsonify({'error': 'No autorizado'}), 403
+        
+    if not GOOGLE_DRIVE_AVAILABLE:
+        return jsonify({'error': 'Google Drive no disponible'}), 400
+    
+    try:
+        service = get_google_drive_service()
+        if not service:
+            return jsonify({'error': 'No se pudo conectar a Google Drive. Verifica las credenciales.'}), 400
+        
+        # Buscar archivos CSV y hojas de cálculo
+        query = "mimeType='text/csv' or mimeType='application/vnd.google-apps.spreadsheet'"
+        results = service.files().list(
+            q=query,
+            fields="files(id, name, mimeType, createdTime, webViewLink, size)",
+            orderBy='createdTime desc',
+            pageSize=50
+        ).execute()
+        
+        files = results.get('files', [])
+        
+        # Formatear información de archivos
+        formatted_files = []
+        for file in files:
+            formatted_files.append({
+                'id': file['id'],
+                'name': file['name'],
+                'type': 'Google Sheets' if file['mimeType'] == 'application/vnd.google-apps.spreadsheet' else 'CSV',
+                'created': file.get('createdTime', ''),
+                'view_link': file.get('webViewLink', ''),
+                'size': file.get('size', 'N/A')
+            })
+        
+        return jsonify({
+            'success': True,
+            'files': formatted_files,
+            'count': len(formatted_files)
+        })
+        
+    except HttpError as e:
+        return jsonify({'error': f'Error de Google Drive: {e}'}), 400
+    except Exception as e:
+        return jsonify({'error': f'Error: {str(e)}'}), 500
+
+@app.route('/tasks/import-from-google-drive', methods=['POST'])
+def import_tasks_from_google_drive():
+    """Importar tareas desde Google Drive (CSV o Google Sheets)"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    if not GOOGLE_DRIVE_AVAILABLE:
+        flash('Google Drive no está disponible', 'error')
+        return redirect('/tasks')
+    
+    data = request.get_json()
+    file_id = data.get('file_id')
+    
+    if not file_id:
+        return jsonify({'error': 'ID de archivo requerido'}), 400
+    
+    try:
+        drive_service = get_google_drive_service()
+        sheets_service = get_google_sheets_service()
+        
+        if not drive_service:
+            return jsonify({'error': 'No se pudo conectar a Google Drive'}), 400
+        
+        # Obtener metadatos del archivo
+        file_metadata = drive_service.files().get(fileId=file_id).execute()
+        file_name = file_metadata['name']
+        mime_type = file_metadata['mimeType']
+        
+        csv_content = None
+        
+        if mime_type == 'application/vnd.google-apps.spreadsheet':
+            # Es una hoja de cálculo de Google
+            if not sheets_service:
+                return jsonify({'error': 'No se pudo conectar a Google Sheets'}), 400
+            
+            # Exportar como CSV
+            request_export = drive_service.files().export_media(
+                fileId=file_id,
+                mimeType='text/csv'
+            )
+            csv_content = request_export.execute().decode('utf-8')
+            
+        elif mime_type == 'text/csv':
+            # Es un archivo CSV regular
+            request_download = drive_service.files().get_media(fileId=file_id)
+            csv_content = request_download.execute().decode('utf-8')
+        else:
+            return jsonify({'error': 'Tipo de archivo no soportado'}), 400
+        
+        # Procesar el contenido CSV
+        if not csv_content:
+            return jsonify({'error': 'No se pudo obtener el contenido del archivo'}), 400
+        
+        # Usar la misma lógica de importación que el CSV upload
+        csv_reader = csv.DictReader(io.StringIO(csv_content))
+        
+        imported_count = 0
+        updated_count = 0
+        errors = []
+        
+        for row_num, row in enumerate(csv_reader, start=2):  # Empezar en 2 porque la fila 1 son headers
+            try:
+                tarea_name = row.get('Tarea', '').strip()
+                
+                if not tarea_name:
+                    continue
+                
+                # Buscar tarea existente
+                existing = Task.query.filter_by(tarea=tarea_name).first()
+                
+                # Buscar estado en diferentes nombres de columna
+                estado_value = (row.get('Estado', '') or 
+                               row.get('Pendiente', '') or 
+                               row.get('Status', '') or 
+                               'Pendiente').strip()
+                
+                if existing:
+                    # Actualizar tarea existente
+                    existing.colaborador = row.get('Colaborador', '').strip()
+                    existing.fecha_inicio = row.get('Fecha de inicio', '').strip()
+                    existing.fecha_final = row.get('Fecha final', '').strip()
+                    existing.estado = estado_value
+                    existing.updated_at = datetime.now()
+                    updated_count += 1
+                else:
+                    # Crear nueva tarea
+                    new_task = Task(
+                        tarea = tarea_name,
+                        colaborador = row.get('Colaborador', '').strip(),
+                        fecha_inicio = row.get('Fecha de inicio', '').strip(),
+                        fecha_final = row.get('Fecha final', '').strip(),
+                        estado = estado_value,
+                        notas = ''
+                    )
+                    db.session.add(new_task)
+                    imported_count += 1
+                    
+            except Exception as e:
+                errors.append(f"Fila {row_num}: {str(e)}")
+        
+        db.session.commit()
+        
+        result_message = f'Importación desde Google Drive exitosa: {imported_count} tareas nuevas, {updated_count} actualizadas'
+        if errors:
+            result_message += f'. {len(errors)} errores encontrados.'
+        
+        return jsonify({
+            'success': True,
+            'message': result_message,
+            'imported': imported_count,
+            'updated': updated_count,
+            'errors': errors[:5],  # Mostrar solo los primeros 5 errores
+            'source': file_name
+        })
+        
+    except HttpError as e:
+        error_msg = f'Error de Google Drive: {e}'
+        return jsonify({'error': error_msg}), 400
+    except Exception as e:
+        db.session.rollback()
+        error_msg = f'Error al importar desde Google Drive: {str(e)}'
+        return jsonify({'error': error_msg}), 500
 
 print("✅ Task Manager cargado")
