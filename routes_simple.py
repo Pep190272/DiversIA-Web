@@ -175,7 +175,7 @@ def registro():
                 db.session.commit()
                 flash(f'¡Información actualizada exitosamente, {form.nombre.data}!', 'success')
                 print(f"✅ Lead actualizado: {form.nombre.data} {form.apellidos.data}")
-                return redirect(url_for('gracias'))
+                return redirect(url_for('index'))
             
             # Crear nuevo lead con información básica
             nuevo_lead = GeneralLead()
@@ -229,7 +229,7 @@ def registro():
             flash(f'¡Registro completado exitosamente, {form.nombre.data}! Te contactaremos pronto con información sobre oportunidades laborales.', 'success')
             # Lead registrado exitosamente
             
-            return redirect(url_for('gracias'))
+            return redirect(url_for('index'))
             
         except Exception as e:
             print(f"❌ Error en registro simple: {e}")

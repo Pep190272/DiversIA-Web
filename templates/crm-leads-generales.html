@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM Leads Generales - DiversIA</title>
+    <title>Dashboard Leads - DiversIA</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -16,31 +16,34 @@
             margin-bottom: 15px;
             transition: all 0.3s ease;
             cursor: pointer;
+            background: white;
         }
         .lead-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-        .nd-badge {
+        .time-badge {
             background: #e3f2fd;
             color: #1976d2;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 0.8em;
         }
-        .no-nd-badge {
-            background: #f3e5f5;
-            color: #7b1fa2;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
+        .status-new {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
         }
-        .converted-badge {
-            background: #e8f5e8;
-            color: #2e7d32;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
+        .status-contacted {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+        }
+        .auto-refresh {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
@@ -51,17 +54,17 @@
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h1 class="h3 mb-0">📝 CRM Leads Generales</h1>
-                        <p class="text-muted">Personas que completaron el test "Haz mi test" - Captación inicial</p>
+                        <h1 class="h3 mb-0">📊 Dashboard de Leads en Tiempo Real</h1>
+                        <p class="text-muted">Registros de personas interesadas en DiversIA</p>
                     </div>
                     <div>
                         <a href="/crm-minimal" class="btn btn-secondary me-2">
                             ← Volver al CRM
                         </a>
                         <button class="btn btn-success me-2" onclick="exportAllLeads()">
-                            📊 Exportar Leads
+                            📊 Exportar CSV
                         </button>
-                        <button class="btn btn-primary" onclick="loadLeads()">
+                        <button class="btn btn-primary auto-refresh" onclick="loadLeads()">
                             🔄 Actualizar
                         </button>
                     </div>
@@ -69,12 +72,12 @@
             </div>
         </div>
 
-        <!-- Estadísticas -->
+        <!-- Estadísticas Simplificadas -->
         <div class="row mb-4">
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h5 class="card-title">Total Leads</h5>
+                        <h5 class="card-title">Total Registros</h5>
                         <h2 class="text-primary" id="total-leads">0</h2>
                     </div>
                 </div>
@@ -82,77 +85,71 @@
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h5 class="card-title">Neurodivergentes</h5>
-                        <h2 class="text-info" id="nd-leads">0</h2>
+                        <h5 class="card-title">Hoy</h5>
+                        <h2 class="text-success" id="today-leads">0</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h5 class="card-title">No Neurodivergentes</h5>
-                        <h2 class="text-purple" id="no-nd-leads">0</h2>
+                        <h5 class="card-title">Esta Semana</h5>
+                        <h2 class="text-info" id="week-leads">0</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h5 class="card-title">Convertidos</h5>
-                        <h2 class="text-success" id="converted-leads">0</h2>
+                        <h5 class="card-title">Este Mes</h5>
+                        <h2 class="text-warning" id="month-leads">0</h2>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filtros y Acciones -->
+        <!-- Filtros Simples -->
         <div class="row mb-4">
-            <div class="col-md-3">
-                <select class="form-select" id="filter-type" onchange="filterLeads()">
-                    <option value="">Todos los leads</option>
-                    <option value="nd">Solo neurodivergentes</option>
-                    <option value="no-nd">Solo no neurodivergentes</option>
-                    <option value="converted">Solo convertidos</option>
-                    <option value="not-converted">No convertidos</option>
-                </select>
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <input type="text" class="form-control" id="search-input" placeholder="Buscar por nombre o email..." onkeyup="searchLeads()">
             </div>
-            <div class="col-md-6">
-                <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll()" id="select-all-btn">
-                        ☐ Seleccionar Todo
-                    </button>
-                    <button class="btn btn-sm btn-success" onclick="exportSelected()" id="export-selected-btn" disabled>
-                        📊 Exportar Seleccionados
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteSelected()" id="delete-selected-btn" disabled>
-                        🗑️ Eliminar Seleccionados
-                    </button>
-                    <button class="btn btn-sm btn-info" onclick="exportAllLeads()">
-                        📋 Exportar Todos
-                    </button>
-                </div>
+            <div class="col-md-4">
+                <select class="form-select" id="filter-source" onchange="filterLeads()">
+                    <option value="">Todos los orígenes</option>
+                    <option value="redes_sociales">Redes Sociales</option>
+                    <option value="google">Google</option>
+                    <option value="recomendacion">Recomendación</option>
+                    <option value="evento">Evento</option>
+                    <option value="medios">Medios</option>
+                    <option value="otro">Otro</option>
+                </select>
             </div>
-        </div>
-        
-        <!-- Información de selección -->
-        <div class="row mb-3" id="selection-info" style="display: none;">
-            <div class="col-12">
-                <div class="alert alert-info mb-0">
-                    <span id="selected-count">0</span> leads seleccionados
-                </div>
+            <div class="col-md-4">
+                <select class="form-select" id="filter-time" onchange="filterLeads()">
+                    <option value="">Todos los tiempos</option>
+                    <option value="today">Hoy</option>
+                    <option value="week">Esta semana</option>
+                    <option value="month">Este mes</option>
+                </select>
             </div>
         </div>
 
-        <!-- Lista de leads -->
+        <!-- Lista de Leads -->
         <div class="row">
             <div class="col-12">
-                <div id="leads-container">
-                    <div class="text-center">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Cargando...</span>
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Registros Recientes</h5>
+                        <small class="text-muted">Actualización automática cada 30 segundos</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="leads-container">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Cargando registros...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -160,20 +157,20 @@
         </div>
     </div>
 
-    <!-- Modal para editar lead -->
-    <div class="modal fade" id="editLeadModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+    <!-- Modal para ver detalles -->
+    <div class="modal fade" id="leadModal" tabindex="-1">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Editar Lead</h5>
+                    <h5 class="modal-title">Detalles del Registro</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body" id="editModalBody">
+                <div class="modal-body" id="modal-body">
                     <!-- Contenido dinámico -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveLeadChanges()">Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="contactLead()">Marcar como Contactado</button>
                 </div>
             </div>
         </div>
@@ -182,523 +179,208 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let allLeads = [];
-        let currentEditingLead = null;
+        let filteredLeads = [];
+        let selectedLeadId = null;
 
-        // Cargar datos al inicio
+        // Cargar leads al inicio
         document.addEventListener('DOMContentLoaded', function() {
             loadLeads();
+            // Auto-refresh cada 30 segundos
+            setInterval(loadLeads, 30000);
         });
 
-        async function loadLeads() {
-            try {
-                const response = await fetch('/api/leads-generales');
-                allLeads = await response.json();
-                
-                selectedLeads.clear(); // Limpiar selección al recargar
-                updateStatistics();
-                displayLeads(allLeads);
-                updateSelectionUI();
-                
-            } catch (error) {
-                console.error('Error loading leads:', error);
-                document.getElementById('leads-container').innerHTML = 
-                    '<div class="alert alert-danger">Error cargando leads</div>';
-            }
+        function loadLeads() {
+            fetch('/api/general-leads')
+                .then(response => response.json())
+                .then(data => {
+                    allLeads = data.leads || [];
+                    updateStats();
+                    displayLeads(allLeads);
+                })
+                .catch(error => {
+                    console.error('Error cargando leads:', error);
+                    document.getElementById('leads-container').innerHTML = 
+                        '<div class="alert alert-danger">Error cargando los registros</div>';
+                });
         }
 
-        function updateStatistics() {
-            const total = allLeads.length;
-            const ndLeads = allLeads.filter(lead => lead.tipo_neurodivergencia).length;
-            const noNdLeads = total - ndLeads;
-            const converted = allLeads.filter(lead => lead.convertido_a_perfil).length;
+        function updateStats() {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-            document.getElementById('total-leads').textContent = total;
-            document.getElementById('nd-leads').textContent = ndLeads;
-            document.getElementById('no-nd-leads').textContent = noNdLeads;
-            document.getElementById('converted-leads').textContent = converted;
+            const todayCount = allLeads.filter(lead => new Date(lead.created_at) >= today).length;
+            const weekCount = allLeads.filter(lead => new Date(lead.created_at) >= weekAgo).length;
+            const monthCount = allLeads.filter(lead => new Date(lead.created_at) >= monthAgo).length;
+
+            document.getElementById('total-leads').textContent = allLeads.length;
+            document.getElementById('today-leads').textContent = todayCount;
+            document.getElementById('week-leads').textContent = weekCount;
+            document.getElementById('month-leads').textContent = monthCount;
         }
-
-        let selectedLeads = new Set();
 
         function displayLeads(leads) {
             const container = document.getElementById('leads-container');
             
             if (leads.length === 0) {
-                container.innerHTML = '<div class="alert alert-info">No hay leads registrados aún</div>';
+                container.innerHTML = '<div class="text-center text-muted py-4">No hay registros disponibles</div>';
                 return;
             }
 
-            let html = '';
-            leads.forEach(lead => {
-                const isNd = lead.tipo_neurodivergencia && lead.tipo_neurodivergencia !== '';
-                const badge = isNd ? 
-                    `<span class="nd-badge">${lead.tipo_neurodivergencia.toUpperCase()}</span>` :
-                    `<span class="no-nd-badge">No ND</span>`;
+            const html = leads.map(lead => {
+                const date = new Date(lead.created_at);
+                const timeAgo = getTimeAgo(date);
+                const isNew = (Date.now() - date.getTime()) < 24 * 60 * 60 * 1000; // Menos de 24 horas
                 
-                const convertedBadge = lead.convertido_a_perfil ? 
-                    `<span class="converted-badge ms-2">✓ Convertido</span>` : '';
-
-                const isSelected = selectedLeads.has(lead.id);
-                const selectedClass = isSelected ? 'border-primary bg-light' : '';
-
-                html += `
-                    <div class="lead-card ${selectedClass}" style="position: relative;">
+                return `
+                    <div class="lead-card ${isNew ? 'status-new' : ''}" onclick="showLeadDetails(${lead.id})">
                         <div class="row">
-                            <div class="col-md-1">
-                                <div class="form-check">
-                                    <input class="form-check-input lead-checkbox" type="checkbox" 
-                                           id="lead-${lead.id}" value="${lead.id}" 
-                                           ${isSelected ? 'checked' : ''}
-                                           onchange="toggleLeadSelection(${lead.id})">
-                                </div>
-                            </div>
-                            <div class="col-md-5" onclick="editLead(${lead.id})" style="cursor: pointer;">
+                            <div class="col-md-4">
                                 <h6 class="mb-1">${lead.nombre} ${lead.apellidos}</h6>
                                 <small class="text-muted">${lead.email}</small>
-                                <div class="mt-2">${badge}${convertedBadge}</div>
                             </div>
-                            <div class="col-md-3" onclick="editLead(${lead.id})" style="cursor: pointer;">
+                            <div class="col-md-3">
                                 <small class="text-muted">Ciudad:</small><br>
-                                <span>${lead.ciudad}</span><br>
-                                <small class="text-muted">Teléfono:</small><br>
-                                <span>${lead.telefono || 'No especificado'}</span>
+                                <span>${lead.ciudad || 'No especificada'}</span>
                             </div>
-                            <div class="col-md-2" onclick="editLead(${lead.id})" style="cursor: pointer;">
-                                <small class="text-muted">Registrado:</small><br>
-                                <span>${new Date(lead.created_at).toLocaleDateString()}</span><br>
-                                <small class="text-muted">Experiencia:</small><br>
-                                <span class="text-truncate d-block" style="max-width: 120px;">
-                                    ${lead.experiencia_laboral || 'No especificada'}
-                                </span>
+                            <div class="col-md-3">
+                                <small class="text-muted">Origen:</small><br>
+                                <span class="badge bg-light text-dark">${getSourceLabel(lead.motivaciones)}</span>
                             </div>
-                            <div class="col-md-1">
-                                <button class="btn btn-sm btn-outline-danger" 
-                                        onclick="deleteIndividualLead(${lead.id}, event)"
-                                        title="Eliminar lead">
-                                    🗑️
-                                </button>
+                            <div class="col-md-2 text-end">
+                                <span class="time-badge">${timeAgo}</span>
+                                ${isNew ? '<br><small class="text-warning">✨ Nuevo</small>' : ''}
                             </div>
                         </div>
+                        ${lead.intereses_laborales ? `
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <small class="text-muted">Intereses:</small><br>
+                                    <span class="text-truncate d-block">${lead.intereses_laborales}</span>
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
-            });
+            }).join('');
 
             container.innerHTML = html;
         }
 
-        async function editLead(leadId) {
-            try {
-                const response = await fetch(`/api/leads-generales/${leadId}`);
-                const lead = await response.json();
-                currentEditingLead = lead;
-
-                const modalBody = document.getElementById('editModalBody');
-                modalBody.innerHTML = `
-                    <form id="editLeadForm">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="edit-nombre" value="${lead.nombre}">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Apellidos</label>
-                                    <input type="text" class="form-control" id="edit-apellidos" value="${lead.apellidos}">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Teléfono</label>
-                                    <input type="text" class="form-control" id="edit-telefono" value="${lead.telefono || ''}">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Ciudad</label>
-                                    <input type="text" class="form-control" id="edit-ciudad" value="${lead.ciudad}">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label">Habilidades</label>
-                                    <textarea class="form-control" id="edit-habilidades" rows="2">${lead.habilidades || ''}</textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label">Experiencia Laboral</label>
-                                    <textarea class="form-control" id="edit-experiencia" rows="3">${lead.experiencia_laboral || ''}</textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label class="form-label">Intereses Laborales</label>
-                                    <textarea class="form-control" id="edit-intereses" rows="3">${lead.intereses_laborales || ''}</textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="edit-convertido" ${lead.convertido_a_perfil ? 'checked' : ''}>
-                                    <label class="form-check-label" for="edit-convertido">
-                                        Convertido a perfil específico
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                `;
-
-                new bootstrap.Modal(document.getElementById('editLeadModal')).show();
-
-            } catch (error) {
-                console.error('Error loading lead details:', error);
-                alert('Error cargando detalles del lead');
-            }
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'Hace unos segundos';
+            if (diffInSeconds < 3600) return `Hace ${Math.floor(diffInSeconds / 60)} min`;
+            if (diffInSeconds < 86400) return `Hace ${Math.floor(diffInSeconds / 3600)} h`;
+            return `Hace ${Math.floor(diffInSeconds / 86400)} días`;
         }
 
-        async function saveLeadChanges() {
-            if (!currentEditingLead) return;
-
-            try {
-                const formData = {
-                    nombre: document.getElementById('edit-nombre').value,
-                    apellidos: document.getElementById('edit-apellidos').value,
-                    telefono: document.getElementById('edit-telefono').value,
-                    ciudad: document.getElementById('edit-ciudad').value,
-                    habilidades: document.getElementById('edit-habilidades').value,
-                    experiencia_laboral: document.getElementById('edit-experiencia').value,
-                    intereses_laborales: document.getElementById('edit-intereses').value,
-                    convertido_a_perfil: document.getElementById('edit-convertido').checked
-                };
-
-                const response = await fetch(`/api/leads-generales/${currentEditingLead.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const result = await response.json();
-                
-                if (result.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('editLeadModal')).hide();
-                    loadLeads(); // Recargar datos
-                    alert('Lead actualizado correctamente');
-                } else {
-                    alert('Error actualizando lead: ' + result.error);
-                }
-
-            } catch (error) {
-                console.error('Error saving lead:', error);
-                alert('Error guardando cambios');
-            }
+        function getSourceLabel(source) {
+            const labels = {
+                'redes_sociales': 'Redes Sociales',
+                'google': 'Google',
+                'recomendacion': 'Recomendación',
+                'evento': 'Evento',
+                'medios': 'Medios',
+                'otro': 'Otro'
+            };
+            return labels[source] || 'No especificado';
         }
 
-        function filterLeads() {
-            updateLeadDisplay();
-            updateSelectionUI();
+        function showLeadDetails(leadId) {
+            const lead = allLeads.find(l => l.id === leadId);
+            if (!lead) return;
+
+            selectedLeadId = leadId;
+            const modalBody = document.getElementById('modal-body');
+            
+            modalBody.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Nombre:</strong><br>${lead.nombre} ${lead.apellidos}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Email:</strong><br>${lead.email}
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <strong>Teléfono:</strong><br>${lead.telefono || 'No proporcionado'}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Ciudad:</strong><br>${lead.ciudad}
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <strong>Origen:</strong><br>${getSourceLabel(lead.motivaciones)}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Registro:</strong><br>${new Date(lead.created_at).toLocaleString('es-ES')}
+                    </div>
+                </div>
+                ${lead.intereses_laborales ? `
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <strong>Intereses:</strong><br>${lead.intereses_laborales}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            new bootstrap.Modal(document.getElementById('leadModal')).show();
         }
 
         function searchLeads() {
-            updateLeadDisplay();
-            updateSelectionUI();
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = allLeads.filter(lead => 
+                lead.nombre.toLowerCase().includes(query) ||
+                lead.apellidos.toLowerCase().includes(query) ||
+                lead.email.toLowerCase().includes(query)
+            );
+            displayLeads(filtered);
         }
 
-        async function exportAllLeads() {
-            try {
-                const response = await fetch('/api/leads-generales/export-all');
+        function filterLeads() {
+            const sourceFilter = document.getElementById('filter-source').value;
+            const timeFilter = document.getElementById('filter-time').value;
+            
+            let filtered = allLeads;
+            
+            if (sourceFilter) {
+                filtered = filtered.filter(lead => lead.motivaciones === sourceFilter);
+            }
+            
+            if (timeFilter) {
+                const now = new Date();
+                let cutoff;
                 
-                if (response.ok) {
-                    // Descargar archivo CSV
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `todos_los_leads_${new Date().toISOString().split('T')[0]}.csv`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                    
-                    alert(`✅ ${allLeads.length} leads exportados correctamente`);
-                } else {
-                    const result = await response.json();
-                    alert('❌ Error exportando leads: ' + result.error);
-                }
-            } catch (error) {
-                console.error('Error exporting all leads:', error);
-                alert('❌ Error exportando todos los leads');
-            }
-        }
-
-        function toggleLeadSelection(leadId) {
-            if (selectedLeads.has(leadId)) {
-                selectedLeads.delete(leadId);
-            } else {
-                selectedLeads.add(leadId);
-            }
-            updateSelectionUI();
-            updateLeadDisplay();
-        }
-
-        function toggleSelectAll() {
-            const currentLeads = getCurrentFilteredLeads();
-            const allSelected = currentLeads.every(lead => selectedLeads.has(lead.id));
-            
-            if (allSelected) {
-                // Deseleccionar todos los visibles
-                currentLeads.forEach(lead => selectedLeads.delete(lead.id));
-            } else {
-                // Seleccionar todos los visibles
-                currentLeads.forEach(lead => selectedLeads.add(lead.id));
-            }
-            
-            updateSelectionUI();
-            displayLeads(currentLeads);
-        }
-
-        function updateSelectionUI() {
-            const count = selectedLeads.size;
-            const selectAllBtn = document.getElementById('select-all-btn');
-            const exportBtn = document.getElementById('export-selected-btn');
-            const deleteBtn = document.getElementById('delete-selected-btn');
-            const selectionInfo = document.getElementById('selection-info');
-            const selectedCountSpan = document.getElementById('selected-count');
-            
-            // Actualizar contador
-            selectedCountSpan.textContent = count;
-            
-            // Mostrar/ocultar información de selección
-            if (count > 0) {
-                selectionInfo.style.display = 'block';
-                exportBtn.disabled = false;
-                deleteBtn.disabled = false;
-            } else {
-                selectionInfo.style.display = 'none';
-                exportBtn.disabled = true;
-                deleteBtn.disabled = true;
-            }
-            
-            // Actualizar texto del botón de seleccionar todo
-            const currentLeads = getCurrentFilteredLeads();
-            const allSelected = currentLeads.length > 0 && currentLeads.every(lead => selectedLeads.has(lead.id));
-            selectAllBtn.innerHTML = allSelected ? '☑️ Deseleccionar Todo' : '☐ Seleccionar Todo';
-        }
-
-        function getCurrentFilteredLeads() {
-            const filter = document.getElementById('filter-type').value;
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            
-            let filteredLeads = allLeads;
-            
-            // Aplicar filtro por tipo
-            switch(filter) {
-                case 'nd':
-                    filteredLeads = filteredLeads.filter(lead => lead.tipo_neurodivergencia);
-                    break;
-                case 'no-nd':
-                    filteredLeads = filteredLeads.filter(lead => !lead.tipo_neurodivergencia);
-                    break;
-                case 'converted':
-                    filteredLeads = filteredLeads.filter(lead => lead.convertido_a_perfil);
-                    break;
-                case 'not-converted':
-                    filteredLeads = filteredLeads.filter(lead => !lead.convertido_a_perfil);
-                    break;
-            }
-            
-            // Aplicar búsqueda
-            if (searchTerm) {
-                filteredLeads = filteredLeads.filter(lead => 
-                    lead.nombre.toLowerCase().includes(searchTerm) ||
-                    lead.apellidos.toLowerCase().includes(searchTerm) ||
-                    lead.email.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            return filteredLeads;
-        }
-
-        function updateLeadDisplay() {
-            const filteredLeads = getCurrentFilteredLeads();
-            displayLeads(filteredLeads);
-        }
-
-        async function deleteSelected() {
-            if (selectedLeads.size === 0) {
-                alert('No hay leads seleccionados');
-                return;
-            }
-            
-            const count = selectedLeads.size;
-            
-            // PROTECCIÓN DE DATOS MÚLTIPLE
-            
-            // Primera confirmación
-            if (!confirm(`⚠️ ATENCIÓN: ¿Estás seguro de que quieres eliminar ${count} leads seleccionados?\n\nEsta acción eliminará permanentemente los datos de estas personas.\n\n¿Deseas continuar?`)) {
-                return;
-            }
-            
-            // Segunda confirmación para eliminaciones masivas
-            if (count > 5) {
-                if (!confirm(`🛑 CONFIRMACIÓN ADICIONAL REQUERIDA\n\nVas a eliminar ${count} leads (más de 5).\n\nEsto podría afectar significativamente tu base de datos.\n\n¿Estás COMPLETAMENTE SEGURO de que quieres continuar?`)) {
-                    return;
-                }
-            }
-            
-            try {
-                // Primer intento - verificar confirmación
-                let response = await fetch('/api/leads-generales/bulk-delete', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        lead_ids: Array.from(selectedLeads),
-                        confirmed: true
-                    })
-                });
-                
-                let result = await response.json();
-                
-                // Si requiere doble confirmación
-                if (result.requires_double_confirmation) {
-                    if (!confirm(`🔒 CONFIRMACIÓN FINAL REQUERIDA\n\nPor seguridad, eliminar ${count} elementos requiere una confirmación adicional.\n\nEsta es tu ÚLTIMA oportunidad para cancelar.\n\n¿Proceder con la eliminación?`)) {
-                        return;
-                    }
-                    
-                    // Segundo intento con doble confirmación
-                    response = await fetch('/api/leads-generales/bulk-delete', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ 
-                            lead_ids: Array.from(selectedLeads),
-                            confirmed: true,
-                            double_confirmed: true
-                        })
-                    });
-                    
-                    result = await response.json();
+                if (timeFilter === 'today') {
+                    cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                } else if (timeFilter === 'week') {
+                    cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                } else if (timeFilter === 'month') {
+                    cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
                 }
                 
-                if (result.success) {
-                    alert(`✅ ${result.deleted_count} leads eliminados correctamente\n\n${result.backup_created ? '🛡️ Backup de seguridad creado' : ''}`);
-                    selectedLeads.clear();
-                    loadLeads(); // Recargar datos
-                } else {
-                    alert('❌ Error eliminando leads: ' + result.error);
-                }
-            } catch (error) {
-                console.error('Error deleting selected leads:', error);
-                alert('❌ Error eliminando leads seleccionados');
+                filtered = filtered.filter(lead => new Date(lead.created_at) >= cutoff);
             }
+            
+            displayLeads(filtered);
         }
 
-        async function exportSelected() {
-            if (selectedLeads.size === 0) {
-                alert('No hay leads seleccionados para exportar');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/leads-generales/bulk-export', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ lead_ids: Array.from(selectedLeads) })
-                });
-                
-                if (response.ok) {
-                    // Descargar archivo CSV
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `leads_seleccionados_${new Date().toISOString().split('T')[0]}.csv`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                    
-                    alert(`✅ ${selectedLeads.size} leads exportados correctamente`);
-                } else {
-                    const result = await response.json();
-                    alert('❌ Error exportando leads: ' + result.error);
-                }
-            } catch (error) {
-                console.error('Error exporting selected leads:', error);
-                alert('❌ Error exportando leads seleccionados');
-            }
+        function exportAllLeads() {
+            window.location.href = '/api/export-general-leads';
         }
 
-        async function deleteIndividualLead(leadId, event) {
-            event.stopPropagation(); // Evitar que se abra el modal de edición
+        function contactLead() {
+            if (!selectedLeadId) return;
             
-            const lead = allLeads.find(l => l.id === leadId);
-            if (!lead) return;
-            
-            // PROTECCIÓN DE DATOS INDIVIDUAL
-            if (!confirm(`⚠️ ELIMINACIÓN DE DATOS PERSONALES\n\n¿Estás seguro de que quieres eliminar a:\n\n👤 ${lead.nombre} ${lead.apellidos}\n📧 ${lead.email}\n\nEsta acción eliminará permanentemente todos los datos de esta persona.\n\n¿Deseas continuar?`)) {
-                return;
-            }
-            
-            try {
-                // Primer intento - verificar confirmación
-                let response = await fetch(`/api/leads-generales/${leadId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ confirmed: true })
-                });
-                
-                const result = await response.json();
-                
-                if (result.requires_confirmation) {
-                    // Si el backend requiere confirmación adicional
-                    if (!confirm(`🔒 CONFIRMACIÓN DE SEGURIDAD REQUERIDA\n\nPor la protección de datos, confirma nuevamente que quieres eliminar a:\n${lead.nombre} ${lead.apellidos}\n\n¿Proceder?`)) {
-                        return;
-                    }
-                    
-                    // Segundo intento con confirmación
-                    response = await fetch(`/api/leads-generales/${leadId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ confirmed: true, double_confirmed: true })
-                    });
-                    
-                    result = await response.json();
-                }
-                
-                if (result.success) {
-                    alert(`✅ Lead eliminado correctamente\n\n${result.backup_info ? '🛡️ ' + result.backup_info : ''}`);
-                    selectedLeads.delete(leadId); // Remover de selección si estaba seleccionado
-                    loadLeads(); // Recargar datos
-                } else {
-                    alert('❌ Error eliminando lead: ' + result.error);
-                }
-            } catch (error) {
-                console.error('Error deleting lead:', error);
-                alert('❌ Error eliminando lead');
-            }
+            // Aquí podrías agregar lógica para marcar como contactado
+            alert('Funcionalidad de contacto pendiente de implementar');
         }
     </script>
 </body>
