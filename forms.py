@@ -7,6 +7,26 @@ class MultiCheckboxField(SelectMultipleField):
     widget = ListWidget(prefix_label=False)
     option_widget = CheckboxInput()
 
+# Formulario simple para leads generales (sin neurodivergencia específica)
+class RegistroLeadForm(FlaskForm):
+    nombre = StringField('Nombre', validators=[DataRequired(message='El nombre es obligatorio')])
+    apellidos = StringField('Apellidos', validators=[DataRequired(message='Los apellidos son obligatorios')])
+    email = StringField('Email', validators=[DataRequired(message='El email es obligatorio'), Email(message='Introduce un email válido')])
+    telefono = StringField('Teléfono', validators=[Optional()])
+    ciudad = StringField('Ciudad', validators=[DataRequired(message='La ciudad es obligatoria')])
+    intereses = TextAreaField('¿En qué estás interesado?', validators=[Optional()], 
+                             render_kw={"placeholder": "Ejemplo: Información sobre empleo, recursos, capacitación..."})
+    como_conociste = SelectField('¿Cómo conociste DiversIA?', choices=[
+        ('', 'Selecciona una opción'),
+        ('redes_sociales', 'Redes sociales'),
+        ('google', 'Búsqueda en Google'),
+        ('recomendacion', 'Recomendación de alguien'),
+        ('evento', 'Evento o conferencia'),
+        ('medios', 'Medios de comunicación'),
+        ('otro', 'Otro')
+    ], validators=[Optional()])
+    aceptar_privacidad = BooleanField('Acepto la política de privacidad', validators=[DataRequired(message='Debes aceptar la política de privacidad')])
+
 # Formulario base para registro general
 class RegistroGeneralForm(FlaskForm):
     nombre = StringField('Nombre', validators=[DataRequired(message='El nombre es obligatorio')])

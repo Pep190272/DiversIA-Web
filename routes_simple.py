@@ -135,9 +135,9 @@ def terminos_condiciones():
 # ===== REGISTROS =====
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
-    """Página de registro general - Haz mi test"""
-    from forms import RegistroGeneralForm
-    form = RegistroGeneralForm()
+    """Página de registro general - Lead simple"""
+    from forms import RegistroLeadForm
+    form = RegistroLeadForm()
     
     # Validación más permisiva para debug
     if request.method == 'POST' and form.nombre.data and form.email.data:
@@ -150,50 +150,36 @@ def registro():
             # Verificar si el email ya existe
             lead_existente = GeneralLead.query.filter_by(email=form.email.data).first()
             if lead_existente:
-                # Actualizar el lead existente en lugar de crear uno nuevo
+                # Actualizar el lead existente con información básica
                 lead_existente.nombre = form.nombre.data
                 lead_existente.apellidos = form.apellidos.data
                 lead_existente.telefono = form.telefono.data
                 lead_existente.ciudad = form.ciudad.data
-                lead_existente.fecha_nacimiento = form.fecha_nacimiento.data
-                lead_existente.tipo_neurodivergencia = form.tipo_neurodivergencia.data
-                lead_existente.diagnostico_formal = form.diagnostico_formal.data == 'si'
-                lead_existente.habilidades = form.habilidades.data
-                lead_existente.experiencia_laboral = form.experiencia_laboral.data
-                lead_existente.formacion_academica = form.formacion_academica.data
-                lead_existente.intereses_laborales = form.intereses_laborales.data
-                lead_existente.adaptaciones_necesarias = form.adaptaciones_necesarias.data
-                lead_existente.motivaciones = form.motivaciones.data
+                lead_existente.intereses_laborales = form.intereses.data
+                lead_existente.motivaciones = form.como_conociste.data
                 
                 db.session.commit()
-                flash(f'¡Test actualizado exitosamente, {form.nombre.data}! Tu información ha sido actualizada.', 'success')
+                flash(f'¡Información actualizada exitosamente, {form.nombre.data}!', 'success')
                 print(f"✅ Lead actualizado: {form.nombre.data} {form.apellidos.data}")
-                return redirect(url_for('personas_nd'))
+                return redirect(url_for('gracias'))
             
-            # Mapear el campo diagnostico_formal (string a boolean)
-            diagnostico_bool = form.diagnostico_formal.data == 'si'
-            
-            # Crear nuevo lead con TODA la información del formulario
+            # Crear nuevo lead con información básica
             nuevo_lead = GeneralLead()
-            # Información personal
+            # Información personal básica
             nuevo_lead.nombre = form.nombre.data
             nuevo_lead.apellidos = form.apellidos.data
             nuevo_lead.email = form.email.data
             nuevo_lead.telefono = form.telefono.data
             nuevo_lead.ciudad = form.ciudad.data
-            nuevo_lead.fecha_nacimiento = form.fecha_nacimiento.data
             
-            # Información de neurodivergencia
-            nuevo_lead.tipo_neurodivergencia = form.tipo_neurodivergencia.data
-            nuevo_lead.diagnostico_formal = diagnostico_bool
+            # Campos simples de lead
+            nuevo_lead.intereses_laborales = form.intereses.data
+            nuevo_lead.motivaciones = form.como_conociste.data
             
-            # Información laboral y personal
-            nuevo_lead.habilidades = form.habilidades.data
-            nuevo_lead.experiencia_laboral = form.experiencia_laboral.data
-            nuevo_lead.formacion_academica = form.formacion_academica.data
-            nuevo_lead.intereses_laborales = form.intereses_laborales.data
-            nuevo_lead.adaptaciones_necesarias = form.adaptaciones_necesarias.data
-            nuevo_lead.motivaciones = form.motivaciones.data
+            # Campos por defecto para compatibilidad
+            nuevo_lead.tipo_neurodivergencia = None
+            nuevo_lead.diagnostico_formal = False
+            nuevo_lead.fecha_nacimiento = None
             
             db.session.add(nuevo_lead)
             db.session.commit()
@@ -202,21 +188,23 @@ def registro():
             try:
                 from flask_email_service import email_service
                 
-                # Email de bienvenida al usuario
+                # Email de bienvenida al usuario lead
                 email_service.send_welcome_email_user(
                     nombre=form.nombre.data,
                     email=form.email.data,
-                    tipo_neurodivergencia=form.tipo_neurodivergencia.data
+                    tipo_neurodivergencia="Lead General"
                 )
                 
                 # Email de notificación a DiversIA
-                email_service.send_notification_email("usuario", {
+                email_service.send_notification_email("lead", {
                     'nombre': form.nombre.data,
                     'apellidos': form.apellidos.data,
                     'email': form.email.data,
                     'telefono': form.telefono.data,
                     'ciudad': form.ciudad.data,
-                    'tipo_neurodivergencia': form.tipo_neurodivergencia.data
+                    'intereses': form.intereses.data,
+                    'como_conociste': form.como_conociste.data,
+                    'tipo': 'Lead General'
                 })
                 
                 print(f"✅ Emails enviados para registro general: {form.nombre.data}")
@@ -224,10 +212,10 @@ def registro():
             except Exception as e:
                 print(f"⚠️ Error enviando emails de registro general: {e}")
             
-            flash(f'¡Test completado exitosamente, {form.nombre.data}! Tu información ha sido guardada. Te contactaremos pronto con información sobre formularios específicos.', 'success')
+            flash(f'¡Registro completado exitosamente, {form.nombre.data}! Te contactaremos pronto con información sobre oportunidades laborales.', 'success')
             # Lead registrado exitosamente
             
-            return redirect(url_for('personas_nd'))
+            return redirect(url_for('gracias'))
             
         except Exception as e:
             flash('Error al guardar tu información. Por favor intenta de nuevo.', 'error')
