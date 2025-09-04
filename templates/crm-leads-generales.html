@@ -189,18 +189,35 @@
             setInterval(loadLeads, 30000);
         });
 
-        function loadLeads() {
+        function loadLeads(retryCount = 0) {
+            // Mostrar indicador de carga
+            document.getElementById('leads-container').innerHTML = 
+                '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
+                
             fetch('/api/leads-generales')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     allLeads = Array.isArray(data) ? data : [];
                     updateStats();
                     displayLeads(allLeads);
+                    console.log(`✅ Leads cargados correctamente: ${allLeads.length} registros`);
                 })
                 .catch(error => {
                     console.error('Error cargando leads:', error);
-                    document.getElementById('leads-container').innerHTML = 
-                        '<div class="alert alert-danger">Error cargando los registros</div>';
+                    
+                    // Reintentar automáticamente hasta 3 veces
+                    if (retryCount < 3) {
+                        console.log(`🔄 Reintentando carga (${retryCount + 1}/3) en 2 segundos...`);
+                        setTimeout(() => loadLeads(retryCount + 1), 2000);
+                    } else {
+                        document.getElementById('leads-container').innerHTML = 
+                            '<div class="alert alert-warning">⚠️ Error cargando registros. <button class="btn btn-sm btn-primary" onclick="loadLeads()">🔄 Reintentar</button></div>';
+                    }
                 });
         }
 
