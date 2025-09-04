@@ -412,11 +412,14 @@
                 button.innerHTML = '⏳';
                 button.disabled = true;
 
-                fetch(`/api/leads-generales/${leadId}/delete`, {
+                fetch(`/api/leads-generales/${leadId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                    }
+                    },
+                    body: JSON.stringify({
+                        confirmed: true
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {

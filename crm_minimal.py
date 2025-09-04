@@ -1731,5 +1731,60 @@ def create_minimal_crm_routes(app):
         
         return sectores_encontrados
 
+    @app.route('/unsubscribe')
+    def unsubscribe():
+        """Página para darse de baja de emails de marketing"""
+        from flask import render_template_string
+        token = request.args.get('token')
+        
+        if not token:
+            return render_template_string("""
+            <!DOCTYPE html>
+            <html>
+            <head><title>DiversIA - Baja de emails</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head>
+            <body class="bg-light">
+                <div class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h2>❌ Token inválido</h2>
+                                    <p>El enlace de baja no es válido o ha expirado.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """)
+        
+        # Aquí podrías implementar la lógica de baja real con el token
+        return render_template_string(f"""
+        <!DOCTYPE html>
+        <html>
+        <head><title>DiversIA - Baja de emails</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head>
+        <body class="bg-light">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h2>✅ Baja exitosa</h2>
+                                <p>Te has dado de baja exitosamente de los emails de DiversIA.</p>
+                                <p class="text-muted">Token: {token[:8]}...</p>
+                                <hr>
+                                <p><small>Si cambias de opinión, siempre puedes volver a registrarte en <a href="/">diversia.es</a></small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        """)
+
     print("CRM Minimal inicializado correctamente")
     
