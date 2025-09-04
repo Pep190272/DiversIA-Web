@@ -198,32 +198,33 @@ def registro():
             db.session.add(nuevo_lead)
             db.session.commit()
             
-            # Enviar email de bienvenida con SendGrid
+            # Enviar emails automáticos con Gmail (sistema original)
             try:
-                from sendgrid_service import send_welcome_email
-                import uuid
+                from flask_email_service import email_service
                 
-                # Generar token único para darse de baja
-                unsubscribe_token = str(uuid.uuid4())
-                
-                # Nombre completo del usuario
-                nombre_completo = f"{form.nombre.data} {form.apellidos.data}"
-                
-                # Enviar email de bienvenida personalizado
-                email_enviado = send_welcome_email(
-                    user_name=nombre_completo,
-                    user_email=form.email.data,
-                    unsubscribe_token=unsubscribe_token
+                # Email de bienvenida al usuario lead (personalizado)
+                email_service.send_welcome_email_user(
+                    nombre=f"{form.nombre.data} {form.apellidos.data}",
+                    email=form.email.data,
+                    tipo_neurodivergencia="Lead General"
                 )
                 
-                if email_enviado:
-                    print(f"✅ Email de bienvenida SendGrid enviado a: {nombre_completo} ({form.email.data})")
-                else:
-                    print(f"⚠️ No se pudo enviar email de bienvenida a: {form.email.data}")
+                # Email de notificación a DiversIA
+                email_service.send_notification_email("lead", {
+                    'nombre': form.nombre.data,
+                    'apellidos': form.apellidos.data,
+                    'email': form.email.data,
+                    'telefono': form.telefono.data,
+                    'ciudad': form.ciudad.data,
+                    'intereses': form.intereses.data,
+                    'como_conociste': form.como_conociste.data,
+                    'tipo': 'Lead General'
+                })
+                
+                print(f"✅ Emails Gmail enviados para registro general: {form.nombre.data}")
                 
             except Exception as e:
-                print(f"❌ Error enviando email de bienvenida con SendGrid: {e}")
-                # No fallar el registro si el email falla
+                print(f"⚠️ Error enviando emails de registro general con Gmail: {e}")
             
             flash(f'¡Registro completado exitosamente, {form.nombre.data}! Te contactaremos pronto con información sobre oportunidades laborales.', 'success')
             # Lead registrado exitosamente
