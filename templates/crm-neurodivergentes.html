@@ -130,28 +130,11 @@
                         <small class="text-muted">Insights relevantes sobre educación, experiencia y necesidades específicas</small>
                     </div>
                     <div class="card-body">
-                        <!-- Análisis Educativo -->
-                        <h6 class="mt-3 mb-3">🎓 Niveles Educativos</h6>
-                        <div id="education-stats">
-                            <!-- Se llena dinámicamente -->
-                        </div>
-                        
-                        <!-- Análisis de Experiencia Laboral -->
-                        <h6 class="mt-4 mb-3">💼 Análisis de Experiencia Laboral</h6>
-                        <div id="work-stats">
-                            <!-- Se llena dinámicamente -->
-                        </div>
-                        
-                        <!-- Análisis de Adaptaciones -->
-                        <h6 class="mt-4 mb-3">⚙️ Necesidades de Adaptación</h6>
-                        <div id="adaptations-stats">
-                            <!-- Se llena dinámicamente -->
-                        </div>
-                        
-                        <!-- Análisis de Diagnóstico -->
-                        <h6 class="mt-4 mb-3">🩺 Análisis de Diagnóstico Formal vs Autodiagnóstico</h6>
-                        <div id="diagnosis-stats">
-                            <!-- Se llena dinámicamente -->
+                        <div class="text-center py-4">
+                            <p class="mb-3">📊 Para ver análisis detallados con gráficos interactivos:</p>
+                            <a href="/usuarios-neurodivergentes/dashboard" class="btn btn-primary btn-lg">
+                                🚀 Ir al Dashboard Analytics
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -310,9 +293,6 @@
                     document.getElementById('with-diagnosis').textContent = data.ai_insights.con_diagnostico_formal;
                     document.getElementById('today-registrations').textContent = data.ai_insights.con_experiencia_laboral;
                     document.getElementById('this-month').textContent = data.ai_insights.necesitan_adaptaciones;
-                    
-                    // Crear dashboard inteligente
-                    createIntelligentDashboard(data);
                 } else {
                     console.error('Error cargando insights:', data.error);
                 }
@@ -323,127 +303,10 @@
             }
         }
 
-        function createIntelligentDashboard(data) {
-            // Crear dashboard de educación
-            createEducationDashboard(data.education_levels);
-            
-            // Crear dashboard de experiencia laboral
-            createWorkExperienceDashboard(data.work_experience_types);
-            
-            // Crear dashboard de adaptaciones
-            createAdaptationsDashboard(data.adaptation_needs);
-            
-            // Crear análisis de diagnóstico
-            createDiagnosisDashboard(data.diagnosis_breakdown);
-        }
 
-        function createEducationDashboard(educationData) {
-            const container = document.getElementById('education-stats');
-            if (!container) return;
-            
-            const colors = ['bg-primary', 'bg-success', 'bg-warning', 'bg-info'];
-            let html = '<div class="row">';
-            
-            educationData.forEach((item, index) => {
-                const percentage = ((item.count / 10) * 100).toFixed(1);
-                html += `
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <div class="card ${colors[index % colors.length]} text-white h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
-                                <h4>${item.count}</h4>
-                                <p class="mb-1 small">${item.nivel}</p>
-                                <small>${percentage}% del total</small>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
 
-        function createWorkExperienceDashboard(workData) {
-            const container = document.getElementById('work-stats');
-            if (!container) return;
-            
-            const colors = ['bg-success', 'bg-info', 'bg-warning', 'bg-secondary', 'bg-danger'];
-            let html = '<div class="row">';
-            
-            workData.forEach((item, index) => {
-                const percentage = ((item.count / 10) * 100).toFixed(1);
-                html += `
-                    <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card ${colors[index % colors.length]} text-white h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-briefcase fa-2x mb-2"></i>
-                                <h4>${item.count}</h4>
-                                <p class="mb-1 small">${item.tipo}</p>
-                                <small>${percentage}% del total</small>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
 
-        function createAdaptationsDashboard(adaptationData) {
-            const container = document.getElementById('adaptations-stats');
-            if (!container) return;
-            
-            const colors = ['bg-dark', 'bg-primary', 'bg-info', 'bg-success', 'bg-warning'];
-            let html = '<div class="row">';
-            
-            adaptationData.forEach((item, index) => {
-                const percentage = ((item.count / 10) * 100).toFixed(1);
-                html += `
-                    <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card ${colors[index % colors.length]} text-white h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-cogs fa-2x mb-2"></i>
-                                <h4>${item.count}</h4>
-                                <p class="mb-1 small">${item.tipo}</p>
-                                <small>${percentage}% del total</small>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
 
-        function createDiagnosisDashboard(diagnosisData) {
-            const container = document.getElementById('diagnosis-stats');
-            if (!container) return;
-            
-            let html = '<div class="row">';
-            
-            diagnosisData.forEach((item, index) => {
-                const formalColor = item.formal ? 'bg-success' : 'bg-warning';
-                const formalText = item.formal ? 'Diagnóstico Formal' : 'Autodiagnóstico';
-                html += `
-                    <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card ${formalColor} text-white h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-stethoscope fa-2x mb-2"></i>
-                                <h4>${item.count}</h4>
-                                <p class="mb-1 small">${item.tipo}</p>
-                                <small>${formalText}</small>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
 
         function loadOverviewDataFallback() {
             // FALLBACK: ACTUALIZAR CON DATOS REALES DESDE API ORIGINAL
