@@ -111,11 +111,39 @@
             <div class="col-lg-6">
                 <div class="card analytics-card">
                     <div class="card-header">
-                        <h5 class="mb-0">🧠 Distribución por Tipo de Neurodivergencia</h5>
+                        <h5 class="mb-0">🧠 Distribución por Tipo</h5>
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
                             <canvas id="neurodivergenceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">🗺️ Distribución Geográfica</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="geographicChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sectores Laborales y Análisis -->
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">💼 Sectores Laborales de Interés</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="sectorsChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -385,6 +413,113 @@
                 return `<span class="skill-tag" style="font-size: ${size}px;">${skill} (${count})</span>`;
             }).join(' ');
         }
+
+        // Funciones para nuevos gráficos
+        async function loadGeographicData() {
+            try {
+                const response = await fetch('/api/neurodivergent/geographic-data');
+                const data = await response.json();
+                
+                if (data.success && data.geographic_data.length > 0) {
+                    createGeographicChart(data.geographic_data);
+                }
+            } catch (error) {
+                console.error('Error cargando datos geográficos:', error);
+            }
+        }
+
+        async function loadSectorsData() {
+            try {
+                const response = await fetch('/api/neurodivergent/sectors-data');
+                const data = await response.json();
+                
+                if (data.success && data.sectors_data.length > 0) {
+                    createSectorsChart(data.sectors_data);
+                }
+            } catch (error) {
+                console.error('Error cargando datos de sectores:', error);
+            }
+        }
+
+        function createGeographicChart(geographicData) {
+            const ctx = document.getElementById('geographicChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: geographicData.map(item => item.ciudad),
+                    datasets: [{
+                        label: 'Usuarios por Ciudad',
+                        data: geographicData.map(item => item.count),
+                        backgroundColor: [
+                            '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', 
+                            '#feca57', '#48dbfb', '#0abde3', '#74b9ff',
+                            '#6c5ce7', '#a29bfe', '#fd79a8', '#fdcb6e'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createSectorsChart(sectorsData) {
+            const ctx = document.getElementById('sectorsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: sectorsData.map(item => item.sector),
+                    datasets: [{
+                        data: sectorsData.map(item => item.count),
+                        backgroundColor: [
+                            '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', 
+                            '#feca57', '#48dbfb', '#0abde3', '#74b9ff',
+                            '#6c5ce7', '#a29bfe', '#fd79a8', '#fdcb6e'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 10
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Cargar todos los datos al inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            loadGeographicData();
+            loadSectorsData();
+        });
     </script>
 </body>
 </html>

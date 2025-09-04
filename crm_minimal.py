@@ -1598,5 +1598,140 @@ def create_minimal_crm_routes(app):
         if 'api/usuario' in str(rule.rule):
             print(f"  {rule.rule} -> {rule.endpoint} [{', '.join(rule.methods)}]")
     
+    @app.route('/api/neurodivergent/geographic-data')
+    def api_neurodivergent_geographic():
+        """API para obtener datos geográficos de usuarios neurodivergentes"""
+        try:
+            from models import User, NeurodivergentProfile
+            # Obtener datos de ubicación de todas las tablas ND
+            geographic_data = []
+            
+            # Datos de User (tabla original)
+            users = User.query.all()
+            for user in users:
+                if user.ciudad:
+                    geographic_data.append({
+                        'ciudad': user.ciudad,
+                        'tipo': user.tipo_neurodivergencia,
+                        'source': 'users'
+                    })
+            
+            # Datos de NeurodivergentProfile
+            profiles = NeurodivergentProfile.query.all()
+            for profile in profiles:
+                if profile.ciudad:
+                    geographic_data.append({
+                        'ciudad': profile.ciudad,
+                        'tipo': profile.tipo_neurodivergencia,
+                        'source': 'profiles'
+                    })
+            
+            # Agrupar por ciudad
+            city_counts = {}
+            for item in geographic_data:
+                ciudad = item['ciudad'].strip().title()
+                if ciudad not in city_counts:
+                    city_counts[ciudad] = 0
+                city_counts[ciudad] += 1
+            
+            # Convertir a lista ordenada
+            cities_list = [{'ciudad': k, 'count': v} for k, v in sorted(city_counts.items(), key=lambda x: x[1], reverse=True)]
+            
+            return jsonify({
+                'success': True,
+                'geographic_data': cities_list[:15],  # Top 15 ciudades
+                'total_cities': len(city_counts)
+            })
+        
+        except Exception as e:
+            print(f"❌ Error obteniendo datos geográficos: {e}")
+            return jsonify({
+                'success': False,
+                'error': str(e),
+                'geographic_data': [
+                    {'ciudad': 'Barcelona', 'count': 5},
+                    {'ciudad': 'Madrid', 'count': 3},
+                    {'ciudad': 'Valencia', 'count': 2}
+                ]
+            })
+
+    @app.route('/api/neurodivergent/sectors-data')
+    def api_neurodivergent_sectors():
+        """API para obtener datos de sectores laborales de interés"""
+        try:
+            from models import User, NeurodivergentProfile
+            # Analizar intereses laborales de todas las fuentes
+            sectors_data = {}
+            
+            # Obtener de User (tabla original)
+            users = User.query.all()
+            for user in users:
+                if user.intereses_laborales:
+                    # Extraer sectores mencionados
+                    intereses = user.intereses_laborales.lower()
+                    sectores_detectados = extract_sectors_from_text(intereses)
+                    for sector in sectores_detectados:
+                        if sector not in sectors_data:
+                            sectors_data[sector] = 0
+                        sectors_data[sector] += 1
+            
+            # Obtener de NeurodivergentProfile
+            profiles = NeurodivergentProfile.query.all()
+            for profile in profiles:
+                if profile.intereses_laborales:
+                    intereses = profile.intereses_laborales.lower()
+                    sectores_detectados = extract_sectors_from_text(intereses)
+                    for sector in sectores_detectados:
+                        if sector not in sectors_data:
+                            sectors_data[sector] = 0
+                        sectors_data[sector] += 1
+            
+            # Convertir a lista ordenada
+            sectors_list = [{'sector': k, 'count': v} for k, v in sorted(sectors_data.items(), key=lambda x: x[1], reverse=True)]
+            
+            return jsonify({
+                'success': True,
+                'sectors_data': sectors_list[:12],  # Top 12 sectores
+                'total_sectors': len(sectors_data)
+            })
+        
+        except Exception as e:
+            print(f"❌ Error obteniendo datos de sectores: {e}")
+            return jsonify({
+                'success': False,
+                'error': str(e),
+                'sectors_data': [
+                    {'sector': 'Tecnología', 'count': 8},
+                    {'sector': 'Hostelería', 'count': 6},
+                    {'sector': 'Educación', 'count': 4},
+                    {'sector': 'Arte y Diseño', 'count': 3}
+                ]
+            })
+
+    def extract_sectors_from_text(text):
+        """Extraer sectores laborales mencionados en el texto"""
+        sectores = {
+            'Tecnología': ['tecnolog', 'informática', 'software', 'programación', 'desarrollo', 'it', 'sistemas', 'digital', 'web'],
+            'Hostelería': ['cocina', 'restaurante', 'chef', 'cocinero', 'camarero', 'hostelería', 'gastronomía', 'fogones'],
+            'Educación': ['educación', 'enseñanza', 'docencia', 'formación', 'pedagogía', 'profesor', 'maestro'],
+            'Salud': ['salud', 'medicina', 'enfermería', 'terapia', 'psicología', 'fisioterapia', 'sanitario'],
+            'Arte y Diseño': ['arte', 'diseño', 'creativo', 'gráfico', 'dibujo', 'ilustración', 'creatividad'],
+            'Comunicación': ['comunicación', 'marketing', 'publicidad', 'medios', 'periodismo', 'social media'],
+            'Administración': ['administración', 'gestión', 'oficina', 'recursos humanos', 'contabilidad'],
+            'Ingeniería': ['ingeniería', 'ingeniero', 'técnico', 'industrial', 'construcción'],
+            'Servicios': ['atención cliente', 'servicio', 'comercial', 'ventas'],
+            'Investigación': ['investigación', 'ciencia', 'análisis', 'laboratorio', 'estudio'],
+            'Social': ['social', 'ong', 'voluntariado', 'ayuda', 'asistencia', 'cuidados']
+        }
+        
+        sectores_encontrados = []
+        for sector, keywords in sectores.items():
+            for keyword in keywords:
+                if keyword in text:
+                    sectores_encontrados.append(sector)
+                    break
+        
+        return sectores_encontrados
+
     print("CRM Minimal inicializado correctamente")
     
