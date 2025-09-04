@@ -268,6 +268,9 @@
                             <div class="col-md-2 text-end">
                                 <span class="time-badge">${timeAgo}</span>
                                 ${isNew ? '<br><small class="text-warning">✨ Nuevo</small>' : ''}
+                                <br><button class="btn btn-outline-danger btn-sm mt-1" onclick="event.stopPropagation(); deleteLead(${lead.id}, '${lead.nombre} ${lead.apellidos}')" title="Eliminar lead">
+                                    🗑️
+                                </button>
                             </div>
                         </div>
                         ${lead.intereses_laborales ? `
@@ -398,6 +401,42 @@
             
             // Aquí podrías agregar lógica para marcar como contactado
             alert('Funcionalidad de contacto pendiente de implementar');
+        }
+
+        // Función para eliminar lead individual
+        function deleteLead(leadId, leadName) {
+            if (confirm(`¿Estás seguro de que quieres eliminar el lead de ${leadName}?\n\nEsta acción no se puede deshacer.`)) {
+                // Mostrar indicador de carga en el botón
+                const button = event.target;
+                const originalContent = button.innerHTML;
+                button.innerHTML = '⏳';
+                button.disabled = true;
+
+                fetch(`/api/leads-generales/${leadId}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log(`✅ Lead ${leadName} eliminado correctamente`);
+                        // Recargar la lista de leads
+                        loadLeads();
+                    } else {
+                        alert(`Error eliminando el lead: ${data.error || 'Error desconocido'}`);
+                        button.innerHTML = originalContent;
+                        button.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error eliminando lead:', error);
+                    alert('Error eliminando el lead. Intenta de nuevo.');
+                    button.innerHTML = originalContent;
+                    button.disabled = false;
+                });
+            }
         }
     </script>
 </body>
