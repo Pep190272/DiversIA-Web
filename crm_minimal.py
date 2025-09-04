@@ -97,9 +97,7 @@ def create_minimal_crm_routes(app):
     
     @app.route('/leads-generales')
     def leads_generales():
-        """Dashboard de leads generales del test 'Haz mi test' - requiere autenticación"""
-        if not ('admin_user_id' in session or 'admin_username' in session or session.get('admin_ok')):
-            return redirect('/diversia-admin')
+        """Dashboard de leads generales del test 'Haz mi test' - acceso directo sin autenticación"""
         return render_template('crm-leads-generales.html')
     
     @app.route('/api/minimal/companies')
