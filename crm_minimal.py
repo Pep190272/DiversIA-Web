@@ -88,6 +88,11 @@ def create_minimal_crm_routes(app):
         """Dashboard de usuarios neurodivergentes del CRM - SIN AUTENTICACIÓN PARA PRUEBAS"""
         return render_template('crm-neurodivergentes.html')
     
+    @app.route('/usuarios-neurodivergentes/dashboard')
+    def usuarios_nd_dashboard():
+        """Dashboard interactivo con gráficos para análisis de usuarios ND"""
+        return render_template('dashboard-neurodivergentes.html')
+    
     # RUTA ELIMINADA - Usar solo /usuarios-neurodivergentes para evitar duplicación
     
     @app.route('/leads-generales')

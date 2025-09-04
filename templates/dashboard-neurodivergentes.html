@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Analytics ND - DiversIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .chart-container {
+            height: 400px;
+            position: relative;
+        }
+        .analytics-card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            border: none;
+        }
+        .skill-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 2px;
+            display: inline-block;
+        }
+        .nd-color-tdah { background: linear-gradient(135deg, #ff6b6b, #ff5252); }
+        .nd-color-tea { background: linear-gradient(135deg, #4ecdc4, #26a69a); }
+        .nd-color-dislexia { background: linear-gradient(135deg, #45b7d1, #2196f3); }
+        .nd-color-discalculia { background: linear-gradient(135deg, #96ceb4, #4caf50); }
+        .nd-color-tourette { background: linear-gradient(135deg, #feca57, #ff9800); }
+        .nd-color-tel { background: linear-gradient(135deg, #48dbfb, #00bcd4); }
+        .dashboard-title {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="dashboard-title">📊 Dashboard Analytics - Neurodivergentes</h1>
+                <p class="text-muted">Análisis completo de usuarios, habilidades y tendencias</p>
+            </div>
+            <div>
+                <a href="/usuarios-neurodivergentes" class="btn btn-outline-primary me-2">
+                    📋 Ver Lista
+                </a>
+                <a href="/crm-minimal" class="btn btn-outline-secondary">
+                    ← CRM Principal
+                </a>
+            </div>
+        </div>
+
+        <!-- Métricas principales -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card metric-card nd-color-tdah">
+                    <div class="card-body text-center">
+                        <h3 id="totalUsuarios">0</h3>
+                        <p class="mb-0">Total Usuarios ND</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card nd-color-tea">
+                    <div class="card-body text-center">
+                        <h3 id="conDiagnostico">0</h3>
+                        <p class="mb-0">Con Diagnóstico</p>
+                        <small id="porcentajeDiagnostico">0%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card nd-color-dislexia">
+                    <div class="card-body text-center">
+                        <h3 id="conExperiencia">0</h3>
+                        <p class="mb-0">Con Experiencia</p>
+                        <small id="porcentajeExperiencia">0%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card nd-color-discalculia">
+                    <div class="card-body text-center">
+                        <h3 id="necesitanAdaptaciones">0</h3>
+                        <p class="mb-0">Necesitan Adaptaciones</p>
+                        <small id="porcentajeAdaptaciones">0%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos principales -->
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">🧠 Distribución por Tipo de Neurodivergencia</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="neurodivergenceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📊 Diagnóstico Formal vs Autodiagnóstico</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="diagnosisChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análisis de habilidades y experiencia -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">💼 Tipos de Experiencia Laboral</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="experienceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">🎯 Adaptaciones Requeridas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="adaptationsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Habilidades más comunes -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">🔥 Habilidades Más Comunes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="skillsCloud" class="text-center py-4">
+                            <p class="text-muted">Cargando análisis de habilidades...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            try {
+                // Cargar usuarios básicos
+                const usersResponse = await fetch('/api/usuarios-neurodivergentes');
+                const users = await usersResponse.json();
+                
+                updateMetrics(users);
+                createNeurodivergenceChart(users);
+                createDiagnosisChart(users);
+                createExperienceChart(users);
+                createAdaptationsChart(users);
+                createSkillsCloud(users);
+                
+            } catch (error) {
+                console.error('Error cargando datos del dashboard:', error);
+            }
+        }
+
+        function updateMetrics(users) {
+            const total = users.length;
+            const withDiagnosis = users.filter(u => u.diagnostico_formal).length;
+            const withExperience = users.filter(u => u.experiencia_laboral && u.experiencia_laboral.trim() !== '').length;
+            const needAdaptations = users.filter(u => u.adaptaciones_necesarias && u.adaptaciones_necesarias.trim() !== '').length;
+
+            document.getElementById('totalUsuarios').textContent = total;
+            document.getElementById('conDiagnostico').textContent = withDiagnosis;
+            document.getElementById('conExperiencia').textContent = withExperience;
+            document.getElementById('necesitanAdaptaciones').textContent = needAdaptations;
+
+            // Porcentajes
+            document.getElementById('porcentajeDiagnostico').textContent = 
+                total > 0 ? `${Math.round(withDiagnosis / total * 100)}%` : '0%';
+            document.getElementById('porcentajeExperiencia').textContent = 
+                total > 0 ? `${Math.round(withExperience / total * 100)}%` : '0%';
+            document.getElementById('porcentajeAdaptaciones').textContent = 
+                total > 0 ? `${Math.round(needAdaptations / total * 100)}%` : '0%';
+        }
+
+        function createNeurodivergenceChart(users) {
+            const types = {};
+            users.forEach(user => {
+                const type = user.tipo_neurodivergencia || 'No especificado';
+                types[type] = (types[type] || 0) + 1;
+            });
+
+            const ctx = document.getElementById('neurodivergenceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(types),
+                    datasets: [{
+                        data: Object.values(types),
+                        backgroundColor: [
+                            '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', 
+                            '#feca57', '#48dbfb', '#0abde3', '#74b9ff'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createDiagnosisChart(users) {
+            const formal = users.filter(u => u.diagnostico_formal).length;
+            const informal = users.length - formal;
+
+            const ctx = document.getElementById('diagnosisChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Diagnóstico Formal', 'Autodiagnóstico'],
+                    datasets: [{
+                        data: [formal, informal],
+                        backgroundColor: ['#28a745', '#ffc107']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createExperienceChart(users) {
+            const experiences = {};
+            users.forEach(user => {
+                if (user.experiencia_laboral) {
+                    // Extraer palabras clave de experiencia
+                    const exp = user.experiencia_laboral.toLowerCase();
+                    if (exp.includes('cocina') || exp.includes('restaurante')) {
+                        experiences['Gastronomía'] = (experiences['Gastronomía'] || 0) + 1;
+                    } else if (exp.includes('desarrollo') || exp.includes('programación')) {
+                        experiences['Tecnología'] = (experiences['Tecnología'] || 0) + 1;
+                    } else if (exp.includes('comercio') || exp.includes('ventas')) {
+                        experiences['Comercio'] = (experiences['Comercio'] || 0) + 1;
+                    } else if (exp.includes('administración') || exp.includes('oficina')) {
+                        experiences['Administración'] = (experiences['Administración'] || 0) + 1;
+                    } else {
+                        experiences['Otros'] = (experiences['Otros'] || 0) + 1;
+                    }
+                }
+            });
+
+            const ctx = document.getElementById('experienceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(experiences),
+                    datasets: [{
+                        label: 'Usuarios',
+                        data: Object.values(experiences),
+                        backgroundColor: '#667eea'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createAdaptationsChart(users) {
+            const adaptations = {};
+            users.forEach(user => {
+                if (user.adaptaciones_necesarias) {
+                    const adapt = user.adaptaciones_necesarias.toLowerCase();
+                    if (adapt.includes('horario') || adapt.includes('flexible')) {
+                        adaptations['Horarios Flexibles'] = (adaptations['Horarios Flexibles'] || 0) + 1;
+                    } else if (adapt.includes('ambiente') || adapt.includes('tranquilo')) {
+                        adaptations['Ambiente Tranquilo'] = (adaptations['Ambiente Tranquilo'] || 0) + 1;
+                    } else if (adapt.includes('equipo') || adapt.includes('colaborativo')) {
+                        adaptations['Trabajo en Equipo'] = (adaptations['Trabajo en Equipo'] || 0) + 1;
+                    } else {
+                        adaptations['Otros'] = (adaptations['Otros'] || 0) + 1;
+                    }
+                }
+            });
+
+            const ctx = document.getElementById('adaptationsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'polarArea',
+                data: {
+                    labels: Object.keys(adaptations),
+                    datasets: [{
+                        data: Object.values(adaptations),
+                        backgroundColor: [
+                            '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function createSkillsCloud(users) {
+            const skills = {};
+            users.forEach(user => {
+                if (user.habilidades) {
+                    const skillList = user.habilidades.split(/[,;]+/);
+                    skillList.forEach(skill => {
+                        const cleanSkill = skill.trim().toLowerCase();
+                        if (cleanSkill.length > 2) {
+                            skills[cleanSkill] = (skills[cleanSkill] || 0) + 1;
+                        }
+                    });
+                }
+            });
+
+            const sortedSkills = Object.entries(skills)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 20);
+
+            const skillsContainer = document.getElementById('skillsCloud');
+            skillsContainer.innerHTML = sortedSkills.map(([skill, count]) => {
+                const size = Math.min(16 + count * 2, 24);
+                return `<span class="skill-tag" style="font-size: ${size}px;">${skill} (${count})</span>`;
+            }).join(' ');
+        }
+    </script>
+</body>
+</html>

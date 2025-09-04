@@ -65,15 +65,21 @@
                         <p class="text-muted">Gestión completa de personas neurodivergentes registradas</p>
                     </div>
                     <div>
+                        <a href="/usuarios-neurodivergentes/dashboard" class="btn btn-info me-2">
+                            📊 Dashboard Analytics
+                        </a>
                         <a href="/crm-minimal" class="btn btn-secondary me-2">
-                            ← Volver al CRM
+                            ← CRM Principal
                         </a>
-                        <button class="btn btn-success me-2" onclick="exportAllData()">
-                            📊 Exportar Todo
-                        </button>
-                        <a href="/admin/export/users.csv" class="btn btn-primary">
-                            📁 Descargar CSV
-                        </a>
+                        <div class="btn-group">
+                            <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                📁 Exportar
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" onclick="exportAllData()">📊 Exportar Todo</a></li>
+                                <li><a class="dropdown-item" href="/admin/export/users.csv">📄 Descargar CSV</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -146,6 +152,43 @@
                         <h6 class="mt-4 mb-3">🩺 Análisis de Diagnóstico Formal vs Autodiagnóstico</h6>
                         <div id="diagnosis-stats">
                             <!-- Se llena dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Búsqueda y Filtros -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body py-3">
+                        <div class="row align-items-center">
+                            <div class="col-lg-4 col-md-6 mb-2">
+                                <div class="input-group">
+                                    <span class="input-group-text">🔍</span>
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Buscar por nombre, email o ciudad...">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-2">
+                                <select class="form-select" id="diagnosisFilter">
+                                    <option value="">Todos los diagnósticos</option>
+                                    <option value="formal">Con diagnóstico formal</option>
+                                    <option value="informal">Sin diagnóstico formal</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-2">
+                                <select class="form-select" id="experienceFilter">
+                                    <option value="">Toda la experiencia</option>
+                                    <option value="with">Con experiencia laboral</option>
+                                    <option value="without">Sin experiencia laboral</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6 mb-2">
+                                <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                    🧹 Limpiar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -253,6 +296,7 @@
             loadStatsData();
             loadOverviewData();
             createOverviewCards();
+            setupSearchAndFilters();
         });
 
         async function loadStatsData() {
@@ -492,6 +536,89 @@
             });
         }
 
+        // Variables globales
+        let allUsersData = [];
+
+        function setupSearchAndFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const diagnosisFilter = document.getElementById('diagnosisFilter');
+            const experienceFilter = document.getElementById('experienceFilter');
+
+            // Aplicar filtros con debounce para búsqueda
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    applyFiltersToCurrentTab();
+                }, 300);
+            });
+
+            diagnosisFilter.addEventListener('change', applyFiltersToCurrentTab);
+            experienceFilter.addEventListener('change', applyFiltersToCurrentTab);
+        }
+
+        function applyFiltersToCurrentTab() {
+            const activeTab = document.querySelector('.nav-link.active');
+            if (activeTab && activeTab.textContent.includes('📊 Resumen')) {
+                loadOverviewData();
+            } else {
+                // Recargar datos de la pestaña activa con filtros
+                const activeTabContent = document.querySelector('.tab-pane.active');
+                if (activeTabContent) {
+                    const tabId = activeTabContent.id;
+                    const typeMap = {
+                        'tdah-tab': 'TDAH',
+                        'tea-tab': 'TEA',
+                        'dislexia-tab': 'Dislexia',
+                        'discalculia-tab': 'Discalculia',
+                        'tourette-tab': 'Tourette',
+                        'tel-tab': 'TEL',
+                        'disgrafia-tab': 'Disgrafía',
+                        'tps-tab': 'TPS',
+                        'altas-capacidades-tab': 'Altas Capacidades'
+                    };
+                    const type = typeMap[tabId];
+                    if (type) {
+                        loadNeurodivergenceData(type);
+                    }
+                }
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('diagnosisFilter').value = '';
+            document.getElementById('experienceFilter').value = '';
+            applyFiltersToCurrentTab();
+        }
+
+        function filterUsers(users) {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const diagnosisFilter = document.getElementById('diagnosisFilter').value;
+            const experienceFilter = document.getElementById('experienceFilter').value;
+
+            return users.filter(user => {
+                // Filtro de búsqueda
+                const matchesSearch = !searchTerm || 
+                    user.nombre.toLowerCase().includes(searchTerm) ||
+                    user.apellidos.toLowerCase().includes(searchTerm) ||
+                    user.email.toLowerCase().includes(searchTerm) ||
+                    (user.ciudad && user.ciudad.toLowerCase().includes(searchTerm));
+
+                // Filtro de diagnóstico
+                const matchesDiagnosis = !diagnosisFilter ||
+                    (diagnosisFilter === 'formal' && user.diagnostico_formal) ||
+                    (diagnosisFilter === 'informal' && !user.diagnostico_formal);
+
+                // Filtro de experiencia
+                const matchesExperience = !experienceFilter ||
+                    (experienceFilter === 'with' && user.experiencia_laboral && user.experiencia_laboral.trim() !== '') ||
+                    (experienceFilter === 'without' && (!user.experiencia_laboral || user.experiencia_laboral.trim() === ''));
+
+                return matchesSearch && matchesDiagnosis && matchesExperience;
+            });
+        }
+
         async function loadNeurodivergenceData(type) {
             console.log('🎯 Iniciando carga de datos para tipo:', type);
             let contentId;
@@ -581,35 +708,44 @@
                     </div>
                 `;
                 
-                if (data && data.length > 0) {
-                    data.forEach(user => {
+                // Aplicar filtros antes de mostrar
+                const filteredData = filterUsers(data);
+                
+                if (filteredData && filteredData.length > 0) {
+                    filteredData.forEach(user => {
                         html += `
                             <div class="user-card">
-                                <div class="row">
-                                    <div class="col-md-4" onclick="showUserDetails('${user.id}')" style="cursor: pointer;">
-                                        <strong>${user.nombre} ${user.apellidos}</strong><br>
-                                        <small class="text-muted">${user.email}</small>
-                                    </div>
-                                    <div class="col-md-3" onclick="showUserDetails('${user.id}')" style="cursor: pointer;">
-                                        📍 ${user.ciudad}<br>
-                                        📱 ${user.telefono || 'No especificado'}
-                                    </div>
-                                    <div class="col-md-3" onclick="showUserDetails('${user.id}')" style="cursor: pointer;">
-                                        ${user.diagnostico_formal ? '✅ Diagnóstico formal' : '⏳ Sin diagnóstico'}
-                                    </div>
-                                    <div class="col-md-2 text-end">
-                                        <div class="btn-group-vertical">
-                                            <button class="btn btn-sm btn-outline-info mb-1" onclick="showUserDetails('${user.id}')" title="Ver Detalles">
-                                                👁️ Ver
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-primary mb-1" onclick="editUser('${user.id}')" title="Editar">
-                                                ✏️ Editar
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user.id}', '${user.nombre} ${user.apellidos}')" title="Eliminar">
-                                                🗑️ Eliminar
-                                            </button>
+                                <div class="row align-items-center">
+                                    <div class="col-lg-7 col-md-8" onclick="showUserDetails('${user.id}')" style="cursor: pointer;">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <strong>${user.nombre} ${user.apellidos}</strong>
+                                                <br><small class="text-muted">${user.email}</small>
+                                                <br><small class="text-info">${user.tipo_neurodivergencia} • ${user.ciudad}</small>
+                                            </div>
+                                            <div class="ms-2">
+                                                ${user.diagnostico_formal ? 
+                                                    '<span class="badge bg-success">✅ Diagnóstico</span>' : 
+                                                    '<span class="badge bg-warning">⏳ Pendiente</span>'
+                                                }
+                                            </div>
                                         </div>
-                                        <small class="text-muted d-block mt-1">${new Date(user.created_at).toLocaleDateString()}</small>
+                                    </div>
+                                    <div class="col-lg-5 col-md-4">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">${new Date(user.created_at).toLocaleDateString()}</small>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-info" onclick="showUserDetails('${user.id}')" title="Ver Detalles">
+                                                    👁️
+                                                </button>
+                                                <button class="btn btn-outline-primary" onclick="editUser('${user.id}')" title="Editar">
+                                                    ✏️
+                                                </button>
+                                                <button class="btn btn-outline-danger" onclick="deleteUser('${user.id}', '${user.nombre} ${user.apellidos}')" title="Eliminar">
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
