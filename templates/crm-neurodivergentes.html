@@ -598,9 +598,17 @@
                                         ${user.diagnostico_formal ? '✅ Diagnóstico formal' : '⏳ Sin diagnóstico'}
                                     </div>
                                     <div class="col-md-2 text-end">
-                                        <button class="btn btn-sm btn-outline-info" onclick="showUserDetails('${user.id}')" title="Ver Detalles">
-                                            👁️ Ver
-                                        </button>
+                                        <div class="btn-group-vertical">
+                                            <button class="btn btn-sm btn-outline-info mb-1" onclick="showUserDetails('${user.id}')" title="Ver Detalles">
+                                                👁️ Ver
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-primary mb-1" onclick="editUser('${user.id}')" title="Editar">
+                                                ✏️ Editar
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user.id}', '${user.nombre} ${user.apellidos}')" title="Eliminar">
+                                                🗑️ Eliminar
+                                            </button>
+                                        </div>
                                         <small class="text-muted d-block mt-1">${new Date(user.created_at).toLocaleDateString()}</small>
                                     </div>
                                 </div>
@@ -652,9 +660,14 @@
                     </div>
                     <div class="row mt-3">
                         <div class="col-12 text-center">
-                            <small class="text-muted">
-                                ℹ️ Para editar o eliminar usuarios, accede al panel de administración
-                            </small>
+                            <div class="d-flex gap-2 mt-3">
+                                <button class="btn btn-primary btn-sm" onclick="editUser(${user.id})">
+                                    ✏️ Editar
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id}, '${user.nombre || 'Usuario'}')">
+                                    🗑️ Eliminar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
