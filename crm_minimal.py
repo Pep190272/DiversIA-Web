@@ -505,10 +505,10 @@ def create_minimal_crm_routes(app):
             return jsonify({
                 'success': True,
                 'ai_insights': {
-                    'total_perfiles': basic_stats[0],
-                    'con_diagnostico_formal': basic_stats[1],
-                    'con_experiencia_laboral': basic_stats[2],
-                    'necesitan_adaptaciones': basic_stats[3]
+                    'total_perfiles': basic_stats[0] if basic_stats else 0,
+                    'con_diagnostico_formal': basic_stats[1] if basic_stats else 0,
+                    'con_experiencia_laboral': basic_stats[2] if basic_stats else 0,
+                    'necesitan_adaptaciones': basic_stats[3] if basic_stats else 0
                 },
                 'education_levels': [{'nivel': row[0], 'count': row[1]} for row in education_analysis],
                 'work_experience_types': [{'tipo': row[0], 'count': row[1]} for row in work_experience],
@@ -747,7 +747,11 @@ def create_minimal_crm_routes(app):
             })
             
         except Exception as e:
-            db.session.rollback()
+            try:
+                from app import db
+                db.session.rollback()
+            except:
+                pass
             return jsonify({'success': False, 'error': str(e)}), 500
 
     # ==================== RUTAS PARA LEADS GENERALES (TEST "HAZ MI TEST") ====================
@@ -897,7 +901,11 @@ def create_minimal_crm_routes(app):
                 'backup_info': f"Backup creado para {lead.nombre} {lead.apellidos}"
             })
         except Exception as e:
-            db.session.rollback()
+            try:
+                from app import db
+                db.session.rollback()
+            except:
+                pass
             return jsonify({'success': False, 'error': str(e)}), 500
     
     @app.route('/api/leads-generales/bulk-delete', methods=['POST'])
@@ -962,7 +970,11 @@ def create_minimal_crm_routes(app):
                 'backup_count': len(backup_data)
             })
         except Exception as e:
-            db.session.rollback()
+            try:
+                from app import db
+                db.session.rollback()
+            except:
+                pass
             return jsonify({'success': False, 'error': str(e)}), 500
     
     @app.route('/api/leads-generales/bulk-export', methods=['POST'])
@@ -1124,7 +1136,38 @@ def create_minimal_crm_routes(app):
                     })
             except Exception as e:
                 print(f"⚠️ Error cargando perfiles ND específicos: {e}")
-                # En caso de error de DB, devolver datos mock para pruebas
+                # Intentar reconexión automática
+                try:
+                    from app import db
+                    db.session.rollback()
+                    db.engine.dispose()
+                    # Reintentar una vez más
+                    usuarios_profile = NeurodivergentProfile.query.all()
+                    for profile in usuarios_profile:
+                        usuarios_data.append({
+                            'id': f'profile_{profile.id}',
+                            'fuente': 'NeurodivergentProfile (reconectado)',
+                            'nombre': profile.nombre,
+                            'apellidos': profile.apellidos,
+                            'nombre_completo': f"{profile.nombre} {profile.apellidos}",
+                            'email': profile.email,
+                            'telefono': profile.telefono,
+                            'ciudad': profile.ciudad,
+                            'fecha_nacimiento': profile.fecha_nacimiento.isoformat() if profile.fecha_nacimiento else None,
+                            'tipo_neurodivergencia': profile.tipo_neurodivergencia,
+                            'diagnostico_formal': profile.diagnostico_formal,
+                            'habilidades': profile.habilidades,
+                            'experiencia_laboral': profile.experiencia_laboral,
+                            'formacion_academica': profile.formacion_academica,
+                            'intereses_laborales': profile.intereses_laborales,
+                            'adaptaciones_necesarias': profile.adaptaciones_necesarias,
+                            'motivaciones': profile.motivaciones,
+                            'created_at': profile.created_at.isoformat() if profile.created_at else None
+                        })
+                    print("✅ Reconexión exitosa a base de datos")
+                except Exception as e2:
+                    print(f"⚠️ Reconexión falló, usando datos demo: {e2}")
+                    # En caso de error de DB persistente, devolver datos demo para pruebas
                 usuarios_data = [
                     {
                         'id': 'profile_1',
@@ -1446,7 +1489,11 @@ def create_minimal_crm_routes(app):
             
             return jsonify({'success': True, 'message': 'Asociación actualizada correctamente'})
         except Exception as e:
-            db.session.rollback()
+            try:
+                from app import db
+                db.session.rollback()
+            except:
+                pass
             return jsonify({'success': False, 'error': str(e)}), 500
     
     @app.route('/api/asociaciones/<int:asociacion_id>', methods=['DELETE'])
@@ -1462,7 +1509,11 @@ def create_minimal_crm_routes(app):
             
             return jsonify({'success': True, 'message': 'Asociación eliminada correctamente'})
         except Exception as e:
-            db.session.rollback()
+            try:
+                from app import db
+                db.session.rollback()
+            except:
+                pass
             return jsonify({'success': False, 'error': str(e)}), 500
     
     @app.route('/api/asociaciones/export-csv')

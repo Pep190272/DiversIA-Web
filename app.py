@@ -37,6 +37,15 @@ print("✅ PostgreSQL database connected")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
+    "pool_timeout": 20,
+    "max_overflow": 0,
+    "echo": False,
+    "connect_args": {
+        "connect_timeout": 10,
+        "keepalives_idle": 600,
+        "keepalives_interval": 30,
+        "keepalives_count": 3,
+    }
 }
 
 # Security headers
