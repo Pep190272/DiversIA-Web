@@ -304,22 +304,87 @@ def delete_task(task_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@app.route('/tasks/delete-all', methods=['DELETE'])
+@app.route('/tasks/delete-all', methods=['DELETE', 'POST'])
 def delete_all_tasks():
     """Eliminar todas las tareas"""
     if 'admin_ok' not in session or not session.get('admin_ok'):
-        return jsonify({'error': 'No autorizado'}), 403
+        return jsonify({'error': 'No autorizado - Necesitas estar logueado como admin'}), 403
     
     try:
         count = Task.query.count()
+        if count == 0:
+            if request.method == 'POST':
+                flash('No hay tareas para eliminar', 'info')
+                return redirect('/tasks')
+            return jsonify({'success': True, 'message': 'No hay tareas para eliminar'})
+        
         Task.query.delete()
         db.session.commit()
         
-        return jsonify({'success': True, 'message': f'{count} tareas eliminadas'})
+        print(f"✅ Administrador eliminó TODAS las tareas: {count} tareas eliminadas")
+        
+        if request.method == 'POST':
+            flash(f'✅ Se eliminaron {count} tareas correctamente', 'success')
+            return redirect('/tasks')
+        
+        return jsonify({'success': True, 'message': f'✅ Se eliminaron {count} tareas correctamente'})
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        error_msg = f'Error al eliminar tareas: {str(e)}'
+        print(f"❌ {error_msg}")
+        
+        if request.method == 'POST':
+            flash(f'Error: {error_msg}', 'error')
+            return redirect('/tasks')
+        
+        return jsonify({'error': error_msg}), 500
+
+@app.route('/tasks/clear-all-confirm')
+def clear_all_tasks_confirm():
+    """Página de confirmación para eliminar todas las tareas"""
+    if 'admin_ok' not in session or not session.get('admin_ok'):
+        return redirect('/diversia-admin')
+    
+    total_tasks = Task.query.count()
+    return f'''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Confirmar Eliminación</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-light">
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h4>⚠️ CONFIRMAR ELIMINACIÓN</h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="lead">¿Estás seguro de que quieres eliminar <strong>TODAS las {total_tasks} tareas</strong>?</p>
+                            <div class="alert alert-warning">
+                                <strong>¡ATENCIÓN!</strong> Esta acción NO se puede deshacer.
+                            </div>
+                            <div class="d-flex gap-3">
+                                <form method="POST" action="/tasks/delete-all">
+                                    <button type="submit" class="btn btn-danger btn-lg">
+                                        🗑️ SÍ, ELIMINAR TODO
+                                    </button>
+                                </form>
+                                <a href="/tasks" class="btn btn-secondary btn-lg">
+                                    ❌ Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    '''
 
 @app.route('/tasks/add', methods=['POST'])
 def add_task_manual():
@@ -553,8 +618,8 @@ TASKS_TABLE_TEMPLATE = '''
                     </div>
                     <div class="col-md-4 text-end">
                         <button class="btn btn-success me-2" onclick="showAddTaskForm()">➕ Añadir Tarea</button>
-                        <a href="/tasks/export" class="btn btn-warning me-2">Exportar CSV</a>
-                        <button onclick="deleteAllTasks()" class="btn btn-danger">🗑️ Eliminar Todo</button>
+                        <a href="/tasks/export" class="btn btn-warning me-2">📁 Exportar CSV</a>
+                        <a href="/tasks/clear-all-confirm" class="btn btn-danger">🗑️ Eliminar Todo</a>
                     </div>
                 </div>
                 
@@ -927,16 +992,20 @@ TASKS_TABLE_TEMPLATE = '''
         }
         
         function deleteAllTasks() {
-            if (confirm('⚠️ ATENCIÓN: ¿Estás COMPLETAMENTE SEGURO de eliminar TODAS las tareas?')) {
-                if (confirm('🛑 ÚLTIMA CONFIRMACIÓN: Esto eliminará TODAS las tareas. ¿Confirmas?')) {
+            if (confirm('⚠️ ATENCIÓN: ¿Estás COMPLETAMENTE SEGURO de eliminar TODAS las tareas?\\n\\nEsto eliminará TODAS las tareas permanentemente.')) {
+                if (confirm('🛑 ÚLTIMA CONFIRMACIÓN: Eliminar TODAS las tareas. ¿Confirmas?\\n\\nEsta acción NO se puede deshacer.')) {
                     fetch('/tasks/delete-all', {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             alert('✅ ' + data.message);
-                            location.reload();
+                            window.location.reload();
                         } else {
                             alert('❌ Error al eliminar todo: ' + data.error);
                         }
