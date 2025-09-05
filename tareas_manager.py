@@ -13,7 +13,7 @@ tareas_bp = Blueprint('tareas', __name__)
 def mostrar_tareas():
     """Mostrar tabla de tareas con edición inline"""
     if 'admin_ok' not in session or not session.get('admin_ok'):
-        return redirect('/diversia-admin')
+        return redirect('/admin/login-new?redirect=/tareas')
     
     try:
         # Obtener tareas directamente de la tabla SQL
@@ -149,10 +149,20 @@ TAREAS_TEMPLATE = '''
         <div class="row">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2>📋 Gestión de Tareas</h2>
                     <div>
-                        <a href="/admin-dashboard" class="btn btn-secondary me-2">← Dashboard</a>
-                        <a href="/diversia-admin" class="btn btn-outline-secondary">Admin</a>
+                        <h2>📋 Gestión de Tareas</h2>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="/admin-dashboard" class="text-decoration-none">🏠 Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/login-new" class="text-decoration-none">📊 CRM</a></li>
+                                <li class="breadcrumb-item active">📋 Tareas</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div>
+                        <a href="/dashboard-tareas" class="btn btn-outline-primary me-2">📈 Analytics</a>
+                        <a href="/admin/login-new" class="btn btn-secondary me-2">← CRM</a>
+                        <a href="/admin-dashboard" class="btn btn-outline-secondary">Dashboard</a>
                     </div>
                 </div>
                 
