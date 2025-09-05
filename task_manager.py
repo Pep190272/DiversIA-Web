@@ -821,8 +821,8 @@ TASKS_TABLE_TEMPLATE = '''
     
     <script>
         function deleteTask(id) {
-            if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
-                fetch(`/tasks/delete/${id}`, {
+            if (confirm('Estas seguro de que quieres eliminar esta tarea?')) {
+                fetch('/tasks/delete/' + id, {
                     method: 'DELETE'
                 })
                 .then(response => response.json())
@@ -852,7 +852,7 @@ TASKS_TABLE_TEMPLATE = '''
         // ===== GOOGLE DRIVE FUNCTIONS =====
         function showGoogleDriveModal() {
             // Mostrar alert simple que funciona en cualquier entorno
-            alert('🔧 Google Drive - Configuración Pendiente\n\nLa función de Google Drive no está completamente configurada aún.\n\nMientras tanto, puedes usar la opción "📂 Local" para subir archivos CSV desde tu computadora, que funciona perfectamente.');
+            alert('Google Drive - Configuracion Pendiente\n\nLa funcion de Google Drive no esta completamente configurada aun.\n\nMientras tanto, puedes usar la opcion Local para subir archivos CSV desde tu computadora, que funciona perfectamente.');
         }
         
         
@@ -928,7 +928,7 @@ TASKS_TABLE_TEMPLATE = '''
         }
         
         function importFromGoogleDrive(fileId, fileName) {
-            if (!confirm(`¿Importar tareas desde "${fileName}"?`)) {
+            if (!confirm('Importar tareas desde "' + fileName + '"?')) {
                 return;
             }
             
@@ -1004,27 +1004,27 @@ TASKS_TABLE_TEMPLATE = '''
         });
         
         function loadEmployeeOptions() {
-            console.log('🔄 Intentando cargar empleados...');
+            console.log('Intentando cargar empleados...');
             fetch('/tasks/employees')
             .then(response => {
-                console.log('📡 Respuesta recibida, status:', response.status);
+                console.log('Respuesta recibida, status:', response.status);
                 return response.json();
             })
             .then(employees => {
                 // Actualizar opciones disponibles para asignación
                 window.availableEmployees = employees;
-                console.log('✅ Empleados cargados:', employees.length, 'empleados');
-                console.log('👥 Lista completa:', employees);
+                console.log('Empleados cargados:', employees.length, 'empleados');
+                console.log('Lista completa:', employees);
             })
             .catch(error => {
-                console.error('❌ Error loading employees:', error);
+                console.error('Error loading employees:', error);
                 window.availableEmployees = [];
             });
         }
         
         function deleteAllTasks() {
-            if (confirm('⚠️ ATENCIÓN: ¿Estás COMPLETAMENTE SEGURO de eliminar TODAS las tareas?\n\nEsto eliminará TODAS las tareas permanentemente.')) {
-                if (confirm('🛑 ÚLTIMA CONFIRMACIÓN: Eliminar TODAS las tareas. ¿Confirmas?\n\nEsta acción NO se puede deshacer.')) {
+            if (confirm('ATENCION: Estas COMPLETAMENTE SEGURO de eliminar TODAS las tareas?\n\nEsto eliminara TODAS las tareas permanentemente.')) {
+                if (confirm('ULTIMA CONFIRMACION: Eliminar TODAS las tareas. Confirmas?\n\nEsta accion NO se puede deshacer.')) {
                     fetch('/tasks/delete-all', {
                         method: 'DELETE',
                         credentials: 'same-origin',
@@ -1105,8 +1105,8 @@ TASKS_TABLE_TEMPLATE = '''
             initializeSearch();
             loadEmployeeOptions();
             
-            console.log('🔧 Sistema de edición inline inicializado');
-            console.log('📋 Campos editables encontrados:', document.querySelectorAll('.editable-field').length);
+            console.log('Sistema de edicion inline inicializado');
+            console.log('Campos editables encontrados:', document.querySelectorAll('.editable-field').length);
 
             // Hacer todos los campos editables
             document.querySelectorAll('.editable-field').forEach(field => {
@@ -1126,7 +1126,7 @@ TASKS_TABLE_TEMPLATE = '''
                 const field = element.getAttribute('data-field');
                 const taskId = element.getAttribute('data-id');
                 
-                console.log('🖱️ Iniciando edición:', { field, taskId, originalValue });
+                console.log('Iniciando edicion:', { field, taskId, originalValue });
                 element.classList.add('editing');
                 
                 // Crear input apropiado según el campo
@@ -1211,7 +1211,7 @@ TASKS_TABLE_TEMPLATE = '''
                 // Mostrar loading
                 element.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
                 
-                fetch(`/tasks/edit/${taskId}`, {
+                fetch('/tasks/edit/' + taskId, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
