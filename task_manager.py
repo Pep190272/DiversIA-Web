@@ -1005,17 +1005,17 @@ TASKS_TABLE_TEMPLATE = '''
         function loadEmployeeOptions() {
             console.log('Intentando cargar empleados...');
             fetch('/tasks/employees')
-            .then(response function{
+            .then(function(response) {
                 console.log('Respuesta recibida, status:', response.status);
                 return response.json();
             })
-            .then(employees function{
+            .then(function(employees) {
                 // Actualizar opciones disponibles para asignación
                 window.availableEmployees = employees;
                 console.log('Empleados cargados:', employees.length, 'empleados');
                 console.log('Lista completa:', employees);
             })
-            .catch(error function{
+            .catch(function(error) {
                 console.error('Error loading employees:', error);
                 window.availableEmployees = [];
             });
@@ -1032,7 +1032,7 @@ TASKS_TABLE_TEMPLATE = '''
                         }
                     })
                     .then(response functionresponse.json())
-                    .then(data function{
+                    .then(data function() {
                         if (data.success) {
                             alert('✅ ' + data.message);
                             window.location.reload();
@@ -1040,7 +1040,7 @@ TASKS_TABLE_TEMPLATE = '''
                             alert('❌ Error al eliminar todo: ' + data.error);
                         }
                     })
-                    .catch(error function{
+                    .catch(function(error) {
                         alert('❌ Error de conexión: ' + error);
                     });
                 }
@@ -1069,7 +1069,7 @@ TASKS_TABLE_TEMPLATE = '''
             var term = searchTerm.toLowerCase().trim();
             let visibleCount = 0;
             
-            allRows.forEach(row function{
+            allRows.forEach(row function() {
                 var tarea = row.cells[1].textContent.toLowerCase();
                 var colaborador = row.cells[2].textContent.toLowerCase();
                 var estado = row.cells[5].textContent.toLowerCase();
@@ -1108,7 +1108,7 @@ TASKS_TABLE_TEMPLATE = '''
             console.log('Campos editables encontrados:', document.querySelectorAll('.editable-field').length);
 
             // Hacer todos los campos editables
-            document.querySelectorAll('.editable-field').forEach(field function{
+            document.querySelectorAll('.editable-field').forEach(field function() {
                 field.addEventListener('click', function() {
                     if (currentlyEditing && currentlyEditing !== this) {
                         cancelEdit(currentlyEditing);
@@ -1222,7 +1222,7 @@ TASKS_TABLE_TEMPLATE = '''
                     })
                 })
                 .then(response functionresponse.json())
-                .then(data function{
+                .then(data function() {
                     if (data.success) {
                         // Mostrar valor actualizado
                         var displayValue = newValue || '-';
@@ -1239,7 +1239,7 @@ TASKS_TABLE_TEMPLATE = '''
                         
                         // Efecto visual de éxito
                         element.style.backgroundColor = '#d4edda';
-                        setTimeout(() function{
+                        setTimeout(() function() {
                             element.style.backgroundColor = '';
                         }, 1000);
                     } else {
@@ -1247,7 +1247,7 @@ TASKS_TABLE_TEMPLATE = '''
                         cancelEdit(element, originalValue);
                     }
                 })
-                .catch(error function{
+                .catch(function(error) {
                     alert('Error de conexión: ' + error);
                     cancelEdit(element, originalValue);
                 });
@@ -1818,8 +1818,8 @@ TASKS_ANALYTICS_TEMPLATE = '''
         document.addEventListener('DOMContentLoaded', function() {
             // Animar las tarjetas métricas
             var metricCards = document.querySelectorAll('.metric-card');
-            metricCards.forEach((card, index) function{
-                setTimeout(() function{
+            metricCards.forEach((card, index) function() {
+                setTimeout(() function() {
                     card.style.transform = 'translateY(0)';
                     card.style.opacity = '1';
                 }, index * 100);
@@ -1827,7 +1827,7 @@ TASKS_ANALYTICS_TEMPLATE = '''
         });
 
         // Configuración inicial de animaciones
-        document.querySelectorAll('.metric-card').forEach(card function{
+        document.querySelectorAll('.metric-card').forEach(card function() {
             card.style.transform = 'translateY(20px)';
             card.style.opacity = '0';
             card.style.transition = 'all 0.5s ease';
