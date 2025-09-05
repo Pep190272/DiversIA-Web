@@ -282,7 +282,7 @@ SIMPLE_TASKS_TEMPLATE = '''
             fetch('/tasks-simple/edit/' + taskId, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({field: 'colaborador', value: select.value})
+                body: JSON.stringify({field: 'colaborador', value: nuevoValor === 'Sin asignar' ? '' : nuevoValor})
             })
             .then(function(response) {
                 return response.json();
