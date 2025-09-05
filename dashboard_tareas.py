@@ -14,7 +14,7 @@ dashboard_bp = Blueprint('dashboard_tareas', __name__)
 def mostrar_dashboard():
     """Dashboard principal con gráficos interactivos"""
     if 'admin_ok' not in session or not session.get('admin_ok'):
-        return redirect('/admin/login-new?redirect=/dashboard-tareas')
+        return redirect('/admin/login-new')
     
     return render_template_string(DASHBOARD_TEMPLATE)
 
@@ -391,8 +391,7 @@ DASHBOARD_TEMPLATE = '''
                     </div>
                     <div>
                         <a href="/tareas" class="btn btn-primary me-2">📋 Ver Tareas</a>
-                        <a href="/admin/login-new" class="btn btn-secondary me-2">← CRM</a>
-                        <a href="/admin-dashboard" class="btn btn-outline-secondary">Dashboard</a>
+                        <a href="/admin/login-new" class="btn btn-secondary">← Volver al CRM</a>
                     </div>
                 </div>
             </div>
