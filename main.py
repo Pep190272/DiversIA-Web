@@ -40,7 +40,10 @@ def admin_dashboard():
                                         <div class="card-body">
                                             <h5>🎯 Gestión de Tareas</h5>
                                             <p>Sistema completo de asignación y seguimiento de tareas con colaboradores</p>
-                                            <a href="/tareas" class="btn btn-primary">Acceder</a>
+                                            <div class="d-grid gap-2">
+                                                <a href="/tareas" class="btn btn-primary">📋 Gestionar Tareas</a>
+                                                <a href="/dashboard-tareas" class="btn btn-outline-primary">📊 Dashboard Analytics</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -113,6 +116,9 @@ import colaboradores_manager  # noqa: F401
 
 # Sistema de Tareas NUEVO
 import tareas_manager  # noqa: F401
+
+# Dashboard de Tareas con Analytics
+import dashboard_tareas  # noqa: F401
 
 # Sistema de test de emails
 import email_test_endpoint  # noqa: F401
