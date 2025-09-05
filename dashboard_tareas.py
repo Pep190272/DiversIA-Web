@@ -397,30 +397,42 @@ DASHBOARD_TEMPLATE = '''
             </div>
         </div>
 
-        <!-- Métricas principales -->
+        <!-- Métricas principales expandidas -->
         <div class="row mb-4" id="metricas-principales">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="metric-card">
                     <h3 id="total-tareas">-</h3>
                     <p>Total de Tareas</p>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="metric-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
                     <h3 id="tareas-completadas">-</h3>
-                    <p>Tareas Completadas</p>
+                    <p>Completadas</p>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="metric-card" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
                     <h3 id="tareas-en-curso">-</h3>
-                    <p>Tareas en Curso</p>
+                    <p>En Curso</p>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="metric-card" style="background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);">
+                    <h3 id="tareas-sin-asignar">-</h3>
+                    <p>Sin Asignar</p>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="metric-card" style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);">
                     <h3 id="porcentaje-completado">-</h3>
                     <p>% Completado</p>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="metric-card" style="background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);">
+                    <h3 id="promedio-tareas">-</h3>
+                    <p>Promedio/Empleado</p>
                 </div>
             </div>
         </div>
@@ -441,12 +453,24 @@ DASHBOARD_TEMPLATE = '''
             </div>
         </div>
 
-        <!-- Análisis de productividad -->
+        <!-- Análisis de productividad avanzado -->
         <div class="row mb-4">
-            <div class="col-12">
+            <div class="col-md-8">
                 <div class="chart-container">
-                    <div class="chart-title">🎯 Análisis de Productividad por Colaborador</div>
+                    <div class="chart-title">🎯 Análisis de Productividad Avanzado</div>
                     <div id="productividad-colaboradores">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="chart-container">
+                    <div class="chart-title">⚖️ Carga de Trabajo</div>
+                    <div id="carga-trabajo">
                         <div class="text-center">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Cargando...</span>
@@ -457,11 +481,27 @@ DASHBOARD_TEMPLATE = '''
             </div>
         </div>
 
+        <!-- Nuevos análisis -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <div class="chart-title">📈 Tendencias Temporales</div>
+                    <canvas id="chartTendencias" width="400" height="200"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <div class="chart-title">📂 Tipos de Tareas</div>
+                    <canvas id="chartTipos" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
         <!-- Gráfico de barras comparativo -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="chart-container">
-                    <div class="chart-title">📊 Comparativa de Rendimiento</div>
+                    <div class="chart-title">📊 Comparativa de Rendimiento por Colaborador</div>
                     <canvas id="chartComparativo" width="400" height="200"></canvas>
                 </div>
             </div>
@@ -470,7 +510,7 @@ DASHBOARD_TEMPLATE = '''
 
     <script>
         // Variables globales para los gráficos
-        let chartEstados, chartColaboradores, chartComparativo;
+        let chartEstados, chartColaboradores, chartComparativo, chartTendencias, chartTipos;
         
         // Cargar datos al iniciar la página
         document.addEventListener('DOMContentLoaded', function() {
@@ -478,6 +518,9 @@ DASHBOARD_TEMPLATE = '''
             cargarGraficoEstados();
             cargarGraficoColaboradores();
             cargarProductividadColaboradores();
+            cargarCargaTrabajo();
+            cargarGraficoTendencias();
+            cargarGraficoTipos();
             cargarGraficoComparativo();
         });
         
@@ -488,7 +531,9 @@ DASHBOARD_TEMPLATE = '''
                 document.getElementById('total-tareas').textContent = data.total_tareas || 0;
                 document.getElementById('tareas-completadas').textContent = data.tareas_completadas || 0;
                 document.getElementById('tareas-en-curso').textContent = data.tareas_en_curso || 0;
+                document.getElementById('tareas-sin-asignar').textContent = data.tareas_sin_asignar || 0;
                 document.getElementById('porcentaje-completado').textContent = (data.porcentaje_completado || 0) + '%';
+                document.getElementById('promedio-tareas').textContent = data.promedio_tareas_por_empleado || 0;
             })
             .catch(error => console.error('Error cargando métricas:', error));
         }
@@ -612,14 +657,30 @@ DASHBOARD_TEMPLATE = '''
                         <div class="colaborador-item">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="mb-0">${colaborador.colaborador}</h6>
-                                <span class="badge bg-primary">${colaborador.porcentaje_completado}% completado</span>
+                                <div>
+                                    <span class="badge bg-primary">${colaborador.porcentaje_completado}% completado</span>
+                                    <span class="badge bg-secondary ms-1">${colaborador.tendencia}</span>
+                                </div>
                             </div>
                             <div class="productivity-bar">
                                 <div class="productivity-fill" style="width: ${colaborador.porcentaje_completado}%"></div>
                             </div>
-                            <small class="text-muted">
-                                ${colaborador.completadas} completadas • ${colaborador.pendientes} pendientes • ${colaborador.total} total
-                            </small>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        ✅ ${colaborador.completadas} • 🔄 ${colaborador.en_curso} • ⏳ ${colaborador.pendientes}
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        Eficiencia: <strong>${colaborador.eficiencia}</strong> | Velocidad: ${colaborador.velocidad_promedio}/mes
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-success">Julio: ${colaborador.julio_terminadas}</small>
+                                <small class="text-info ms-2">Agosto: ${colaborador.agosto_terminadas}</small>
+                            </div>
                         </div>
                     `;
                 });
@@ -627,6 +688,140 @@ DASHBOARD_TEMPLATE = '''
                 container.innerHTML = html;
             })
             .catch(error => console.error('Error cargando productividad:', error));
+        }
+        
+        function cargarCargaTrabajo() {
+            fetch('/api/dashboard/carga-trabajo')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('carga-trabajo');
+                
+                let html = '';
+                data.forEach(empleado => {
+                    html += `
+                        <div class="mb-3 p-3 border rounded" style="border-left: 4px solid ${empleado.color_carga} !important;">
+                            <div class="d-flex justify-content-between">
+                                <strong>${empleado.colaborador}</strong>
+                                <span class="badge" style="background-color: ${empleado.color_carga};">${empleado.nivel_carga}</span>
+                            </div>
+                            <div class="mt-2">
+                                <div class="small">Carga actual: <strong>${empleado.carga_actual}</strong> tareas</div>
+                                <div class="small text-muted">${empleado.activas} activas + ${empleado.pendientes_asignadas} pendientes</div>
+                                <div class="small text-muted">Total asignadas: ${empleado.total_asignadas}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            })
+            .catch(error => console.error('Error cargando carga de trabajo:', error));
+        }
+        
+        function cargarGraficoTendencias() {
+            fetch('/api/dashboard/tendencias')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('chartTendencias').getContext('2d');
+                
+                chartTendencias = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(item => item.mes),
+                        datasets: [
+                            {
+                                label: 'Tareas Terminadas',
+                                data: data.map(item => item.terminadas),
+                                borderColor: '#28a745',
+                                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Tareas Iniciadas',
+                                data: data.map(item => item.iniciadas),
+                                borderColor: '#007bff',
+                                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                                fill: false,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'nearest',
+                            axis: 'x',
+                            intersect: false
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error cargando tendencias:', error));
+        }
+        
+        function cargarGraficoTipos() {
+            fetch('/api/dashboard/tipos-tareas')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('chartTipos').getContext('2d');
+                
+                chartTipos = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.map(item => item.categoria),
+                        datasets: [{
+                            data: data.map(item => item.total),
+                            backgroundColor: [
+                                '#FF6384',  // Marketing
+                                '#36A2EB',  // Desarrollo
+                                '#FFCE56',  // Redes Sociales
+                                '#4BC0C0'   // Otros
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    usePointStyle: true
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const item = data[context.dataIndex];
+                                        return `${context.label}: ${item.total} tareas (${item.completadas} completadas, ${item.en_curso} en curso, ${item.pendientes} pendientes)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error cargando tipos de tareas:', error));
         }
         
         function cargarGraficoComparativo() {
@@ -701,10 +896,15 @@ DASHBOARD_TEMPLATE = '''
             if (chartEstados) chartEstados.destroy();
             if (chartColaboradores) chartColaboradores.destroy();
             if (chartComparativo) chartComparativo.destroy();
+            if (chartTendencias) chartTendencias.destroy();
+            if (chartTipos) chartTipos.destroy();
             
             cargarGraficoEstados();
             cargarGraficoColaboradores();
             cargarProductividadColaboradores();
+            cargarCargaTrabajo();
+            cargarGraficoTendencias();
+            cargarGraficoTipos();
             cargarGraficoComparativo();
         }
         
