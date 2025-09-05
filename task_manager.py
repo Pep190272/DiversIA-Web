@@ -522,6 +522,18 @@ def delete_employee(employee_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+@app.route('/tasks/employees', methods=['GET'])
+def get_employees_for_tasks():
+    """Obtener empleados para asignación de tareas (accesible desde página de tareas)"""
+    employees = Employee.query.filter_by(active=True).all()
+    return jsonify([{
+        'id': emp.id,
+        'name': emp.name,
+        'email': emp.email,
+        'rol': emp.rol,
+        'department': emp.department
+    } for emp in employees])
+
 # Template para tabla de tareas
 TASKS_TABLE_TEMPLATE = '''
 <!DOCTYPE html>
@@ -992,13 +1004,14 @@ TASKS_TABLE_TEMPLATE = '''
         });
         
         function loadEmployeeOptions() {
-            fetch('/employees')
+            fetch('/tasks/employees')
             .then(response => response.json())
             .then(employees => {
                 // Actualizar opciones disponibles para asignación
                 window.availableEmployees = employees;
+                console.log('✅ Empleados cargados:', employees.length);
             })
-            .catch(error => console.error('Error loading employees:', error));
+            .catch(error => console.error('❌ Error loading employees:', error));
         }
         
         function deleteAllTasks() {
