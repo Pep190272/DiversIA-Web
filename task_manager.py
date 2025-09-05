@@ -1004,14 +1004,22 @@ TASKS_TABLE_TEMPLATE = '''
         });
         
         function loadEmployeeOptions() {
+            console.log('🔄 Intentando cargar empleados...');
             fetch('/tasks/employees')
-            .then(response => response.json())
+            .then(response => {
+                console.log('📡 Respuesta recibida, status:', response.status);
+                return response.json();
+            })
             .then(employees => {
                 // Actualizar opciones disponibles para asignación
                 window.availableEmployees = employees;
-                console.log('✅ Empleados cargados:', employees.length);
+                console.log('✅ Empleados cargados:', employees.length, 'empleados');
+                console.log('👥 Lista completa:', employees);
             })
-            .catch(error => console.error('❌ Error loading employees:', error));
+            .catch(error => {
+                console.error('❌ Error loading employees:', error);
+                window.availableEmployees = [];
+            });
         }
         
         function deleteAllTasks() {
@@ -1096,6 +1104,9 @@ TASKS_TABLE_TEMPLATE = '''
             // Inicializar búsqueda y cargar empleados
             initializeSearch();
             loadEmployeeOptions();
+            
+            console.log('🔧 Sistema de edición inline inicializado');
+            console.log('📋 Campos editables encontrados:', document.querySelectorAll('.editable-field').length);
 
             // Hacer todos los campos editables
             document.querySelectorAll('.editable-field').forEach(field => {
@@ -1115,6 +1126,7 @@ TASKS_TABLE_TEMPLATE = '''
                 const field = element.getAttribute('data-field');
                 const taskId = element.getAttribute('data-id');
                 
+                console.log('🖱️ Iniciando edición:', { field, taskId, originalValue });
                 element.classList.add('editing');
                 
                 // Crear input apropiado según el campo
