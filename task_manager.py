@@ -102,50 +102,75 @@ def import_tasks_csv():
         imported_count = 0
         updated_count = 0
         
+        # Debug: mostrar columnas disponibles
+        fieldnames = csv_reader.fieldnames
+        print(f"📊 Columnas detectadas en CSV: {fieldnames}")
+        
         for row in csv_reader:
-            tarea_name = row.get('Tarea', '').strip()
+            # Función helper para obtener valor de múltiples posibles nombres de columna
+            def get_column_value(possible_names):
+                for name in possible_names:
+                    if name in row and row[name]:
+                        return row[name].strip()
+                return ''
+            
+            # Obtener tarea (columna principal)
+            tarea_name = get_column_value(['Tarea', 'Task', 'Title', 'Título', 'Nombre'])
             
             if not tarea_name:
                 continue
+            
+            # Obtener colaborador
+            colaborador = get_column_value(['Colaborador', 'Collaborator', 'Assignee', 'Asignado', 'Responsible'])
+            
+            # Obtener fechas con múltiples formatos
+            fecha_inicio = get_column_value(['Fecha de inicio', 'Fecha inicio', 'Start Date', 'Start', 'Inicio', 'Fecha_inicio'])
+            fecha_final = get_column_value(['Fecha final', 'Fecha fin', 'End Date', 'End', 'Final', 'Due Date', 'Fecha_final'])
+            
+            # Obtener estado con múltiples nombres
+            estado_value = get_column_value(['Estado', 'Status', 'State', 'Estatus', 'Pendiente', 'Complete'])
+            if not estado_value:
+                estado_value = 'Pendiente'
+            
+            # Obtener notas
+            notas = get_column_value(['Notas', 'Notes', 'Comments', 'Comentarios', 'Description', 'Descripción'])
+            
+            print(f"📝 Procesando: {tarea_name} | Colaborador: {colaborador} | Estado: {estado_value} | Inicio: {fecha_inicio} | Final: {fecha_final}")
             
             # Buscar tarea existente
             existing = Task.query.filter_by(tarea=tarea_name).first()
             
             if existing:
                 # Actualizar tarea existente
-                existing.colaborador = row.get('Colaborador', '').strip()
-                existing.fecha_inicio = row.get('Fecha de inicio', '').strip()
-                existing.fecha_final = row.get('Fecha final', '').strip()
-                # Buscar estado en diferentes posibles nombres de columna
-                estado_value = (row.get('Estado', '') or 
-                               row.get('Pendiente', '') or 
-                               row.get('Status', '') or 
-                               'Pendiente').strip()
+                existing.colaborador = colaborador
+                existing.fecha_inicio = fecha_inicio
+                existing.fecha_final = fecha_final
                 existing.estado = estado_value
+                existing.notas = notas
                 existing.updated_at = datetime.now()
                 updated_count += 1
             else:
                 # Crear nueva tarea
                 new_task = Task(
                     tarea = tarea_name,
-                    colaborador = row.get('Colaborador', '').strip(),
-                    fecha_inicio = row.get('Fecha de inicio', '').strip(),
-                    fecha_final = row.get('Fecha final', '').strip(),
-                    estado = (row.get('Estado', '') or 
-                             row.get('Pendiente', '') or 
-                             row.get('Status', '') or 
-                             'Pendiente').strip(),
-                    notas = ''
+                    colaborador = colaborador,
+                    fecha_inicio = fecha_inicio,
+                    fecha_final = fecha_final,
+                    estado = estado_value,
+                    notas = notas
                 )
                 db.session.add(new_task)
                 imported_count += 1
         
         db.session.commit()
-        flash(f'Importación exitosa: {imported_count} tareas nuevas, {updated_count} actualizadas', 'success')
+        flash(f'✅ Importación exitosa: {imported_count} tareas nuevas, {updated_count} actualizadas', 'success')
+        print(f"✅ CSV importado correctamente: {imported_count} nuevas, {updated_count} actualizadas")
         
     except Exception as e:
         db.session.rollback()
-        flash(f'Error al importar CSV: {str(e)}', 'error')
+        error_msg = f'Error al importar CSV: {str(e)}'
+        flash(error_msg, 'error')
+        print(f"❌ {error_msg}")
     
     return redirect('/tasks')
 
