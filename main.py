@@ -38,12 +38,9 @@ def admin_dashboard():
                                 <div class="col-md-6 mb-3">
                                     <div class="card border-primary">
                                         <div class="card-body">
-                                            <h5>🎯 Gestión de Tareas</h5>
-                                            <p>Sistema completo de asignación y seguimiento de tareas con colaboradores</p>
-                                            <div class="d-grid gap-2">
-                                                <a href="/tareas" class="btn btn-primary">📋 Gestionar Tareas</a>
-                                                <a href="/dashboard-tareas" class="btn btn-outline-primary">📊 Dashboard Analytics</a>
-                                            </div>
+                                            <h5>🎯 CRM Principal</h5>
+                                            <p>Sistema completo de gestión de contactos, tareas y analytics</p>
+                                            <a href="/admin/login-new" class="btn btn-primary">📊 Acceder al CRM</a>
                                         </div>
                                     </div>
                                 </div>
