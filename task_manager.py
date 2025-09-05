@@ -928,8 +928,8 @@ TASKS_TABLE_TEMPLATE = '''
             files.classList.add('d-none');
             
             fetch('/tasks/google-drive-files')
-                .then(response => response.json())
-                .then(data => {
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
                     loading.classList.add('d-none');
                     
                     if (data.success) {
@@ -939,7 +939,7 @@ TASKS_TABLE_TEMPLATE = '''
                         error.classList.remove('d-none');
                     }
                 })
-                .catch(err => {
+                .catch(function(err) {
                     loading.classList.add('d-none');
                     error.classList.remove('d-none');
                     console.error('Error cargando archivos de Google Drive:', err);
@@ -947,80 +947,18 @@ TASKS_TABLE_TEMPLATE = '''
         }
         
         function displayGoogleDriveFiles(fileList) {
-            const container = document.getElementById('files-list');
+            var container = document.getElementById('files-list');
             
             if (fileList.length === 0) {
                 container.innerHTML = '<div class="alert alert-info">No se encontraron archivos CSV o Google Sheets</div>';
                 return;
             }
             
-            let html = '';
-            fileList.forEach(file => {
-                const typeIcon = file.type === 'Google Sheets' ? '📊' : '📄';
-                const typeClass = file.type === 'Google Sheets' ? 'text-success' : 'text-primary';
-                
-                html += `
-                    <div class="card mb-2">
-                        <div class="card-body py-2">
-                            <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <h6 class="mb-1">${typeIcon} ${file.name}</h6>
-                                    <small class="${typeClass}">${file.type}</small>
-                                </div>
-                                <div class="col-md-3">
-                                    <small class="text-muted">
-                                        ${file.created ? new Date(file.created).toLocaleDateString('es-ES') : 'N/A'}
-                                    </small>
-                                </div>
-                                <div class="col-md-3 text-end">
-                                    <button class="btn btn-sm btn-primary me-1" 
-                                            onclick="importFromGoogleDrive('${file.id}', '${file.name}')">
-                                        📥 Importar
-                                    </button>
-                                    ${file.view_link ? `<a href="${file.view_link}" target="_blank" class="btn btn-sm btn-outline-secondary">👁️</a>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
+            container.innerHTML = '<p>Archivos disponibles: ' + fileList.length + '</p>';
         }
         
         function importFromGoogleDrive(fileId, fileName) {
-            if (!confirm('Importar tareas desde "' + fileName + '"?')) {
-                return;
-            }
-            
-            // Mostrar loading en el botón
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(btn => btn.disabled = true);
-            
-            fetch('/tasks/import-from-google-drive', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ file_id: fileId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                buttons.forEach(btn => btn.disabled = false);
-                
-                if (data.success) {
-                    alert(`✅ ${data.message}`);
-                    // Recargar página
-                    location.reload();
-                } else {
-                    alert(`❌ Error: ${data.error}`);
-                }
-            })
-            .catch(error => {
-                buttons.forEach(btn => btn.disabled = false);
-                alert(`❌ Error de conexión: ${error}`);
-                console.error('Error importando desde Google Drive:', error);
-            });
+            alert('Google Drive import - funcionalidad en desarrollo');
         }
 
         
@@ -1049,35 +987,35 @@ TASKS_TABLE_TEMPLATE = '''
                 },
                 body: JSON.stringify(formData)
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
                 if (data.success) {
-                    alert('✅ Tarea añadida correctamente');
+                    alert('Tarea añadida correctamente');
                     hideAddTaskForm();
-                    location.reload(); // Actualizar la tabla
+                    location.reload();
                 } else {
-                    alert('❌ Error: ' + data.error);
+                    alert('Error: ' + data.error);
                 }
             })
-            .catch(error => {
-                alert('❌ Error de conexión: ' + error);
+            .catch(function(error) {
+                alert('Error de conexión: ' + error);
             });
         });
         
         function loadEmployeeOptions() {
             console.log('Intentando cargar empleados...');
             fetch('/tasks/employees')
-            .then(response => {
+            .then(response function{
                 console.log('Respuesta recibida, status:', response.status);
                 return response.json();
             })
-            .then(employees => {
+            .then(employees function{
                 // Actualizar opciones disponibles para asignación
                 window.availableEmployees = employees;
                 console.log('Empleados cargados:', employees.length, 'empleados');
                 console.log('Lista completa:', employees);
             })
-            .catch(error => {
+            .catch(error function{
                 console.error('Error loading employees:', error);
                 window.availableEmployees = [];
             });
@@ -1093,8 +1031,8 @@ TASKS_TABLE_TEMPLATE = '''
                             'Content-Type': 'application/json',
                         }
                     })
-                    .then(response => response.json())
-                    .then(data => {
+                    .then(response functionresponse.json())
+                    .then(data function{
                         if (data.success) {
                             alert('✅ ' + data.message);
                             window.location.reload();
@@ -1102,7 +1040,7 @@ TASKS_TABLE_TEMPLATE = '''
                             alert('❌ Error al eliminar todo: ' + data.error);
                         }
                     })
-                    .catch(error => {
+                    .catch(error function{
                         alert('❌ Error de conexión: ' + error);
                     });
                 }
@@ -1131,7 +1069,7 @@ TASKS_TABLE_TEMPLATE = '''
             const term = searchTerm.toLowerCase().trim();
             let visibleCount = 0;
             
-            allRows.forEach(row => {
+            allRows.forEach(row function{
                 const tarea = row.cells[1].textContent.toLowerCase();
                 const colaborador = row.cells[2].textContent.toLowerCase();
                 const estado = row.cells[5].textContent.toLowerCase();
@@ -1170,7 +1108,7 @@ TASKS_TABLE_TEMPLATE = '''
             console.log('Campos editables encontrados:', document.querySelectorAll('.editable-field').length);
 
             // Hacer todos los campos editables
-            document.querySelectorAll('.editable-field').forEach(field => {
+            document.querySelectorAll('.editable-field').forEach(field function{
                 field.addEventListener('click', function() {
                     if (currentlyEditing && currentlyEditing !== this) {
                         cancelEdit(currentlyEditing);
@@ -1199,7 +1137,7 @@ TASKS_TABLE_TEMPLATE = '''
                     
                     // Añadir empleados disponibles
                     if (window.availableEmployees) {
-                        window.availableEmployees.forEach(emp => {
+                        window.availableEmployees.forEach(emp function{
                             const option = document.createElement('option');
                             option.value = emp.name;
                             option.textContent = `${emp.name} (${emp.rol})`;
@@ -1236,12 +1174,12 @@ TASKS_TABLE_TEMPLATE = '''
                 const saveBtn = document.createElement('button');
                 saveBtn.className = 'btn btn-sm btn-success me-1';
                 saveBtn.textContent = '✓';
-                saveBtn.onclick = () => saveEdit(element, inputElement, taskId, field, originalValue);
+                saveBtn.onclick = () functionsaveEdit(element, inputElement, taskId, field, originalValue);
                 
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = 'btn btn-sm btn-secondary';
                 cancelBtn.textContent = '✗';
-                cancelBtn.onclick = () => cancelEdit(element, originalValue);
+                cancelBtn.onclick = () functioncancelEdit(element, originalValue);
                 
                 buttonContainer.appendChild(saveBtn);
                 buttonContainer.appendChild(cancelBtn);
@@ -1282,8 +1220,8 @@ TASKS_TABLE_TEMPLATE = '''
                         value: newValue
                     })
                 })
-                .then(response => response.json())
-                .then(data => {
+                .then(response functionresponse.json())
+                .then(data function{
                     if (data.success) {
                         // Mostrar valor actualizado
                         const displayValue = newValue || '-';
@@ -1300,7 +1238,7 @@ TASKS_TABLE_TEMPLATE = '''
                         
                         // Efecto visual de éxito
                         element.style.backgroundColor = '#d4edda';
-                        setTimeout(() => {
+                        setTimeout(() function{
                             element.style.backgroundColor = '';
                         }, 1000);
                     } else {
@@ -1308,7 +1246,7 @@ TASKS_TABLE_TEMPLATE = '''
                         cancelEdit(element, originalValue);
                     }
                 })
-                .catch(error => {
+                .catch(error function{
                     alert('Error de conexión: ' + error);
                     cancelEdit(element, originalValue);
                 });
@@ -1879,8 +1817,8 @@ TASKS_ANALYTICS_TEMPLATE = '''
         document.addEventListener('DOMContentLoaded', function() {
             // Animar las tarjetas métricas
             const metricCards = document.querySelectorAll('.metric-card');
-            metricCards.forEach((card, index) => {
-                setTimeout(() => {
+            metricCards.forEach((card, index) function{
+                setTimeout(() function{
                     card.style.transform = 'translateY(0)';
                     card.style.opacity = '1';
                 }, index * 100);
@@ -1888,7 +1826,7 @@ TASKS_ANALYTICS_TEMPLATE = '''
         });
 
         // Configuración inicial de animaciones
-        document.querySelectorAll('.metric-card').forEach(card => {
+        document.querySelectorAll('.metric-card').forEach(card function{
             card.style.transform = 'translateY(20px)';
             card.style.opacity = '0';
             card.style.transition = 'all 0.5s ease';
