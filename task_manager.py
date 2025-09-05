@@ -818,49 +818,51 @@ TASKS_TABLE_TEMPLATE = '''
     </div>
     
     <script>
-        // Variables globales
-        let employees = [];
+        var employees = [];
         
-        // Cargar empleados al iniciar
-        fetch('/tasks/employees')
-        .then(response => response.json())
-        .then(data => {
+        fetch('/tasks/employees').then(function(response) {
+            return response.json();
+        }).then(function(data) {
             employees = data;
             console.log('Empleados cargados:', employees.length);
-        })
-        .catch(error => console.error('Error cargando empleados:', error));
+        });
         
         function editState(cell, taskId) {
-            const currentValue = cell.textContent;
-            cell.innerHTML = '<select onchange="saveState(this, ' + taskId + ')" onblur="cancelEdit(this, \'' + currentValue + '\')">' +
-                '<option value="Pendiente"' + (currentValue === 'Pendiente' ? ' selected' : '') + '>Pendiente</option>' +
-                '<option value="En curso"' + (currentValue === 'En curso' ? ' selected' : '') + '>En curso</option>' +
-                '<option value="Completado"' + (currentValue === 'Completado' ? ' selected' : '') + '>Completado</option>' +
-                '</select>';
+            var currentValue = cell.textContent;
+            var select = document.createElement('select');
+            select.innerHTML = '<option value="Pendiente">Pendiente</option><option value="En curso">En curso</option><option value="Completado">Completado</option>';
+            select.value = currentValue;
+            select.onchange = function() { saveState(this, taskId); };
+            cell.innerHTML = '';
+            cell.appendChild(select);
         }
 
         function editEmployee(cell, taskId) {
-            const currentValue = cell.textContent;
-            let options = '<option value="">Sin asignar</option>';
-            employees.forEach(emp => {
-                const selected = currentValue === emp.name ? ' selected' : '';
-                options += '<option value="' + emp.name + '"' + selected + '>' + emp.name + ' (' + emp.rol + ')</option>';
-            });
-            cell.innerHTML = '<select onchange="saveEmployee(this, ' + taskId + ')" onblur="cancelEdit(this, \'' + currentValue + '\')">' + options + '</select>';
+            var currentValue = cell.textContent;
+            var select = document.createElement('select');
+            var options = '<option value="">Sin asignar</option>';
+            for (var i = 0; i < employees.length; i++) {
+                var emp = employees[i];
+                options += '<option value="' + emp.name + '">' + emp.name + ' (' + emp.rol + ')</option>';
+            }
+            select.innerHTML = options;
+            select.value = currentValue === 'Sin asignar' ? '' : currentValue;
+            select.onchange = function() { saveEmployee(this, taskId); };
+            cell.innerHTML = '';
+            cell.appendChild(select);
         }
 
         function saveState(select, taskId) {
-            const newValue = select.value;
+            var newValue = select.value;
             fetch('/tasks/edit/' + taskId, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ field: 'estado', value: newValue })
-            })
-            .then(response => response.json())
-            .then(data => {
+            }).then(function(response) {
+                return response.json();
+            }).then(function(data) {
                 if (data.success) {
-                    select.parentElement.textContent = newValue;
-                    location.reload(); // Actualizar para mostrar colores
+                    location.reload();
                 } else {
                     alert('Error: ' + data.error);
                 }
@@ -868,43 +870,32 @@ TASKS_TABLE_TEMPLATE = '''
         }
 
         function saveEmployee(select, taskId) {
-            const newValue = select.value || 'Sin asignar';
+            var newValue = select.value || 'Sin asignar';
             fetch('/tasks/edit/' + taskId, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ field: 'colaborador', value: newValue })
-            })
-            .then(response => response.json())
-            .then(data => {
+            }).then(function(response) {
+                return response.json();
+            }).then(function(data) {
                 if (data.success) {
-                    select.parentElement.textContent = newValue;
+                    location.reload();
                 } else {
                     alert('Error: ' + data.error);
                 }
             });
         }
 
-        function cancelEdit(element, originalValue) {
-            setTimeout(() => {
-                element.textContent = originalValue;
-            }, 100);
-        }
-
         function deleteTask(id) {
             if (confirm('Estas seguro de que quieres eliminar esta tarea?')) {
-                fetch('/tasks/delete/' + id, {
-                    method: 'DELETE'
-                })
-                .then(response => response.json())
-                .then(data => {
+                fetch('/tasks/delete/' + id, { method: 'DELETE' })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
                     if (data.success) {
                         location.reload();
                     } else {
-                        alert('Error al eliminar: ' + data.error);
+                        alert('Error: ' + data.error);
                     }
-                })
-                .catch(error => {
-                    alert('Error de conexion: ' + error);
                 });
             }
         }
