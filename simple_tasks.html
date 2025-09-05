@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tareas - Simple</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        select { width: 100%; padding: 4px; }
+        .edit-cell { cursor: pointer; background: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>Gestión de Tareas</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Tarea</th>
+                <th>Estado</th>
+                <th>Colaborador</th>
+                <th>Fecha Inicio</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tasks-table">
+            <tr>
+                <td>Tarea de prueba 1</td>
+                <td class="edit-cell" onclick="editState(this, 1)">Pendiente</td>
+                <td class="edit-cell" onclick="editEmployee(this, 1)">Sin asignar</td>
+                <td>2025-01-01</td>
+                <td><button onclick="deleteTask(1)">Eliminar</button></td>
+            </tr>
+            <tr>
+                <td>Tarea de prueba 2</td>
+                <td class="edit-cell" onclick="editState(this, 2)">En curso</td>
+                <td class="edit-cell" onclick="editEmployee(this, 2)">Pep</td>
+                <td>2025-01-02</td>
+                <td><button onclick="deleteTask(2)">Eliminar</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        const employees = [
+            {name: 'Pep', rol: 'Developer'},
+            {name: 'Olga', rol: 'Marketing Manager'}
+        ];
+
+        function editState(cell, taskId) {
+            const currentValue = cell.textContent;
+            cell.innerHTML = `
+                <select onchange="saveState(this, ${taskId})" onblur="cancelEdit(this, '${currentValue}')">
+                    <option value="Pendiente" ${currentValue === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                    <option value="En curso" ${currentValue === 'En curso' ? 'selected' : ''}>En curso</option>
+                    <option value="Completado" ${currentValue === 'Completado' ? 'selected' : ''}>Completado</option>
+                </select>
+            `;
+        }
+
+        function editEmployee(cell, taskId) {
+            const currentValue = cell.textContent;
+            let options = `<option value="">Sin asignar</option>`;
+            employees.forEach(emp => {
+                const selected = currentValue === emp.name ? 'selected' : '';
+                options += `<option value="${emp.name}" ${selected}>${emp.name} (${emp.rol})</option>`;
+            });
+            cell.innerHTML = `<select onchange="saveEmployee(this, ${taskId})" onblur="cancelEdit(this, '${currentValue}')">${options}</select>`;
+        }
+
+        function saveState(select, taskId) {
+            const newValue = select.value;
+            // Aquí iría la llamada a la API
+            console.log('Guardando estado:', taskId, newValue);
+            select.parentElement.textContent = newValue;
+        }
+
+        function saveEmployee(select, taskId) {
+            const newValue = select.value || 'Sin asignar';
+            // Aquí iría la llamada a la API
+            console.log('Guardando empleado:', taskId, newValue);
+            select.parentElement.textContent = newValue;
+        }
+
+        function cancelEdit(element, originalValue) {
+            setTimeout(() => {
+                element.textContent = originalValue;
+            }, 100);
+        }
+
+        function deleteTask(taskId) {
+            if (confirm('Eliminar tarea?')) {
+                console.log('Eliminando tarea:', taskId);
+            }
+        }
+    </script>
+</body>
+</html>

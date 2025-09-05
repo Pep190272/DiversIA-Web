@@ -747,10 +747,9 @@ TASKS_TABLE_TEMPLATE = '''
                                                   title="Click para editar">{{ task.tarea }}</span>
                                         </td>
                                         <td>
-                                            <span class="editable-field editable-collaborator" 
-                                                  data-field="colaborador" 
-                                                  data-id="{{ task.id }}"
-                                                  title="Click para editar">{{ task.colaborador or '-' }}</span>
+                                            <span class="edit-cell" 
+                                                  onclick="editEmployee(this, {{ task.id }})"
+                                                  title="Click para editar">{{ task.colaborador or 'Sin asignar' }}</span>
                                         </td>
                                         <td>
                                             <span class="editable-field" 
@@ -765,10 +764,9 @@ TASKS_TABLE_TEMPLATE = '''
                                                   title="Click para editar">{{ task.fecha_final or '-' }}</span>
                                         </td>
                                         <td>
-                                            <span class="editable-field editable-status" 
-                                                  data-field="estado" 
-                                                  data-id="{{ task.id }}"
-                                                  title="Click para editar">{{ task.estado }}</span>
+                                            <span class="edit-cell" 
+                                                  onclick="editState(this, {{ task.id }})"
+                                                  title="Click para editar">{{ task.estado or 'Pendiente' }}</span>
                                         </td>
                                         <td>
                                             <button class="btn btn-sm btn-danger" onclick="deleteTask({{ task.id }})">Eliminar</button>
@@ -820,6 +818,78 @@ TASKS_TABLE_TEMPLATE = '''
     </div>
     
     <script>
+        // Variables globales
+        let employees = [];
+        
+        // Cargar empleados al iniciar
+        fetch('/tasks/employees')
+        .then(response => response.json())
+        .then(data => {
+            employees = data;
+            console.log('Empleados cargados:', employees.length);
+        })
+        .catch(error => console.error('Error cargando empleados:', error));
+        
+        function editState(cell, taskId) {
+            const currentValue = cell.textContent;
+            cell.innerHTML = '<select onchange="saveState(this, ' + taskId + ')" onblur="cancelEdit(this, \'' + currentValue + '\')">' +
+                '<option value="Pendiente"' + (currentValue === 'Pendiente' ? ' selected' : '') + '>Pendiente</option>' +
+                '<option value="En curso"' + (currentValue === 'En curso' ? ' selected' : '') + '>En curso</option>' +
+                '<option value="Completado"' + (currentValue === 'Completado' ? ' selected' : '') + '>Completado</option>' +
+                '</select>';
+        }
+
+        function editEmployee(cell, taskId) {
+            const currentValue = cell.textContent;
+            let options = '<option value="">Sin asignar</option>';
+            employees.forEach(emp => {
+                const selected = currentValue === emp.name ? ' selected' : '';
+                options += '<option value="' + emp.name + '"' + selected + '>' + emp.name + ' (' + emp.rol + ')</option>';
+            });
+            cell.innerHTML = '<select onchange="saveEmployee(this, ' + taskId + ')" onblur="cancelEdit(this, \'' + currentValue + '\')">' + options + '</select>';
+        }
+
+        function saveState(select, taskId) {
+            const newValue = select.value;
+            fetch('/tasks/edit/' + taskId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ field: 'estado', value: newValue })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    select.parentElement.textContent = newValue;
+                    location.reload(); // Actualizar para mostrar colores
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+
+        function saveEmployee(select, taskId) {
+            const newValue = select.value || 'Sin asignar';
+            fetch('/tasks/edit/' + taskId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ field: 'colaborador', value: newValue })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    select.parentElement.textContent = newValue;
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+
+        function cancelEdit(element, originalValue) {
+            setTimeout(() => {
+                element.textContent = originalValue;
+            }, 100);
+        }
+
         function deleteTask(id) {
             if (confirm('Estas seguro de que quieres eliminar esta tarea?')) {
                 fetch('/tasks/delete/' + id, {
@@ -834,7 +904,7 @@ TASKS_TABLE_TEMPLATE = '''
                     }
                 })
                 .catch(error => {
-                    alert('Error de conexión: ' + error);
+                    alert('Error de conexion: ' + error);
                 });
             }
         }
