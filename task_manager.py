@@ -44,27 +44,80 @@ def tasks_dashboard():
 
 @app.route('/tasks/analytics')
 def tasks_analytics():
-    """Dashboard de análisis con gráficos"""
+    """Dashboard de análisis avanzado con métricas empresariales"""
     # Verificar autenticación admin
     if 'admin_ok' not in session or not session.get('admin_ok'):
         return redirect('/diversia-admin')
     
-    # Estadísticas de tareas
+    # Estadísticas básicas de tareas
     total_tasks = Task.query.count()
     pendientes = Task.query.filter_by(estado='Pendiente').count()
     en_curso = Task.query.filter_by(estado='En curso').count()
     completadas = Task.query.filter_by(estado='Completado').count()
     
-    # Tareas por colaborador
+    # Métricas empresariales avanzadas
+    
+    # 1. Tareas por colaborador con eficiencia
     tasks_by_collaborator = db.session.query(
         Task.colaborador,
         db.func.count(Task.id).label('total_tasks'),
         db.func.sum(db.case((Task.estado == 'Completado', 1), else_=0)).label('completed'),
         db.func.sum(db.case((Task.estado == 'En curso', 1), else_=0)).label('in_progress'),
         db.func.sum(db.case((Task.estado == 'Pendiente', 1), else_=0)).label('pending')
-    ).group_by(Task.colaborador).all()
+    ).filter(Task.colaborador.isnot(None), Task.colaborador != '').group_by(Task.colaborador).all()
     
-    # Productividad por estado
+    # 2. Distribución temporal de tareas (últimos 30 días)
+    from datetime import datetime, timedelta
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    recent_tasks = Task.query.filter(Task.created_at >= thirty_days_ago).all()
+    
+    # 3. Análisis de fechas límite y retrasos
+    tasks_with_dates = Task.query.filter(Task.fecha_final.isnot(None), Task.fecha_final != '').all()
+    overdue_tasks = []
+    upcoming_deadlines = []
+    
+    for task in tasks_with_dates:
+        if task.fecha_final:
+            try:
+                deadline = datetime.strptime(task.fecha_final, '%Y-%m-%d')
+                if deadline < datetime.now() and task.estado != 'Completado':
+                    overdue_tasks.append(task)
+                elif deadline <= datetime.now() + timedelta(days=7) and task.estado != 'Completado':
+                    upcoming_deadlines.append(task)
+            except:
+                pass  # Ignorar fechas mal formateadas
+    
+    # 4. Análisis de carga de trabajo por colaborador
+    workload_analysis = []
+    for collab in tasks_by_collaborator:
+        efficiency = (collab.completed / collab.total_tasks * 100) if collab.total_tasks > 0 else 0
+        workload_status = 'Alto' if collab.total_tasks > 5 else 'Medio' if collab.total_tasks > 2 else 'Bajo'
+        workload_analysis.append({
+            'colaborador': collab.colaborador,
+            'total_tasks': collab.total_tasks,
+            'completed': collab.completed,
+            'efficiency': round(efficiency, 1),
+            'workload_status': workload_status,
+            'pending_urgent': collab.pending + collab.in_progress
+        })
+    
+    # 5. Tendencias de creación de tareas (últimos 7 días)
+    daily_task_creation = {}
+    for i in range(7):
+        day = datetime.now() - timedelta(days=i)
+        day_str = day.strftime('%Y-%m-%d')
+        count = Task.query.filter(
+            db.func.date(Task.created_at) == day.date()
+        ).count()
+        daily_task_creation[day.strftime('%a %d')] = count
+    
+    # 6. Métricas de rendimiento empresarial
+    total_employees = Employee.query.filter_by(active=True).count()
+    tasks_per_employee = round(total_tasks / total_employees, 1) if total_employees > 0 else 0
+    completion_rate = round((completadas / total_tasks * 100), 1) if total_tasks > 0 else 0
+    productivity_score = round(completion_rate * 0.6 + (en_curso / total_tasks * 100) * 0.3 + (pendientes / total_tasks * 100) * 0.1, 1) if total_tasks > 0 else 0
+    
+    # Datos para gráficos
     productivity_data = {
         'pendientes': pendientes,
         'en_curso': en_curso, 
@@ -80,6 +133,14 @@ def tasks_analytics():
                                 en_curso=en_curso,
                                 completadas=completadas,
                                 tasks_by_collaborator=tasks_by_collaborator,
+                                workload_analysis=workload_analysis,
+                                overdue_tasks=overdue_tasks,
+                                upcoming_deadlines=upcoming_deadlines,
+                                daily_task_creation=daily_task_creation,
+                                total_employees=total_employees,
+                                tasks_per_employee=tasks_per_employee,
+                                completion_rate=completion_rate,
+                                productivity_score=productivity_score,
                                 productivity_data=productivity_data,
                                 employees=employees)
 
@@ -1138,55 +1199,151 @@ TASKS_ANALYTICS_TEMPLATE = '''
             </div>
         </div>
         
-        <!-- Métricas principales -->
+        <!-- Métricas principales mejoradas -->
         <div class="row mb-4">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="card metric-card">
                     <div class="card-body text-center">
                         <h3>{{ total_tasks }}</h3>
-                        <p class="mb-0">Total Tareas</p>
+                        <p class="mb-0">📋 Total Tareas</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="card metric-card">
                     <div class="card-body text-center">
-                        <h3>{{ completadas }}</h3>
-                        <p class="mb-0">Completadas</p>
-                        <small>{% if total_tasks > 0 %}{{ (completadas / total_tasks * 100)|round(1) }}%{% else %}0%{% endif %}</small>
+                        <h3>{{ completion_rate }}%</h3>
+                        <p class="mb-0">✅ Completadas</p>
+                        <small>{{ completadas }} de {{ total_tasks }}</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="card metric-card">
                     <div class="card-body text-center">
-                        <h3>{{ en_curso }}</h3>
-                        <p class="mb-0">En Progreso</p>
-                        <small>{% if total_tasks > 0 %}{{ (en_curso / total_tasks * 100)|round(1) }}%{% else %}0%{% endif %}</small>
+                        <h3>{{ productivity_score }}%</h3>
+                        <p class="mb-0">📈 Productividad</p>
+                        <small>Score empresarial</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="card metric-card">
                     <div class="card-body text-center">
-                        <h3>{{ pendientes }}</h3>
-                        <p class="mb-0">Pendientes</p>
-                        <small>{% if total_tasks > 0 %}{{ (pendientes / total_tasks * 100)|round(1) }}%{% else %}0%{% endif %}</small>
+                        <h3>{{ total_employees }}</h3>
+                        <p class="mb-0">👥 Empleados</p>
+                        <small>{{ tasks_per_employee }} tareas/emp</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <h3>{{ overdue_tasks|length }}</h3>
+                        <p class="mb-0">⚠️ Atrasadas</p>
+                        <small>Vencidas</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <h3>{{ upcoming_deadlines|length }}</h3>
+                        <p class="mb-0">🕐 Próximas</p>
+                        <small>Esta semana</small>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Gráficos -->
-        <div class="row">
+        <!-- Alertas y notificaciones -->
+        {% if overdue_tasks|length > 0 or upcoming_deadlines|length > 0 %}
+        <div class="row mb-4">
+            {% if overdue_tasks|length > 0 %}
+            <div class="col-md-6">
+                <div class="alert alert-danger">
+                    <h6><i class="bi bi-exclamation-triangle"></i> ⚠️ Tareas Atrasadas ({{ overdue_tasks|length }})</h6>
+                    <ul class="mb-0">
+                        {% for task in overdue_tasks[:3] %}
+                        <li><strong>{{ task.tarea[:50] }}</strong> - {{ task.colaborador or 'Sin asignar' }} - Vencía: {{ task.fecha_final }}</li>
+                        {% endfor %}
+                        {% if overdue_tasks|length > 3 %}
+                        <li><em>... y {{ overdue_tasks|length - 3 }} más</em></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            {% if upcoming_deadlines|length > 0 %}
+            <div class="col-md-6">
+                <div class="alert alert-warning">
+                    <h6><i class="bi bi-clock"></i> 🕐 Próximas a Vencer ({{ upcoming_deadlines|length }})</h6>
+                    <ul class="mb-0">
+                        {% for task in upcoming_deadlines[:3] %}
+                        <li><strong>{{ task.tarea[:50] }}</strong> - {{ task.colaborador or 'Sin asignar' }} - Vence: {{ task.fecha_final }}</li>
+                        {% endfor %}
+                        {% if upcoming_deadlines|length > 3 %}
+                        <li><em>... y {{ upcoming_deadlines|length - 3 }} más</em></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Gráficos principales -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5>📊 Estado General de Tareas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5>📈 Tendencia de Creación (7 días)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h5>⚡ Eficiencia por Colaborador</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="efficiencyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos secundarios -->
+        <div class="row mb-4">
             <div class="col-md-6">
                 <div class="card analytics-card">
                     <div class="card-header">
-                        <h5>📈 Estado General de Tareas</h5>
+                        <h5>👥 Carga de Trabajo por Colaborador</h5>
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
-                            <canvas id="statusChart"></canvas>
+                            <canvas id="workloadChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -1195,36 +1352,41 @@ TASKS_ANALYTICS_TEMPLATE = '''
             <div class="col-md-6">
                 <div class="card analytics-card">
                     <div class="card-header">
-                        <h5>👥 Productividad por Colaborador</h5>
+                        <h5>🎯 Análisis de Plazos</h5>
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
-                            <canvas id="collaboratorChart"></canvas>
+                            <canvas id="deadlineChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Tabla de rendimiento -->
+        <!-- Tabla de rendimiento mejorada -->
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card analytics-card">
-                    <div class="card-header">
-                        <h5>📋 Rendimiento Detallado por Colaborador</h5>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>📋 Análisis Detallado de Rendimiento</h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary" onclick="exportAnalytics()">📊 Exportar</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="refreshAnalytics()">🔄 Actualizar</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
                                     <tr>
-                                        <th>Colaborador</th>
-                                        <th>Total Tareas</th>
-                                        <th>Completadas</th>
-                                        <th>En Progreso</th>
-                                        <th>Pendientes</th>
-                                        <th>% Completado</th>
-                                        <th>Eficiencia</th>
+                                        <th>👤 Colaborador</th>
+                                        <th>📊 Total</th>
+                                        <th>✅ Completadas</th>
+                                        <th>🔄 En Progreso</th>
+                                        <th>📋 Pendientes</th>
+                                        <th>📈 % Eficiencia</th>
+                                        <th>⚡ Carga</th>
+                                        <th>🎯 Estado</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1311,15 +1473,191 @@ TASKS_ANALYTICS_TEMPLATE = '''
     </div>
     
     <script>
-        // Gráfico de estado general
+        // 1. Gráfico de estado general (Doughnut mejorado)
         const statusCtx = document.getElementById('statusChart').getContext('2d');
         new Chart(statusCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Completadas', 'En Progreso', 'Pendientes'],
+                labels: ['✅ Completadas', '🔄 En Progreso', '📋 Pendientes'],
                 datasets: [{
                     data: [{{ completadas }}, {{ en_curso }}, {{ pendientes }}],
                     backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                    borderWidth: 3,
+                    borderColor: '#fff',
+                    hoverBorderWidth: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = {{ total_tasks }};
+                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 2. Gráfico de tendencia de creación (Line chart)
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        const trendData = {{ daily_task_creation|safe }};
+        const trendLabels = Object.keys(trendData);
+        const trendValues = Object.values(trendData);
+        
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: trendLabels,
+                datasets: [{
+                    label: 'Tareas Creadas',
+                    data: trendValues,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#007bff',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // 3. Gráfico de eficiencia por colaborador (Radar chart)
+        const efficiencyCtx = document.getElementById('efficiencyChart').getContext('2d');
+        new Chart(efficiencyCtx, {
+            type: 'radar',
+            data: {
+                labels: [{% for collab in workload_analysis %}'{{ collab.colaborador[:10] }}'{% if not loop.last %},{% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Eficiencia %',
+                    data: [{% for collab in workload_analysis %}{{ collab.efficiency }}{% if not loop.last %},{% endif %}{% endfor %}],
+                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    borderColor: '#28a745',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#28a745',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // 4. Gráfico de carga de trabajo (Bar horizontal)
+        const workloadCtx = document.getElementById('workloadChart').getContext('2d');
+        new Chart(workloadCtx, {
+            type: 'bar',
+            data: {
+                labels: [{% for collab in tasks_by_collaborator %}'{{ collab.colaborador or "Sin asignar" }}'{% if not loop.last %},{% endif %}{% endfor %}],
+                datasets: [{
+                    label: '✅ Completadas',
+                    data: [{% for collab in tasks_by_collaborator %}{{ collab.completed }}{% if not loop.last %},{% endif %}{% endfor %}],
+                    backgroundColor: '#28a745'
+                }, {
+                    label: '🔄 En Progreso',
+                    data: [{% for collab in tasks_by_collaborator %}{{ collab.in_progress }}{% if not loop.last %},{% endif %}{% endfor %}],
+                    backgroundColor: '#ffc107'
+                }, {
+                    label: '📋 Pendientes',
+                    data: [{% for collab in tasks_by_collaborator %}{{ collab.pending }}{% if not loop.last %},{% endif %}{% endfor %}],
+                    backgroundColor: '#dc3545'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        stacked: true,
+                        beginAtZero: true
+                    },
+                    y: {
+                        stacked: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            }
+        });
+
+        // 5. Gráfico de análisis de plazos (Pie chart)
+        const deadlineCtx = document.getElementById('deadlineChart').getContext('2d');
+        const overdueCount = {{ overdue_tasks|length }};
+        const upcomingCount = {{ upcoming_deadlines|length }};
+        const onTimeCount = {{ total_tasks }} - overdueCount - upcomingCount;
+        
+        new Chart(deadlineCtx, {
+            type: 'pie',
+            data: {
+                labels: ['⚠️ Atrasadas', '🕐 Próximas a Vencer', '✅ A Tiempo'],
+                datasets: [{
+                    data: [overdueCount, upcomingCount, onTimeCount],
+                    backgroundColor: ['#dc3545', '#fd7e14', '#28a745'],
                     borderWidth: 2,
                     borderColor: '#fff'
                 }]
@@ -1329,52 +1667,66 @@ TASKS_ANALYTICS_TEMPLATE = '''
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = overdueCount + upcomingCount + onTimeCount;
+                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                            }
+                        }
                     }
                 }
             }
         });
-        
-        // Gráfico de productividad por colaborador
-        const collaboratorCtx = document.getElementById('collaboratorChart').getContext('2d');
-        const collaboratorData = {
-            labels: [{% for collab in tasks_by_collaborator %}'{{ collab.colaborador or "Sin asignar" }}'{% if not loop.last %},{% endif %}{% endfor %}],
-            datasets: [{
-                label: 'Completadas',
-                data: [{% for collab in tasks_by_collaborator %}{{ collab.completed }}{% if not loop.last %},{% endif %}{% endfor %}],
-                backgroundColor: '#28a745'
-            }, {
-                label: 'En Progreso',
-                data: [{% for collab in tasks_by_collaborator %}{{ collab.in_progress }}{% if not loop.last %},{% endif %}{% endfor %}],
-                backgroundColor: '#ffc107'
-            }, {
-                label: 'Pendientes',
-                data: [{% for collab in tasks_by_collaborator %}{{ collab.pending }}{% if not loop.last %},{% endif %}{% endfor %}],
-                backgroundColor: '#dc3545'
-            }]
-        };
-        
-        new Chart(collaboratorCtx, {
-            type: 'bar',
-            data: collaboratorData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        stacked: true
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    }
-                }
-            }
+
+        // Funciones de utilidad
+        function exportAnalytics() {
+            const data = {
+                total_tasks: {{ total_tasks }},
+                completion_rate: {{ completion_rate }},
+                productivity_score: {{ productivity_score }},
+                overdue_tasks: {{ overdue_tasks|length }},
+                upcoming_deadlines: {{ upcoming_deadlines|length }},
+                export_date: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'analytics_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function refreshAnalytics() {
+            window.location.reload();
+        }
+
+        // Animaciones y efectos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animar las tarjetas métricas
+            const metricCards = document.querySelectorAll('.metric-card');
+            metricCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.opacity = '1';
+                }, index * 100);
+            });
+        });
+
+        // Configuración inicial de animaciones
+        document.querySelectorAll('.metric-card').forEach(card => {
+            card.style.transform = 'translateY(20px)';
+            card.style.opacity = '0';
+            card.style.transition = 'all 0.5s ease';
         });
     </script>
 </body>
