@@ -118,8 +118,9 @@ TAREAS_TEMPLATE = '''
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.01);
             z-index: 1000;
+            display: none;
         }
         .dropdown-content {
             position: absolute;
@@ -279,6 +280,7 @@ TAREAS_TEMPLATE = '''
             
             // Agregar al DOM
             overlay.appendChild(dropdown);
+            overlay.style.display = 'block';
             document.body.appendChild(overlay);
             
             // Event listener para cerrar
@@ -288,12 +290,24 @@ TAREAS_TEMPLATE = '''
                 }
             });
             
+            // Auto-cerrar después de 10 segundos por seguridad
+            setTimeout(function() {
+                if (dropdownActivo === overlay) {
+                    cerrarDropdown();
+                }
+            }, 10000);
+            
             dropdownActivo = overlay;
         }
         
         function cerrarDropdown() {
             if (dropdownActivo) {
-                document.body.removeChild(dropdownActivo);
+                dropdownActivo.style.display = 'none';
+                try {
+                    document.body.removeChild(dropdownActivo);
+                } catch(e) {
+                    console.log('Error removiendo overlay:', e);
+                }
                 dropdownActivo = null;
             }
         }
