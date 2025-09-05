@@ -918,9 +918,9 @@ TASKS_TABLE_TEMPLATE = '''
         
         
         function loadGoogleDriveFiles() {
-            const loading = document.getElementById('gdrive-loading');
-            const error = document.getElementById('gdrive-error');
-            const files = document.getElementById('gdrive-files');
+            var loading = document.getElementById('gdrive-loading');
+            var error = document.getElementById('gdrive-error');
+            var files = document.getElementById('gdrive-files');
             
             // Mostrar loading, ocultar otros
             loading.classList.remove('d-none');
@@ -966,7 +966,7 @@ TASKS_TABLE_TEMPLATE = '''
         document.getElementById('taskForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const formData = {
+            var formData = {
                 tarea: document.getElementById('taskTarea').value.trim(),
                 colaborador: document.getElementById('taskColaborador').value.trim(),
                 estado: document.getElementById('taskEstado').value.trim(),
@@ -1052,7 +1052,7 @@ TASKS_TABLE_TEMPLATE = '''
         
         function initializeSearch() {
             allRows = Array.from(document.querySelectorAll('tbody tr'));
-            const searchInput = document.getElementById('searchInput');
+            var searchInput = document.getElementById('searchInput');
             
             searchInput.addEventListener('input', function() {
                 performSearch(this.value);
@@ -1066,15 +1066,15 @@ TASKS_TABLE_TEMPLATE = '''
         }
         
         function performSearch(searchTerm) {
-            const term = searchTerm.toLowerCase().trim();
+            var term = searchTerm.toLowerCase().trim();
             let visibleCount = 0;
             
             allRows.forEach(row function{
-                const tarea = row.cells[1].textContent.toLowerCase();
-                const colaborador = row.cells[2].textContent.toLowerCase();
-                const estado = row.cells[5].textContent.toLowerCase();
+                var tarea = row.cells[1].textContent.toLowerCase();
+                var colaborador = row.cells[2].textContent.toLowerCase();
+                var estado = row.cells[5].textContent.toLowerCase();
                 
-                const matches = tarea.includes(term) || 
+                var matches = tarea.includes(term) || 
                               colaborador.includes(term) || 
                               estado.includes(term);
                 
@@ -1121,9 +1121,9 @@ TASKS_TABLE_TEMPLATE = '''
                 if (currentlyEditing === element) return;
 
                 currentlyEditing = element;
-                const originalValue = element.textContent.trim();
-                const field = element.getAttribute('data-field');
-                const taskId = element.getAttribute('data-id');
+                var originalValue = element.textContent.trim();
+                var field = element.getAttribute('data-field');
+                var taskId = element.getAttribute('data-id');
                 
                 console.log('Iniciando edicion:', { field, taskId, originalValue });
                 element.classList.add('editing');
@@ -1137,10 +1137,11 @@ TASKS_TABLE_TEMPLATE = '''
                     
                     // Añadir empleados disponibles
                     if (window.availableEmployees) {
-                        window.availableEmployees.forEach(emp function{
-                            const option = document.createElement('option');
+                        for (var i = 0; i < window.availableEmployees.length; i++) {
+                            var emp = window.availableEmployees[i];
+                            var option = document.createElement('option');
                             option.value = emp.name;
-                            option.textContent = `${emp.name} (${emp.rol})`;
+                            option.textContent = emp.name + ' (' + emp.rol + ')';
                             inputElement.appendChild(option);
                         });
                     }
@@ -1168,15 +1169,15 @@ TASKS_TABLE_TEMPLATE = '''
                 }
                 
                 // Crear botones de acción
-                const buttonContainer = document.createElement('div');
+                var buttonContainer = document.createElement('div');
                 buttonContainer.className = 'save-cancel-buttons';
                 
-                const saveBtn = document.createElement('button');
+                var saveBtn = document.createElement('button');
                 saveBtn.className = 'btn btn-sm btn-success me-1';
                 saveBtn.textContent = '✓';
                 saveBtn.onclick = () functionsaveEdit(element, inputElement, taskId, field, originalValue);
                 
-                const cancelBtn = document.createElement('button');
+                var cancelBtn = document.createElement('button');
                 cancelBtn.className = 'btn btn-sm btn-secondary';
                 cancelBtn.textContent = '✗';
                 cancelBtn.onclick = () functioncancelEdit(element, originalValue);
@@ -1205,7 +1206,7 @@ TASKS_TABLE_TEMPLATE = '''
             }
 
             function saveEdit(element, inputElement, taskId, field, originalValue) {
-                const newValue = inputElement.value.trim();
+                var newValue = inputElement.value.trim();
                 
                 // Mostrar loading
                 element.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div>';
@@ -1224,14 +1225,14 @@ TASKS_TABLE_TEMPLATE = '''
                 .then(data function{
                     if (data.success) {
                         // Mostrar valor actualizado
-                        const displayValue = newValue || '-';
+                        var displayValue = newValue || '-';
                         element.textContent = displayValue;
                         element.classList.remove('editing');
                         currentlyEditing = null;
                         
                         // Actualizar clase de estado si es necesario
                         if (field === 'estado') {
-                            const row = element.closest('tr');
+                            var row = element.closest('tr');
                             row.className = row.className.replace(/status-[\\w-]+/g, '');
                             row.classList.add('status-' + newValue.toLowerCase().replace(' ', '-'));
                         }
@@ -1577,7 +1578,7 @@ TASKS_ANALYTICS_TEMPLATE = '''
     
     <script>
         // 1. Gráfico de estado general (Doughnut mejorado)
-        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        var statusCtx = document.getElementById('statusChart').getContext('2d');
         new Chart(statusCtx, {
             type: 'doughnut',
             data: {
@@ -1604,8 +1605,8 @@ TASKS_ANALYTICS_TEMPLATE = '''
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                const total = {{ total_tasks }};
-                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                var total = {{ total_tasks }};
+                                var percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
                                 return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
                             }
                         }
@@ -1615,10 +1616,10 @@ TASKS_ANALYTICS_TEMPLATE = '''
         });
 
         // 2. Gráfico de tendencia de creación (Line chart)
-        const trendCtx = document.getElementById('trendChart').getContext('2d');
-        const trendData = {{ daily_task_creation|safe }};
-        const trendLabels = Object.keys(trendData);
-        const trendValues = Object.values(trendData);
+        var trendCtx = document.getElementById('trendChart').getContext('2d');
+        var trendData = {{ daily_task_creation|safe }};
+        var trendLabels = Object.keys(trendData);
+        var trendValues = Object.values(trendData);
         
         new Chart(trendCtx, {
             type: 'line',
@@ -1662,7 +1663,7 @@ TASKS_ANALYTICS_TEMPLATE = '''
         });
 
         // 3. Gráfico de eficiencia por colaborador (Radar chart)
-        const efficiencyCtx = document.getElementById('efficiencyChart').getContext('2d');
+        var efficiencyCtx = document.getElementById('efficiencyChart').getContext('2d');
         new Chart(efficiencyCtx, {
             type: 'radar',
             data: {
@@ -1704,7 +1705,7 @@ TASKS_ANALYTICS_TEMPLATE = '''
         });
 
         // 4. Gráfico de carga de trabajo (Bar horizontal)
-        const workloadCtx = document.getElementById('workloadChart').getContext('2d');
+        var workloadCtx = document.getElementById('workloadChart').getContext('2d');
         new Chart(workloadCtx, {
             type: 'bar',
             data: {
@@ -1749,10 +1750,10 @@ TASKS_ANALYTICS_TEMPLATE = '''
         });
 
         // 5. Gráfico de análisis de plazos (Pie chart)
-        const deadlineCtx = document.getElementById('deadlineChart').getContext('2d');
-        const overdueCount = {{ overdue_tasks|length }};
-        const upcomingCount = {{ upcoming_deadlines|length }};
-        const onTimeCount = {{ total_tasks }} - overdueCount - upcomingCount;
+        var deadlineCtx = document.getElementById('deadlineChart').getContext('2d');
+        var overdueCount = {{ overdue_tasks|length }};
+        var upcomingCount = {{ upcoming_deadlines|length }};
+        var onTimeCount = {{ total_tasks }} - overdueCount - upcomingCount;
         
         new Chart(deadlineCtx, {
             type: 'pie',
@@ -1779,8 +1780,8 @@ TASKS_ANALYTICS_TEMPLATE = '''
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                const total = overdueCount + upcomingCount + onTimeCount;
-                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                var total = overdueCount + upcomingCount + onTimeCount;
+                                var percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
                                 return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
                             }
                         }
@@ -1791,7 +1792,7 @@ TASKS_ANALYTICS_TEMPLATE = '''
 
         // Funciones de utilidad
         function exportAnalytics() {
-            const data = {
+            var data = {
                 total_tasks: {{ total_tasks }},
                 completion_rate: {{ completion_rate }},
                 productivity_score: {{ productivity_score }},
@@ -1800,9 +1801,9 @@ TASKS_ANALYTICS_TEMPLATE = '''
                 export_date: new Date().toISOString()
             };
             
-            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
+            var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
             a.href = url;
             a.download = 'analytics_' + new Date().toISOString().split('T')[0] + '.json';
             a.click();
@@ -1816,7 +1817,7 @@ TASKS_ANALYTICS_TEMPLATE = '''
         // Animaciones y efectos
         document.addEventListener('DOMContentLoaded', function() {
             // Animar las tarjetas métricas
-            const metricCards = document.querySelectorAll('.metric-card');
+            var metricCards = document.querySelectorAll('.metric-card');
             metricCards.forEach((card, index) function{
                 setTimeout(() function{
                     card.style.transform = 'translateY(0)';
