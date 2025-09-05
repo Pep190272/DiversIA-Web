@@ -1239,7 +1239,7 @@ TASKS_TABLE_TEMPLATE = '''
                         
                         // Efecto visual de éxito
                         element.style.backgroundColor = '#d4edda';
-                        setTimeout(() function() {
+                        setTimeout(function() {
                             element.style.backgroundColor = '';
                         }, 1000);
                     } else {
@@ -1253,12 +1253,81 @@ TASKS_TABLE_TEMPLATE = '''
                 });
             }
 
-            function cancelEdit(element, originalValue = null) {
+            function cancelEdit(element, originalValue) {
                 if (originalValue !== null) {
                     element.textContent = originalValue;
                 }
                 element.classList.remove('editing');
                 currentlyEditing = null;
+            }
+
+            // FUNCIONES PARA DROPDOWNS
+            var employees = [];
+            
+            fetch('/tasks/employees').then(function(response) {
+                return response.json();
+            }).then(function(data) {
+                employees = data;
+                console.log('Empleados cargados:', employees.length);
+            });
+            
+            function editState(cell, taskId) {
+                var currentValue = cell.textContent;
+                var select = document.createElement('select');
+                select.innerHTML = '<option value="Pendiente">Pendiente</option><option value="En curso">En curso</option><option value="Completado">Completado</option>';
+                select.value = currentValue;
+                select.onchange = function() { saveState(this, taskId); };
+                cell.innerHTML = '';
+                cell.appendChild(select);
+            }
+
+            function editEmployee(cell, taskId) {
+                var currentValue = cell.textContent;
+                var select = document.createElement('select');
+                var options = '<option value="">Sin asignar</option>';
+                for (var i = 0; i < employees.length; i++) {
+                    var emp = employees[i];
+                    options += '<option value="' + emp.name + '">' + emp.name + ' (' + emp.rol + ')</option>';
+                }
+                select.innerHTML = options;
+                select.value = currentValue === 'Sin asignar' ? '' : currentValue;
+                select.onchange = function() { saveEmployee(this, taskId); };
+                cell.innerHTML = '';
+                cell.appendChild(select);
+            }
+
+            function saveState(select, taskId) {
+                var newValue = select.value;
+                fetch('/tasks/edit/' + taskId, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ field: 'estado', value: newValue })
+                }).then(function(response) {
+                    return response.json();
+                }).then(function(data) {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                });
+            }
+
+            function saveEmployee(select, taskId) {
+                var newValue = select.value || 'Sin asignar';
+                fetch('/tasks/edit/' + taskId, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ field: 'colaborador', value: newValue })
+                }).then(function(response) {
+                    return response.json();
+                }).then(function(data) {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                });
             }
         });
     </script>
