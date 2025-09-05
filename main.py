@@ -1,4 +1,10 @@
 from app import app
+from tasks_simple import tasks_bp
+
+# Registrar el nuevo blueprint
+app.register_blueprint(tasks_bp)
+
+print("✅ Tasks Simple Blueprint registrado")
 
 # Configuración CORS para permitir formularios desde el navegador
 @app.after_request
