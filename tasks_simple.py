@@ -168,9 +168,13 @@ SIMPLE_TASKS_TEMPLATE = '''
         
         // Editar estado
         function editEstado(celda, taskId) {
+            // Prevenir múltiples ediciones
+            if (celda.querySelector('select')) return;
+            
             var valorActual = celda.textContent.trim();
             var select = document.createElement('select');
             select.className = 'form-select form-select-sm';
+            select.style.minWidth = '120px';
             
             var opciones = [
                 {value: 'Pendiente', text: 'Pendiente'},
@@ -188,20 +192,44 @@ SIMPLE_TASKS_TEMPLATE = '''
                 select.appendChild(option);
             }
             
+            // Eventos para manejar cambios y cancelación
             select.onchange = function() {
-                guardarEstado(this, taskId, celda);
+                guardarEstado(this, taskId, celda, valorActual);
+            };
+            
+            select.onblur = function() {
+                setTimeout(function() {
+                    if (select.parentNode) {
+                        celda.textContent = valorActual;
+                    }
+                }, 200);
+            };
+            
+            select.onkeydown = function(e) {
+                if (e.key === 'Escape') {
+                    celda.textContent = valorActual;
+                }
             };
             
             celda.innerHTML = '';
             celda.appendChild(select);
-            select.focus();
+            
+            // Abrir dropdown automáticamente
+            setTimeout(function() {
+                select.focus();
+                select.click();
+            }, 50);
         }
         
         // Editar colaborador
         function editColaborador(celda, taskId) {
+            // Prevenir múltiples ediciones
+            if (celda.querySelector('select')) return;
+            
             var valorActual = celda.textContent.trim();
             var select = document.createElement('select');
             select.className = 'form-select form-select-sm';
+            select.style.minWidth = '150px';
             
             // Opción sin asignar
             var optionVacio = document.createElement('option');
@@ -224,17 +252,37 @@ SIMPLE_TASKS_TEMPLATE = '''
                 select.appendChild(option);
             }
             
+            // Eventos para manejar cambios y cancelación
             select.onchange = function() {
-                guardarColaborador(this, taskId, celda);
+                guardarColaborador(this, taskId, celda, valorActual);
+            };
+            
+            select.onblur = function() {
+                setTimeout(function() {
+                    if (select.parentNode) {
+                        celda.textContent = valorActual;
+                    }
+                }, 200);
+            };
+            
+            select.onkeydown = function(e) {
+                if (e.key === 'Escape') {
+                    celda.textContent = valorActual;
+                }
             };
             
             celda.innerHTML = '';
             celda.appendChild(select);
-            select.focus();
+            
+            // Abrir dropdown automáticamente
+            setTimeout(function() {
+                select.focus();
+                select.click();
+            }, 50);
         }
         
         // Guardar estado
-        function guardarEstado(select, taskId, celda) {
+        function guardarEstado(select, taskId, celda, valorOriginal) {
             var nuevoValor = select.value;
             
             fetch('/tasks-simple/edit/' + taskId, {
@@ -264,7 +312,7 @@ SIMPLE_TASKS_TEMPLATE = '''
         }
         
         // Guardar colaborador
-        function guardarColaborador(select, taskId, celda) {
+        function guardarColaborador(select, taskId, celda, valorOriginal) {
             var nuevoValor = select.value || 'Sin asignar';
             
             fetch('/tasks-simple/edit/' + taskId, {
