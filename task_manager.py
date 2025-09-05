@@ -1023,8 +1023,8 @@ TASKS_TABLE_TEMPLATE = '''
         }
         
         function deleteAllTasks() {
-            if (confirm('⚠️ ATENCIÓN: ¿Estás COMPLETAMENTE SEGURO de eliminar TODAS las tareas?\\n\\nEsto eliminará TODAS las tareas permanentemente.')) {
-                if (confirm('🛑 ÚLTIMA CONFIRMACIÓN: Eliminar TODAS las tareas. ¿Confirmas?\\n\\nEsta acción NO se puede deshacer.')) {
+            if (confirm('⚠️ ATENCIÓN: ¿Estás COMPLETAMENTE SEGURO de eliminar TODAS las tareas?\n\nEsto eliminará TODAS las tareas permanentemente.')) {
+                if (confirm('🛑 ÚLTIMA CONFIRMACIÓN: Eliminar TODAS las tareas. ¿Confirmas?\n\nEsta acción NO se puede deshacer.')) {
                     fetch('/tasks/delete-all', {
                         method: 'DELETE',
                         credentials: 'same-origin',
