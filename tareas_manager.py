@@ -23,7 +23,7 @@ def mostrar_tareas():
         
         # Obtener empleados
         with db.engine.connect() as conn:
-            result = conn.execute(db.text("SELECT name, rol FROM employee WHERE active = true"))
+            result = conn.execute(db.text("SELECT name, rol FROM empleados WHERE active = true"))
             empleados = result.fetchall()
         
         return render_template_string(TAREAS_TEMPLATE, tareas=tareas, empleados=empleados)
@@ -80,7 +80,7 @@ def obtener_empleados():
     """Obtener lista de empleados para dropdowns"""
     try:
         with db.engine.connect() as conn:
-            result = conn.execute(db.text("SELECT name, rol FROM employee WHERE active = true"))
+            result = conn.execute(db.text("SELECT name, rol FROM empleados WHERE active = true"))
             empleados = [{'name': row[0], 'rol': row[1]} for row in result.fetchall()]
         
         return jsonify(empleados)
