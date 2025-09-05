@@ -56,33 +56,56 @@ def api_colaboradores():
 
 @dashboard_bp.route('/api/dashboard/productividad')
 def api_productividad():
-    """API para métricas de productividad"""
+    """API para métricas de productividad avanzadas"""
     try:
         with db.engine.connect() as conn:
-            # Tareas completadas vs pendientes por colaborador
+            # Análisis completo por colaborador
             result = conn.execute(db.text("""
                 SELECT 
                     colaborador,
                     SUM(CASE WHEN estado = 'Terminada' THEN 1 ELSE 0 END) as completadas,
-                    SUM(CASE WHEN estado != 'Terminada' OR estado IS NULL THEN 1 ELSE 0 END) as pendientes
+                    SUM(CASE WHEN estado = 'En curso' THEN 1 ELSE 0 END) as en_curso,
+                    SUM(CASE WHEN estado = 'Pendiente' OR estado IS NULL THEN 1 ELSE 0 END) as pendientes,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN estado = 'Terminada' AND fecha_final LIKE '%07/2025%' THEN 1 ELSE 0 END) as julio_terminadas,
+                    SUM(CASE WHEN estado = 'Terminada' AND fecha_final LIKE '%08/2025%' THEN 1 ELSE 0 END) as agosto_terminadas
                 FROM tareas_empresa 
+                WHERE colaborador IS NOT NULL
                 GROUP BY colaborador
             """))
             
             datos = []
             for row in result.fetchall():
-                colaborador = row[0] or 'Sin asignar'
+                colaborador = row[0]
                 completadas = row[1]
-                pendientes = row[2]
-                total = completadas + pendientes
+                en_curso = row[2] 
+                pendientes = row[3]
+                total = row[4]
+                julio_terminadas = row[5]
+                agosto_terminadas = row[6]
+                
                 porcentaje = (completadas / total * 100) if total > 0 else 0
+                
+                # Calcular velocidad (tareas por mes)
+                velocidad_julio = julio_terminadas
+                velocidad_agosto = agosto_terminadas
+                tendencia = "📈" if agosto_terminadas > julio_terminadas else "📉" if agosto_terminadas < julio_terminadas else "➡️"
+                
+                # Calcular eficiencia (completadas vs total asignadas)
+                eficiencia = "Alta" if porcentaje >= 80 else "Media" if porcentaje >= 60 else "Baja"
                 
                 datos.append({
                     'colaborador': colaborador,
                     'completadas': completadas,
+                    'en_curso': en_curso,
                     'pendientes': pendientes,
                     'total': total,
-                    'porcentaje_completado': round(porcentaje, 1)
+                    'porcentaje_completado': round(porcentaje, 1),
+                    'julio_terminadas': julio_terminadas,
+                    'agosto_terminadas': agosto_terminadas,
+                    'tendencia': tendencia,
+                    'eficiencia': eficiencia,
+                    'velocidad_promedio': round((julio_terminadas + agosto_terminadas) / 2, 1)
                 })
         
         return jsonify(datos)
@@ -122,20 +145,173 @@ def api_resumen():
             # Porcentaje de completado
             porcentaje_completado = (tareas_completadas / total_tareas * 100) if total_tareas > 0 else 0
             
+            # Tareas sin asignar
+            result = conn.execute(db.text("SELECT COUNT(*) FROM tareas_empresa WHERE colaborador IS NULL"))
+            tareas_sin_asignar = result.scalar()
+            
+            # Eficiencia por mes (tareas terminadas este mes vs total)
+            result = conn.execute(db.text("""
+                SELECT COUNT(*) FROM tareas_empresa 
+                WHERE estado = 'Terminada' AND fecha_final LIKE '%07/2025%'
+            """))
+            terminadas_julio = result.scalar()
+            
+            result = conn.execute(db.text("""
+                SELECT COUNT(*) FROM tareas_empresa 
+                WHERE estado = 'Terminada' AND fecha_final LIKE '%08/2025%'
+            """))
+            terminadas_agosto = result.scalar()
+            
             datos = {
                 'total_tareas': total_tareas,
                 'tareas_completadas': tareas_completadas,
                 'tareas_en_curso': tareas_en_curso,
                 'tareas_pendientes': tareas_pendientes,
+                'tareas_sin_asignar': tareas_sin_asignar,
                 'total_empleados': total_empleados,
                 'colaboradores_activos': colaboradores_activos,
-                'porcentaje_completado': round(porcentaje_completado, 1)
+                'porcentaje_completado': round(porcentaje_completado, 1),
+                'terminadas_julio': terminadas_julio,
+                'terminadas_agosto': terminadas_agosto,
+                'promedio_tareas_por_empleado': round(total_tareas / total_empleados, 1) if total_empleados > 0 else 0
             }
         
         return jsonify(datos)
     except Exception as e:
         logger.error(f"Error en api_resumen: {e}")
         return jsonify({})
+
+@dashboard_bp.route('/api/dashboard/tendencias')
+def api_tendencias():
+    """API para análisis de tendencias temporales"""
+    try:
+        with db.engine.connect() as conn:
+            # Tareas por mes
+            result = conn.execute(db.text("""
+                SELECT 
+                    'Julio 2025' as mes,
+                    SUM(CASE WHEN estado = 'Terminada' AND fecha_final LIKE '%07/2025%' THEN 1 ELSE 0 END) as terminadas,
+                    SUM(CASE WHEN fecha_inicio LIKE '%07/2025%' THEN 1 ELSE 0 END) as iniciadas
+                FROM tareas_empresa
+                UNION ALL
+                SELECT 
+                    'Agosto 2025' as mes,
+                    SUM(CASE WHEN estado = 'Terminada' AND fecha_final LIKE '%08/2025%' THEN 1 ELSE 0 END) as terminadas,
+                    SUM(CASE WHEN fecha_inicio LIKE '%08/2025%' THEN 1 ELSE 0 END) as iniciadas
+                FROM tareas_empresa
+                UNION ALL
+                SELECT 
+                    'Septiembre 2025' as mes,
+                    SUM(CASE WHEN estado = 'Terminada' AND fecha_final LIKE '%09/2025%' THEN 1 ELSE 0 END) as terminadas,
+                    SUM(CASE WHEN fecha_inicio LIKE '%09/2025%' THEN 1 ELSE 0 END) as iniciadas
+                FROM tareas_empresa
+            """))
+            
+            datos = [{'mes': row[0], 'terminadas': row[1], 'iniciadas': row[2]} for row in result.fetchall()]
+            
+        return jsonify(datos)
+    except Exception as e:
+        logger.error(f"Error en api_tendencias: {e}")
+        return jsonify([])
+
+@dashboard_bp.route('/api/dashboard/carga-trabajo')
+def api_carga_trabajo():
+    """API para análisis de carga de trabajo"""
+    try:
+        with db.engine.connect() as conn:
+            # Distribución de carga por empleado
+            result = conn.execute(db.text("""
+                SELECT 
+                    colaborador,
+                    COUNT(*) as total_asignadas,
+                    SUM(CASE WHEN estado = 'En curso' THEN 1 ELSE 0 END) as activas,
+                    SUM(CASE WHEN estado = 'Pendiente' OR estado IS NULL THEN 1 ELSE 0 END) as pendientes_asignadas
+                FROM tareas_empresa 
+                WHERE colaborador IS NOT NULL
+                GROUP BY colaborador
+            """))
+            
+            datos = []
+            for row in result.fetchall():
+                colaborador = row[0]
+                total = row[1]
+                activas = row[2]
+                pendientes = row[3]
+                carga_actual = activas + pendientes
+                
+                # Clasificar nivel de carga
+                if carga_actual >= 3:
+                    nivel_carga = "Alta"
+                    color_carga = "#dc3545"
+                elif carga_actual == 2:
+                    nivel_carga = "Media" 
+                    color_carga = "#ffc107"
+                else:
+                    nivel_carga = "Baja"
+                    color_carga = "#28a745"
+                
+                datos.append({
+                    'colaborador': colaborador,
+                    'total_asignadas': total,
+                    'carga_actual': carga_actual,
+                    'activas': activas,
+                    'pendientes_asignadas': pendientes,
+                    'nivel_carga': nivel_carga,
+                    'color_carga': color_carga
+                })
+                
+        return jsonify(datos)
+    except Exception as e:
+        logger.error(f"Error en api_carga_trabajo: {e}")
+        return jsonify([])
+
+@dashboard_bp.route('/api/dashboard/tipos-tareas')
+def api_tipos_tareas():
+    """API para análisis de tipos de tareas"""
+    try:
+        with db.engine.connect() as conn:
+            # Categorización automática por palabras clave en el nombre
+            result = conn.execute(db.text("""
+                SELECT 
+                    nombre,
+                    estado,
+                    colaborador,
+                    CASE 
+                        WHEN LOWER(nombre) LIKE '%marketing%' OR LOWER(nombre) LIKE '%email%' OR LOWER(nombre) LIKE '%campaña%' THEN 'Marketing'
+                        WHEN LOWER(nombre) LIKE '%web%' OR LOWER(nombre) LIKE '%app%' OR LOWER(nombre) LIKE '%aplicaci%' THEN 'Desarrollo'
+                        WHEN LOWER(nombre) LIKE '%linkedin%' OR LOWER(nombre) LIKE '%instagram%' OR LOWER(nombre) LIKE '%telegram%' OR LOWER(nombre) LIKE '%discord%' THEN 'Redes Sociales'
+                        ELSE 'Otros'
+                    END as categoria
+                FROM tareas_empresa
+            """))
+            
+            # Agrupar por categoría
+            categorias = {}
+            for row in result.fetchall():
+                categoria = row[3]
+                if categoria not in categorias:
+                    categorias[categoria] = {
+                        'categoria': categoria,
+                        'total': 0,
+                        'completadas': 0,
+                        'en_curso': 0,
+                        'pendientes': 0
+                    }
+                
+                categorias[categoria]['total'] += 1
+                if row[1] == 'Terminada':
+                    categorias[categoria]['completadas'] += 1
+                elif row[1] == 'En curso':
+                    categorias[categoria]['en_curso'] += 1
+                else:
+                    categorias[categoria]['pendientes'] += 1
+            
+            datos = list(categorias.values())
+            
+        return jsonify(datos)
+    except Exception as e:
+        logger.error(f"Error en api_tipos_tareas: {e}")
+        return jsonify([])
 
 # Template del dashboard
 DASHBOARD_TEMPLATE = '''
