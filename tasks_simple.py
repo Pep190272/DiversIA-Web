@@ -175,6 +175,7 @@ SIMPLE_TASKS_TEMPLATE = '''
             var select = document.createElement('select');
             select.className = 'form-select form-select-sm';
             select.style.minWidth = '120px';
+            select.style.display = 'block';
             
             var opciones = [
                 {value: 'Pendiente', text: 'Pendiente'},
@@ -192,33 +193,15 @@ SIMPLE_TASKS_TEMPLATE = '''
                 select.appendChild(option);
             }
             
-            // Eventos para manejar cambios y cancelación
-            select.onchange = function() {
-                guardarEstado(this, taskId, celda, valorActual);
-            };
-            
-            select.onblur = function() {
-                setTimeout(function() {
-                    if (select.parentNode) {
-                        celda.textContent = valorActual;
-                    }
-                }, 200);
-            };
-            
-            select.onkeydown = function(e) {
-                if (e.key === 'Escape') {
-                    celda.textContent = valorActual;
-                }
-            };
+            // Solo manejar el cambio
+            select.addEventListener('change', function() {
+                var nuevoValor = this.value;
+                guardarEstado(nuevoValor, taskId, celda);
+            });
             
             celda.innerHTML = '';
             celda.appendChild(select);
-            
-            // Abrir dropdown automáticamente
-            setTimeout(function() {
-                select.focus();
-                select.click();
-            }, 50);
+            select.focus();
         }
         
         // Editar colaborador
@@ -230,6 +213,7 @@ SIMPLE_TASKS_TEMPLATE = '''
             var select = document.createElement('select');
             select.className = 'form-select form-select-sm';
             select.style.minWidth = '150px';
+            select.style.display = 'block';
             
             // Opción sin asignar
             var optionVacio = document.createElement('option');
@@ -252,38 +236,19 @@ SIMPLE_TASKS_TEMPLATE = '''
                 select.appendChild(option);
             }
             
-            // Eventos para manejar cambios y cancelación
-            select.onchange = function() {
-                guardarColaborador(this, taskId, celda, valorActual);
-            };
-            
-            select.onblur = function() {
-                setTimeout(function() {
-                    if (select.parentNode) {
-                        celda.textContent = valorActual;
-                    }
-                }, 200);
-            };
-            
-            select.onkeydown = function(e) {
-                if (e.key === 'Escape') {
-                    celda.textContent = valorActual;
-                }
-            };
+            // Solo manejar el cambio
+            select.addEventListener('change', function() {
+                var nuevoValor = this.value || 'Sin asignar';
+                guardarColaborador(nuevoValor, taskId, celda);
+            });
             
             celda.innerHTML = '';
             celda.appendChild(select);
-            
-            // Abrir dropdown automáticamente
-            setTimeout(function() {
-                select.focus();
-                select.click();
-            }, 50);
+            select.focus();
         }
         
         // Guardar estado
-        function guardarEstado(select, taskId, celda, valorOriginal) {
-            var nuevoValor = select.value;
+        function guardarEstado(nuevoValor, taskId, celda) {
             
             fetch('/tasks-simple/edit/' + taskId, {
                 method: 'POST',
@@ -312,8 +277,7 @@ SIMPLE_TASKS_TEMPLATE = '''
         }
         
         // Guardar colaborador
-        function guardarColaborador(select, taskId, celda, valorOriginal) {
-            var nuevoValor = select.value || 'Sin asignar';
+        function guardarColaborador(nuevoValor, taskId, celda) {
             
             fetch('/tasks-simple/edit/' + taskId, {
                 method: 'POST',
