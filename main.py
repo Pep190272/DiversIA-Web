@@ -1,10 +1,4 @@
 from app import app
-from tasks_simple import tasks_bp
-
-# Registrar el nuevo blueprint
-app.register_blueprint(tasks_bp)
-
-print("✅ Tasks Simple Blueprint registrado")
 
 # Configuración CORS para permitir formularios desde el navegador
 @app.after_request
@@ -46,7 +40,7 @@ def admin_dashboard():
                                         <div class="card-body">
                                             <h5>🎯 Gestión de Tareas</h5>
                                             <p>Sistema completo de asignación y seguimiento de tareas con colaboradores</p>
-                                            <a href="/tasks" class="btn btn-primary">Acceder</a>
+                                            <a href="/tareas" class="btn btn-primary">Acceder</a>
                                         </div>
                                     </div>
                                 </div>
@@ -115,8 +109,10 @@ except Exception as e:
 # Email Marketing System
 import email_marketing_manager  # noqa: F401
 import email_notifications  # noqa: F401
-import task_manager
 import colaboradores_manager  # noqa: F401
+
+# Sistema de Tareas NUEVO
+import tareas_manager  # noqa: F401
 
 # Sistema de test de emails
 import email_test_endpoint  # noqa: F401
