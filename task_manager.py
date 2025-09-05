@@ -188,10 +188,20 @@ def import_tasks_csv():
             fecha_inicio = get_column_value(['Fecha de inicio', 'Fecha inicio', 'Start Date', 'Start', 'Inicio', 'Fecha_inicio'])
             fecha_final = get_column_value(['Fecha final', 'Fecha fin', 'End Date', 'End', 'Final', 'Due Date', 'Fecha_final'])
             
-            # Obtener estado con múltiples nombres
-            estado_value = get_column_value(['Estado', 'Status', 'State', 'Estatus', 'Pendiente', 'Complete'])
-            if not estado_value:
+            # Obtener estado con múltiples nombres y mapear valores
+            estado_raw = get_column_value(['Estado', 'Status', 'State', 'Estatus', 'Pendiente', 'Complete', 'Terminada', 'Terminado', 'Finished'])
+            
+            # Mapear diferentes formatos de estado a los valores válidos
+            if not estado_raw:
                 estado_value = 'Pendiente'
+            else:
+                estado_lower = estado_raw.lower().strip()
+                if estado_lower in ['completado', 'completada', 'terminado', 'terminada', 'finished', 'done', 'complete', 'sí', 'si', 'yes', '1', 'true']:
+                    estado_value = 'Completado'
+                elif estado_lower in ['en curso', 'en progreso', 'in progress', 'working', 'activo', 'active']:
+                    estado_value = 'En curso'
+                else:
+                    estado_value = 'Pendiente'
             
             # Obtener notas
             notas = get_column_value(['Notas', 'Notes', 'Comments', 'Comentarios', 'Description', 'Descripción'])
