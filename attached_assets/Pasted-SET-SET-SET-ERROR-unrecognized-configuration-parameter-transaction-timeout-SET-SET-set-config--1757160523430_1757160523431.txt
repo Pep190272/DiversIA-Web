@@ -1,0 +1,284 @@
+SET
+SET
+SET
+ERROR:  unrecognized configuration parameter "transaction_timeout"
+SET
+SET
+ set_config 
+------------
+ 
+(1 row)
+
+SET
+SET
+SET
+SET
+SET
+SET
+ERROR:  relation "admin_users" already exists
+ALTER TABLE
+ERROR:  relation "admin_users_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "admins" already exists
+ALTER TABLE
+ERROR:  relation "admins_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "asociaciones" already exists
+ALTER TABLE
+ERROR:  relation "asociaciones_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "companies" already exists
+ALTER TABLE
+ERROR:  relation "companies_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "crm_contacts" already exists
+ALTER TABLE
+ERROR:  relation "crm_contacts_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "email_marketing" already exists
+ALTER TABLE
+ERROR:  relation "email_marketing_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "empleados" already exists
+ALTER TABLE
+ERROR:  relation "empleados_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "employees" already exists
+ALTER TABLE
+ERROR:  relation "employees_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "form_submissions" already exists
+ALTER TABLE
+ERROR:  relation "form_submissions_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "general_leads" already exists
+ALTER TABLE
+ERROR:  relation "general_leads_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "job_offers" already exists
+ALTER TABLE
+ERROR:  relation "job_offers_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "neurodivergent_profiles_new" already exists
+ALTER TABLE
+ERROR:  relation "neurodivergent_profiles_new_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "notifications_backup" already exists
+ALTER TABLE
+ERROR:  relation "notifications_backup_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "tareas_empresa" already exists
+ALTER TABLE
+ERROR:  relation "tareas_empresa_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "tasks" already exists
+ALTER TABLE
+ERROR:  relation "tasks_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "test_results" already exists
+ALTER TABLE
+ERROR:  relation "test_results_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ERROR:  relation "users" already exists
+ALTER TABLE
+ERROR:  relation "users_id_seq" already exists
+ALTER SEQUENCE
+ALTER SEQUENCE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ERROR:  duplicate key value violates unique constraint "admin_users_pkey"
+DETAIL:  Key (id)=(1) already exists.
+CONTEXT:  COPY admin_users, line 1
+COPY 0
+ERROR:  duplicate key value violates unique constraint "asociaciones_pkey"
+DETAIL:  Key (id)=(1) already exists.
+CONTEXT:  COPY asociaciones, line 1
+ERROR:  duplicate key value violates unique constraint "companies_pkey"
+DETAIL:  Key (id)=(1) already exists.
+CONTEXT:  COPY companies, line 1
+COPY 0
+ERROR:  duplicate key value violates unique constraint "email_marketing_pkey"
+DETAIL:  Key (id)=(6) already exists.
+CONTEXT:  COPY email_marketing, line 1
+ERROR:  duplicate key value violates unique constraint "empleados_pkey"
+DETAIL:  Key (id)=(1) already exists.
+CONTEXT:  COPY empleados, line 1
+ERROR:  duplicate key value violates unique constraint "employees_pkey"
+DETAIL:  Key (id)=(2) already exists.
+CONTEXT:  COPY employees, line 1
+COPY 0
+ERROR:  duplicate key value violates unique constraint "general_leads_pkey"
+DETAIL:  Key (id)=(9) already exists.
+CONTEXT:  COPY general_leads, line 1
+COPY 0
+COPY 0
+COPY 0
+ERROR:  duplicate key value violates unique constraint "tareas_empresa_pkey"
+DETAIL:  Key (id)=(2) already exists.
+CONTEXT:  COPY tareas_empresa, line 1
+ERROR:  duplicate key value violates unique constraint "tasks_pkey"
+DETAIL:  Key (id)=(37) already exists.
+CONTEXT:  COPY tasks, line 1
+COPY 0
+COPY 0
+ setval 
+--------
+      1
+(1 row)
+
+ setval 
+--------
+      1
+(1 row)
+
+ setval 
+--------
+      1
+(1 row)
+
+ setval 
+--------
+      4
+(1 row)
+
+ setval 
+--------
+      1
+(1 row)
+
+ setval 
+--------
+    157
+(1 row)
+
+ setval 
+--------
+      3
+(1 row)
+
+ setval 
+--------
+      4
+(1 row)
+
+ setval 
+--------
+      1
+(1 row)
+
+ setval 
+--------
+     13
+(1 row)
+
+ setval 
+--------
+      1
+(1 row)
+
+ setval 
+--------
+     41
+(1 row)
+
+ setval 
+--------
+      1
+(1 row)
+
+ setval 
+--------
+      8
+(1 row)
+
+ setval 
+--------
+     44
+(1 row)
+
+ setval 
+--------
+      1
+(1 row)
+
+ setval 
+--------
+      1
+(1 row)
+
+ERROR:  relation "admin_users_email_key" already exists
+ERROR:  multiple primary keys for table "admin_users" are not allowed
+ERROR:  relation "admin_users_username_key" already exists
+ERROR:  relation "admins_email_key" already exists
+ERROR:  multiple primary keys for table "admins" are not allowed
+ERROR:  relation "admins_username_key" already exists
+ERROR:  multiple primary keys for table "asociaciones" are not allowed
+ERROR:  multiple primary keys for table "companies" are not allowed
+ERROR:  multiple primary keys for table "crm_contacts" are not allowed
+ERROR:  multiple primary keys for table "email_marketing" are not allowed
+ERROR:  multiple primary keys for table "empleados" are not allowed
+ERROR:  relation "employees_email_key" already exists
+ERROR:  multiple primary keys for table "employees" are not allowed
+ERROR:  multiple primary keys for table "form_submissions" are not allowed
+ERROR:  multiple primary keys for table "general_leads" are not allowed
+ERROR:  multiple primary keys for table "job_offers" are not allowed
+ERROR:  multiple primary keys for table "neurodivergent_profiles_new" are not allowed
+ERROR:  multiple primary keys for table "notifications_backup" are not allowed
+ERROR:  multiple primary keys for table "tareas_empresa" are not allowed
+ERROR:  multiple primary keys for table "tasks" are not allowed
+ERROR:  multiple primary keys for table "test_results" are not allowed
+ERROR:  multiple primary keys for table "users" are not allowed
+ERROR:  relation "asociaciones_created_at_idx" already exists
+ERROR:  relation "companies_created_at_idx" already exists
+ERROR:  relation "companies_email_contacto_idx" already exists
+ERROR:  relation "crm_contacts_created_at_idx" already exists
+ERROR:  relation "crm_contacts_email_idx" already exists
+ERROR:  relation "crm_contacts_name_idx" already exists
+ERROR:  relation "form_submissions_created_at_idx" already exists
+ERROR:  relation "form_submissions_form_type_idx" already exists
+ERROR:  relation "general_leads_created_at_idx" already exists
+ERROR:  relation "general_leads_email_idx" already exists
+ERROR:  relation "general_leads_email_key" already exists
+ERROR:  relation "job_offers_created_at_idx" already exists
+ERROR:  relation "neurodivergent_profiles_new_created_at_idx" already exists
+ERROR:  relation "neurodivergent_profiles_new_email_idx" already exists
+ERROR:  relation "notifications_backup_created_at_idx" already exists
+ERROR:  relation "test_results_created_at_idx" already exists
+ERROR:  relation "users_created_at_idx" already exists
+ERROR:  relation "users_email_idx" already exists
+ERROR:  relation "users_email_key" already exists
+ERROR:  constraint "job_offers_company_id_fkey" for relation "job_offers" already exists
+ERROR:  constraint "test_results_user_id_fkey" for relation "test_results" already exists
+ERROR:  permission denied to change default privileges
+ERROR:  permission denied to change default privileges
