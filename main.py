@@ -1,19 +1,34 @@
 from app import app
 
+import os
+
+# Obtener la URL de la base de datos desde las variables de entorno
+db_url = os.getenv("REPLIT_DB_URL")
+
+# Imprimir la dirección de la base de datos
+print("La dirección de tu base de datos es:", db_url)
+
+
 # Configuración CORS para permitir formularios desde el navegador
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Headers',
+                         'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods',
+                         'GET,PUT,POST,DELETE,OPTIONS')
     return response
+
+
 from flask import render_template
+
 
 # Routes principales - WEB PÚBLICA DE DIVERSIA
 @app.route('/')
 def index():
     """Página principal pública de DiversIA"""
     return render_template('index.html')
+
 
 # Panel de administración movido a ruta específica
 @app.route('/admin-dashboard')
@@ -85,6 +100,7 @@ def admin_dashboard():
     </html>
     """
 
+
 # Importar rutas simplificadas
 import routes_simple  # noqa: F401
 
@@ -125,4 +141,8 @@ if __name__ == "__main__":
     print("🌐 Iniciando DiversIA Web Preview Server...")
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
     app.config['TEMPLATES_AUTO_RELOAD'] = True
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False, threaded=True)
+    app.run(host="0.0.0.0",
+            port=5000,
+            debug=True,
+            use_reloader=False,
+            threaded=True)

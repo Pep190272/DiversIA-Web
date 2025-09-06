@@ -1,0 +1,43 @@
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Starting gunicorn 23.0.0
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Listening at: http://0.0.0.0:5000 (7305)
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Using worker: sync
+[2025-09-06 11:25:29 +0000] [7316] [INFO] Booting worker with pid: 7316
+ [2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:29 +0000] [7305] [INFO] Handling signal: winch
+[2025-09-06 11:25:30 +0000] [7305] [INFO] Handling signal: winch
+✅ Database initialized successfully
+La dirección de tu base de datos es: https://kv.replit.com/v0/eyJhbGciOiJIUzUxMiIsImlzcyI6ImNvbm1hbiIsImtpZCI6InByb2Q6MSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjb25tYW4iLCJleHAiOjE3NTcyNTgxNTIsImlhdCI6MTc1NzE0NjU1MiwiZGF0YWJhc2VfaWQiOiIwNzMwODNkMi1kZDE0LTQyNGUtYTU0OS00YzAzZTQ4MTMxYjcifQ.0dKO0xmW-K9JdMOAOpEj1qv2wxCIKkKQPDHnmqHUOdpEYyqeJBtWBWukqkZBTV2B1bQ1JUfdKM7dnPqjtXQSBw
+✅ Routes simplificado cargado correctamente
+Login system cargado - /diversia-admin
+🔍 Rutas API registradas:
+  /api/usuario/<user_id>/editar -> api_editar_usuario [HEAD, GET, OPTIONS, POST]
+  /api/usuario/<user_id>/borrar -> api_borrar_usuario [DELETE, OPTIONS]
+  /api/usuario/<user_id>/detalles -> get_user_details_public [HEAD, GET, OPTIONS]
+  /api/usuarios-neurodivergentes -> get_usuarios_neurodivergentes [HEAD, GET, OPTIONS]
+  /api/usuarios -> get_usuarios [HEAD, GET, OPTIONS]
+  /api/usuarios/<int:user_id> -> get_usuario [HEAD, GET, OPTIONS]
+CRM Minimal inicializado correctamente
+✅ CRM Minimal cargado
+✅ Usuario admin ya existe
+✅ Sistema admin final inicializado correctamente
+🔑 Acceso: /admin/login-new
+✅ Admin disponible: /admin/login-new
+✅ Email Marketing Manager cargado
+✅ Sistema de notificaciones por email cargado
+✅ Sistema de Tareas completamente nuevo cargado
+✅ Dashboard de Tareas con gráficos interactivos cargado
+✅ Servicio de emails Gmail configurado correctamente
+✅ Endpoint de test de emails agregado: /api/test-email
