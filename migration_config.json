@@ -1,0 +1,18 @@
+{
+  "migration_date": "2025-09-06T11:47:15.318114",
+  "source": "Replit",
+  "target": "Vercel",
+  "database_type": "PostgreSQL",
+  "replit_db_url": "https://kv.replit.com/v0/eyJhbGciOiJIUzUxMiIsImlzcyI6ImNvbm1hbiIsImtpZCI6InByb2Q6MSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjb25tYW4iLCJleHAiOjE3NTcyNTgxNTIsImlhdCI6MTc1NzE0NjU1MiwiZGF0YWJhc2VfaWQiOiIwNzMwODNkMi1kZDE0LTQyNGUtYTU0OS00YzAzZTQ4MTMxYjcifQ.0dKO0xmW-K9JdMOAOpEj1qv2wxCIKkKQPDHnmqHUOdpEYyqeJBtWBWukqkZBTV2B1bQ1JUfdKM7dnPqjtXQSBw",
+  "environment_vars": {
+    "SESSION_SECRET": "REQUIRED_TO_SET_IN_VERCEL",
+    "GMAIL_USER": "diversiaeternals@gmail.com",
+    "GMAIL_APP_PASSWORD": "REQUIRED_TO_SET_IN_VERCEL",
+    "SENDGRID_API_KEY": "REQUIRED_TO_SET_IN_VERCEL"
+  },
+  "required_services": [
+    "Neon PostgreSQL",
+    "Vercel Hosting",
+    "GitHub Repository"
+  ]
+}
