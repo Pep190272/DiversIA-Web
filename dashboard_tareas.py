@@ -391,7 +391,7 @@ DASHBOARD_TEMPLATE = '''
                     </div>
                     <div>
                         <a href="/tareas" class="btn btn-primary me-2">📋 Ver Tareas</a>
-                        <a href="/admin/login-new" class="btn btn-secondary">← Volver al CRM</a>
+                        <a href="/crm-minimal" class="btn btn-secondary">← Volver al CRM</a>
                     </div>
                 </div>
             </div>

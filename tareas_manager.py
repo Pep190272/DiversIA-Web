@@ -154,7 +154,7 @@ TAREAS_TEMPLATE = '''
                     </div>
                     <div>
                         <a href="/dashboard-tareas" class="btn btn-outline-primary me-2">📈 Analytics</a>
-                        <a href="/admin/login-new" class="btn btn-secondary">← Volver al CRM</a>
+                        <a href="/crm-minimal" class="btn btn-secondary">← Volver al CRM</a>
                     </div>
                 </div>
                 
