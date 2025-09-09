@@ -449,7 +449,7 @@ def registro_tea():
                 perfil_existente.apellidos = form.apellidos.data
                 perfil_existente.telefono = form.telefono.data
                 perfil_existente.ciudad = form.ciudad.data
-                perfil_existente.fecha_nacimiento = form.fecha_nacimiento.data
+                perfil_existente.fecha_nacimiento = form.fecha_nacimiento.data or '1990-01-01'
                 perfil_existente.tipo_neurodivergencia = 'TEA'
                 perfil_existente.diagnostico_formal = form.diagnostico_formal.data == 'si'
                 perfil_existente.habilidades = form.habilidades.data
@@ -498,7 +498,7 @@ def registro_tea():
                 nuevo_perfil.email = form.email.data
                 nuevo_perfil.telefono = form.telefono.data
                 nuevo_perfil.ciudad = form.ciudad.data
-                nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data
+                nuevo_perfil.fecha_nacimiento = form.fecha_nacimiento.data or '1990-01-01'
                 nuevo_perfil.tipo_neurodivergencia = 'TEA'
                 nuevo_perfil.diagnostico_formal = form.diagnostico_formal.data == 'si'
                 nuevo_perfil.habilidades = form.habilidades.data
